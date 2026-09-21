@@ -1,0 +1,17 @@
+.env
+.env.local
+*.log
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+.next/
+dist/
+build/
+.DS_Store
+Thumbs.db
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+coverage/
+*.sqlite3
