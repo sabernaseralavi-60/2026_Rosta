@@ -32,6 +32,7 @@ from silp.core.exceptions import (
 )
 from silp.core.logging import get_logger
 from silp.models.education import CourseOffering, Enrollment
+from silp.services import events
 
 log = get_logger("silp.enrollment")
 
@@ -204,6 +205,7 @@ class EnrollmentService:
         enrollment.status = "COMPLETED"
         enrollment.decided_at = _now()
         enrollment.decided_by = decided_by
+        await events.publish(self.session, events.EnrollmentCompleted(enrollment_id=enrollment.id))
         await self.session.commit()
         return enrollment
 

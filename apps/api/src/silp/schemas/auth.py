@@ -13,6 +13,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from silp.domain.identity.normalize import to_latin_digits
+from silp.schemas.gamification import MePointsOut
 from silp.schemas.profile import ProfileOut
 
 Channel = Literal["SMS", "EMAIL"]
@@ -110,10 +111,10 @@ class SessionOut(BaseModel):
 
 
 class MeOut(BaseModel):
-    """§5.3 `GET /me` — نسخهٔ M1.
+    """§5.3 `GET /me`.
 
-    امتیاز (M5) و شمارندهٔ اعلان (M6) بعداً افزوده می‌شوند. آنچه هست، همان
-    شکل نهایی را دارد تا کلاینت بعداً بازنویسی نشود.
+    امتیاز از M5 است؛ شمارندهٔ اعلان (M6) بعداً افزوده می‌شود. آنچه هست،
+    همان شکل نهایی را دارد تا کلاینت بعداً بازنویسی نشود.
     """
 
     id: uuid.UUID
@@ -125,6 +126,8 @@ class MeOut(BaseModel):
     profile: ProfileOut | None = None
     roles: list[RoleGrantOut]
     onboarding: OnboardingOut
+    points: MePointsOut | None = None
+    """§5.3 — افزوده در M5. `None` فقط اگر محاسبه ممکن نبود؛ کاربر تازه `0` می‌گیرد."""
 
 
 class RoleGrantOut(BaseModel):

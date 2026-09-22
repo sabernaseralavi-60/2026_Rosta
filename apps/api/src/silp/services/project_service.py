@@ -44,7 +44,7 @@ from silp.models.project import (
     Team,
     TeamMember,
 )
-from silp.services import authz
+from silp.services import authz, events
 
 log = get_logger("silp.project")
 
@@ -370,6 +370,7 @@ class ProjectService:
         rewards["final_report"] = final_report.strip()
         project.rewards = rewards
         await self._record(project, actor.id, "PROJECT_COMPLETED", "پروژه با موفقیت بسته شد.")
+        await events.publish(self.session, events.ProjectCompleted(project_id=project.id))
         await self.session.commit()
         log.info("project_completed", project_id=str(project.id))
         return project

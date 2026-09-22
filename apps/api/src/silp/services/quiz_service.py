@@ -50,6 +50,7 @@ from silp.models.quiz import (
     QuizAttempt,
     QuizQuestion,
 )
+from silp.services import events
 
 log = get_logger("silp.quiz")
 
@@ -220,6 +221,8 @@ class QuizService:
         quiz = await self.get(quiz_id, offering_id=offering_id)
         if quiz.results_published_at is None:
             quiz.results_published_at = datetime.now(UTC)
+            # نتیجه‌ای که حالا دیده می‌شود، امتیازش هم حالا ثبت می‌شود (ADR-0012).
+            await events.publish(self.session, events.QuizResultsPublished(quiz_id=quiz.id))
             await self.session.commit()
             await self.session.refresh(quiz)
             log.info("quiz_results_published", quiz_id=str(quiz.id))

@@ -26,6 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.exceptions import NotFound, ValidationFailed
 from silp.models.education import Resource, ResourceProgress
+from silp.services import events
 
 # FR-EDU-04 — «تماشای ≥ ۹۰٪ ⇒ COMPLETED خودکار».
 VIDEO_COMPLETE_PERCENT = 90
@@ -109,6 +110,11 @@ class ProgressService:
                 },
             )
         )
+        if is_complete and not was_completed:
+            # §7.13 — امتیاز `LEARNING` و بررسی تکمیل هفته، در همین تراکنش.
+            await events.publish(
+                self.session, events.ResourceCompleted(user_id=user_id, resource_id=resource_id)
+            )
         await self.session.commit()
 
         refreshed = await self.session.get(

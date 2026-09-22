@@ -40,6 +40,7 @@ from silp.domain.quiz import (
     review_payload,
 )
 from silp.models.quiz import Quiz, QuizAnswer, QuizAttempt, QuizQuestion
+from silp.services import events
 
 log = get_logger("silp.grading")
 
@@ -197,6 +198,7 @@ class GradingService:
         answer.feedback = feedback
 
         await self._recalculate(attempt)
+        await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id))
         await self.session.commit()
         await self.session.refresh(answer)
 
@@ -255,6 +257,7 @@ class GradingService:
         attempt = await self._attempt_of(attempt_id, quiz_id)
         await self._recalculate(attempt)
         attempt.graded_by = grader_id
+        await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id))
         await self.session.commit()
         await self.session.refresh(attempt)
         return attempt
@@ -271,6 +274,9 @@ class GradingService:
         attempt.status = "VOIDED"
         attempt.is_provisional = False
         attempt.graded_by = grader_id
+        # تلاش باطل‌شده امتیازش را پس می‌دهد؛ اگر بهترین تلاش بود، تلاش
+        # بعدیِ دانشجو جایش را می‌گیرد (§7.12).
+        await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id))
         await self.session.commit()
         await self.session.refresh(attempt)
         log.info("attempt_voided", attempt_id=str(attempt_id), grader_id=str(grader_id))
@@ -291,7 +297,7 @@ class GradingService:
             raise NotFound("این آزمون پیدا نشد.")
 
         now = datetime.now(UTC)
-        if not is_staff and not _results_visible(quiz, attempt, now=now):
+        if not is_staff and not results_visible(quiz, attempt, now=now):
             raise ResultNotAvailable()
         if attempt.status == "IN_PROGRESS":
             raise ResultNotAvailable("این آزمون هنوز تمام نشده است.")
@@ -468,8 +474,13 @@ class GradingService:
 # ── توابع ماژول ────────────────────────────────────────────────────────
 
 
-def _results_visible(quiz: Quiz, attempt: QuizAttempt, *, now: datetime) -> bool:
-    """FR-QUIZ-04 — سه حالت نمایش نتیجه."""
+def results_visible(quiz: Quiz, attempt: QuizAttempt, *, now: datetime) -> bool:
+    """FR-QUIZ-04 — سه حالت نمایش نتیجه.
+
+    عمومی است چون امتیاز آزمون هم به آن وابسته است: امتیاز «نمرهٔ آزمون»
+    پیش از دیده شدن نتیجه ثبت نمی‌شود، وگرنه Toast «+۲۴ امتیاز» نمره را
+    زودتر از خود صفحهٔ نتیجه لو می‌داد (ADR-0012).
+    """
     match quiz.result_visibility:
         case "IMMEDIATE":
             return attempt.status in ("GRADED", "SUBMITTED", "AUTO_SUBMITTED")
@@ -546,4 +557,5 @@ __all__ = [
     "PendingAnswer",
     "QuestionStats",
     "ResultQuestion",
+    "results_visible",
 ]

@@ -29,6 +29,7 @@ from silp.models.education import (
     WeekMaterial,
 )
 from silp.models.file import File
+from silp.models.gamification import Badge, PointEntry, PointRule, UserBadge
 from silp.models.identity import (
     NULL_SCOPE,
     OTPChallenge,
@@ -69,6 +70,7 @@ __all__ = [
     "NULL_SCOPE",
     "Announcement",
     "Asset",
+    "Badge",
     "AttendanceRecord",
     "Base",
     "Certificate",
@@ -87,6 +89,8 @@ __all__ = [
     "Milestone",
     "OTPChallenge",
     "PeerEvaluation",
+    "PointEntry",
+    "PointRule",
     "Profile",
     "ProfileAsset",
     "ProfileInterest",
@@ -121,6 +125,7 @@ __all__ = [
     "Term",
     "University",
     "User",
+    "UserBadge",
     "UserRole",
     "WeekMaterial",
 ]

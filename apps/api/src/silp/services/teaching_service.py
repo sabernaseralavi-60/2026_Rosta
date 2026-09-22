@@ -32,6 +32,7 @@ from silp.models.education import (
     Resource,
     WeekMaterial,
 )
+from silp.services import events
 
 log = get_logger("silp.teaching")
 
@@ -458,6 +459,13 @@ class TeachingService:
                     "recorded_by": recorded_by,
                 },
             )
+        )
+        await events.publish(
+            self.session,
+            events.AttendanceRecorded(
+                offering_id=offering_id,
+                student_ids=tuple(dict.fromkeys(e.student_id for e in entries)),
+            ),
         )
         await self.session.commit()
         log.info("attendance_recorded", offering_id=str(offering_id), count=len(entries))

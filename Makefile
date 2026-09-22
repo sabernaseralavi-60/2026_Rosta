@@ -8,7 +8,7 @@ RUN_API      := $(DC_DEV) run --rm --no-deps api
 RUN_API_DB   := $(DC_DEV) run --rm api
 
 .DEFAULT_GOAL := help
-.PHONY: help setup dev down logs migrate revision downgrade seed shell psql redis-cli \
+.PHONY: help setup dev down logs migrate revision downgrade seed points-backfill shell psql redis-cli \
         test test-api test-web e2e load types lint fmt check clean nuke
 
 help: ## نمایش این راهنما
@@ -60,6 +60,10 @@ courses-sync: ## همگام‌سازی پوشهٔ Courses/ با کتابخانه
 
 courses-check: ## گزارش بدون نوشتن: چه چیزی تازه است، چه چیزی عوض شده
 	$(RUN_API_DB) python -m silp.scripts.sync_courses --dry-run
+
+# ── امتیاز (M5) ──────────────────────────────────────────────────────────
+points-backfill: ## امتیاز فعالیت‌های پیش از M5 از وضعیت موجود — بی‌اثر در تکرار
+	$(RUN_API_DB) python -m silp.scripts.backfill_points
 
 psql: ## پوستهٔ تعاملی PostgreSQL
 	$(DC_DEV) exec postgres psql -U silp -d silp

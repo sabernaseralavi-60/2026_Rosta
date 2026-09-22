@@ -31,6 +31,7 @@ from silp.models.profile import (
     ProfileSurveyVersion,
 )
 from silp.models.taxonomy import Asset, Interest, Skill
+from silp.services import events
 
 log = get_logger("silp.profile")
 
@@ -230,6 +231,12 @@ class ProfileService:
         """
         profile.survey_completed_steps = max(profile.survey_completed_steps, step)
         profile.survey_updated_at = datetime.now(UTC)
+        await events.publish(
+            self.session,
+            events.SurveyStepCompleted(
+                user_id=profile.user_id, completed_steps=profile.survey_completed_steps
+            ),
+        )
         await self.session.commit()
         # §8.12 — نیمرخ عوض شد، پیشنهادهای کش‌شده دیگر معتبر نیستند.
         # پس از commit انجام می‌شود تا کش، وضعیتی را نشکند که هنوز نوشته نشده.

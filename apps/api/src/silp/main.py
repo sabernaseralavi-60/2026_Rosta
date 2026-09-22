@@ -26,6 +26,7 @@ from silp.routers.v1 import (
     auth,
     courses,
     files,
+    gamification,
     me,
     projects,
     quizzes,
@@ -132,6 +133,11 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(quizzes.router)
     v1.include_router(quizzes.attempts_router)
     v1.include_router(subscriptions.router)
+    # ── امتیاز و داشبورد (M5) ──────────────────────────────────────────
+    v1.include_router(gamification.me_router)
+    v1.include_router(gamification.leaderboard_router)
+    v1.include_router(gamification.teach_router)
+    v1.include_router(gamification.admin_router)
     app.include_router(v1)
 
 

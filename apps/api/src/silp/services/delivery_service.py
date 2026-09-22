@@ -43,6 +43,7 @@ from silp.models.delivery import (
     Milestone,
 )
 from silp.models.project import Project
+from silp.services import events
 from silp.services.project_service import MAX_MILESTONES_PER_PROJECT, ProjectService
 
 log = get_logger("silp.delivery")
@@ -327,6 +328,12 @@ class DeliveryService:
             entity_type="deliverable",
             entity_id=deliverable.id,
             commit=False,
+        )
+        await events.publish(
+            self.session,
+            events.DeliverableReviewed(
+                deliverable_id=deliverable.id, reviewer_id=actor.id, decision=decision
+            ),
         )
         await self.session.commit()
         log.info("deliverable_reviewed", deliverable_id=str(deliverable.id), decision=decision)

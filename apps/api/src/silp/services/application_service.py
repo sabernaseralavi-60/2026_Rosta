@@ -37,7 +37,7 @@ from silp.domain.recommendation.schemas import MatchResult
 from silp.domain.recommendation.scorer import score_project
 from silp.models.profile import Profile
 from silp.models.project import Project, ProjectApplication, ProjectRole
-from silp.services import authz
+from silp.services import authz, events
 from silp.services.project_service import ProjectService
 
 log = get_logger("silp.application")
@@ -211,6 +211,10 @@ class ApplicationService:
         application.decision_note = (note or "").strip() or None
         application.decided_by = actor.id
         application.decided_at = _now()
+        if decision == "ACCEPTED":
+            await events.publish(
+                self.session, events.ApplicationAccepted(application_id=application.id)
+            )
         await self.session.commit()
 
         if decision == "ACCEPTED":

@@ -70,6 +70,7 @@ from silp.domain.quiz import (
 )
 from silp.models.education import Enrollment
 from silp.models.quiz import Quiz, QuizAnswer, QuizAttempt, QuizQuestion
+from silp.services import events
 
 log = get_logger("silp.attempt")
 
@@ -442,6 +443,7 @@ class AttemptService:
         if attempt.auto_closed:
             log.info("attempt_auto_submitted", attempt_id=str(attempt.id))
 
+        await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id))
         await self.session.commit()
         await self.session.refresh(attempt)
         return SubmitOutcome(

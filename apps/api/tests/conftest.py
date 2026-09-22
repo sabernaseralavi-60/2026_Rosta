@@ -23,6 +23,21 @@ os.environ.setdefault("STORAGE_PROVIDER", "memory")
 os.environ.setdefault("LOG_LEVEL", "WARNING")
 
 
+@pytest.fixture(autouse=True, scope="session")
+def strict_event_listeners():  # type: ignore[no-untyped-def]
+    """شنوندهٔ رویداد در تست خطا را بالا بیاورد، نه اینکه فقط لاگ کند.
+
+    در تولید، شکست محاسبهٔ امتیاز نباید تأیید تحویل‌دادنی را بشکند
+    (`silp.services.events`)؛ ولی همین رفتار در تست باگ امتیاز را پنهان
+    می‌کند — عمل اصلی سبز می‌شود و امتیازی که باید ثبت می‌شد، بی‌صدا نیست.
+    """
+    from silp.services import events
+
+    events.STRICT = True
+    yield
+    events.STRICT = False
+
+
 @pytest.fixture(scope="session")
 def settings():  # type: ignore[no-untyped-def]
     from silp.core.config import get_settings

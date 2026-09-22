@@ -1,8 +1,10 @@
 """مسیر /me — §5.3.
 
-بخش هویتی از M0 است؛ نیمرخ و ارزیابی چهارگامی در M1 افزوده شده. امتیاز
-(M5) و شمارندهٔ اعلان (M6) بعداً به همین پاسخ می‌آیند و شکل پاسخ از حالا
-همان شکل نهایی است تا کلاینت دوباره نوشته نشود.
+بخش هویتی از M0 است؛ نیمرخ و ارزیابی چهارگامی در M1 و امتیاز در M5
+افزوده شده. شمارندهٔ اعلان (M6) بعداً به همین پاسخ می‌آید و شکل پاسخ از
+حالا همان شکل نهایی است تا کلاینت دوباره نوشته نشود.
+
+مسیرهای امتیاز، نشان و داشبورد زیر همین `/me` در `gamification.py` هستند.
 
 هر گام ارزیابی، بلافاصله **پیشنهاد** برمی‌گرداند — «لحظهٔ طلایی» §01.
 این تنها دلیلی است که مسیر نیمرخ به موتور توصیه‌گر وابسته است.
@@ -24,6 +26,7 @@ from silp.routers.deps import AuthServiceDep, CurrentUserDep, ProfileServiceDep,
 from silp.routers.v1.projects import project_summary_of
 from silp.schemas.auth import MeOut, OnboardingOut, RoleGrantOut
 from silp.schemas.common import ErrorResponse
+from silp.schemas.gamification import MePointsOut
 from silp.schemas.profile import (
     AssetsStepIn,
     InterestsStepIn,
@@ -36,6 +39,7 @@ from silp.schemas.profile import (
     UniversityRef,
 )
 from silp.schemas.project import RecommendationItemOut, breakdown_of, reasons_of
+from silp.services.points_service import PointsService
 from silp.services.profile_service import InterestAnswer, SkillAnswer
 
 router = APIRouter(
@@ -83,6 +87,7 @@ async def get_me(
 
     onboarding = await auth.onboarding_for(user)
     profile = await profiles.get(current.id)
+    level = (await PointsService(session).summary(current.id)).level
 
     return MeOut(
         id=user.id,
@@ -106,6 +111,7 @@ async def get_me(
             total_steps=onboarding.total_steps,
             next_route=onboarding.next_route,
         ),
+        points=MePointsOut(total=level.total, level=level.level, next_level_at=level.next_at),
     )
 
 

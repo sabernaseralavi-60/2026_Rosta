@@ -263,3 +263,27 @@ async def test_completed_upload_survives_the_request(  # type: ignore[no-untyped
     finally:
         await committing_session.execute(delete(File).where(File.id == file_id))
         await committing_session.commit()
+
+
+async def test_points_from_a_listener_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """M5 — امتیاز را شنونده در savepoint می‌نویسد و `commit` سرویس تثبیتش می‌کند.
+
+    اگر رویداد پس از `commit` منتشر می‌شد، یا شنونده تراکنش خودش را
+    می‌خواست، ردیف امتیاز فقط در نشست درخواست دیده می‌شد و این تست
+    شکست می‌خورد.
+    """
+    from tests.integration.helpers import complete_profile
+
+    from silp.models.gamification import PointEntry
+
+    await complete_profile(committing_client, account["token"])
+
+    async with other_connection() as verifier:
+        rules = list(
+            await verifier.scalars(
+                select(PointEntry.rule_code).where(PointEntry.user_id == account["user_id"])
+            )
+        )
+    assert rules == ["PROFILE_COMPLETED"]
