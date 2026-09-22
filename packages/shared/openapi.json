@@ -260,6 +260,149 @@
         "title": "AnnouncementOut",
         "type": "object"
       },
+      "AppealDecisionIn": {
+        "properties": {
+          "accept": {
+            "title": "Accept",
+            "type": "boolean"
+          },
+          "new_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Score"
+          },
+          "response": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Response",
+            "type": "string"
+          }
+        },
+        "required": [
+          "accept",
+          "response"
+        ],
+        "title": "AppealDecisionIn",
+        "type": "object"
+      },
+      "AppealIn": {
+        "properties": {
+          "question_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Id"
+          },
+          "reason": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "AppealIn",
+        "type": "object"
+      },
+      "AppealOut": {
+        "properties": {
+          "attempt_id": {
+            "format": "uuid",
+            "title": "Attempt Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "question_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Id"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "response": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response"
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "ACCEPTED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "attempt_id",
+          "status",
+          "status_fa",
+          "reason",
+          "created_at"
+        ],
+        "title": "AppealOut",
+        "type": "object"
+      },
       "ApplicationIn": {
         "additionalProperties": false,
         "properties": {
@@ -544,6 +687,321 @@
         "title": "AssetsStepIn",
         "type": "object"
       },
+      "AttemptResultOut": {
+        "properties": {
+          "attempt_id": {
+            "format": "uuid",
+            "title": "Attempt Id",
+            "type": "string"
+          },
+          "attempt_no": {
+            "title": "Attempt No",
+            "type": "integer"
+          },
+          "auto_closed": {
+            "default": false,
+            "title": "Auto Closed",
+            "type": "boolean"
+          },
+          "class_average": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Class Average"
+          },
+          "cohort_size": {
+            "default": 0,
+            "title": "Cohort Size",
+            "type": "integer"
+          },
+          "is_provisional": {
+            "title": "Is Provisional",
+            "type": "boolean"
+          },
+          "passed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passed"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/ResultQuestionOut"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "quiz_id": {
+            "format": "uuid",
+            "title": "Quiz Id",
+            "type": "string"
+          },
+          "quiz_title_fa": {
+            "title": "Quiz Title Fa",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "IN_PROGRESS",
+              "SUBMITTED",
+              "AUTO_SUBMITTED",
+              "GRADED",
+              "VOIDED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "total_points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Points",
+            "type": "string"
+          },
+          "total_score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Score"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "quiz_id",
+          "quiz_title_fa",
+          "attempt_no",
+          "status",
+          "total_points",
+          "is_provisional",
+          "questions"
+        ],
+        "title": "AttemptResultOut",
+        "type": "object"
+      },
+      "AttemptStartOut": {
+        "properties": {
+          "attempt_id": {
+            "format": "uuid",
+            "title": "Attempt Id",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "question_count": {
+            "title": "Question Count",
+            "type": "integer"
+          },
+          "seconds_remaining": {
+            "title": "Seconds Remaining",
+            "type": "integer"
+          },
+          "server_time": {
+            "format": "date-time",
+            "title": "Server Time",
+            "type": "string"
+          },
+          "total_points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Points",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "server_time",
+          "expires_at",
+          "seconds_remaining",
+          "question_count",
+          "total_points"
+        ],
+        "title": "AttemptStartOut",
+        "type": "object"
+      },
+      "AttemptSummaryOut": {
+        "description": "یک تلاش در فهرست استاد.",
+        "properties": {
+          "attempt_no": {
+            "title": "Attempt No",
+            "type": "integer"
+          },
+          "auto_closed": {
+            "title": "Auto Closed",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "integrity_event_count": {
+            "default": 0,
+            "title": "Integrity Event Count",
+            "type": "integer"
+          },
+          "is_provisional": {
+            "title": "Is Provisional",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "IN_PROGRESS",
+              "SUBMITTED",
+              "AUTO_SUBMITTED",
+              "GRADED",
+              "VOIDED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          },
+          "student_name": {
+            "title": "Student Name",
+            "type": "string"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "total_score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Score"
+          }
+        },
+        "required": [
+          "id",
+          "student_id",
+          "student_name",
+          "attempt_no",
+          "status",
+          "status_fa",
+          "is_provisional",
+          "auto_closed"
+        ],
+        "title": "AttemptSummaryOut",
+        "type": "object"
+      },
+      "AttemptViewOut": {
+        "properties": {
+          "attempt_id": {
+            "format": "uuid",
+            "title": "Attempt Id",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/VisibleQuestionOut"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "quiz_id": {
+            "format": "uuid",
+            "title": "Quiz Id",
+            "type": "string"
+          },
+          "quiz_title_fa": {
+            "title": "Quiz Title Fa",
+            "type": "string"
+          },
+          "seconds_remaining": {
+            "title": "Seconds Remaining",
+            "type": "integer"
+          },
+          "server_time": {
+            "format": "date-time",
+            "title": "Server Time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "IN_PROGRESS",
+              "SUBMITTED",
+              "AUTO_SUBMITTED",
+              "GRADED",
+              "VOIDED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total_points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Points",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "quiz_id",
+          "quiz_title_fa",
+          "status",
+          "server_time",
+          "expires_at",
+          "seconds_remaining",
+          "total_points",
+          "questions"
+        ],
+        "title": "AttemptViewOut",
+        "type": "object"
+      },
       "AttendanceEntryIn": {
         "additionalProperties": false,
         "properties": {
@@ -687,6 +1145,155 @@
         "title": "AuthUserOut",
         "type": "object"
       },
+      "BankItemIn": {
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Body",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "course_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Id"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "maximum": 5.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "kind": {
+            "enum": [
+              "SINGLE_CHOICE",
+              "MULTI_CHOICE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "NUMERIC",
+              "ESSAY",
+              "MATCHING"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind",
+          "body",
+          "payload"
+        ],
+        "title": "BankItemIn",
+        "type": "object"
+      },
+      "BankItemOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "SINGLE_CHOICE",
+              "MULTI_CHOICE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "NUMERIC",
+              "ESSAY",
+              "MATCHING"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "usage_count": {
+            "title": "Usage Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "kind_fa",
+          "body",
+          "usage_count"
+        ],
+        "title": "BankItemOut",
+        "type": "object"
+      },
       "BreakdownOut": {
         "description": "شش زیرامتیاز §8.2 تا §8.7، برای شفافیت امتیاز (اصل ۳ §00).",
         "properties": {
@@ -755,6 +1362,38 @@
           "source_offering_id"
         ],
         "title": "CopyContentIn",
+        "type": "object"
+      },
+      "CopyFromBankIn": {
+        "properties": {
+          "bank_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Bank Ids",
+            "type": "array"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "default": "1",
+            "title": "Points"
+          }
+        },
+        "required": [
+          "bank_ids"
+        ],
+        "title": "CopyFromBankIn",
         "type": "object"
       },
       "CopyResultOut": {
@@ -1534,6 +2173,93 @@
         "title": "FinalGradeIn",
         "type": "object"
       },
+      "GradeAnswerIn": {
+        "properties": {
+          "feedback": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "score"
+        ],
+        "title": "GradeAnswerIn",
+        "type": "object"
+      },
+      "GradedAnswerOut": {
+        "properties": {
+          "attempt_id": {
+            "format": "uuid",
+            "title": "Attempt Id",
+            "type": "string"
+          },
+          "attempt_is_provisional": {
+            "title": "Attempt Is Provisional",
+            "type": "boolean"
+          },
+          "attempt_total": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attempt Total"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "question_id": {
+            "format": "uuid",
+            "title": "Question Id",
+            "type": "string"
+          },
+          "score": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Score",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "question_id",
+          "score",
+          "attempt_is_provisional"
+        ],
+        "title": "GradedAnswerOut",
+        "type": "object"
+      },
       "GradingPolicyIn": {
         "additionalProperties": false,
         "properties": {
@@ -1569,6 +2295,55 @@
         "title": "GradingPolicyIn",
         "type": "object"
       },
+      "GradingQueueOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "graded_count": {
+            "title": "Graded Count",
+            "type": "integer"
+          },
+          "pending": {
+            "items": {
+              "$ref": "#/components/schemas/PendingAnswerOut"
+            },
+            "title": "Pending",
+            "type": "array"
+          },
+          "points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          },
+          "question_id": {
+            "format": "uuid",
+            "title": "Question Id",
+            "type": "string"
+          },
+          "rubric": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric"
+          }
+        },
+        "required": [
+          "question_id",
+          "body",
+          "points",
+          "graded_count",
+          "pending"
+        ],
+        "title": "GradingQueueOut",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1580,6 +2355,50 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "IntegrityEventIn": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "kind": {
+            "enum": [
+              "TAB_BLUR",
+              "WINDOW_RESIZE",
+              "LONG_PASTE",
+              "RECONNECT"
+            ],
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "IntegrityEventIn",
+        "type": "object"
+      },
+      "IntegrityEventOut": {
+        "properties": {
+          "recorded": {
+            "title": "Recorded",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "recorded"
+        ],
+        "title": "IntegrityEventOut",
         "type": "object"
       },
       "InterestAnswerIn": {
@@ -3051,6 +3870,118 @@
         "title": "PasswordLoginIn",
         "type": "object"
       },
+      "PendingAnswerOut": {
+        "properties": {
+          "attempt_id": {
+            "format": "uuid",
+            "title": "Attempt Id",
+            "type": "string"
+          },
+          "attempt_no": {
+            "title": "Attempt No",
+            "type": "integer"
+          },
+          "points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          },
+          "question_id": {
+            "format": "uuid",
+            "title": "Question Id",
+            "type": "string"
+          },
+          "response": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response"
+          },
+          "student_name": {
+            "title": "Student Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "question_id",
+          "student_name",
+          "attempt_no",
+          "points"
+        ],
+        "title": "PendingAnswerOut",
+        "type": "object"
+      },
+      "PickRandomIn": {
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "count": {
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "course_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Id"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "maximum": 5.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "default": "1",
+            "title": "Points"
+          }
+        },
+        "required": [
+          "count"
+        ],
+        "title": "PickRandomIn",
+        "type": "object"
+      },
       "PlanOut": {
         "properties": {
           "code": {
@@ -4116,6 +5047,682 @@
         "title": "PublishWeekIn",
         "type": "object"
       },
+      "QuestionIn": {
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Body",
+            "type": "string"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "kind": {
+            "enum": [
+              "SINGLE_CHOICE",
+              "MULTI_CHOICE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "NUMERIC",
+              "ESSAY",
+              "MATCHING"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              }
+            ],
+            "default": "1",
+            "title": "Points"
+          },
+          "sort_order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sort Order"
+          }
+        },
+        "required": [
+          "kind",
+          "body",
+          "payload"
+        ],
+        "title": "QuestionIn",
+        "type": "object"
+      },
+      "QuestionOut": {
+        "description": "سؤال از دید استاد — اینجا `payload` کلید پاسخ **دارد**.",
+        "properties": {
+          "bank_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bank Id"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "SINGLE_CHOICE",
+              "MULTI_CHOICE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "NUMERIC",
+              "ESSAY",
+              "MATCHING"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          },
+          "sort_order": {
+            "title": "Sort Order",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "kind_fa",
+          "body",
+          "payload",
+          "points",
+          "sort_order"
+        ],
+        "title": "QuestionOut",
+        "type": "object"
+      },
+      "QuestionReviewOut": {
+        "description": "کلید پاسخ و توضیح — **فقط** پس از انتشار نتیجه.",
+        "properties": {
+          "accepted": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted"
+          },
+          "correct": {
+            "title": "Correct"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "tolerance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tolerance"
+          }
+        },
+        "title": "QuestionReviewOut",
+        "type": "object"
+      },
+      "QuestionStatsOut": {
+        "properties": {
+          "answered": {
+            "title": "Answered",
+            "type": "integer"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "discrimination": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discrimination"
+          },
+          "kind": {
+            "enum": [
+              "SINGLE_CHOICE",
+              "MULTI_CHOICE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "NUMERIC",
+              "ESSAY",
+              "MATCHING"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "note_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note Fa"
+          },
+          "points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          },
+          "question_id": {
+            "format": "uuid",
+            "title": "Question Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question_id",
+          "body",
+          "kind",
+          "points",
+          "answered"
+        ],
+        "title": "QuestionStatsOut",
+        "type": "object"
+      },
+      "QuizDetailOut": {
+        "description": "آزمون از دید استاد — با سؤال‌ها و کلید پاسخ.",
+        "properties": {
+          "attempt_count": {
+            "default": 0,
+            "title": "Attempt Count",
+            "type": "integer"
+          },
+          "closes_at": {
+            "format": "date-time",
+            "title": "Closes At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_min": {
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "max_attempts": {
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "offering_id": {
+            "format": "uuid",
+            "title": "Offering Id",
+            "type": "string"
+          },
+          "opens_at": {
+            "format": "date-time",
+            "title": "Opens At",
+            "type": "string"
+          },
+          "passing_score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passing Score"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionOut"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "result_visibility": {
+            "enum": [
+              "IMMEDIATE",
+              "AFTER_CLOSE",
+              "MANUAL"
+            ],
+            "title": "Result Visibility",
+            "type": "string"
+          },
+          "result_visibility_fa": {
+            "title": "Result Visibility Fa",
+            "type": "string"
+          },
+          "results_published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Results Published At"
+          },
+          "show_correct_answers": {
+            "title": "Show Correct Answers",
+            "type": "boolean"
+          },
+          "shuffle_options": {
+            "title": "Shuffle Options",
+            "type": "boolean"
+          },
+          "shuffle_questions": {
+            "title": "Shuffle Questions",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "total_points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Points",
+            "type": "string"
+          },
+          "week_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Id"
+          }
+        },
+        "required": [
+          "id",
+          "offering_id",
+          "title_fa",
+          "duration_min",
+          "opens_at",
+          "closes_at",
+          "max_attempts",
+          "shuffle_questions",
+          "shuffle_options",
+          "result_visibility",
+          "result_visibility_fa",
+          "show_correct_answers",
+          "status",
+          "status_fa",
+          "total_points"
+        ],
+        "title": "QuizDetailOut",
+        "type": "object"
+      },
+      "QuizIn": {
+        "properties": {
+          "closes_at": {
+            "format": "date-time",
+            "title": "Closes At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_min": {
+            "maximum": 300.0,
+            "minimum": 1.0,
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "max_attempts": {
+            "default": 1,
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "opens_at": {
+            "format": "date-time",
+            "title": "Opens At",
+            "type": "string"
+          },
+          "passing_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passing Score"
+          },
+          "result_visibility": {
+            "default": "AFTER_CLOSE",
+            "enum": [
+              "IMMEDIATE",
+              "AFTER_CLOSE",
+              "MANUAL"
+            ],
+            "title": "Result Visibility",
+            "type": "string"
+          },
+          "show_correct_answers": {
+            "default": true,
+            "title": "Show Correct Answers",
+            "type": "boolean"
+          },
+          "shuffle_options": {
+            "default": true,
+            "title": "Shuffle Options",
+            "type": "boolean"
+          },
+          "shuffle_questions": {
+            "default": true,
+            "title": "Shuffle Questions",
+            "type": "boolean"
+          },
+          "title_fa": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "week_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Id"
+          }
+        },
+        "required": [
+          "title_fa",
+          "duration_min",
+          "opens_at",
+          "closes_at"
+        ],
+        "title": "QuizIn",
+        "type": "object"
+      },
+      "QuizSummaryOut": {
+        "description": "فراداده — **بدون سؤالات** (§5.6).",
+        "properties": {
+          "active_attempt_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Attempt Id"
+          },
+          "closes_at": {
+            "format": "date-time",
+            "title": "Closes At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_min": {
+            "title": "Duration Min",
+            "type": "integer"
+          },
+          "effective_duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Duration Sec"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "max_attempts": {
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "opens_at": {
+            "format": "date-time",
+            "title": "Opens At",
+            "type": "string"
+          },
+          "passing_score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Passing Score"
+          },
+          "question_count": {
+            "title": "Question Count",
+            "type": "integer"
+          },
+          "server_time": {
+            "format": "date-time",
+            "title": "Server Time",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "NOT_OPEN",
+              "AVAILABLE",
+              "IN_PROGRESS",
+              "EXHAUSTED",
+              "CLOSED"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "state_fa": {
+            "title": "State Fa",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "total_points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Points",
+            "type": "string"
+          },
+          "used_attempts": {
+            "title": "Used Attempts",
+            "type": "integer"
+          },
+          "week_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Number"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa",
+          "duration_min",
+          "opens_at",
+          "closes_at",
+          "max_attempts",
+          "total_points",
+          "question_count",
+          "state",
+          "state_fa",
+          "server_time",
+          "used_attempts"
+        ],
+        "title": "QuizSummaryOut",
+        "type": "object"
+      },
       "ReasonIn": {
         "additionalProperties": false,
         "description": "بدنهٔ اقدام‌هایی که سند برایشان «با ذکر دلیل» نوشته است — §7.4.",
@@ -4272,6 +5879,23 @@
           "refresh_token"
         ],
         "title": "RefreshIn",
+        "type": "object"
+      },
+      "ReorderIn": {
+        "properties": {
+          "question_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Question Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "question_ids"
+        ],
+        "title": "ReorderIn",
         "type": "object"
       },
       "ResourceIn": {
@@ -4504,6 +6128,106 @@
         "title": "ResourceProgressOut",
         "type": "object"
       },
+      "ResultQuestionOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_correct": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Correct"
+          },
+          "kind": {
+            "enum": [
+              "SINGLE_CHOICE",
+              "MULTI_CHOICE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "NUMERIC",
+              "ESSAY",
+              "MATCHING"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "my_answer": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Answer"
+          },
+          "points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          },
+          "review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionReviewOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "kind_fa",
+          "body",
+          "points"
+        ],
+        "title": "ResultQuestionOut",
+        "type": "object"
+      },
       "ReviewIn": {
         "additionalProperties": false,
         "properties": {
@@ -4676,6 +6400,60 @@
           "enrolled_at"
         ],
         "title": "RosterEntryOut",
+        "type": "object"
+      },
+      "SaveAnswerIn": {
+        "properties": {
+          "client_ts": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Ts"
+          },
+          "is_flagged": {
+            "default": false,
+            "title": "Is Flagged",
+            "type": "boolean"
+          },
+          "response": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response"
+          }
+        },
+        "title": "SaveAnswerIn",
+        "type": "object"
+      },
+      "SaveAnswerOut": {
+        "properties": {
+          "saved_at": {
+            "format": "date-time",
+            "title": "Saved At",
+            "type": "string"
+          },
+          "seconds_remaining": {
+            "title": "Seconds Remaining",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "saved_at",
+          "seconds_remaining"
+        ],
+        "title": "SaveAnswerOut",
         "type": "object"
       },
       "SessionOut": {
@@ -4918,6 +6696,59 @@
           "skills"
         ],
         "title": "SkillsStepIn",
+        "type": "object"
+      },
+      "SubmitIn": {
+        "properties": {
+          "confirm_unanswered": {
+            "default": 0,
+            "title": "Confirm Unanswered",
+            "type": "integer"
+          }
+        },
+        "title": "SubmitIn",
+        "type": "object"
+      },
+      "SubmitOut": {
+        "properties": {
+          "auto_score": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Auto Score",
+            "type": "string"
+          },
+          "is_provisional": {
+            "title": "Is Provisional",
+            "type": "boolean"
+          },
+          "result_available": {
+            "title": "Result Available",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "IN_PROGRESS",
+              "SUBMITTED",
+              "AUTO_SUBMITTED",
+              "GRADED",
+              "VOIDED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total_points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Points",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "auto_score",
+          "is_provisional",
+          "total_points",
+          "result_available"
+        ],
+        "title": "SubmitOut",
         "type": "object"
       },
       "SubscriptionActivateIn": {
@@ -5340,6 +7171,97 @@
           "total_steps"
         ],
         "title": "SurveyStepOut",
+        "type": "object"
+      },
+      "SyncAnswerIn": {
+        "properties": {
+          "client_ts": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Ts"
+          },
+          "is_flagged": {
+            "default": false,
+            "title": "Is Flagged",
+            "type": "boolean"
+          },
+          "question_id": {
+            "format": "uuid",
+            "title": "Question Id",
+            "type": "string"
+          },
+          "response": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response"
+          }
+        },
+        "required": [
+          "question_id"
+        ],
+        "title": "SyncAnswerIn",
+        "type": "object"
+      },
+      "SyncIn": {
+        "properties": {
+          "answers": {
+            "items": {
+              "$ref": "#/components/schemas/SyncAnswerIn"
+            },
+            "maxItems": 200,
+            "title": "Answers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "answers"
+        ],
+        "title": "SyncIn",
+        "type": "object"
+      },
+      "SyncOut": {
+        "properties": {
+          "accepted": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Accepted",
+            "type": "array"
+          },
+          "rejected": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Rejected",
+            "type": "array"
+          },
+          "seconds_remaining": {
+            "title": "Seconds Remaining",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "accepted",
+          "rejected",
+          "seconds_remaining"
+        ],
+        "title": "SyncOut",
         "type": "object"
       },
       "TaskIn": {
@@ -5886,6 +7808,74 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "VisibleQuestionOut": {
+        "description": "سؤال در تلاش فعال — `payload` هرگز کلید پاسخ ندارد (§5.6).",
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_flagged": {
+            "default": false,
+            "title": "Is Flagged",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "SINGLE_CHOICE",
+              "MULTI_CHOICE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "NUMERIC",
+              "ESSAY",
+              "MATCHING"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "my_answer": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Answer"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "kind_fa",
+          "body",
+          "points",
+          "payload"
+        ],
+        "title": "VisibleQuestionOut",
+        "type": "object"
+      },
       "WeekDetailOut": {
         "properties": {
           "description": {
@@ -6301,6 +8291,522 @@
         "summary": "تصمیم دربارهٔ درخواست",
         "tags": [
           "projects"
+        ]
+      }
+    },
+    "/api/v1/attempts/{attempt_id}": {
+      "get": {
+        "operationId": "view_attempt_api_v1_attempts__attempt_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptViewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "سؤالات + پاسخ‌های ذخیره‌شده + زمان باقی",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/v1/attempts/{attempt_id}/answers/{question_id}": {
+      "put": {
+        "operationId": "save_answer_api_v1_attempts__attempt_id__answers__question_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "question_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Question Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveAnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ذخیرهٔ پاسخ — بی‌اثر در تکرار",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/v1/attempts/{attempt_id}/appeal": {
+      "post": {
+        "operationId": "open_appeal_api_v1_attempts__attempt_id__appeal_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppealIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppealOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "اعتراض به نمره",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/v1/attempts/{attempt_id}/integrity": {
+      "post": {
+        "operationId": "record_integrity_api_v1_attempts__attempt_id__integrity_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrityEventIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrityEventOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت رویداد تمامیت — گزارش، نه اتهام",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/v1/attempts/{attempt_id}/result": {
+      "get": {
+        "operationId": "attempt_result_api_v1_attempts__attempt_id__result_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptResultOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "نتیجه",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/v1/attempts/{attempt_id}/submit": {
+      "post": {
+        "operationId": "submit_attempt_api_v1_attempts__attempt_id__submit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ارسال نهایی",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/v1/attempts/{attempt_id}/sync": {
+      "post": {
+        "operationId": "sync_answers_api_v1_attempts__attempt_id__sync_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "همگام‌سازی دسته‌ای پس از آفلاین",
+        "tags": [
+          "quiz"
         ]
       }
     },
@@ -10392,6 +12898,184 @@
         ]
       }
     },
+    "/api/v1/quizzes/offering/{offering_id}": {
+      "get": {
+        "operationId": "quizzes_of_offering_api_v1_quizzes_offering__offering_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuizSummaryOut"
+                  },
+                  "title": "Response Quizzes Of Offering Api V1 Quizzes Offering  Offering Id  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "آزمون‌های یک ارائه",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/v1/quizzes/{quiz_id}": {
+      "get": {
+        "operationId": "quiz_detail_api_v1_quizzes__quiz_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "فراداده — بدون سؤالات",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
+    "/api/v1/quizzes/{quiz_id}/attempts": {
+      "post": {
+        "operationId": "start_attempt_api_v1_quizzes__quiz_id__attempts_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptStartOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "شروع تلاش",
+        "tags": [
+          "quiz"
+        ]
+      }
+    },
     "/api/v1/recommendations/{project_id}/feedback": {
       "post": {
         "description": "§8.9 — «به من نمی‌خورد» / «دیگر نشانم نده» / «فعلاً نه، ولی جالب است».\n\nنظر تازه جای نظر قبلی را می‌گیرد؛ دانشجو باید بتواند نظرش را عوض کند.",
@@ -11065,6 +13749,84 @@
         ]
       }
     },
+    "/api/v1/teach/appeals/{appeal_id}/resolve": {
+      "post": {
+        "operationId": "resolve_appeal_api_v1_teach_appeals__appeal_id__resolve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appeal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Appeal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppealDecisionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppealOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "رسیدگی به اعتراض",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
     "/api/v1/teach/enrollments/{enrollment_id}/decide": {
       "post": {
         "operationId": "decide_enrollment_api_v1_teach_enrollments__enrollment_id__decide_post",
@@ -11575,6 +14337,124 @@
         ]
       }
     },
+    "/api/v1/teach/offerings/{offering_id}/quizzes": {
+      "get": {
+        "operationId": "list_quizzes_api_v1_teach_offerings__offering_id__quizzes_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuizDetailOut"
+                  },
+                  "title": "Response List Quizzes Api V1 Teach Offerings  Offering Id  Quizzes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "آزمون‌های ارائه",
+        "tags": [
+          "teaching"
+        ]
+      },
+      "post": {
+        "operationId": "create_quiz_api_v1_teach_offerings__offering_id__quizzes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ساخت آزمون",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
     "/api/v1/teach/offerings/{offering_id}/students": {
       "get": {
         "operationId": "roster_api_v1_teach_offerings__offering_id__students_get",
@@ -11967,6 +14847,1567 @@
           }
         ],
         "summary": "افزودن منبع به هفته",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/question-bank": {
+      "get": {
+        "operationId": "search_bank_api_v1_teach_question_bank_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "course_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Course Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "difficulty",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Difficulty"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BankItemOut"
+                  },
+                  "title": "Response Search Bank Api V1 Teach Question Bank Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بانک سؤال من",
+        "tags": [
+          "teaching"
+        ]
+      },
+      "post": {
+        "operationId": "add_bank_item_api_v1_teach_question_bank_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankItemIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "افزودن سؤال به بانک",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}": {
+      "delete": {
+        "operationId": "delete_quiz_api_v1_teach_quizzes__quiz_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف آزمون بدون تلاش",
+        "tags": [
+          "teaching"
+        ]
+      },
+      "get": {
+        "operationId": "quiz_detail_api_v1_teach_quizzes__quiz_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "آزمون با سؤال‌ها و کلید پاسخ",
+        "tags": [
+          "teaching"
+        ]
+      },
+      "put": {
+        "operationId": "update_quiz_api_v1_teach_quizzes__quiz_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuizIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش آزمون",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/appeals": {
+      "get": {
+        "operationId": "quiz_appeals_api_v1_teach_quizzes__quiz_id__appeals_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "only_open",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Only Open",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AppealOut"
+                  },
+                  "title": "Response Quiz Appeals Api V1 Teach Quizzes  Quiz Id  Appeals Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "اعتراض‌های این آزمون",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/attempts": {
+      "get": {
+        "operationId": "quiz_attempts_api_v1_teach_quizzes__quiz_id__attempts_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AttemptSummaryOut"
+                  },
+                  "title": "Response Quiz Attempts Api V1 Teach Quizzes  Quiz Id  Attempts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تلاش‌های این آزمون",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/answers/{question_id}": {
+      "put": {
+        "operationId": "grade_answer_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__answers__question_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "question_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Question Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradeAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradedAnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت یا بازنویسی نمرهٔ یک سؤال",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/finalize": {
+      "post": {
+        "operationId": "finalize_attempt_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__finalize_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پایان تصحیح دستی یک تلاش",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/result": {
+      "get": {
+        "operationId": "attempt_result_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__result_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptResultOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "نتیجهٔ یک دانشجو از دید استاد",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/void": {
+      "post": {
+        "operationId": "void_attempt_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__void_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Attempt Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ابطال تلاش",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/close": {
+      "post": {
+        "operationId": "close_quiz_api_v1_teach_quizzes__quiz_id__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بستن آزمون",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/grading-queue": {
+      "get": {
+        "operationId": "grading_queue_api_v1_teach_quizzes__quiz_id__grading_queue_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GradingQueueOut"
+                  },
+                  "title": "Response Grading Queue Api V1 Teach Quizzes  Quiz Id  Grading Queue Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "صف تصحیح تشریحی — بر اساس سؤال",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/publish": {
+      "post": {
+        "operationId": "publish_quiz_api_v1_teach_quizzes__quiz_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "انتشار آزمون",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/publish-results": {
+      "post": {
+        "operationId": "publish_results_api_v1_teach_quizzes__quiz_id__publish_results_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "انتشار نتیجه — حالت MANUAL",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/question-stats": {
+      "get": {
+        "operationId": "question_stats_api_v1_teach_quizzes__quiz_id__question_stats_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionStatsOut"
+                  },
+                  "title": "Response Question Stats Api V1 Teach Quizzes  Quiz Id  Question Stats Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ضریب دشواری و تمیز هر سؤال",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/questions": {
+      "post": {
+        "operationId": "add_question_api_v1_teach_quizzes__quiz_id__questions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "افزودن سؤال",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/questions/from-bank": {
+      "post": {
+        "operationId": "copy_from_bank_api_v1_teach_quizzes__quiz_id__questions_from_bank_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyFromBankIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionOut"
+                  },
+                  "title": "Response Copy From Bank Api V1 Teach Quizzes  Quiz Id  Questions From Bank Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "کپی سؤال از بانک",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/questions/random": {
+      "post": {
+        "operationId": "pick_random_api_v1_teach_quizzes__quiz_id__questions_random_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PickRandomIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionOut"
+                  },
+                  "title": "Response Pick Random Api V1 Teach Quizzes  Quiz Id  Questions Random Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "انتخاب تصادفی N سؤال از بانک",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/questions/reorder": {
+      "post": {
+        "operationId": "reorder_questions_api_v1_teach_quizzes__quiz_id__questions_reorder_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionOut"
+                  },
+                  "title": "Response Reorder Questions Api V1 Teach Quizzes  Quiz Id  Questions Reorder Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ترتیب سؤال‌ها",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/questions/{question_id}": {
+      "delete": {
+        "operationId": "delete_question_api_v1_teach_quizzes__quiz_id__questions__question_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "question_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Question Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف سؤال",
+        "tags": [
+          "teaching"
+        ]
+      },
+      "put": {
+        "operationId": "update_question_api_v1_teach_quizzes__quiz_id__questions__question_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "question_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Question Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "وضعیت اجازه نمی‌دهد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش سؤال",
         "tags": [
           "teaching"
         ]

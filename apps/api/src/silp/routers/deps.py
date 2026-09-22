@@ -31,17 +31,21 @@ from silp.integrations.storage import StorageBackend
 from silp.integrations.storage import get_storage as storage_for
 from silp.models.identity import User
 from silp.services import authz
+from silp.services.appeal_service import AppealService
 from silp.services.application_service import ApplicationService
+from silp.services.attempt_service import AttemptService
 from silp.services.auth_service import AuthService
 from silp.services.course_service import CourseService
 from silp.services.delivery_service import DeliveryService
 from silp.services.enrollment_service import EnrollmentService
 from silp.services.entitlement_service import EntitlementService
 from silp.services.file_service import FileService
+from silp.services.grading_service import GradingService
 from silp.services.otp_service import OTPService
 from silp.services.profile_service import ProfileService
 from silp.services.progress_service import ProgressService
 from silp.services.project_service import ProjectService
+from silp.services.quiz_service import QuizService
 from silp.services.subscription_service import SubscriptionService
 from silp.services.teaching_service import TeachingService
 from silp.services.token_service import TokenService
@@ -145,6 +149,22 @@ def get_teaching_service(session: SessionDep) -> TeachingService:
     return TeachingService(session)
 
 
+def get_quiz_service(session: SessionDep) -> QuizService:
+    return QuizService(session)
+
+
+def get_attempt_service(session: SessionDep) -> AttemptService:
+    return AttemptService(session)
+
+
+def get_grading_service(session: SessionDep) -> GradingService:
+    return GradingService(session)
+
+
+def get_appeal_service(session: SessionDep) -> AppealService:
+    return AppealService(session)
+
+
 def get_subscription_service(session: SessionDep) -> SubscriptionService:
     return SubscriptionService(session)
 
@@ -164,6 +184,10 @@ EntitlementServiceDep = Annotated[EntitlementService, Depends(get_entitlement_se
 ProgressServiceDep = Annotated[ProgressService, Depends(get_progress_service)]
 TeachingServiceDep = Annotated[TeachingService, Depends(get_teaching_service)]
 SubscriptionServiceDep = Annotated[SubscriptionService, Depends(get_subscription_service)]
+QuizServiceDep = Annotated[QuizService, Depends(get_quiz_service)]
+AttemptServiceDep = Annotated[AttemptService, Depends(get_attempt_service)]
+GradingServiceDep = Annotated[GradingService, Depends(get_grading_service)]
+AppealServiceDep = Annotated[AppealService, Depends(get_appeal_service)]
 
 
 async def get_current_user(
@@ -350,6 +374,20 @@ offering_of_resource = _lookup_scope(
 )
 offering_of_enrollment = _lookup_scope(
     "SELECT offering_id FROM enrollments WHERE id = :id", "enrollment_id"
+)
+
+# قلمرو مجوزهای آزمون — §6.4. آزمون به ارائه تعلق دارد، پس قلمرو
+# مجوزِ تصحیح و ابطال هم همان ارائه است (ADR-0010).
+offering_of_quiz = _lookup_scope("SELECT offering_id FROM quizzes WHERE id = :id", "quiz_id")
+offering_of_attempt = _lookup_scope(
+    "SELECT q.offering_id FROM quiz_attempts a JOIN quizzes q ON q.id = a.quiz_id WHERE a.id = :id",
+    "attempt_id",
+)
+offering_of_appeal = _lookup_scope(
+    "SELECT q.offering_id FROM grade_appeals g"
+    " JOIN quiz_attempts a ON a.id = g.attempt_id"
+    " JOIN quizzes q ON q.id = a.quiz_id WHERE g.id = :id",
+    "appeal_id",
 )
 
 

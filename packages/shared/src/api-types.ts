@@ -62,6 +62,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/attempts/{attempt_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** سؤالات + پاسخ‌های ذخیره‌شده + زمان باقی */
+        get: operations["view_attempt_api_v1_attempts__attempt_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{attempt_id}/answers/{question_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** ذخیرهٔ پاسخ — بی‌اثر در تکرار */
+        put: operations["save_answer_api_v1_attempts__attempt_id__answers__question_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{attempt_id}/appeal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** اعتراض به نمره */
+        post: operations["open_appeal_api_v1_attempts__attempt_id__appeal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{attempt_id}/integrity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ثبت رویداد تمامیت — گزارش، نه اتهام */
+        post: operations["record_integrity_api_v1_attempts__attempt_id__integrity_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{attempt_id}/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** نتیجه */
+        get: operations["attempt_result_api_v1_attempts__attempt_id__result_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{attempt_id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ارسال نهایی */
+        post: operations["submit_attempt_api_v1_attempts__attempt_id__submit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attempts/{attempt_id}/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** همگام‌سازی دسته‌ای پس از آفلاین */
+        post: operations["sync_answers_api_v1_attempts__attempt_id__sync_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -1103,6 +1222,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/quizzes/offering/{offering_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** آزمون‌های یک ارائه */
+        get: operations["quizzes_of_offering_api_v1_quizzes_offering__offering_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quizzes/{quiz_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** فراداده — بدون سؤالات */
+        get: operations["quiz_detail_api_v1_quizzes__quiz_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quizzes/{quiz_id}/attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** شروع تلاش */
+        post: operations["start_attempt_api_v1_quizzes__quiz_id__attempts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/recommendations/{project_id}/feedback": {
         parameters: {
             query?: never;
@@ -1354,6 +1524,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teach/appeals/{appeal_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** رسیدگی به اعتراض */
+        post: operations["resolve_appeal_api_v1_teach_appeals__appeal_id__resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teach/enrollments/{enrollment_id}/decide": {
         parameters: {
             query?: never;
@@ -1496,6 +1683,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teach/offerings/{offering_id}/quizzes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** آزمون‌های ارائه */
+        get: operations["list_quizzes_api_v1_teach_offerings__offering_id__quizzes_get"];
+        put?: never;
+        /** ساخت آزمون */
+        post: operations["create_quiz_api_v1_teach_offerings__offering_id__quizzes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teach/offerings/{offering_id}/students": {
         parameters: {
             query?: never;
@@ -1579,6 +1784,316 @@ export interface paths {
         /** افزودن منبع به هفته */
         post: operations["add_resource_api_v1_teach_offerings__offering_id__weeks__week_id__resources_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/question-bank": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** بانک سؤال من */
+        get: operations["search_bank_api_v1_teach_question_bank_get"];
+        put?: never;
+        /** افزودن سؤال به بانک */
+        post: operations["add_bank_item_api_v1_teach_question_bank_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** آزمون با سؤال‌ها و کلید پاسخ */
+        get: operations["quiz_detail_api_v1_teach_quizzes__quiz_id__get"];
+        /** ویرایش آزمون */
+        put: operations["update_quiz_api_v1_teach_quizzes__quiz_id__put"];
+        post?: never;
+        /** حذف آزمون بدون تلاش */
+        delete: operations["delete_quiz_api_v1_teach_quizzes__quiz_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/appeals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** اعتراض‌های این آزمون */
+        get: operations["quiz_appeals_api_v1_teach_quizzes__quiz_id__appeals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** تلاش‌های این آزمون */
+        get: operations["quiz_attempts_api_v1_teach_quizzes__quiz_id__attempts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/answers/{question_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** ثبت یا بازنویسی نمرهٔ یک سؤال */
+        put: operations["grade_answer_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__answers__question_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/finalize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** پایان تصحیح دستی یک تلاش */
+        post: operations["finalize_attempt_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__finalize_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** نتیجهٔ یک دانشجو از دید استاد */
+        get: operations["attempt_result_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__result_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ابطال تلاش */
+        post: operations["void_attempt_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__void_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** بستن آزمون */
+        post: operations["close_quiz_api_v1_teach_quizzes__quiz_id__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/grading-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** صف تصحیح تشریحی — بر اساس سؤال */
+        get: operations["grading_queue_api_v1_teach_quizzes__quiz_id__grading_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** انتشار آزمون */
+        post: operations["publish_quiz_api_v1_teach_quizzes__quiz_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/publish-results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** انتشار نتیجه — حالت MANUAL */
+        post: operations["publish_results_api_v1_teach_quizzes__quiz_id__publish_results_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/question-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ضریب دشواری و تمیز هر سؤال */
+        get: operations["question_stats_api_v1_teach_quizzes__quiz_id__question_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** افزودن سؤال */
+        post: operations["add_question_api_v1_teach_quizzes__quiz_id__questions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/questions/from-bank": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** کپی سؤال از بانک */
+        post: operations["copy_from_bank_api_v1_teach_quizzes__quiz_id__questions_from_bank_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/questions/random": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** انتخاب تصادفی N سؤال از بانک */
+        post: operations["pick_random_api_v1_teach_quizzes__quiz_id__questions_random_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/questions/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ترتیب سؤال‌ها */
+        post: operations["reorder_questions_api_v1_teach_quizzes__quiz_id__questions_reorder_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/quizzes/{quiz_id}/questions/{question_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** ویرایش سؤال */
+        put: operations["update_question_api_v1_teach_quizzes__quiz_id__questions__question_id__put"];
+        post?: never;
+        /** حذف سؤال */
+        delete: operations["delete_question_api_v1_teach_quizzes__quiz_id__questions__question_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1719,6 +2234,55 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** AppealDecisionIn */
+        AppealDecisionIn: {
+            /** Accept */
+            accept: boolean;
+            /** New Score */
+            new_score?: number | string | null;
+            /** Response */
+            response: string;
+        };
+        /** AppealIn */
+        AppealIn: {
+            /** Question Id */
+            question_id?: string | null;
+            /** Reason */
+            reason: string;
+        };
+        /** AppealOut */
+        AppealOut: {
+            /**
+             * Attempt Id
+             * Format: uuid
+             */
+            attempt_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Question Id */
+            question_id?: string | null;
+            /** Reason */
+            reason: string;
+            /** Resolved At */
+            resolved_at?: string | null;
+            /** Response */
+            response?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "OPEN" | "ACCEPTED" | "REJECTED";
+            /** Status Fa */
+            status_fa: string;
+        };
         /** ApplicationIn */
         ApplicationIn: {
             /** Motivation */
@@ -1827,6 +2391,152 @@ export interface components {
             /** Asset Ids */
             asset_ids: string[];
         };
+        /** AttemptResultOut */
+        AttemptResultOut: {
+            /**
+             * Attempt Id
+             * Format: uuid
+             */
+            attempt_id: string;
+            /** Attempt No */
+            attempt_no: number;
+            /**
+             * Auto Closed
+             * @default false
+             */
+            auto_closed: boolean;
+            /** Class Average */
+            class_average?: string | null;
+            /**
+             * Cohort Size
+             * @default 0
+             */
+            cohort_size: number;
+            /** Is Provisional */
+            is_provisional: boolean;
+            /** Passed */
+            passed?: boolean | null;
+            /** Questions */
+            questions: components["schemas"]["ResultQuestionOut"][];
+            /**
+             * Quiz Id
+             * Format: uuid
+             */
+            quiz_id: string;
+            /** Quiz Title Fa */
+            quiz_title_fa: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "IN_PROGRESS" | "SUBMITTED" | "AUTO_SUBMITTED" | "GRADED" | "VOIDED";
+            /** Submitted At */
+            submitted_at?: string | null;
+            /** Total Points */
+            total_points: string;
+            /** Total Score */
+            total_score?: string | null;
+        };
+        /** AttemptStartOut */
+        AttemptStartOut: {
+            /**
+             * Attempt Id
+             * Format: uuid
+             */
+            attempt_id: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Question Count */
+            question_count: number;
+            /** Seconds Remaining */
+            seconds_remaining: number;
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /** Total Points */
+            total_points: string;
+        };
+        /**
+         * AttemptSummaryOut
+         * @description یک تلاش در فهرست استاد.
+         */
+        AttemptSummaryOut: {
+            /** Attempt No */
+            attempt_no: number;
+            /** Auto Closed */
+            auto_closed: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Integrity Event Count
+             * @default 0
+             */
+            integrity_event_count: number;
+            /** Is Provisional */
+            is_provisional: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "IN_PROGRESS" | "SUBMITTED" | "AUTO_SUBMITTED" | "GRADED" | "VOIDED";
+            /** Status Fa */
+            status_fa: string;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name: string;
+            /** Submitted At */
+            submitted_at?: string | null;
+            /** Total Score */
+            total_score?: string | null;
+        };
+        /** AttemptViewOut */
+        AttemptViewOut: {
+            /**
+             * Attempt Id
+             * Format: uuid
+             */
+            attempt_id: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Questions */
+            questions: components["schemas"]["VisibleQuestionOut"][];
+            /**
+             * Quiz Id
+             * Format: uuid
+             */
+            quiz_id: string;
+            /** Quiz Title Fa */
+            quiz_title_fa: string;
+            /** Seconds Remaining */
+            seconds_remaining: number;
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "IN_PROGRESS" | "SUBMITTED" | "AUTO_SUBMITTED" | "GRADED" | "VOIDED";
+            /** Total Points */
+            total_points: string;
+        };
         /** AttendanceEntryIn */
         AttendanceEntryIn: {
             /** Note */
@@ -1878,6 +2588,51 @@ export interface components {
             /** Username */
             username?: string | null;
         };
+        /** BankItemIn */
+        BankItemIn: {
+            /** Body */
+            body: string;
+            /** Category */
+            category?: string | null;
+            /** Course Id */
+            course_id?: string | null;
+            /** Difficulty */
+            difficulty?: number | null;
+            /** Explanation */
+            explanation?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        /** BankItemOut */
+        BankItemOut: {
+            /** Body */
+            body: string;
+            /** Category */
+            category?: string | null;
+            /** Difficulty */
+            difficulty?: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
+            /** Kind Fa */
+            kind_fa: string;
+            /** Usage Count */
+            usage_count: number;
+        };
         /**
          * BreakdownOut
          * @description شش زیرامتیاز §8.2 تا §8.7، برای شفافیت امتیاز (اصل ۳ §00).
@@ -1908,6 +2663,16 @@ export interface components {
              * Format: uuid
              */
             source_offering_id: string;
+        };
+        /** CopyFromBankIn */
+        CopyFromBankIn: {
+            /** Bank Ids */
+            bank_ids: string[];
+            /**
+             * Points
+             * @default 1
+             */
+            points: number | string;
         };
         /** CopyResultOut */
         CopyResultOut: {
@@ -2203,6 +2968,34 @@ export interface components {
             /** Grade */
             grade: number;
         };
+        /** GradeAnswerIn */
+        GradeAnswerIn: {
+            /** Feedback */
+            feedback?: string | null;
+            /** Score */
+            score: number | string;
+        };
+        /** GradedAnswerOut */
+        GradedAnswerOut: {
+            /**
+             * Attempt Id
+             * Format: uuid
+             */
+            attempt_id: string;
+            /** Attempt Is Provisional */
+            attempt_is_provisional: boolean;
+            /** Attempt Total */
+            attempt_total?: string | null;
+            /** Feedback */
+            feedback?: string | null;
+            /**
+             * Question Id
+             * Format: uuid
+             */
+            question_id: string;
+            /** Score */
+            score: string;
+        };
         /** GradingPolicyIn */
         GradingPolicyIn: {
             /**
@@ -2226,10 +3019,45 @@ export interface components {
              */
             quiz: number;
         };
+        /** GradingQueueOut */
+        GradingQueueOut: {
+            /** Body */
+            body: string;
+            /** Graded Count */
+            graded_count: number;
+            /** Pending */
+            pending: components["schemas"]["PendingAnswerOut"][];
+            /** Points */
+            points: string;
+            /**
+             * Question Id
+             * Format: uuid
+             */
+            question_id: string;
+            /** Rubric */
+            rubric?: string | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** IntegrityEventIn */
+        IntegrityEventIn: {
+            /** Detail */
+            detail?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "TAB_BLUR" | "WINDOW_RESIZE" | "LONG_PASTE" | "RECONNECT";
+        };
+        /** IntegrityEventOut */
+        IntegrityEventOut: {
+            /** Recorded */
+            recorded: number;
         };
         /** InterestAnswerIn */
         InterestAnswerIn: {
@@ -2812,6 +3640,45 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** PendingAnswerOut */
+        PendingAnswerOut: {
+            /**
+             * Attempt Id
+             * Format: uuid
+             */
+            attempt_id: string;
+            /** Attempt No */
+            attempt_no: number;
+            /** Points */
+            points: string;
+            /**
+             * Question Id
+             * Format: uuid
+             */
+            question_id: string;
+            /** Response */
+            response?: {
+                [key: string]: unknown;
+            } | null;
+            /** Student Name */
+            student_name: string;
+        };
+        /** PickRandomIn */
+        PickRandomIn: {
+            /** Category */
+            category?: string | null;
+            /** Count */
+            count: number;
+            /** Course Id */
+            course_id?: string | null;
+            /** Difficulty */
+            difficulty?: number | null;
+            /**
+             * Points
+             * @default 1
+             */
+            points: number | string;
+        };
         /** PlanOut */
         PlanOut: {
             /** Code */
@@ -3148,6 +4015,273 @@ export interface components {
             /** Publish At */
             publish_at?: string | null;
         };
+        /** QuestionIn */
+        QuestionIn: {
+            /** Body */
+            body: string;
+            /** Explanation */
+            explanation?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Points
+             * @default 1
+             */
+            points: number | string;
+            /** Sort Order */
+            sort_order?: number | null;
+        };
+        /**
+         * QuestionOut
+         * @description سؤال از دید استاد — اینجا `payload` کلید پاسخ **دارد**.
+         */
+        QuestionOut: {
+            /** Bank Id */
+            bank_id?: string | null;
+            /** Body */
+            body: string;
+            /** Explanation */
+            explanation?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
+            /** Kind Fa */
+            kind_fa: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /** Points */
+            points: string;
+            /** Sort Order */
+            sort_order: number;
+        };
+        /**
+         * QuestionReviewOut
+         * @description کلید پاسخ و توضیح — **فقط** پس از انتشار نتیجه.
+         */
+        QuestionReviewOut: {
+            /** Accepted */
+            accepted?: string[] | null;
+            /** Correct */
+            correct?: unknown;
+            /** Explanation */
+            explanation?: string | null;
+            /** Tolerance */
+            tolerance?: string | null;
+        };
+        /** QuestionStatsOut */
+        QuestionStatsOut: {
+            /** Answered */
+            answered: number;
+            /** Body */
+            body: string;
+            /** Difficulty */
+            difficulty?: string | null;
+            /** Discrimination */
+            discrimination?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
+            /** Note Fa */
+            note_fa?: string | null;
+            /** Points */
+            points: string;
+            /**
+             * Question Id
+             * Format: uuid
+             */
+            question_id: string;
+        };
+        /**
+         * QuizDetailOut
+         * @description آزمون از دید استاد — با سؤال‌ها و کلید پاسخ.
+         */
+        QuizDetailOut: {
+            /**
+             * Attempt Count
+             * @default 0
+             */
+            attempt_count: number;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** Description */
+            description?: string | null;
+            /** Duration Min */
+            duration_min: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Max Attempts */
+            max_attempts: number;
+            /**
+             * Offering Id
+             * Format: uuid
+             */
+            offering_id: string;
+            /**
+             * Opens At
+             * Format: date-time
+             */
+            opens_at: string;
+            /** Passing Score */
+            passing_score?: string | null;
+            /** Questions */
+            questions?: components["schemas"]["QuestionOut"][];
+            /**
+             * Result Visibility
+             * @enum {string}
+             */
+            result_visibility: "IMMEDIATE" | "AFTER_CLOSE" | "MANUAL";
+            /** Result Visibility Fa */
+            result_visibility_fa: string;
+            /** Results Published At */
+            results_published_at?: string | null;
+            /** Show Correct Answers */
+            show_correct_answers: boolean;
+            /** Shuffle Options */
+            shuffle_options: boolean;
+            /** Shuffle Questions */
+            shuffle_questions: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "PUBLISHED" | "CLOSED";
+            /** Status Fa */
+            status_fa: string;
+            /** Title Fa */
+            title_fa: string;
+            /** Total Points */
+            total_points: string;
+            /** Week Id */
+            week_id?: string | null;
+        };
+        /** QuizIn */
+        QuizIn: {
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** Description */
+            description?: string | null;
+            /** Duration Min */
+            duration_min: number;
+            /**
+             * Max Attempts
+             * @default 1
+             */
+            max_attempts: number;
+            /**
+             * Opens At
+             * Format: date-time
+             */
+            opens_at: string;
+            /** Passing Score */
+            passing_score?: number | string | null;
+            /**
+             * Result Visibility
+             * @default AFTER_CLOSE
+             * @enum {string}
+             */
+            result_visibility: "IMMEDIATE" | "AFTER_CLOSE" | "MANUAL";
+            /**
+             * Show Correct Answers
+             * @default true
+             */
+            show_correct_answers: boolean;
+            /**
+             * Shuffle Options
+             * @default true
+             */
+            shuffle_options: boolean;
+            /**
+             * Shuffle Questions
+             * @default true
+             */
+            shuffle_questions: boolean;
+            /** Title Fa */
+            title_fa: string;
+            /** Week Id */
+            week_id?: string | null;
+        };
+        /**
+         * QuizSummaryOut
+         * @description فراداده — **بدون سؤالات** (§5.6).
+         */
+        QuizSummaryOut: {
+            /** Active Attempt Id */
+            active_attempt_id?: string | null;
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /** Description */
+            description?: string | null;
+            /** Duration Min */
+            duration_min: number;
+            /** Effective Duration Sec */
+            effective_duration_sec?: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Max Attempts */
+            max_attempts: number;
+            /**
+             * Opens At
+             * Format: date-time
+             */
+            opens_at: string;
+            /** Passing Score */
+            passing_score?: string | null;
+            /** Question Count */
+            question_count: number;
+            /**
+             * Server Time
+             * Format: date-time
+             */
+            server_time: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "NOT_OPEN" | "AVAILABLE" | "IN_PROGRESS" | "EXHAUSTED" | "CLOSED";
+            /** State Fa */
+            state_fa: string;
+            /** Title Fa */
+            title_fa: string;
+            /** Total Points */
+            total_points: string;
+            /** Used Attempts */
+            used_attempts: number;
+            /** Week Number */
+            week_number?: number | null;
+        };
         /**
          * ReasonIn
          * @description بدنهٔ اقدام‌هایی که سند برایشان «با ذکر دلیل» نوشته است — §7.4.
@@ -3216,6 +4350,11 @@ export interface components {
         RefreshIn: {
             /** Refresh Token */
             refresh_token: string;
+        };
+        /** ReorderIn */
+        ReorderIn: {
+            /** Question Ids */
+            question_ids: string[];
         };
         /** ResourceIn */
         ResourceIn: {
@@ -3304,6 +4443,36 @@ export interface components {
              */
             status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
         };
+        /** ResultQuestionOut */
+        ResultQuestionOut: {
+            /** Body */
+            body: string;
+            /** Feedback */
+            feedback?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Correct */
+            is_correct?: boolean | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
+            /** Kind Fa */
+            kind_fa: string;
+            /** My Answer */
+            my_answer?: {
+                [key: string]: unknown;
+            } | null;
+            /** Points */
+            points: string;
+            review?: components["schemas"]["QuestionReviewOut"] | null;
+            /** Score */
+            score?: string | null;
+        };
         /** ReviewIn */
         ReviewIn: {
             /**
@@ -3370,6 +4539,30 @@ export interface components {
             student_id: string;
             /** Student Name */
             student_name?: string | null;
+        };
+        /** SaveAnswerIn */
+        SaveAnswerIn: {
+            /** Client Ts */
+            client_ts?: string | null;
+            /**
+             * Is Flagged
+             * @default false
+             */
+            is_flagged: boolean;
+            /** Response */
+            response?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** SaveAnswerOut */
+        SaveAnswerOut: {
+            /**
+             * Saved At
+             * Format: date-time
+             */
+            saved_at: string;
+            /** Seconds Remaining */
+            seconds_remaining: number;
         };
         /**
          * SessionOut
@@ -3477,6 +4670,30 @@ export interface components {
         SkillsStepIn: {
             /** Skills */
             skills: components["schemas"]["SkillAnswerIn"][];
+        };
+        /** SubmitIn */
+        SubmitIn: {
+            /**
+             * Confirm Unanswered
+             * @default 0
+             */
+            confirm_unanswered: number;
+        };
+        /** SubmitOut */
+        SubmitOut: {
+            /** Auto Score */
+            auto_score: string;
+            /** Is Provisional */
+            is_provisional: boolean;
+            /** Result Available */
+            result_available: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "IN_PROGRESS" | "SUBMITTED" | "AUTO_SUBMITTED" | "GRADED" | "VOIDED";
+            /** Total Points */
+            total_points: string;
         };
         /** SubscriptionActivateIn */
         SubscriptionActivateIn: {
@@ -3632,6 +4849,39 @@ export interface components {
             preview_recommendations?: components["schemas"]["RecommendationItemOut"][];
             /** Total Steps */
             total_steps: number;
+        };
+        /** SyncAnswerIn */
+        SyncAnswerIn: {
+            /** Client Ts */
+            client_ts?: string | null;
+            /**
+             * Is Flagged
+             * @default false
+             */
+            is_flagged: boolean;
+            /**
+             * Question Id
+             * Format: uuid
+             */
+            question_id: string;
+            /** Response */
+            response?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** SyncIn */
+        SyncIn: {
+            /** Answers */
+            answers: components["schemas"]["SyncAnswerIn"][];
+        };
+        /** SyncOut */
+        SyncOut: {
+            /** Accepted */
+            accepted: string[];
+            /** Rejected */
+            rejected: string[];
+            /** Seconds Remaining */
+            seconds_remaining: number;
         };
         /** TaskIn */
         TaskIn: {
@@ -3836,6 +5086,41 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /**
+         * VisibleQuestionOut
+         * @description سؤال در تلاش فعال — `payload` هرگز کلید پاسخ ندارد (§5.6).
+         */
+        VisibleQuestionOut: {
+            /** Body */
+            body: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Flagged
+             * @default false
+             */
+            is_flagged: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
+            /** Kind Fa */
+            kind_fa: string;
+            /** My Answer */
+            my_answer?: {
+                [key: string]: unknown;
+            } | null;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /** Points */
+            points: string;
+        };
         /** WeekDetailOut */
         WeekDetailOut: {
             /** Description */
@@ -4033,6 +5318,352 @@ export interface operations {
                 };
             };
             /** @description PROJECT_CAPACITY_FULL */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    view_attempt_api_v1_attempts__attempt_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptViewOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_answer_api_v1_attempts__attempt_id__answers__question_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attempt_id: string;
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveAnswerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaveAnswerOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_appeal_api_v1_attempts__attempt_id__appeal_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppealIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppealOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_integrity_api_v1_attempts__attempt_id__integrity_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IntegrityEventIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntegrityEventOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attempt_result_api_v1_attempts__attempt_id__result_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptResultOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_attempt_api_v1_attempts__attempt_id__submit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmitOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sync_answers_api_v1_attempts__attempt_id__sync_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SyncIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyncOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -6775,6 +8406,126 @@ export interface operations {
             };
         };
     };
+    quizzes_of_offering_api_v1_quizzes_offering__offering_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizSummaryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quiz_detail_api_v1_quizzes__quiz_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizSummaryOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_attempt_api_v1_quizzes__quiz_id__attempts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptStartOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     submit_feedback_api_v1_recommendations__project_id__feedback_post: {
         parameters: {
             query?: never;
@@ -7257,6 +9008,59 @@ export interface operations {
             };
         };
     };
+    resolve_appeal_api_v1_teach_appeals__appeal_id__resolve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appeal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppealDecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppealOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     decide_enrollment_api_v1_teach_enrollments__enrollment_id__decide_post: {
         parameters: {
             query?: never;
@@ -7585,6 +9389,81 @@ export interface operations {
             };
         };
     };
+    list_quizzes_api_v1_teach_offerings__offering_id__quizzes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetailOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_quiz_api_v1_teach_offerings__offering_id__quizzes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetailOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     roster_api_v1_teach_offerings__offering_id__students_get: {
         parameters: {
             query?: {
@@ -7808,6 +9687,987 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_bank_api_v1_teach_question_bank_get: {
+        parameters: {
+            query?: {
+                course_id?: string | null;
+                category?: string | null;
+                difficulty?: number | null;
+                kind?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BankItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_bank_item_api_v1_teach_question_bank_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BankItemIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BankItemOut"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    quiz_detail_api_v1_teach_quizzes__quiz_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetailOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_quiz_api_v1_teach_quizzes__quiz_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetailOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_quiz_api_v1_teach_quizzes__quiz_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quiz_appeals_api_v1_teach_quizzes__quiz_id__appeals_get: {
+        parameters: {
+            query?: {
+                only_open?: boolean;
+            };
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppealOut"][];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quiz_attempts_api_v1_teach_quizzes__quiz_id__attempts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptSummaryOut"][];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    grade_answer_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__answers__question_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+                attempt_id: string;
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GradeAnswerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GradedAnswerOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    finalize_attempt_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__finalize_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptSummaryOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attempt_result_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__result_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptResultOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    void_attempt_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__void_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+                attempt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttemptSummaryOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_quiz_api_v1_teach_quizzes__quiz_id__close_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetailOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    grading_queue_api_v1_teach_quizzes__quiz_id__grading_queue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GradingQueueOut"][];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_quiz_api_v1_teach_quizzes__quiz_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetailOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_results_api_v1_teach_quizzes__quiz_id__publish_results_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizDetailOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    question_stats_api_v1_teach_quizzes__quiz_id__question_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionStatsOut"][];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_question_api_v1_teach_quizzes__quiz_id__questions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    copy_from_bank_api_v1_teach_quizzes__quiz_id__questions_from_bank_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyFromBankIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionOut"][];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pick_random_api_v1_teach_quizzes__quiz_id__questions_random_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PickRandomIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionOut"][];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reorder_questions_api_v1_teach_quizzes__quiz_id__questions_reorder_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionOut"][];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_question_api_v1_teach_quizzes__quiz_id__questions__question_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_question_api_v1_teach_quizzes__quiz_id__questions__question_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+                question_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description وضعیت اجازه نمی‌دهد */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

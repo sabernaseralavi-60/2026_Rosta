@@ -218,6 +218,74 @@ class SubscriptionAlreadyActive(Conflict):
     message = "شما هم‌اکنون اشتراک فعال دارید."
 
 
+# ── آزمون — §5.13، §7.3 ────────────────────────────────────────────────
+class QuizNotOpen(Conflict):
+    code = "QUIZ_NOT_OPEN"
+    message = "این آزمون هنوز باز نشده است."
+
+
+class QuizClosed(Conflict):
+    code = "QUIZ_CLOSED"
+    message = "مهلت این آزمون به پایان رسیده است."
+
+
+class AttemptsExhausted(Conflict):
+    code = "ATTEMPTS_EXHAUSTED"
+    message = "تعداد دفعات مجاز شرکت در آزمون تمام شده است."
+
+
+class AttemptExpired(Conflict):
+    """زمان تلاش تمام شده — پاسخ تازه پذیرفته نمی‌شود (§7.3 قاعدهٔ ۳)."""
+
+    code = "ATTEMPT_EXPIRED"
+    message = "زمان آزمون شما به پایان رسیده است."
+
+
+class AttemptAlreadySubmitted(Conflict):
+    code = "ATTEMPT_ALREADY_SUBMITTED"
+    message = "این آزمون قبلاً ارسال شده است."
+
+
+class ActiveAttemptExists(Conflict):
+    """دو کلیک سریع روی «شروع آزمون» — قید `idx_one_active_attempt`."""
+
+    code = "ACTIVE_ATTEMPT_EXISTS"
+    message = "شما یک آزمون نیمه‌تمام دارید."
+
+
+class AttemptStillRunning(Conflict):
+    """تلاشی که دانشجو هنوز در آن است، نمره نمی‌گیرد."""
+
+    code = "ATTEMPT_STILL_RUNNING"
+    message = "این آزمون هنوز تمام نشده است."
+
+
+class AppealWindowClosed(Conflict):
+    """مهلت ۷ روزهٔ اعتراض گذشته — §7.3."""
+
+    code = "APPEAL_WINDOW_CLOSED"
+    message = "مهلت اعتراض به این نمره به پایان رسیده است."
+
+
+class ResultNotAvailable(Conflict):
+    """نتیجه هنوز منتشر نشده — `result_visibility` تصمیم می‌گیرد."""
+
+    code = "RESULT_NOT_AVAILABLE"
+    message = "نتیجهٔ این آزمون هنوز منتشر نشده است."
+
+
+class QuizHasAttempts(Conflict):
+    """ویرایش سؤال‌های آزمونی که دانشجو در آن شرکت کرده."""
+
+    code = "QUIZ_HAS_ATTEMPTS"
+    message = "این آزمون تلاش ثبت‌شده دارد و سؤال‌هایش قابل تغییر نیست."
+
+
+class QuizHasNoQuestions(Conflict):
+    code = "QUIZ_HAS_NO_QUESTIONS"
+    message = "آزمون بدون سؤال منتشر نمی‌شود."
+
+
 # ── فایل — §5.13 ───────────────────────────────────────────────────────
 class FileTooLarge(SILPError):
     status_code = 413

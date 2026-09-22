@@ -28,9 +28,11 @@ from silp.routers.v1 import (
     files,
     me,
     projects,
+    quizzes,
     subscriptions,
     taxonomy,
     teach,
+    teach_quiz,
     workspace,
 )
 
@@ -126,6 +128,9 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(courses.resources_router)
     v1.include_router(courses.materials_router)
     v1.include_router(teach.router)
+    v1.include_router(teach_quiz.router)
+    v1.include_router(quizzes.router)
+    v1.include_router(quizzes.attempts_router)
     v1.include_router(subscriptions.router)
     app.include_router(v1)
 

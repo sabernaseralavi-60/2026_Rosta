@@ -9,7 +9,7 @@ RUN_API_DB   := $(DC_DEV) run --rm api
 
 .DEFAULT_GOAL := help
 .PHONY: help setup dev down logs migrate revision downgrade seed shell psql redis-cli \
-        test test-api test-web e2e types lint fmt check clean nuke
+        test test-api test-web e2e load types lint fmt check clean nuke
 
 help: ## نمایش این راهنما
 	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -83,6 +83,10 @@ test-web: ## vitest
 
 e2e: ## Playwright روی compose.test.yml
 	pnpm --filter web exec playwright test
+
+load: ## آزمون بار آزمون با k6 — make load q=<quiz_id>
+	@test -n "$(q)" || (echo "استفاده: make load q=<شناسهٔ آزمون منتشرشده>" && exit 1)
+	k6 run -e BASE_URL=$(or $(url),http://localhost:8000) -e QUIZ_ID=$(q) infra/k6/quiz-load.js
 
 # ── کیفیت ─────────────────────────────────────────────────────────────────
 lint: ## ruff + mypy + eslint + tsc

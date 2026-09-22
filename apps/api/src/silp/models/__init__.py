@@ -55,6 +55,14 @@ from silp.models.project import (
     Team,
     TeamMember,
 )
+from silp.models.quiz import (
+    GradeAppeal,
+    QuestionBankItem,
+    Quiz,
+    QuizAnswer,
+    QuizAttempt,
+    QuizQuestion,
+)
 from silp.models.taxonomy import Asset, Interest, Skill, University
 
 __all__ = [
@@ -73,6 +81,7 @@ __all__ = [
     "DeliverableFile",
     "Enrollment",
     "File",
+    "GradeAppeal",
     "Interest",
     "MaterialAccessEvent",
     "Milestone",
@@ -93,6 +102,11 @@ __all__ = [
     "ProjectRequiredSkill",
     "ProjectRole",
     "ProjectTask",
+    "QuestionBankItem",
+    "Quiz",
+    "QuizAnswer",
+    "QuizAttempt",
+    "QuizQuestion",
     "RecommendationFeedback",
     "RefreshToken",
     "Resource",
