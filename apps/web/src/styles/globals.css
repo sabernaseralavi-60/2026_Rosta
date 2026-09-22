@@ -1,0 +1,263 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/**
+ * سبک سراسری — PRD §10.3 (تایپوگرافی)، §10.5 (RTL)، §10.8 (دسترس‌پذیری).
+ *
+ * «فارسی درجه‌یک»: تایپوگرافی فارسی باید بهتر از نسخهٔ انگلیسی باشد،
+ * نه ترجمهٔ ناشیانه.
+ */
+
+/* ── قلم — §10.3 ─────────────────────────────────────────────────────
+ * قلم متغیر یک فایل ~۸۰KB به‌جای ۶ فایل جداگانه. الزامی است.
+ * فایل با `pnpm --filter web exec node scripts/fetch-fonts.mjs` دریافت
+ * می‌شود؛ تا آن زمان قلم‌های سیستمی فارسی جایگزین می‌شوند.
+ */
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn[wght].woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+200C-200F, U+FB50-FDFF, U+0020-007F;
+}
+
+@theme {
+  --font-sans:
+    'Vazirmatn', 'Segoe UI', 'Tahoma', 'Noto Sans Arabic', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, monospace;
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+
+  --color-accent-100: var(--accent-100);
+  --color-accent-300: var(--accent-300);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
+
+  --color-canvas: var(--bg-canvas);
+  --color-surface: var(--bg-surface);
+  --color-raised: var(--bg-raised);
+  --color-sunken: var(--bg-sunken);
+
+  --color-fg: var(--fg-primary);
+  --color-fg-secondary: var(--fg-secondary);
+  --color-fg-tertiary: var(--fg-tertiary);
+  --color-on-brand: var(--fg-on-brand);
+
+  --color-line: var(--border-subtle);
+  --color-line-strong: var(--border-default);
+
+  --color-success: var(--success-600);
+  --color-warning: var(--warning-600);
+  --color-danger: var(--danger-600);
+  --color-info: var(--info-500);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+/* ── پایه ──────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* §10.5 — جهت روی <html> تعیین می‌شود، نه با کلاس */
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-canvas);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  /* §10.3 — پیش‌فرض ۱۵px با ارتفاع خط ۱.۷۵ */
+  font-size: 15px;
+  line-height: 1.75;
+  font-weight: 400;
+  /* §10.3 قاعدهٔ ۷ — فاصله‌گذاری حروف در فارسی اتصال را می‌شکند */
+  letter-spacing: 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── تایپوگرافی — §10.3 ────────────────────────────────────────────── */
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: 28px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+h2 {
+  font-size: 22px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+h3 {
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+  /* §10.3 قاعدهٔ ۱ — هرگز زیر ۱.۶ برای متن فارسی */
+  line-height: 1.75;
+}
+
+/* §10.3 قاعدهٔ ۲ — طول خط ۶۵ تا ۷۵ نویسه */
+.prose {
+  max-width: var(--prose-max);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+/* §10.3 قاعدهٔ ۵ — اعداد در متن فارسی: فارسی؛ در جدول و کد: لاتین */
+.fa-digits {
+  font-feature-settings: 'ss02';
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-family: var(--font-sans);
+}
+
+/* §10.5 — شماره، ایمیل، URL و کد همیشه چپ‌به‌راست */
+code,
+kbd,
+samp,
+pre,
+.ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-family: var(--font-mono);
+}
+
+bdi {
+  unicode-bidi: isolate;
+}
+
+/* ── دسترس‌پذیری — §10.8 ───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* حلقهٔ تمرکز فقط با کیبورد؛ کلیک موشواره نباید حلقه بسازد */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* لینک «پرش به محتوای اصلی» — اولین عنصر focusable */
+.skip-link {
+  position: absolute;
+  inset-inline-start: var(--space-4);
+  inset-block-start: calc(-1 * var(--space-16));
+  z-index: 100;
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--bg-surface);
+  color: var(--fg-primary);
+  border: 2px solid var(--border-focus);
+  border-radius: var(--radius-md);
+  transition: inset-block-start var(--dur-fast) var(--ease-out);
+}
+
+.skip-link:focus {
+  inset-block-start: var(--space-4);
+}
+
+/* فقط برای صفحه‌خوان */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ناحیهٔ لمس حداقل ۴۴×۴۴px روی موبایل — §10.8 */
+@media (pointer: coarse) {
+  button,
+  a[role='button'],
+  input[type='checkbox'],
+  input[type='radio'] {
+    min-block-size: 44px;
+    min-inline-size: 44px;
+  }
+}
+
+/* ── احترام به ترجیح کاربر — §10.7، اجباری ─────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --border-subtle: var(--neutral-500);
+    --border-default: var(--neutral-600);
+    --fg-secondary: var(--neutral-800);
+  }
+}
+
+/* ── انیمیشن اسکلت — §10.7، ۱۵۰۰ms تکرار ───────────────────────────── */
+@keyframes silp-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ── آیکن‌های جهت‌دار آینه می‌شوند — §10.5 ──────────────────────────── */
+[dir='rtl'] .icon-directional {
+  scale: -1 1;
+}
+
+/* ── چیدمان صفحه ───────────────────────────────────────────────────── */
+.page {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-inline: var(--space-8);
+  }
+}

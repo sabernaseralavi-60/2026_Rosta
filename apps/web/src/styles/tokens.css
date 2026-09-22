@@ -1,0 +1,173 @@
+/**
+ * توکن‌های طراحی SILP — PRD §10.2، §10.4، §10.7.
+ *
+ * رنگ‌ها در OKLCH تعریف می‌شوند تا روشنایی ادراکی یکنواخت باشد.
+ * پالت از دو ریشه می‌آید: فیروزه‌ای (کاشی‌کاری ایرانی، رشد) و زعفرانی
+ * (گرمای خاک، محصول، عمل). بقیه خنثای گرم است.
+ */
+
+:root {
+  /* ── اصلی: فیروزه‌ای ───────────────────────────── */
+  --brand-50: oklch(97.5% 0.018 185);
+  --brand-100: oklch(94.5% 0.038 185);
+  --brand-200: oklch(89% 0.068 185);
+  --brand-300: oklch(81.5% 0.098 184);
+  --brand-400: oklch(72% 0.118 183);
+  --brand-500: oklch(63% 0.124 182);
+  --brand-600: oklch(54% 0.114 182); /* رنگ اصلی برند */
+  --brand-700: oklch(45.5% 0.096 183);
+  --brand-800: oklch(38% 0.076 184);
+  --brand-900: oklch(31% 0.058 186);
+  --brand-950: oklch(22% 0.04 188);
+
+  /* ── تأکید: زعفرانی ────────────────────────────── */
+  --accent-50: oklch(97.5% 0.028 75);
+  --accent-100: oklch(94% 0.062 76);
+  --accent-200: oklch(88.5% 0.11 77);
+  --accent-300: oklch(82% 0.145 72);
+  --accent-400: oklch(76% 0.165 66);
+  --accent-500: oklch(70% 0.17 60); /* تأکید اصلی */
+  --accent-600: oklch(61% 0.158 53);
+  --accent-700: oklch(51% 0.132 48);
+  --accent-800: oklch(42% 0.104 46);
+  --accent-900: oklch(35% 0.082 46);
+
+  /* ── خنثای گرم ─────────────────────────────────── */
+  --neutral-0: oklch(100% 0 0);
+  --neutral-25: oklch(99% 0.002 90);
+  --neutral-50: oklch(98% 0.004 90);
+  --neutral-100: oklch(96% 0.006 88);
+  --neutral-200: oklch(92% 0.008 86);
+  --neutral-300: oklch(86.5% 0.01 84);
+  --neutral-400: oklch(72% 0.012 82);
+  --neutral-500: oklch(58% 0.012 80);
+  --neutral-600: oklch(46.5% 0.012 80);
+  --neutral-700: oklch(37.5% 0.011 82);
+  --neutral-800: oklch(27.5% 0.01 84);
+  --neutral-900: oklch(19.5% 0.009 86);
+  --neutral-950: oklch(13% 0.008 88);
+
+  /* ── معنایی ────────────────────────────────────── */
+  --success-500: oklch(65% 0.145 150);
+  --success-600: oklch(55% 0.135 150);
+  --warning-500: oklch(78% 0.155 82);
+  --warning-600: oklch(66% 0.145 75);
+  --danger-500: oklch(60% 0.185 25);
+  --danger-600: oklch(52% 0.18 25);
+  --info-500: oklch(62% 0.13 245);
+
+  /* ── رنگ دسته‌های امتیاز ──────────────────────── */
+  --cat-learning: oklch(62% 0.13 245); /* آبی */
+  --cat-research: oklch(58% 0.15 295); /* بنفش */
+  --cat-startup: oklch(70% 0.17 60); /* زعفرانی */
+  --cat-community: oklch(65% 0.145 150); /* سبز */
+
+  /* ── فضا — مقیاس ۴px (§10.4) ───────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ── شعاع گوشه ─────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* ── حرکت (§10.7) ──────────────────────────────── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --dur-instant: 80ms;
+  --dur-fast: 150ms;
+  --dur-normal: 220ms;
+  --dur-slow: 320ms;
+  --dur-celebrate: 900ms;
+
+  /* ── چیدمان ────────────────────────────────────── */
+  --content-max: 1280px;
+  --prose-max: 68ch;
+}
+
+/* ── نقش‌های معنایی: حالت روشن ───────────────────── */
+:root {
+  --bg-canvas: var(--neutral-50);
+  --bg-surface: var(--neutral-0);
+  --bg-raised: var(--neutral-0);
+  --bg-sunken: var(--neutral-100);
+  --bg-inverse: var(--neutral-900);
+
+  --fg-primary: var(--neutral-900);
+  --fg-secondary: var(--neutral-600);
+  --fg-tertiary: var(--neutral-500);
+  --fg-on-brand: var(--neutral-0);
+  --fg-inverse: var(--neutral-50);
+
+  --border-subtle: var(--neutral-200);
+  --border-default: var(--neutral-300);
+  --border-strong: var(--neutral-400);
+  --border-focus: var(--brand-600);
+
+  --shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.04);
+  --shadow-md:
+    0 2px 6px -1px oklch(0% 0 0 / 0.06), 0 1px 3px -1px oklch(0% 0 0 / 0.04);
+  --shadow-lg:
+    0 8px 24px -6px oklch(0% 0 0 / 0.1), 0 2px 6px -2px oklch(0% 0 0 / 0.05);
+}
+
+/* ── حالت تیره ───────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg-canvas: var(--neutral-950);
+    --bg-surface: var(--neutral-900);
+    --bg-raised: var(--neutral-800);
+    --bg-sunken: oklch(10% 0.008 88);
+    --bg-inverse: var(--neutral-100);
+
+    --fg-primary: var(--neutral-100);
+    --fg-secondary: var(--neutral-400);
+    --fg-tertiary: var(--neutral-500);
+    --fg-inverse: var(--neutral-900);
+
+    --border-subtle: oklch(26% 0.009 86);
+    --border-default: oklch(33% 0.01 85);
+    --border-strong: var(--neutral-600);
+    --border-focus: var(--brand-400);
+
+    /* در تاریکی، برند روشن‌تر می‌شود تا کنتراست حفظ شود */
+    --brand-600: oklch(70% 0.118 183);
+    --accent-500: oklch(76% 0.155 64);
+  }
+}
+
+/* همان مقادیر بالا، برای انتخاب دستی کاربر */
+:root[data-theme='dark'] {
+  --bg-canvas: var(--neutral-950);
+  --bg-surface: var(--neutral-900);
+  --bg-raised: var(--neutral-800);
+  --bg-sunken: oklch(10% 0.008 88);
+  --bg-inverse: var(--neutral-100);
+
+  --fg-primary: var(--neutral-100);
+  --fg-secondary: var(--neutral-400);
+  --fg-tertiary: var(--neutral-500);
+  --fg-inverse: var(--neutral-900);
+
+  --border-subtle: oklch(26% 0.009 86);
+  --border-default: oklch(33% 0.01 85);
+  --border-strong: var(--neutral-600);
+  --border-focus: var(--brand-400);
+
+  --brand-600: oklch(70% 0.118 183);
+  --accent-500: oklch(76% 0.155 64);
+}
