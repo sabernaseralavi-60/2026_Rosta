@@ -152,7 +152,11 @@ Authorization: Bearer <access_token>
 | `PATCH` | `/me/survey/interests` | ثبت گام ۳ |
 | `PATCH` | `/me/survey/preferences` | ثبت گام ۴ |
 | `GET` | `/me/points` | دفتر کل امتیاز شخصی (کرسری) |
+| `GET` | `/me/points/summary` | امتیاز کل، سطح، امتیاز نیم‌سال و ۵ ردیف اخیر (برای Toast) |
 | `GET` | `/me/badges` | نشان‌های کسب‌شده و قفل‌شده |
+| `POST` | `/me/badges/seen` | جشن نشان دیده شد (§9.10) |
+| `GET` | `/me/dashboard` | داشبورد دانشجو در یک درخواست (FR-DASH-01) |
+| `GET` | `/me/learning-score/{offering_id}` | نمرهٔ یادگیری من با چهار مؤلفه (§9.6) |
 | `GET` | `/me/certificates` | گواهی‌ها |
 | `PATCH` | `/me/settings` | حریم خصوصی و اعلان |
 | `POST` | `/me/avatar` | دریافت URL آپلود آواتار |
@@ -572,9 +576,15 @@ Authorization: Bearer <access_token>
 ?scope=GLOBAL|OFFERING|UNIVERSITY&scope_id=…&category=LEARNING&term_id=…&limit=10
 ```
 ```jsonc
-{ "entries": [ { "rank": 1, "user": {…}, "total": 1240, "level": 8 } ],
-  "me": { "rank": 34, "total": 340, "level": 4, "percentile": 62 } }
+{ "entries": [ { "rank": 1, "user": {…}, "total": "1240.00", "level": 8, "is_me": false } ],
+  "growth":  [ /* بیشترین رشد ۳۰ روزه — §9.7 قاعدهٔ ۵ */ ],
+  "me": { "rank": 34, "total": "340.00", "level": 4, "percentile": 62,
+          "hidden": false, "excluded_reason": null } }
 ```
+
+`excluded_reason`: `OPTED_OUT` (انصراف؛ رتبه‌اش را خودش می‌بیند) یا
+`STAFF` (کادر آموزشی؛ در رقابت دانشجویان رتبه ندارد — [ADR-0012](../adr/0012-ledger-revisions-and-gamification-gaps.md)). صدک
+برای جمع کمتر از ۵ نفر `null` است. رتبه‌بندی ارائه برای غیرعضو ۴۰۴ است.
 
 ---
 
@@ -647,6 +657,7 @@ Authorization: Bearer <access_token>
 | `POST` | `/teach/answers/{attempt_id}/{qid}/grade` | ثبت نمرهٔ تشریحی |
 | `GET` | `/teach/quizzes/{id}/analytics` | تحلیل سؤال |
 | `GET` | `/teach/review-queue` | صف واحد بررسی تحویل‌دادنی |
+| `GET` | `/teach/offerings/{id}/learning-scores` | نمرهٔ یادگیری و نمرهٔ پیشنهادی (`LS × 0.2`) همهٔ دانشجویان — فقط خواندنی |
 | `POST` | `/teach/enrollments/{id}/decide` | تأیید یا رد ثبت‌نام |
 
 **`GET /teach/dashboard` — پاسخ**
@@ -691,6 +702,7 @@ Authorization: Bearer <access_token>
 | `GET/POST/PATCH` | `/admin/taxonomy/*` | مدیریت طبقه‌بندی |
 | `GET/PATCH` | `/admin/point-rules` | قواعد امتیاز |
 | `POST` | `/admin/point-rules/recalculate` | بازمحاسبهٔ گذشته‌نگر |
+| `POST` | `/admin/point-entries/{id}/reverse` | اصلاح یک ردیف با رکورد معکوس (با دلیل) |
 | `GET/POST/PATCH` | `/admin/badges` | مدیریت نشان |
 | `GET/PATCH` | `/admin/settings` | تنظیمات |
 | `GET` | `/admin/audit` | لاگ حسابرسی |

@@ -453,7 +453,8 @@ IDEA ──► VALIDATION ──► MVP ──► FIRST_REVENUE ──► GROWTH
 | `close_expired_attempts` | هر ۶۰ ثانیه | بستن خودکار آزمون‌های منقضی |
 | `publish_scheduled_weeks` | هر ۵ دقیقه | انتشار هفته‌های زمان‌بندی‌شده |
 | `refresh_point_totals` | هر ۱۵ دقیقه | `REFRESH MATERIALIZED VIEW CONCURRENTLY` |
-| `evaluate_badges` | هر ۱۰ دقیقه | بررسی و اعطای نشان‌های جدید |
+| `evaluate_badges` | هر ۱۰ دقیقه | بررسی و اعطای نشان‌های جدید (پنجرهٔ ۲ ساعته + جاروی شبانهٔ همه) |
+| `release_quiz_points` | هر ۱۰ دقیقه | امتیاز نمرهٔ آزمون‌های «نتیجه پس از پایان» که تازه بسته شده‌اند ([ADR-0012](../adr/0012-ledger-revisions-and-gamification-gaps.md)) |
 | `send_deadline_reminders` | ساعت ۹ صبح | یادآوری مهلت‌های ۳ و ۱ روزه |
 | `compute_project_health` | ساعت ۲ بامداد | به‌روزرسانی شاخص سلامت پروژه‌ها |
 | `mark_overdue_milestones` | ساعت ۱ بامداد | علامت‌گذاری مراحل از مهلت گذشته (§7.12) |

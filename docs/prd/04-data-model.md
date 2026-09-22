@@ -1299,6 +1299,14 @@ CREATE TABLE team_openings (           -- FR-TEAM-02
 
 ## ۴.۸ گیمیفیکیشن
 
+> **اصلاح شد — [ADR-0012](../adr/0012-ledger-revisions-and-gamification-gaps.md).** سه چیز نسبت به پیش‌نویس عوض شده و SQL زیر
+> همان است که مهاجرت ۰۰۱۲ می‌سازد: (۱) `revision` جزء کلید بی‌اثری شد،
+> چون «معکوس کن و با همان منبع دوباره ثبت کن» (§7.12، §9.9) با کلید قبلی
+> تصادم می‌کرد؛ (۲) `multiplier` عکس ضریب لحظهٔ اعطاست و بازمحاسبه بدون
+> آن ممکن نیست؛ (۳) سقف‌ها **تعداد اعطا** هستند (`INTEGER`) و
+> `weekly_cap` افزوده شد. `user_badges.seen_at` هم برای جشن یک‌بارهٔ نشان
+> (§9.10) است.
+
 ```sql
 CREATE TABLE point_rules (
   code          TEXT PRIMARY KEY,      -- 'QUIZ_PASSED', 'MILESTONE_APPROVED', ...
@@ -1306,8 +1314,9 @@ CREATE TABLE point_rules (
   category      TEXT NOT NULL CHECK (category IN ('LEARNING','RESEARCH','STARTUP','COMMUNITY')),
   base_points   NUMERIC(6,2) NOT NULL,
   formula       TEXT,                  -- توضیح فرمول برای قواعد متغیر
-  daily_cap     NUMERIC(6,2),
-  term_cap      NUMERIC(6,2),
+  daily_cap     INT CHECK (daily_cap > 0),    -- تعداد اعطا در روز محلی، نه امتیاز
+  weekly_cap    INT CHECK (weekly_cap > 0),   -- هفتهٔ محلی از شنبه
+  term_cap      INT CHECK (term_cap > 0),
   is_active     BOOLEAN NOT NULL DEFAULT true,
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -1318,18 +1327,27 @@ CREATE TABLE point_entries (           -- دفتر کل تغییرناپذیر (
   category    TEXT NOT NULL CHECK (category IN ('LEARNING','RESEARCH','STARTUP','COMMUNITY')),
   rule_code   TEXT NOT NULL REFERENCES point_rules(code),
   amount      NUMERIC(6,2) NOT NULL,   -- می‌تواند منفی باشد (رکورد معکوس)
+  multiplier  NUMERIC(10,4) NOT NULL DEFAULT 1,  -- amount = base_points × multiplier
   source_type TEXT NOT NULL,           -- 'QUIZ_ATTEMPT','DELIVERABLE','IDEA_VOTE',...
   source_id   UUID,
+  revision    SMALLINT NOT NULL DEFAULT 0,       -- بازنگری پس از معکوس شدن
   term_id     UUID REFERENCES terms(id),
   offering_id UUID REFERENCES course_offerings(id),
   note        TEXT,
   reverses_id UUID REFERENCES point_entries(id),   -- برای اصلاح
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  -- اصلی مثبت، معکوس منفی. «امتیاز صفر» ثبت نمی‌شود.
+  CHECK ((reverses_id IS NULL AND amount > 0) OR (reverses_id IS NOT NULL AND amount < 0))
 );
 -- جلوگیری از ثبت دوبارهٔ امتیاز برای یک رویداد (FR-GAM-01)
 CREATE UNIQUE INDEX idx_point_idempotency
-  ON point_entries(user_id, rule_code, source_type, source_id)
+  ON point_entries(user_id, rule_code, source_type, source_id, revision)
   WHERE reverses_id IS NULL AND source_id IS NOT NULL;
+-- هر ردیف حداکثر یک بار معکوس می‌شود.
+CREATE UNIQUE INDEX idx_point_single_reversal ON point_entries(reverses_id)
+  WHERE reverses_id IS NOT NULL;
+-- D-09: هیچ ردیفی ویرایش نمی‌شود — تریگر `forbid_point_entry_update`
+-- هر UPDATE را رد می‌کند (DELETE برای CASCADE خط‌مشی نگهداری باز است).
 CREATE INDEX idx_points_user_term ON point_entries(user_id, term_id, category);
 CREATE INDEX idx_points_created ON point_entries(created_at DESC);
 
@@ -1340,7 +1358,7 @@ SELECT user_id,
        SUM(amount) AS total
 FROM point_entries
 GROUP BY user_id, term_id, category;
-CREATE UNIQUE INDEX ON user_point_totals(user_id, term_id, category);
+CREATE UNIQUE INDEX ON user_point_totals(user_id, term_id, category) NULLS NOT DISTINCT;
 
 CREATE TABLE badges (
   code        TEXT PRIMARY KEY,
@@ -1358,6 +1376,7 @@ CREATE TABLE user_badges (
   badge_code TEXT NOT NULL REFERENCES badges(code),
   awarded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   context    JSONB,                    -- چه چیزی باعث اعطا شد
+  seen_at    TIMESTAMPTZ,              -- جشن نشان دیده شد (§9.10)
   PRIMARY KEY (user_id, badge_code)
 );
 ```
