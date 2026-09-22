@@ -1,0 +1,3377 @@
+{
+  "components": {
+    "schemas": {
+      "AssetOut": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "sort_order": {
+            "title": "Sort Order",
+            "type": "integer"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "title_fa",
+          "category",
+          "sort_order"
+        ],
+        "title": "AssetOut",
+        "type": "object"
+      },
+      "AssetRequirementOut": {
+        "properties": {
+          "asset_id": {
+            "format": "uuid",
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "is_mandatory": {
+            "title": "Is Mandatory",
+            "type": "boolean"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "title_fa",
+          "is_mandatory"
+        ],
+        "title": "AssetRequirementOut",
+        "type": "object"
+      },
+      "AssetsStepIn": {
+        "additionalProperties": false,
+        "description": "گام ۲ جایگزینی کامل است: فهرست خالی یعنی «هیچ امکانی ندارم».",
+        "properties": {
+          "asset_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 60,
+            "title": "Asset Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "asset_ids"
+        ],
+        "title": "AssetsStepIn",
+        "type": "object"
+      },
+      "AuthUserOut": {
+        "description": "کاربر در پاسخ ورود — §5.2. اطلاعات تماس پوشانده می‌شود (NFR-01).",
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "onboarding_state": {
+            "enum": [
+              "BASIC_INFO_REQUIRED",
+              "SURVEY_REQUIRED",
+              "SURVEY_INCOMPLETE",
+              "COMPLETE"
+            ],
+            "title": "Onboarding State",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "id",
+          "roles",
+          "onboarding_state"
+        ],
+        "title": "AuthUserOut",
+        "type": "object"
+      },
+      "BreakdownOut": {
+        "description": "شش زیرامتیاز §8.2 تا §8.7، برای شفافیت امتیاز (اصل ۳ §00).",
+        "properties": {
+          "asset": {
+            "title": "Asset",
+            "type": "number"
+          },
+          "goal": {
+            "title": "Goal",
+            "type": "number"
+          },
+          "interest": {
+            "title": "Interest",
+            "type": "number"
+          },
+          "skill": {
+            "title": "Skill",
+            "type": "number"
+          },
+          "style": {
+            "title": "Style",
+            "type": "number"
+          },
+          "time": {
+            "title": "Time",
+            "type": "number"
+          }
+        },
+        "required": [
+          "skill",
+          "asset",
+          "interest",
+          "time",
+          "style",
+          "goal"
+        ],
+        "title": "BreakdownOut",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "trace_id": {
+            "title": "Trace Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "trace_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "قالب ثابت خطا — §5.1. فقط برای مستندسازی OpenAPI.",
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "InterestAnswerIn": {
+        "properties": {
+          "interest_id": {
+            "format": "uuid",
+            "title": "Interest Id",
+            "type": "string"
+          },
+          "level": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "interest_id",
+          "level"
+        ],
+        "title": "InterestAnswerIn",
+        "type": "object"
+      },
+      "InterestListOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InterestOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "level_labels": {
+            "items": {
+              "$ref": "#/components/schemas/LevelLabel"
+            },
+            "title": "Level Labels",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "level_labels"
+        ],
+        "title": "InterestListOut",
+        "type": "object"
+      },
+      "InterestOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "sort_order": {
+            "title": "Sort Order",
+            "type": "integer"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "title_fa",
+          "sort_order"
+        ],
+        "title": "InterestOut",
+        "type": "object"
+      },
+      "InterestRefOut": {
+        "properties": {
+          "interest_id": {
+            "format": "uuid",
+            "title": "Interest Id",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "interest_id",
+          "title_fa"
+        ],
+        "title": "InterestRefOut",
+        "type": "object"
+      },
+      "InterestsStepIn": {
+        "additionalProperties": false,
+        "properties": {
+          "interests": {
+            "items": {
+              "$ref": "#/components/schemas/InterestAnswerIn"
+            },
+            "maxItems": 60,
+            "title": "Interests",
+            "type": "array"
+          }
+        },
+        "required": [
+          "interests"
+        ],
+        "title": "InterestsStepIn",
+        "type": "object"
+      },
+      "LevelLabel": {
+        "description": "متن توصیفی هر سطح — FR-PROF-01.\n\nسرور این متن‌ها را می‌فرستد تا `SkillSlider` آن‌ها را در خود ثابت\nنکند؛ تعریف سطح باید در فرم و در توضیح توصیه‌گر یکی باشد.",
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "level",
+          "label"
+        ],
+        "title": "LevelLabel",
+        "type": "object"
+      },
+      "LoginOut": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          },
+          "token_type": {
+            "default": "Bearer",
+            "title": "Token Type",
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/AuthUserOut"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "expires_in",
+          "user"
+        ],
+        "title": "LoginOut",
+        "type": "object"
+      },
+      "LogoutIn": {
+        "properties": {
+          "refresh_token": {
+            "maxLength": 512,
+            "minLength": 20,
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "LogoutIn",
+        "type": "object"
+      },
+      "MatchOut": {
+        "properties": {
+          "breakdown": {
+            "$ref": "#/components/schemas/BreakdownOut"
+          },
+          "is_stretch": {
+            "default": false,
+            "title": "Is Stretch",
+            "type": "boolean"
+          },
+          "match_score": {
+            "title": "Match Score",
+            "type": "number"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/ReasonOut"
+            },
+            "title": "Reasons",
+            "type": "array"
+          }
+        },
+        "required": [
+          "match_score",
+          "breakdown",
+          "reasons"
+        ],
+        "title": "MatchOut",
+        "type": "object"
+      },
+      "MeOut": {
+        "description": "§5.3 `GET /me` — نسخهٔ M1.\n\nامتیاز (M5) و شمارندهٔ اعلان (M6) بعداً افزوده می‌شوند. آنچه هست، همان\nشکل نهایی را دارد تا کلاینت بعداً بازنویسی نشود.",
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "email_verified": {
+            "default": false,
+            "title": "Email Verified",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mobile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mobile"
+          },
+          "mobile_verified": {
+            "default": false,
+            "title": "Mobile Verified",
+            "type": "boolean"
+          },
+          "onboarding": {
+            "$ref": "#/components/schemas/OnboardingOut"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProfileOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/RoleGrantOut"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "id",
+          "roles",
+          "onboarding"
+        ],
+        "title": "MeOut",
+        "type": "object"
+      },
+      "OTPRequestIn": {
+        "example": {
+          "channel": "SMS",
+          "destination": "09121234567",
+          "purpose": "LOGIN"
+        },
+        "properties": {
+          "channel": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SMS",
+                  "EMAIL"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel"
+          },
+          "destination": {
+            "maxLength": 254,
+            "minLength": 3,
+            "title": "Destination",
+            "type": "string"
+          },
+          "purpose": {
+            "default": "LOGIN",
+            "enum": [
+              "LOGIN",
+              "VERIFY_EMAIL",
+              "VERIFY_MOBILE",
+              "RESET_PASSWORD"
+            ],
+            "title": "Purpose",
+            "type": "string"
+          }
+        },
+        "required": [
+          "destination"
+        ],
+        "title": "OTPRequestIn",
+        "type": "object"
+      },
+      "OTPRequestOut": {
+        "properties": {
+          "challenge_id": {
+            "title": "Challenge Id",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "masked_destination": {
+            "title": "Masked Destination",
+            "type": "string"
+          },
+          "resend_after": {
+            "title": "Resend After",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "challenge_id",
+          "expires_in",
+          "resend_after",
+          "masked_destination"
+        ],
+        "title": "OTPRequestOut",
+        "type": "object"
+      },
+      "OTPVerifyIn": {
+        "properties": {
+          "challenge_id": {
+            "format": "uuid",
+            "title": "Challenge Id",
+            "type": "string"
+          },
+          "code": {
+            "maxLength": 8,
+            "minLength": 4,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id",
+          "code"
+        ],
+        "title": "OTPVerifyIn",
+        "type": "object"
+      },
+      "OnboardingOut": {
+        "properties": {
+          "completed_steps": {
+            "title": "Completed Steps",
+            "type": "integer"
+          },
+          "next_route": {
+            "title": "Next Route",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "BASIC_INFO_REQUIRED",
+              "SURVEY_REQUIRED",
+              "SURVEY_INCOMPLETE",
+              "COMPLETE"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "total_steps": {
+            "title": "Total Steps",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "state",
+          "completed_steps",
+          "total_steps",
+          "next_route"
+        ],
+        "title": "OnboardingOut",
+        "type": "object"
+      },
+      "Page_ProjectSummaryOut_": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectSummaryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "has_next"
+        ],
+        "title": "Page[ProjectSummaryOut]",
+        "type": "object"
+      },
+      "PasswordLoginIn": {
+        "description": "FR-AUTH-02 — موبایل یا ایمیل + رمز.",
+        "properties": {
+          "identifier": {
+            "maxLength": 254,
+            "minLength": 3,
+            "title": "Identifier",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identifier",
+          "password"
+        ],
+        "title": "PasswordLoginIn",
+        "type": "object"
+      },
+      "PreferencesStepIn": {
+        "additionalProperties": false,
+        "properties": {
+          "primary_goal": {
+            "anyOf": [
+              {
+                "enum": [
+                  "GRADE",
+                  "LEARNING",
+                  "PUBLICATION",
+                  "INCOME",
+                  "STARTUP",
+                  "EMPLOYMENT"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Goal"
+          },
+          "weekly_hours": {
+            "anyOf": [
+              {
+                "maximum": 80.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Hours"
+          },
+          "work_style": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SOLO",
+                  "TEAM",
+                  "EITHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Style"
+          }
+        },
+        "title": "PreferencesStepIn",
+        "type": "object"
+      },
+      "ProfileOut": {
+        "description": "نیمرخ در پاسخ `GET /me` — §5.3.\n\nکد ملی هرگز اینجا نمی‌آید، حتی پوشانده (NFR-01). مسیر اختصاصی با\nمجوز `profile.view.national_id` دارد.",
+        "properties": {
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Url"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "degree_level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ASSOCIATE",
+                  "BACHELOR",
+                  "MASTER",
+                  "PHD",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degree Level"
+          },
+          "degree_level_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degree Level Fa"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "entry_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry Year"
+          },
+          "field_of_study": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Of Study"
+          },
+          "first_name": {
+            "title": "First Name",
+            "type": "string"
+          },
+          "is_public": {
+            "default": false,
+            "title": "Is Public",
+            "type": "boolean"
+          },
+          "last_name": {
+            "title": "Last Name",
+            "type": "string"
+          },
+          "primary_goal": {
+            "anyOf": [
+              {
+                "enum": [
+                  "GRADE",
+                  "LEARNING",
+                  "PUBLICATION",
+                  "INCOME",
+                  "STARTUP",
+                  "EMPLOYMENT"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Goal"
+          },
+          "university": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UniversityRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "weekly_hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Hours"
+          },
+          "work_style": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SOLO",
+                  "TEAM",
+                  "EITHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Style"
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name"
+        ],
+        "title": "ProfileOut",
+        "type": "object"
+      },
+      "ProfileUpdateIn": {
+        "additionalProperties": false,
+        "description": "`PATCH /me/profile` — همهٔ فیلدها اختیاری‌اند.\n\n`None` یعنی «تغییر نده». این قرارداد در §5.3 صریح است و باعث می‌شود\nفرم چندگامی بتواند فقط فیلدهای همان گام را بفرستد.",
+        "properties": {
+          "bio": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "birth_year": {
+            "anyOf": [
+              {
+                "maximum": 1420.0,
+                "minimum": 1300.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Year"
+          },
+          "degree_level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ASSOCIATE",
+                  "BACHELOR",
+                  "MASTER",
+                  "PHD",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degree Level"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "entry_year": {
+            "anyOf": [
+              {
+                "maximum": 1420.0,
+                "minimum": 1300.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entry Year"
+          },
+          "field_of_study": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Of Study"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "enum": [
+                  "M",
+                  "F",
+                  "UNDISCLOSED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "student_number": {
+            "anyOf": [
+              {
+                "maxLength": 30,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Number"
+          },
+          "university_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "University Id"
+          }
+        },
+        "title": "ProfileUpdateIn",
+        "type": "object"
+      },
+      "ProjectDetailOut": {
+        "properties": {
+          "active_members": {
+            "default": 0,
+            "title": "Active Members",
+            "type": "integer"
+          },
+          "applications_close_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applications Close At"
+          },
+          "deadline_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline On"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "difficulty": {
+            "title": "Difficulty",
+            "type": "integer"
+          },
+          "difficulty_fa": {
+            "title": "Difficulty Fa",
+            "type": "string"
+          },
+          "expected_output": {
+            "title": "Expected Output",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "interests": {
+            "items": {
+              "$ref": "#/components/schemas/InterestRefOut"
+            },
+            "title": "Interests",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "A_VENTURE",
+              "B_RESEARCH",
+              "C_PROBLEM",
+              "D_PERSONAL"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "match": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MatchOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "open_seats": {
+            "default": 0,
+            "title": "Open Seats",
+            "type": "integer"
+          },
+          "required_assets": {
+            "items": {
+              "$ref": "#/components/schemas/AssetRequirementOut"
+            },
+            "title": "Required Assets",
+            "type": "array"
+          },
+          "required_skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillRequirementOut"
+            },
+            "title": "Required Skills",
+            "type": "array"
+          },
+          "rewards": {
+            "additionalProperties": true,
+            "title": "Rewards",
+            "type": "object"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "IN_PROGRESS",
+              "PAUSED",
+              "COMPLETED",
+              "CANCELLED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "team_size_max": {
+            "title": "Team Size Max",
+            "type": "integer"
+          },
+          "team_size_min": {
+            "title": "Team Size Min",
+            "type": "integer"
+          },
+          "time_commitment_hpw": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Commitment Hpw"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "work_style": {
+            "enum": [
+              "SOLO",
+              "TEAM",
+              "EITHER"
+            ],
+            "title": "Work Style",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title_fa",
+          "summary",
+          "kind",
+          "kind_fa",
+          "status",
+          "difficulty",
+          "difficulty_fa",
+          "work_style",
+          "team_size_min",
+          "team_size_max",
+          "description",
+          "expected_output"
+        ],
+        "title": "ProjectDetailOut",
+        "type": "object"
+      },
+      "ProjectSummaryOut": {
+        "description": "پروژه در فهرست‌ها و داخل کارت پیشنهاد — §5.7.",
+        "properties": {
+          "active_members": {
+            "default": 0,
+            "title": "Active Members",
+            "type": "integer"
+          },
+          "applications_close_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applications Close At"
+          },
+          "deadline_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline On"
+          },
+          "difficulty": {
+            "title": "Difficulty",
+            "type": "integer"
+          },
+          "difficulty_fa": {
+            "title": "Difficulty Fa",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "A_VENTURE",
+              "B_RESEARCH",
+              "C_PROBLEM",
+              "D_PERSONAL"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "open_seats": {
+            "default": 0,
+            "title": "Open Seats",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "IN_PROGRESS",
+              "PAUSED",
+              "COMPLETED",
+              "CANCELLED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "team_size_max": {
+            "title": "Team Size Max",
+            "type": "integer"
+          },
+          "team_size_min": {
+            "title": "Team Size Min",
+            "type": "integer"
+          },
+          "time_commitment_hpw": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Commitment Hpw"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "work_style": {
+            "enum": [
+              "SOLO",
+              "TEAM",
+              "EITHER"
+            ],
+            "title": "Work Style",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title_fa",
+          "summary",
+          "kind",
+          "kind_fa",
+          "status",
+          "difficulty",
+          "difficulty_fa",
+          "work_style",
+          "team_size_min",
+          "team_size_max"
+        ],
+        "title": "ProjectSummaryOut",
+        "type": "object"
+      },
+      "ReasonOut": {
+        "description": "دلیل آمادهٔ نمایش — §8.10. متن را بک‌اند می‌سازد، نه کلاینت.",
+        "properties": {
+          "contribution": {
+            "title": "Contribution",
+            "type": "number"
+          },
+          "polarity": {
+            "enum": [
+              "POSITIVE",
+              "WARNING"
+            ],
+            "title": "Polarity",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "polarity",
+          "contribution",
+          "text"
+        ],
+        "title": "ReasonOut",
+        "type": "object"
+      },
+      "RecommendationFeedbackIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "verdict": {
+            "enum": [
+              "NOT_RELEVANT",
+              "INTERESTED",
+              "DISMISSED"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verdict"
+        ],
+        "title": "RecommendationFeedbackIn",
+        "type": "object"
+      },
+      "RecommendationItemOut": {
+        "description": "یک پیشنهاد — §5.7 `GET /projects/recommended`.",
+        "properties": {
+          "breakdown": {
+            "$ref": "#/components/schemas/BreakdownOut"
+          },
+          "is_stretch": {
+            "default": false,
+            "title": "Is Stretch",
+            "type": "boolean"
+          },
+          "match_score": {
+            "title": "Match Score",
+            "type": "number"
+          },
+          "project": {
+            "$ref": "#/components/schemas/ProjectSummaryOut"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/ReasonOut"
+            },
+            "title": "Reasons",
+            "type": "array"
+          }
+        },
+        "required": [
+          "project",
+          "match_score",
+          "reasons",
+          "breakdown"
+        ],
+        "title": "RecommendationItemOut",
+        "type": "object"
+      },
+      "RecommendationsOut": {
+        "properties": {
+          "computed_at": {
+            "format": "date-time",
+            "title": "Computed At",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendationItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "profile_completeness": {
+            "title": "Profile Completeness",
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "profile_completeness",
+          "computed_at"
+        ],
+        "title": "RecommendationsOut",
+        "type": "object"
+      },
+      "RefreshIn": {
+        "properties": {
+          "refresh_token": {
+            "maxLength": 512,
+            "minLength": 20,
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshIn",
+        "type": "object"
+      },
+      "RoleGrantOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "scope_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Id"
+          },
+          "scope_type": {
+            "title": "Scope Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "scope_type"
+        ],
+        "title": "RoleGrantOut",
+        "type": "object"
+      },
+      "SessionOut": {
+        "description": "یک نشست فعال — §5.2 `GET /auth/sessions`.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "is_current": {
+            "title": "Is Current",
+            "type": "boolean"
+          },
+          "user_agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Agent"
+          }
+        },
+        "required": [
+          "id",
+          "user_agent",
+          "ip_address",
+          "created_at",
+          "expires_at",
+          "is_current"
+        ],
+        "title": "SessionOut",
+        "type": "object"
+      },
+      "SkillAnswerIn": {
+        "properties": {
+          "level": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Level",
+            "type": "integer"
+          },
+          "skill_id": {
+            "format": "uuid",
+            "title": "Skill Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skill_id",
+          "level"
+        ],
+        "title": "SkillAnswerIn",
+        "type": "object"
+      },
+      "SkillListOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SkillOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "level_labels": {
+            "items": {
+              "$ref": "#/components/schemas/LevelLabel"
+            },
+            "title": "Level Labels",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items",
+          "level_labels"
+        ],
+        "title": "SkillListOut",
+        "type": "object"
+      },
+      "SkillOut": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Icon"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_core": {
+            "title": "Is Core",
+            "type": "boolean"
+          },
+          "sort_order": {
+            "title": "Sort Order",
+            "type": "integer"
+          },
+          "title_en": {
+            "title": "Title En",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "title_fa",
+          "title_en",
+          "category",
+          "sort_order",
+          "is_core"
+        ],
+        "title": "SkillOut",
+        "type": "object"
+      },
+      "SkillRequirementOut": {
+        "properties": {
+          "is_teachable": {
+            "title": "Is Teachable",
+            "type": "boolean"
+          },
+          "min_level": {
+            "title": "Min Level",
+            "type": "integer"
+          },
+          "skill_id": {
+            "format": "uuid",
+            "title": "Skill Id",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "skill_id",
+          "title_fa",
+          "min_level",
+          "weight",
+          "is_teachable"
+        ],
+        "title": "SkillRequirementOut",
+        "type": "object"
+      },
+      "SkillsStepIn": {
+        "additionalProperties": false,
+        "properties": {
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillAnswerIn"
+            },
+            "maxItems": 60,
+            "title": "Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "skills"
+        ],
+        "title": "SkillsStepIn",
+        "type": "object"
+      },
+      "SurveyInterestOut": {
+        "properties": {
+          "interest_id": {
+            "format": "uuid",
+            "title": "Interest Id",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "interest_id",
+          "level"
+        ],
+        "title": "SurveyInterestOut",
+        "type": "object"
+      },
+      "SurveyOut": {
+        "description": "`GET /me/survey` — وضعیت کامل ارزیابی.",
+        "properties": {
+          "asset_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Asset Ids",
+            "type": "array"
+          },
+          "completed_steps": {
+            "title": "Completed Steps",
+            "type": "integer"
+          },
+          "interests": {
+            "items": {
+              "$ref": "#/components/schemas/SurveyInterestOut"
+            },
+            "title": "Interests",
+            "type": "array"
+          },
+          "primary_goal": {
+            "anyOf": [
+              {
+                "enum": [
+                  "GRADE",
+                  "LEARNING",
+                  "PUBLICATION",
+                  "INCOME",
+                  "STARTUP",
+                  "EMPLOYMENT"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Goal"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SurveySkillOut"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "total_steps": {
+            "title": "Total Steps",
+            "type": "integer"
+          },
+          "weekly_hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Hours"
+          },
+          "work_style": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SOLO",
+                  "TEAM",
+                  "EITHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Work Style"
+          }
+        },
+        "required": [
+          "skills",
+          "asset_ids",
+          "interests",
+          "completed_steps",
+          "total_steps"
+        ],
+        "title": "SurveyOut",
+        "type": "object"
+      },
+      "SurveySkillOut": {
+        "properties": {
+          "is_verified": {
+            "default": false,
+            "title": "Is Verified",
+            "type": "boolean"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "skill_id": {
+            "format": "uuid",
+            "title": "Skill Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skill_id",
+          "level"
+        ],
+        "title": "SurveySkillOut",
+        "type": "object"
+      },
+      "SurveyStepOut": {
+        "description": "پاسخ هر گام — §5.3.\n\n`preview_recommendations` همان «لحظهٔ طلایی» §01 است: سرور بلافاصله\nپس از گام ۱ سه پیشنهاد برمی‌گرداند، حتی با نیمرخ ۲۵٪ کامل.",
+        "properties": {
+          "completed_steps": {
+            "title": "Completed Steps",
+            "type": "integer"
+          },
+          "preview_recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/RecommendationItemOut"
+            },
+            "title": "Preview Recommendations",
+            "type": "array"
+          },
+          "total_steps": {
+            "title": "Total Steps",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "completed_steps",
+          "total_steps"
+        ],
+        "title": "SurveyStepOut",
+        "type": "object"
+      },
+      "TokenPairOut": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          },
+          "token_type": {
+            "default": "Bearer",
+            "title": "Token Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "expires_in"
+        ],
+        "title": "TokenPairOut",
+        "type": "object"
+      },
+      "UniversityOut": {
+        "properties": {
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "province": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Province"
+          },
+          "title_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title En"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa"
+        ],
+        "title": "UniversityOut",
+        "type": "object"
+      },
+      "UniversityRef": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa"
+        ],
+        "title": "UniversityRef",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "\nAPI پلتفرم نوآوری و یادگیری صابر.\n\nپاسخ‌ها مستقیماً بدنهٔ داده هستند و خطاها قالب ثابت\n`{\"error\": {\"code\", \"message\", \"details\", \"trace_id\"}}` دارند.\n",
+    "title": "SILP API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "description": "FR-AUTH-02 — پیام خطا هرگز افشا نمی‌کند که کاربر وجود دارد یا نه.",
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordLoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "محدودیت نرخ"
+          }
+        },
+        "summary": "ورود با رمز عبور",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "description": "خروج بی‌اثر در تکرار است: خروج از نشستی که وجود ندارد هم ۲۰۴ می‌دهد.",
+        "operationId": "logout_api_v1_auth_logout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "محدودیت نرخ"
+          }
+        },
+        "summary": "خروج از نشست جاری",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/otp/request": {
+      "post": {
+        "description": "FR-AUTH-01 — کد شش‌رقمی با اعتبار ۱۲۰ ثانیه.\n\nکانال اگر تصریح نشده باشد از شکل ورودی حدس زده می‌شود، تا کاربر\nمجبور به انتخاب نباشد.",
+        "operationId": "request_otp_api_v1_auth_otp_request_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPRequestIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OTPRequestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "محدودیت نرخ"
+          }
+        },
+        "summary": "درخواست کد یک‌بارمصرف",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/otp/verify": {
+      "post": {
+        "description": "FR-AUTH-01 — در صورت نبود حساب، ساخته می‌شود و نقش STUDENT می‌گیرد.",
+        "operationId": "verify_otp_api_v1_auth_otp_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPVerifyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "محدودیت نرخ"
+          }
+        },
+        "summary": "تأیید کد و دریافت توکن",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "description": "FR-AUTH-03 — چرخش اجباری. توکن قدیمی بلافاصله باطل می‌شود.\n\nاستفادهٔ دوباره از یک توکن باطل‌شده ⇒ `401 TOKEN_REUSE_DETECTED` و\nابطال کل خانواده.",
+        "operationId": "refresh_api_v1_auth_refresh_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPairOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "محدودیت نرخ"
+          }
+        },
+        "summary": "تمدید توکن",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/sessions": {
+      "get": {
+        "description": "FR-AUTH-03 — کاربر باید بتواند دستگاه‌های واردشده را ببیند.",
+        "operationId": "list_sessions_api_v1_auth_sessions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SessionOut"
+                  },
+                  "title": "Response List Sessions Api V1 Auth Sessions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "محدودیت نرخ"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "فهرست نشست‌های فعال",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/sessions/{session_id}": {
+      "delete": {
+        "description": "۴۰۴ برای نشست کاربر دیگر — وجود آن نباید افشا شود (§6.4 قاعدهٔ ۴).",
+        "operationId": "revoke_session_api_v1_auth_sessions__session_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "محدودیت نرخ"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "قطع یک نشست",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "description": "اطلاعات تماس پوشانده برمی‌گردد (NFR-01): `0912***4567`.",
+        "operationId": "get_me_api_v1_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "اطلاعات کاربر جاری",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/profile": {
+      "patch": {
+        "description": "`PATCH` جزئی — فیلدهای نفرستاده دست‌نخورده می‌مانند (§5.3).",
+        "operationId": "update_profile_api_v1_me_profile_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "به‌روزرسانی اطلاعات پایه",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/survey": {
+      "get": {
+        "operationId": "get_survey_api_v1_me_survey_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "وضعیت کامل ارزیابی نیمرخ",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/survey/assets": {
+      "patch": {
+        "operationId": "save_assets_api_v1_me_survey_assets_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetsStepIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyStepOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "گام ۲ — امکانات",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/survey/interests": {
+      "patch": {
+        "operationId": "save_interests_api_v1_me_survey_interests_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterestsStepIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyStepOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "گام ۳ — علاقه‌ها",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/survey/preferences": {
+      "patch": {
+        "operationId": "save_preferences_api_v1_me_survey_preferences_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencesStepIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyStepOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "گام ۴ — ترجیحات",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/survey/skills": {
+      "patch": {
+        "operationId": "save_skills_api_v1_me_survey_skills_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillsStepIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyStepOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "گام ۱ — مهارت‌ها",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/projects": {
+      "get": {
+        "description": "فهرست پروژه‌های باز.\n\nجستجو روی ستون تولیدشدهٔ `search_norm` با ایندکس trigram انجام می‌شود،\nنه `ILIKE '%…%'` — §4.11.",
+        "operationId": "list_projects_api_v1_projects_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "work_style",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Work Style"
+            }
+          },
+          {
+            "in": "query",
+            "name": "difficulty_max",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Difficulty Max"
+            }
+          },
+          {
+            "in": "query",
+            "name": "skill_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Skill Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "interest_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Interest Id"
+            }
+          },
+          {
+            "description": "جستجوی فارسی",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "جستجوی فارسی",
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "newest",
+              "enum": [
+                "match",
+                "newest",
+                "popular",
+                "deadline"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ProjectSummaryOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "فهرست و جستجوی پروژه",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/projects/recommended": {
+      "get": {
+        "description": "§5.7 — هر پیشنهاد با امتیاز، تفکیک شش‌گانه و دلایل فارسی.\n\nمتن دلیل از سرور می‌آید و مستقیماً نمایش داده می‌شود (§8.10).",
+        "operationId": "recommended_api_v1_projects_recommended_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پیشنهادهای شخصی با دلیل",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}": {
+      "get": {
+        "description": "اگر کاربر وارد باشد، `match` هم محاسبه می‌شود.\n\nاین محاسبه از کش پیشنهادها نمی‌آید: کاربر ممکن است پروژه‌ای را ببیند\nکه در ده تای برتر نبوده و همچنان حق دارد بداند چقدر به او می‌خورد.",
+        "operationId": "get_project_api_v1_projects__project_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جزئیات پروژه + تطابق من",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/recommendations/{project_id}/feedback": {
+      "post": {
+        "description": "§8.9 — «به من نمی‌خورد» / «دیگر نشانم نده» / «فعلاً نه، ولی جالب است».\n\nنظر تازه جای نظر قبلی را می‌گیرد؛ دانشجو باید بتواند نظرش را عوض کند.",
+        "operationId": "submit_feedback_api_v1_recommendations__project_id__feedback_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecommendationFeedbackIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بازخورد روی یک پیشنهاد",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/taxonomy/assets": {
+      "get": {
+        "operationId": "list_assets_api_v1_taxonomy_assets_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AssetOut"
+                  },
+                  "title": "Response List Assets Api V1 Taxonomy Assets Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "فهرست امکانات",
+        "tags": [
+          "taxonomy"
+        ]
+      }
+    },
+    "/api/v1/taxonomy/interests": {
+      "get": {
+        "operationId": "list_interests_api_v1_taxonomy_interests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterestListOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "فهرست حوزه‌های علاقه",
+        "tags": [
+          "taxonomy"
+        ]
+      }
+    },
+    "/api/v1/taxonomy/skills": {
+      "get": {
+        "operationId": "list_skills_api_v1_taxonomy_skills_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillListOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "فهرست مهارت‌ها",
+        "tags": [
+          "taxonomy"
+        ]
+      }
+    },
+    "/api/v1/taxonomy/universities": {
+      "get": {
+        "description": "جستجو با `fa_normalize` انجام می‌شود، نه `ILIKE` خام.\n\nکاربر «دانشگاه شهيد باهنر» با «ي» عربی می‌نویسد و باید همان نتیجه را\nبگیرد که با «ی» فارسی — §4.11.",
+        "operationId": "search_universities_api_v1_taxonomy_universities_get",
+        "parameters": [
+          {
+            "description": "بخشی از نام دانشگاه",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "بخشی از نام دانشگاه",
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UniversityOut"
+                  },
+                  "title": "Response Search Universities Api V1 Taxonomy Universities Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "جستجوی دانشگاه",
+        "tags": [
+          "taxonomy"
+        ]
+      }
+    }
+  }
+}

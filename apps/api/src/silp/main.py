@@ -1,0 +1,110 @@
+"""نقطهٔ ورود اپلیکیشن FastAPI — PRD §12.2.
+
+ترتیب افزودن میان‌افزارها معکوس اجراست: آخرین میان‌افزار افزوده‌شده اولین
+اجراکننده است. `TraceMiddleware` باید بیرونی‌ترین باشد تا هر لاگ — از جمله
+لاگ خطا — trace_id داشته باشد.
+"""
+
+from __future__ import annotations
+
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+
+from silp.core.config import Settings, get_settings
+from silp.core.errors import register_error_handlers
+from silp.core.logging import configure_logging, get_logger
+from silp.core.middleware import RequestLogMiddleware, TraceMiddleware
+from silp.core.redis import close_redis
+from silp.db.session import dispose_engine
+from silp.routers import health
+from silp.routers.v1 import auth, me, projects, taxonomy
+
+log = get_logger("silp.main")
+
+API_PREFIX = "/api/v1"
+
+DESCRIPTION = """
+API پلتفرم نوآوری و یادگیری صابر.
+
+پاسخ‌ها مستقیماً بدنهٔ داده هستند و خطاها قالب ثابت
+`{"error": {"code", "message", "details", "trace_id"}}` دارند.
+"""
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    settings: Settings = app.state.settings
+    log.info(
+        "api_starting",
+        environment=settings.environment,
+        version=app.version,
+    )
+    yield
+    await close_redis()
+    await dispose_engine()
+    log.info("api_stopped")
+
+
+def create_app(settings: Settings | None = None) -> FastAPI:
+    settings = settings or get_settings()
+
+    # در توسعه لاگ رنگی و خوانا، در بقیهٔ محیط‌ها JSON ساختاریافته (NFR-13).
+    configure_logging(
+        settings.log_level,
+        renderer="console" if settings.is_development else "json",
+    )
+
+    app = FastAPI(
+        title="SILP API",
+        description=DESCRIPTION,
+        version="0.1.0",
+        lifespan=lifespan,
+        # مستندات تعاملی در تولید بسته است — سطح حمله را بی‌دلیل باز نکنیم.
+        docs_url=None if settings.is_production else "/docs",
+        redoc_url=None if settings.is_production else "/redoc",
+        openapi_url=None if settings.is_production else "/openapi.json",
+        swagger_ui_parameters={"persistAuthorization": True},
+    )
+    app.state.settings = settings
+
+    _register_middleware(app, settings)
+    register_error_handlers(app)
+    _register_routers(app)
+
+    return app
+
+
+def _register_middleware(app: FastAPI, settings: Settings) -> None:
+    # ترتیب معکوس: Trace بیرونی‌ترین لایه می‌شود.
+    app.add_middleware(GZipMiddleware, minimum_size=1024)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origin_list,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "X-Trace-Id", "Idempotency-Key"],
+        expose_headers=["X-Trace-Id", "Retry-After", "Location"],
+        max_age=600,
+    )
+    app.add_middleware(RequestLogMiddleware)
+    app.add_middleware(TraceMiddleware)
+
+
+def _register_routers(app: FastAPI) -> None:
+    # سلامت خارج از /api/v1 است تا Nginx و داکر بدون دانستن نسخه به آن برسند.
+    app.include_router(health.router)
+
+    v1 = APIRouter(prefix=API_PREFIX)
+    v1.include_router(auth.router)
+    v1.include_router(me.router)
+    v1.include_router(taxonomy.router)
+    v1.include_router(projects.router)
+    v1.include_router(projects.feedback_router)
+    app.include_router(v1)
+
+
+app = create_app()
