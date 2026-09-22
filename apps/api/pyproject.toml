@@ -121,13 +121,13 @@ markers = [
 ]
 filterwarnings = ["error::DeprecationWarning:silp.*"]
 
+[tool.coverage.run]
+# SQLAlchemy async هر کوئری را داخل یک greenlet اجرا می‌کند. بدون این
+# تنظیم، coverage.py ردگیری را در آن جابه‌جایی از دست می‌دهد و خطوطی
+# که مسلماً اجرا شده‌اند «پوشش‌نداده» شمرده می‌شوند.
+concurrency = ["greenlet"]
+
 [tool.coverage.report]
-# نکته: پوشش لایهٔ سرویس کمتر از واقعیت گزارش می‌شود. SQLAlchemy async هر
-# کوئری را داخل یک greenlet اجرا می‌کند و coverage.py ردگیری را در آن
-# جابه‌جایی از دست می‌دهد؛ خطوطی که مسلماً اجرا شده‌اند «پوشش‌نداده»
-# شمرده می‌شوند. سخت‌گیرانه‌تر از واقعیت است، پس دروازهٔ ۸۰٪ بی‌خطر
-# می‌ماند — ولی دنبال «شکاف»هایی که در گزارش می‌بینید نگردید تا اول
-# مطمئن شوید واقعاً تستی ندارند.
 exclude_lines = [
   "pragma: no cover",
   "if TYPE_CHECKING:",

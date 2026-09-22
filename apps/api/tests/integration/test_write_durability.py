@@ -139,3 +139,129 @@ async def test_recommendation_feedback_survives_the_request(  # type: ignore[no-
         stored = await verifier.get(RecommendationFeedback, (account["user_id"], project_id))
         assert stored is not None, "بازخورد commit نشده است"
         assert stored.verdict == "DISMISSED"
+
+
+# ── M2 ─────────────────────────────────────────────────────────────────
+async def test_project_creation_survives_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """پروژه و مشخصات تطابقش باید با هم تثبیت شوند، نه فقط ردیف اصلی."""
+    from silp.models.project import Project, ProjectRequiredSkill
+    from silp.models.taxonomy import Skill
+
+    skill_id = await committing_session.scalar(select(Skill.id).where(Skill.code == "PYTHON"))
+    response = await committing_client.post(
+        "/api/v1/projects",
+        headers=auth(account),
+        json={
+            "title_fa": "پروژهٔ پایداری نوشتن",
+            "summary": "پروژه‌ای که فقط برای آزمون تثبیت داده ساخته می‌شود.",
+            "description": "شرح کامل پروژه با جزئیات کافی برای تصمیم دانشجو.",
+            "kind": "D_PERSONAL",
+            "expected_output": "گزارش",
+            "required_skills": [{"skill_id": str(skill_id), "min_level": 3}],
+        },
+    )
+    assert response.status_code == 201, response.text
+    project_id = uuid.UUID(response.json()["id"])
+
+    try:
+        async with other_connection() as verifier:
+            stored = await verifier.get(Project, project_id)
+            assert stored is not None, "پروژه commit نشده است"
+            requirement = await verifier.scalar(
+                select(ProjectRequiredSkill.min_level).where(
+                    ProjectRequiredSkill.project_id == project_id
+                )
+            )
+        assert requirement == 3, "مهارت لازم در همان تراکنش تثبیت نشده است"
+    finally:
+        await committing_session.execute(delete(Project).where(Project.id == project_id))
+        await committing_session.commit()
+
+
+async def test_publish_persists_team_and_lead_membership(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """§7.12 — تیم و عضویت مدیر در همان تراکنش انتشار نوشته می‌شوند."""
+    from silp.models.project import Project, Team, TeamMember
+    from silp.models.taxonomy import Skill
+
+    skill_id = await committing_session.scalar(select(Skill.id).where(Skill.code == "PYTHON"))
+    created = await committing_client.post(
+        "/api/v1/projects",
+        headers=auth(account),
+        json={
+            "title_fa": "پروژهٔ انتشار پایدار",
+            "summary": "پروژه‌ای برای آزمون ساخت تیم هنگام انتشار.",
+            "description": "شرح کامل پروژه با جزئیات کافی برای تصمیم دانشجو.",
+            "kind": "D_PERSONAL",
+            "expected_output": "گزارش",
+            "required_skills": [{"skill_id": str(skill_id), "min_level": 3}],
+        },
+    )
+    project_id = uuid.UUID(created.json()["id"])
+
+    try:
+        await committing_client.post(
+            f"/api/v1/projects/{project_id}/milestones",
+            headers=auth(account),
+            json={"title_fa": "مرحلهٔ اول", "points": 10},
+        )
+        published = await committing_client.post(
+            f"/api/v1/projects/{project_id}/publish", headers=auth(account)
+        )
+        assert published.status_code == 200, published.text
+
+        async with other_connection() as verifier:
+            team_id = await verifier.scalar(select(Team.id).where(Team.project_id == project_id))
+            assert team_id is not None, "تیم commit نشده است"
+            is_lead = await verifier.scalar(
+                select(TeamMember.is_lead).where(
+                    TeamMember.team_id == team_id, TeamMember.user_id == account["user_id"]
+                )
+            )
+        assert is_lead is True, "عضویت مدیر در تیم تثبیت نشده است"
+    finally:
+        await committing_session.execute(delete(Project).where(Project.id == project_id))
+        await committing_session.commit()
+
+
+async def test_completed_upload_survives_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account, storage
+) -> None:
+    """§5.9 — بدون تثبیت `uploaded_at`، فایل برای درخواست بعدی ناتمام است."""
+    from silp.models.file import File
+
+    body = b"%PDF-1.7\n"
+    reserved = await committing_client.post(
+        "/api/v1/files/upload-url",
+        headers=auth(account),
+        json={
+            "original_name": "durable.pdf",
+            "content_type": "application/pdf",
+            "size_bytes": len(body),
+            "purpose": "DELIVERABLE",
+        },
+    )
+    assert reserved.status_code == 200, reserved.text
+    payload = reserved.json()
+    file_id = uuid.UUID(payload["file_id"])
+
+    try:
+        storage.put_object(
+            payload["upload_url"].split("/", 3)[-1], body, "application/pdf"
+        )
+        completed = await committing_client.post(
+            f"/api/v1/files/{file_id}/complete", headers=auth(account)
+        )
+        assert completed.status_code == 200, completed.text
+
+        async with other_connection() as verifier:
+            stored = await verifier.get(File, file_id)
+            assert stored is not None, "ردیف فایل commit نشده است"
+            assert stored.uploaded_at is not None, "تکمیل آپلود commit نشده است"
+            assert stored.size_bytes == len(body)
+    finally:
+        await committing_session.execute(delete(File).where(File.id == file_id))
+        await committing_session.commit()

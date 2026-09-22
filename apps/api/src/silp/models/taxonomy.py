@@ -10,7 +10,7 @@
 
 from __future__ import annotations
 
-from sqlalchemy import Boolean, CheckConstraint, Integer, Text, text
+from sqlalchemy import Boolean, CheckConstraint, Index, Integer, Text, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from silp.db.base import Base, UUIDPrimaryKeyMixin
@@ -59,6 +59,13 @@ class University(UUIDPrimaryKeyMixin, Base):
 
     __table_args__ = (
         CheckConstraint(f"type IS NULL OR {_in_list('type', UNIVERSITY_TYPES)}", name="type_valid"),
+        # جستجوی دانشگاه با نام فارسی — §5.4. ایندکس روی خروجی تابع است،
+        # نه روی ستون، پس با `text()` نوشته می‌شود.
+        Index(
+            "idx_universities_search",
+            text("fa_normalize(title_fa) gin_trgm_ops"),
+            postgresql_using="gin",
+        ),
     )
 
 

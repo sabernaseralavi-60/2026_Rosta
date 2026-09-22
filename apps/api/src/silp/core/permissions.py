@@ -111,6 +111,8 @@ class Permission(StrEnum):
 
     # ── پروژه (M2) ─────────────────────────────────────────────────────
     PROJECT_CREATE_MANAGED = "project.create.managed"
+    PROJECT_EDIT = "project.edit"
+    PROJECT_PUBLISH = "project.publish"
     PROJECT_WORKSPACE_VIEW = "project.workspace.view"
     PROJECT_APPLICATION_DECIDE = "project.application.decide"
     PROJECT_MILESTONE_MANAGE = "project.milestone.manage"
@@ -181,6 +183,10 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     Permission.APPEAL_RESOLVE: frozenset({Role.INSTRUCTOR, Role.ADMIN}),
     # پروژه
     Permission.PROJECT_CREATE_MANAGED: frozenset({Role.MENTOR, Role.INSTRUCTOR, Role.ADMIN}),
+    # §5.7 «ویرایش» و «انتشار» را به مدیر پروژه می‌دهد. استاد هم
+    # هست چون پروژهٔ متصل به ارائهٔ او زیر نظر اوست (پانویس ۷ §6.2).
+    Permission.PROJECT_EDIT: frozenset({Role.PROJECT_LEAD, Role.INSTRUCTOR, Role.ADMIN}),
+    Permission.PROJECT_PUBLISH: frozenset({Role.PROJECT_LEAD, Role.INSTRUCTOR, Role.ADMIN}),
     Permission.PROJECT_WORKSPACE_VIEW: frozenset(
         {Role.PROJECT_MEMBER, Role.PROJECT_LEAD, Role.MENTOR, Role.INSTRUCTOR, Role.ADMIN}
     ),
@@ -221,6 +227,8 @@ SCOPED_PERMISSIONS: frozenset[Permission] = frozenset(
         Permission.QUIZ_ATTEMPT_INVALIDATE,
         Permission.GRADE_OVERRIDE,
         Permission.APPEAL_RESOLVE,
+        Permission.PROJECT_EDIT,
+        Permission.PROJECT_PUBLISH,
         Permission.PROJECT_WORKSPACE_VIEW,
         Permission.PROJECT_APPLICATION_DECIDE,
         Permission.PROJECT_MILESTONE_MANAGE,

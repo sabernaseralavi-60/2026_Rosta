@@ -143,6 +143,12 @@ class Project(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         CheckConstraint("team_size_min >= 1", name="team_size_min_positive"),
         CheckConstraint("team_size_max >= team_size_min", name="team_size"),
         CheckConstraint("jsonb_typeof(rewards) = 'object'", name="rewards_is_object"),
+        # جستجوی فارسی با trigram روی ستون تولیدشده — §4.11.
+        Index(
+            "idx_projects_search",
+            text("search_norm gin_trgm_ops"),
+            postgresql_using="gin",
+        ),
         Index("idx_projects_lead", "lead_id"),
         Index("idx_projects_tags", "tags", postgresql_using="gin"),
         Index(
@@ -345,7 +351,8 @@ class ProjectApplication(UUIDPrimaryKeyMixin, Base):
     )
 
     __table_args__ = (
-        UniqueConstraint("project_id", "applicant_id", name="applicant"),
+        # نام کامل صریح: قرارداد `uq` نام قید را جایگزین نمی‌کند.
+        UniqueConstraint("project_id", "applicant_id", name="uq_project_applications_applicant"),
         CheckConstraint(_in_list("status", APPLICATION_STATUSES), name="status_valid"),
         CheckConstraint("length(motivation) <= 500", name="motivation_length"),
         CheckConstraint(

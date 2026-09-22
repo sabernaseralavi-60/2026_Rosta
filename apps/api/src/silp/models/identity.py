@@ -77,6 +77,12 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         # شمارهٔ موبایل ایرانی، نرمال‌شده — FR-AUTH-01
         CheckConstraint(r"mobile IS NULL OR mobile ~ '^09\d{9}$'", name="mobile_format"),
         Index("idx_users_status", "status", postgresql_where=text("deleted_at IS NULL")),
+        # مسیر عمومی /u/{username}
+        Index(
+            "idx_users_username_active",
+            "username",
+            postgresql_where=text("username IS NOT NULL AND deleted_at IS NULL"),
+        ),
     )
 
     @property
@@ -133,6 +139,8 @@ class UserRole(Base):
             name="scope_id_matches_type",
         ),
         Index("idx_user_roles_scope", "scope_type", "scope_id"),
+        # ترکیبی، نه جزئی: `now()` در شرط ایندکس پذیرفته نمی‌شود.
+        Index("idx_user_roles_user_active", "user_id", "expires_at"),
         Index(
             "uq_user_roles_grant",
             "user_id",
@@ -184,6 +192,7 @@ class RefreshToken(UUIDPrimaryKeyMixin, Base):
             postgresql_where=text("revoked_at IS NULL"),
         ),
         Index("idx_refresh_family", "family_id"),
+        Index("idx_refresh_expires", "expires_at"),
     )
 
     def is_usable(self, at: datetime) -> bool:
@@ -220,7 +229,10 @@ class OTPChallenge(UUIDPrimaryKeyMixin, Base):
             "purpose",
             postgresql_where=text("consumed_at IS NULL"),
         ),
-        UniqueConstraint("id", "destination", name="id_destination"),
+        Index("idx_otp_created", "created_at"),
+        # قرارداد نام‌گذاری `uq` به نام قید کاری ندارد، پس نام کامل
+        # صریح داده می‌شود تا با مهاجرت یکی بماند.
+        UniqueConstraint("id", "destination", name="uq_otp_challenges_id_destination"),
     )
 
     @property

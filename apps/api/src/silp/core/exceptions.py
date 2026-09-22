@@ -103,6 +103,75 @@ class ProfileIncomplete(SILPError):
     message = "برای این کار باید نیمرخ خود را کامل کنید."
 
 
+# ── پروژه — §5.13 ──────────────────────────────────────────────────────
+class ProjectNotOpen(Conflict):
+    code = "PROJECT_NOT_OPEN"
+    message = "این پروژه پذیرش ندارد."
+
+
+class ProjectCapacityFull(Conflict):
+    code = "PROJECT_CAPACITY_FULL"
+    message = "ظرفیت این پروژه تکمیل شده است."
+
+
+class DuplicateApplication(Conflict):
+    code = "DUPLICATE_APPLICATION"
+    message = "شما قبلاً برای این پروژه درخواست داده‌اید."
+
+
+class TooManyOpenApplications(Conflict):
+    code = "TOO_MANY_OPEN_APPLICATIONS"
+    message = "حداکثر ۵ درخواست باز می‌توانید داشته باشید."
+
+
+class NotTeamMember(PermissionDenied):
+    code = "NOT_TEAM_MEMBER"
+    message = "شما عضو تیم این پروژه نیستید."
+
+
+class MilestoneNotOpen(Conflict):
+    code = "MILESTONE_NOT_OPEN"
+    message = "این مرحله پذیرای تحویل نیست."
+
+
+class ConcurrentModification(Conflict):
+    """§7.12 — تصادم شماره‌گذاری پس از چند تلاش برطرف نشد."""
+
+    code = "CONCURRENT_MODIFICATION"
+    message = "هم‌زمان کس دیگری همین را تغییر داد. دوباره تلاش کنید."
+    log_level = "warning"
+
+
+# ── فایل — §5.13 ───────────────────────────────────────────────────────
+class FileTooLarge(SILPError):
+    status_code = 413
+    code = "FILE_TOO_LARGE"
+    message = "حجم فایل بیش از حد مجاز است."
+
+    def __init__(self, *, max_bytes: int, **kwargs: Any) -> None:
+        details = kwargs.pop("details", {}) or {}
+        details["max_bytes"] = max_bytes
+        super().__init__(details=details, **kwargs)
+
+
+class ContentTypeNotAllowed(SILPError):
+    status_code = 415
+    code = "CONTENT_TYPE_NOT_ALLOWED"
+    message = "این نوع فایل مجاز نیست."
+
+
+class FileScanPending(Conflict):
+    code = "FILE_SCAN_PENDING"
+    message = "فایل در حال بررسی است. کمی صبر کنید."
+
+
+class UploadIncomplete(Conflict):
+    """آپلود روی فضای ذخیره‌سازی تمام نشده — §5.9."""
+
+    code = "UPLOAD_INCOMPLETE"
+    message = "آپلود این فایل کامل نشده است."
+
+
 # ── ۴۲۲ ────────────────────────────────────────────────────────────────
 class ValidationFailed(SILPError):
     status_code = 422

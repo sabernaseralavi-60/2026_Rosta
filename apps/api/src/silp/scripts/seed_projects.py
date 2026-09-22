@@ -14,12 +14,14 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
+from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.logging import get_logger
+from silp.models.delivery import Milestone
 from silp.models.identity import User
 from silp.models.project import (
     Project,
@@ -28,10 +30,20 @@ from silp.models.project import (
     ProjectRequiredSkill,
     ProjectRole,
     Team,
+    TeamMember,
 )
 from silp.models.taxonomy import Asset, Interest, Skill
 
 log = get_logger("silp.seed.projects")
+
+# M2 — هر پروژهٔ نمونه باید مرحله داشته باشد، وگرنه فضای کاری خالی
+# است و جریان تحویل قابل امتحان نیست. الگو عمداً کوتاه و مشترک است؛
+# مراحل واقعیِ هر پروژه در M7-16 با دادهٔ میدانی جایگزین می‌شوند.
+MILESTONE_TEMPLATE: tuple[tuple[str, str, int, str], ...] = (
+    ("شناخت و برنامه‌ریزی", "محدوده، ذی‌نفعان و برنامهٔ اجرا مشخص شود.", 20, "DOCUMENT"),
+    ("اجرا", "کار اصلی پروژه انجام و شواهدش ثبت شود.", 50, "MIXED"),
+    ("گزارش و تحویل نهایی", "خروجی نهایی تحویل و جمع‌بندی نوشته شود.", 30, "DOCUMENT"),
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -355,9 +367,30 @@ async def seed_projects(session: AsyncSession, lead_id: uuid.UUID) -> tuple[int,
                 ProjectRole(project_id=project.id, title_fa=role.title_fa, slots=role.slots)
             )
 
-        # هر پروژه از روز اول یک تیم دارد، حتی خالی: بدون آن، پیوستن در M2
-        # باید تیم بسازد و آن عملیات را پیچیده‌تر می‌کند.
-        session.add(Team(project_id=project.id, name=f"تیم {seed.title_fa}"))
+        # §7.12 — پروژهٔ `OPEN` تیم دارد و مدیرش عضو `is_lead` آن است؛
+        # همان کاری که `publish` می‌کند، اینجا دستی انجام می‌شود چون
+        # پروژهٔ نمونه مستقیم `OPEN` ساخته می‌شود.
+        team = Team(project_id=project.id, name=f"تیم {seed.title_fa}")
+        session.add(team)
+        await session.flush()
+        session.add(
+            TeamMember(team_id=team.id, user_id=lead_id, is_lead=True, status="ACTIVE")
+        )
+
+        for order, (title, description, points, output_kind) in enumerate(
+            MILESTONE_TEMPLATE, start=1
+        ):
+            session.add(
+                Milestone(
+                    project_id=project.id,
+                    title_fa=title,
+                    description=description,
+                    sort_order=order,
+                    points=Decimal(points),
+                    output_kind=output_kind,
+                    checklist=[],
+                )
+            )
 
         created += 1
         log.info("seed_project_created", slug=seed.slug, kind=seed.kind)

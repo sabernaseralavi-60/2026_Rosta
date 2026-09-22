@@ -19,6 +19,7 @@ os.environ.setdefault("JWT_SECRET_KEY", "test-jwt-key-11111111111111111111111111
 os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://silp:silp@postgres-test:5432/silp_test")
 os.environ.setdefault("REDIS_URL", "redis://redis-test:6379/0")
 os.environ.setdefault("SMS_PROVIDER", "memory")
+os.environ.setdefault("STORAGE_PROVIDER", "memory")
 os.environ.setdefault("LOG_LEVEL", "WARNING")
 
 
@@ -36,6 +37,22 @@ def sms():  # type: ignore[no-untyped-def]
     from silp.integrations.sms import MemorySMSSender
 
     return MemorySMSSender()
+
+
+@pytest.fixture
+def storage():  # type: ignore[no-untyped-def]
+    """ذخیره‌سازی حافظه‌ای مشترک با اپ — تست نقش کلاینت آپلودکننده را بازی می‌کند.
+
+    همان نمونه‌ای است که `get_storage` در محیط تست برمی‌گرداند، پس
+    آنچه تست `put_object` می‌کند، همان است که سرویس `stat` می‌کند.
+    محتوایش بین تست‌ها پاک می‌شود.
+    """
+    from silp.integrations.storage import get_memory_storage
+
+    backend = get_memory_storage()
+    backend.objects.clear()
+    yield backend
+    backend.objects.clear()
 
 
 PROBE_TIMEOUT_SECONDS = 10.0

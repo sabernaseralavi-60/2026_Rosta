@@ -47,12 +47,23 @@ class Settings(BaseSettings):
     redis_url: RedisDsn = RedisDsn("redis://redis:6379/0")
 
     # ── ذخیره‌سازی ─────────────────────────────────────────────────────
+    storage_provider: Literal["s3", "memory"] = "s3"
     s3_endpoint: str = "http://minio:9000"
     s3_bucket: str = "silp-dev"
     s3_access_key: str = ""
     s3_secret_key: str = ""
     s3_region: str = "us-east-1"
     s3_public_base: str = ""
+    # §5.9 — عمر URL امضاشده. کوتاه‌تر امن‌تر است، ولی آپلود ۵۰۰ مگابایتی
+    # روی اینترنت ایران در ۹۰۰ ثانیه هم ممکن است تمام نشود.
+    upload_url_ttl_seconds: Annotated[int, Field(ge=60, le=7200)] = 900
+    download_url_ttl_seconds: Annotated[int, Field(ge=60, le=3600)] = 900
+    # FR-EDU-03 — سقف‌ها «قابل تنظیم» هستند؛ پیش‌فرض همان سند است.
+    upload_max_mb_document: Annotated[int, Field(ge=1, le=500)] = 50
+    upload_max_mb_image: Annotated[int, Field(ge=1, le=500)] = 10
+    upload_max_mb_video: Annotated[int, Field(ge=1, le=500)] = 500
+    upload_max_mb_dataset: Annotated[int, Field(ge=1, le=500)] = 200
+    upload_max_mb_archive: Annotated[int, Field(ge=1, le=500)] = 200
 
     # ── احراز هویت (FR-AUTH-01) ────────────────────────────────────────
     otp_length: Annotated[int, Field(ge=4, le=8)] = 6
@@ -100,6 +111,18 @@ class Settings(BaseSettings):
     @property
     def is_test(self) -> bool:
         return self.environment == "test"
+
+    @property
+    def upload_limit_overrides(self) -> dict[str, int]:
+        """سقف هر دسته به بایت — کلید با `domain.files.Category` یکی است."""
+        mb = 1024 * 1024
+        return {
+            "DOCUMENT": self.upload_max_mb_document * mb,
+            "IMAGE": self.upload_max_mb_image * mb,
+            "VIDEO": self.upload_max_mb_video * mb,
+            "DATASET": self.upload_max_mb_dataset * mb,
+            "ARCHIVE": self.upload_max_mb_archive * mb,
+        }
 
     @property
     def cors_origin_list(self) -> list[str]:

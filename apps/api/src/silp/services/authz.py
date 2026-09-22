@@ -26,12 +26,13 @@ from silp.core.permissions import (
 )
 from silp.core.redis import ROLES_TTL_SECONDS, get_redis, key_roles
 from silp.models.identity import UserRole
+from silp.models.project import Project, Team, TeamMember
 
 log = get_logger("silp.authz")
 
 
-async def load_grants(session: AsyncSession, user_id: uuid.UUID) -> tuple[RoleGrant, ...]:
-    """خواندن اعطاهای نقش فعال از دیتابیس — بدون کش."""
+async def load_stored_grants(session: AsyncSession, user_id: uuid.UUID) -> tuple[RoleGrant, ...]:
+    """اعطاهای ثبت‌شده در `user_roles` — بدون نقش‌های مشتق."""
     now = datetime.now(UTC)
     rows = await session.scalars(
         select(UserRole).where(
@@ -54,6 +55,58 @@ async def load_grants(session: AsyncSession, user_id: uuid.UUID) -> tuple[RoleGr
             )
         )
     return tuple(grants)
+
+
+async def load_derived_grants(session: AsyncSession, user_id: uuid.UUID) -> tuple[RoleGrant, ...]:
+    """§6.1 — `PROJECT_LEAD` و `PROJECT_MEMBER` در `user_roles` ذخیره نمی‌شوند.
+
+    دو منبع دارند و هر دو لازم‌اند:
+
+    * **عضویت فعال در تیم** — عضو عادی `PROJECT_MEMBER` و عضو `is_lead`
+      نقش `PROJECT_LEAD` می‌گیرد.
+    * **`projects.lead_id`** — پروژهٔ `DRAFT` هنوز تیم ندارد (§7.12 تیم
+      هنگام انتشار ساخته می‌شود)، پس سازنده تا لحظهٔ انتشار از راه تیم
+      هیچ نقشی نمی‌گیرد و نمی‌تواند پروژهٔ خودش را منتشر کند.
+
+    عضو `LEFT` یا `REMOVED` نقشی نمی‌گیرد: ایندکس یکتای
+    `idx_team_member_active` تضمین می‌کند هر کاربر حداکثر یک عضویت فعال
+    در هر تیم دارد.
+    """
+    member_rows = await session.execute(
+        select(Team.project_id, TeamMember.is_lead)
+        .join(TeamMember, TeamMember.team_id == Team.id)
+        .where(
+            TeamMember.user_id == user_id,
+            TeamMember.status == "ACTIVE",
+            Team.project_id.is_not(None),
+        )
+    )
+    grants: list[RoleGrant] = [
+        RoleGrant(
+            role=Role.PROJECT_LEAD if is_lead else Role.PROJECT_MEMBER,
+            scope_type=ScopeType.PROJECT,
+            scope_id=project_id,
+        )
+        for project_id, is_lead in member_rows
+    ]
+
+    lead_project_ids = await session.scalars(
+        select(Project.id).where(Project.lead_id == user_id, Project.deleted_at.is_(None))
+    )
+    known = {g.scope_id for g in grants if g.role is Role.PROJECT_LEAD}
+    grants.extend(
+        RoleGrant(role=Role.PROJECT_LEAD, scope_type=ScopeType.PROJECT, scope_id=project_id)
+        for project_id in lead_project_ids
+        if project_id not in known
+    )
+    return tuple(grants)
+
+
+async def load_grants(session: AsyncSession, user_id: uuid.UUID) -> tuple[RoleGrant, ...]:
+    """همهٔ اعطاهای مؤثر کاربر — ثبت‌شده و مشتق. بدون کش."""
+    stored = await load_stored_grants(session, user_id)
+    derived = await load_derived_grants(session, user_id)
+    return stored + derived
 
 
 def _serialize(grants: tuple[RoleGrant, ...]) -> str:

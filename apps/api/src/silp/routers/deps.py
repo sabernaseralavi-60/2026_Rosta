@@ -12,6 +12,7 @@ from typing import Annotated
 
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import text as sa_text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.config import Settings, get_settings
@@ -26,12 +27,19 @@ from silp.core.permissions import CurrentUser, Permission, Role, RoleGrant
 from silp.core.security import decode_access_token
 from silp.db.session import get_session
 from silp.integrations.sms import SMSSender, get_sms_sender
+from silp.integrations.storage import StorageBackend
+from silp.integrations.storage import get_storage as storage_for
 from silp.models.identity import User
 from silp.services import authz
+from silp.services.application_service import ApplicationService
 from silp.services.auth_service import AuthService
+from silp.services.delivery_service import DeliveryService
+from silp.services.file_service import FileService
 from silp.services.otp_service import OTPService
 from silp.services.profile_service import ProfileService
+from silp.services.project_service import ProjectService
 from silp.services.token_service import TokenService
+from silp.services.workspace_service import WorkspaceService
 
 # auto_error=False تا نبود هدر، خطای انگلیسی FastAPI ندهد و از مسیر
 # استاندارد خطای فارسی ما عبور کند.
@@ -41,8 +49,13 @@ SessionDep = Annotated[AsyncSession, Depends(get_session)]
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 CredentialsDep = Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)]
 
-# resolver قلمرو: از مسیر یا بدنهٔ درخواست، شناسهٔ قلمرو را استخراج می‌کند.
-ScopeResolver = Callable[[Request], Awaitable[uuid.UUID | None]]
+# resolver قلمرو: شناسهٔ قلمرو را از مسیر درخواست پیدا می‌کند.
+#
+# نشست درخواست را هم می‌گیرد، نه فقط `Request`: قلمرو یک تحویل‌دادنی
+# با یک کوئری به دست می‌آید و آن کوئری باید روی **همان** نشست اجرا
+# شود، وگرنه ردیف‌های نوشته‌شده و هنوز commit‌نشدهٔ همین درخواست را
+# نمی‌بیند.
+ScopeResolver = Callable[[Request, AsyncSession], Awaitable[uuid.UUID | None]]
 
 
 def get_sms(settings: SettingsDep) -> SMSSender:
@@ -74,10 +87,43 @@ def get_profile_service(session: SessionDep) -> ProfileService:
     return ProfileService(session)
 
 
+def get_storage(settings: SettingsDep) -> StorageBackend:
+    return storage_for(settings)
+
+
+def get_file_service(
+    session: SessionDep,
+    settings: SettingsDep,
+    storage: Annotated[StorageBackend, Depends(get_storage)],
+) -> FileService:
+    return FileService(session, settings, storage)
+
+
+def get_project_service(session: SessionDep) -> ProjectService:
+    return ProjectService(session)
+
+
+def get_application_service(session: SessionDep) -> ApplicationService:
+    return ApplicationService(session)
+
+
+def get_delivery_service(session: SessionDep) -> DeliveryService:
+    return DeliveryService(session)
+
+
+def get_workspace_service(session: SessionDep) -> WorkspaceService:
+    return WorkspaceService(session)
+
+
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 ProfileServiceDep = Annotated[ProfileService, Depends(get_profile_service)]
 TokenServiceDep = Annotated[TokenService, Depends(get_token_service)]
 OTPServiceDep = Annotated[OTPService, Depends(get_otp_service)]
+FileServiceDep = Annotated[FileService, Depends(get_file_service)]
+ProjectServiceDep = Annotated[ProjectService, Depends(get_project_service)]
+ApplicationServiceDep = Annotated[ApplicationService, Depends(get_application_service)]
+DeliveryServiceDep = Annotated[DeliveryService, Depends(get_delivery_service)]
+WorkspaceServiceDep = Annotated[WorkspaceService, Depends(get_workspace_service)]
 
 
 async def get_current_user(
@@ -170,7 +216,7 @@ def require(
         user: CurrentUserDep,
         session: SessionDep,
     ) -> CurrentUser:
-        scope_id = await scope(request) if scope else None
+        scope_id = await scope(request, session) if scope else None
         if not await authz.has_permission(session, user, permission, scope_id):
             raise PermissionDenied(permission=permission.value)
         return user
@@ -196,16 +242,56 @@ def require_role(role: Role) -> Callable[..., Awaitable[CurrentUser]]:
 def path_uuid(param: str) -> ScopeResolver:
     """استخراج شناسهٔ قلمرو از پارامتر مسیر."""
 
-    async def resolver(request: Request) -> uuid.UUID | None:
-        raw = request.path_params.get(param)
-        if raw is None:
-            return None
-        try:
-            return uuid.UUID(str(raw))
-        except ValueError:
-            return None
+    async def resolver(request: Request, session: AsyncSession) -> uuid.UUID | None:
+        return _path_uuid_value(request, param)
 
     return resolver
+
+
+def _path_uuid_value(request: Request, param: str) -> uuid.UUID | None:
+    raw = request.path_params.get(param)
+    if raw is None:
+        return None
+    try:
+        return uuid.UUID(str(raw))
+    except ValueError:
+        return None
+
+
+def _lookup_project_scope(sql: str, param: str) -> ScopeResolver:
+    """قلمرو پروژه را از یک شناسهٔ وابسته در مسیر پیدا می‌کند.
+
+    کوئری خام است تا وابستگی حلقوی `deps → service → deps` نسازد؛ فقط
+    یک شناسه لازم است، نه یک موجودیت کامل.
+    """
+    statement = sa_text(sql)
+
+    async def resolver(request: Request, session: AsyncSession) -> uuid.UUID | None:
+        entity_id = _path_uuid_value(request, param)
+        if entity_id is None:
+            return None
+        project_id: uuid.UUID | None = await session.scalar(statement, {"id": entity_id})
+        return project_id
+
+    return resolver
+
+
+# قلمرو مجوزهای پروژه‌ای — §6.4. هر endpoint پروژه یکی از این‌ها را
+# به `require(...)` می‌دهد تا «مدیر پروژهٔ الف» نتواند در پروژهٔ ب
+# تصمیم بگیرد.
+project_from_path = path_uuid("project_id")
+
+project_of_application = _lookup_project_scope(
+    "SELECT project_id FROM project_applications WHERE id = :id", "application_id"
+)
+project_of_milestone = _lookup_project_scope(
+    "SELECT project_id FROM milestones WHERE id = :id", "milestone_id"
+)
+project_of_deliverable = _lookup_project_scope(
+    "SELECT m.project_id FROM deliverables d"
+    " JOIN milestones m ON m.id = d.milestone_id WHERE d.id = :id",
+    "deliverable_id",
+)
 
 
 # ── اطلاعات درخواست ────────────────────────────────────────────────────
@@ -221,19 +307,28 @@ ClientIPDep = Annotated[str, Depends(get_client_ip)]
 UserAgentDep = Annotated[str | None, Depends(get_user_agent)]
 
 __all__ = [
+    "ApplicationServiceDep",
     "AuthServiceDep",
     "ClientIPDep",
     "CurrentUserDep",
+    "DeliveryServiceDep",
+    "FileServiceDep",
     "OTPServiceDep",
     "OptionalUserDep",
     "ProfileServiceDep",
+    "ProjectServiceDep",
     "RoleGrant",
     "SessionDep",
     "SettingsDep",
     "TokenServiceDep",
     "UserAgentDep",
+    "WorkspaceServiceDep",
     "get_current_user",
     "path_uuid",
+    "project_from_path",
+    "project_of_application",
+    "project_of_deliverable",
+    "project_of_milestone",
     "require",
     "require_role",
 ]
