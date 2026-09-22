@@ -349,6 +349,28 @@ Authorization: Bearer <access_token>
 | `GET` | `/attempts/{id}/result` | صاحب تلاش | نتیجه |
 | `POST` | `/attempts/{id}/appeal` | صاحب تلاش | اعتراض به نمره |
 | `POST` | `/attempts/{id}/integrity` | صاحب تلاش | ثبت رویداد تمامیت |
+| `GET` | `/quizzes/offering/{id}` | دانشجو | آزمون‌های یک ارائه با وضعیت هر کدام |
+
+**ناحیهٔ استاد** زیر `/teach` است و قلمرو همهٔ مجوزهایش **ارائه**
+(ADR-0010):
+
+| متد | مسیر | توضیح |
+|-----|------|-------|
+| `GET/POST` | `/teach/offerings/{id}/quizzes` | فهرست و ساخت آزمون |
+| `GET/PUT/DELETE` | `/teach/quizzes/{id}` | آزمون با کلید پاسخ |
+| `POST` | `/teach/quizzes/{id}/publish` · `/close` · `/publish-results` | چرخهٔ حیات |
+| `POST/PUT/DELETE` | `/teach/quizzes/{id}/questions[/{qid}]` | ویرایشگر سؤال |
+| `POST` | `/teach/quizzes/{id}/questions/reorder` | ترتیب سؤال‌ها |
+| `GET/POST` | `/teach/question-bank` | بانک سؤال |
+| `POST` | `/teach/quizzes/{id}/questions/from-bank` · `/random` | کپی و انتخاب تصادفی |
+| `GET` | `/teach/quizzes/{id}/attempts` | تلاش‌های این آزمون |
+| `GET` | `/teach/quizzes/{id}/grading-queue` | صف تصحیح، **بر اساس سؤال** |
+| `PUT` | `/teach/quizzes/{id}/attempts/{aid}/answers/{qid}` | ثبت یا بازنویسی نمره |
+| `POST` | `/teach/quizzes/{id}/attempts/{aid}/finalize` · `/void` | پایان تصحیح، ابطال |
+| `GET` | `/teach/quizzes/{id}/question-stats` | ضریب دشواری و تمیز |
+| `GET` | `/teach/quizzes/{id}/appeals` | اعتراض‌های باز |
+| `POST` | `/teach/appeals/{id}/resolve` | رسیدگی |
+| `POST` | `/teach/attempts/close-expired` | اجرای دستی کار پس‌زمینه |
 
 **`POST /quizzes/{id}/attempts` — پاسخ ۲۰۱**
 ```jsonc
@@ -400,8 +422,13 @@ Authorization: Bearer <access_token>
 ```jsonc
 { "confirm_unanswered": 2 }   // کلاینت تعداد بی‌پاسخ را تأیید می‌کند
 // 200 → { "status": "GRADED", "auto_score": 16.5, "is_provisional": true,
-//         "result_available_at": "…" }
+//         "total_points": 20, "result_available": false }
 ```
+
+> **`GET /attempts/{id}/result`** علاوه بر نمره، `auto_closed` هم
+> می‌دهد: تلاشی که کار پس‌زمینه بسته با تلاشی که دانشجو فرستاده یکی
+> نیست (ADR-0011). `class_average` زیر سه تلاش `null` می‌ماند تا از
+> روی میانگین، نمرهٔ بقیه قابل حدس نباشد.
 
 ---
 
@@ -693,6 +720,10 @@ Authorization: Bearer <access_token>
 | `ATTEMPT_EXPIRED` | 409 | زمان آزمون شما به پایان رسیده است. |
 | `ATTEMPT_ALREADY_SUBMITTED` | 409 | این آزمون قبلاً ارسال شده است. |
 | `ACTIVE_ATTEMPT_EXISTS` | 409 | شما یک آزمون نیمه‌تمام دارید. |
+| `APPEAL_WINDOW_CLOSED` | 409 | مهلت اعتراض به این نمره به پایان رسیده است. |
+| `RESULT_NOT_AVAILABLE` | 409 | نتیجهٔ این آزمون هنوز منتشر نشده است. |
+| `QUIZ_HAS_ATTEMPTS` | 409 | این آزمون تلاش ثبت‌شده دارد و سؤال‌هایش قابل تغییر نیست. |
+| `QUIZ_HAS_NO_QUESTIONS` | 409 | آزمون بدون سؤال منتشر نمی‌شود. |
 | `PROJECT_NOT_OPEN` | 409 | این پروژه پذیرش ندارد. |
 | `PROJECT_CAPACITY_FULL` | 409 | ظرفیت این پروژه تکمیل شده است. |
 | `DUPLICATE_APPLICATION` | 409 | شما قبلاً برای این پروژه درخواست داده‌اید. |

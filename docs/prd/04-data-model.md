@@ -733,6 +733,9 @@ CREATE TABLE quizzes (
   status          TEXT NOT NULL DEFAULT 'DRAFT'
                   CHECK (status IN ('DRAFT','PUBLISHED','CLOSED')),
   total_points    NUMERIC(6,2) NOT NULL DEFAULT 0,  -- مشتق، با تریگر به‌روز می‌شود
+  -- مهلت ۷ روزهٔ اعتراض (§7.3) از این لحظه می‌شمارد. در حالت `MANUAL`
+  -- از `closes_at` قابل استنتاج نیست، پس ذخیره می‌شود.
+  results_published_at TIMESTAMPTZ,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT quizzes_window CHECK (closes_at > opens_at)
@@ -786,7 +789,8 @@ CREATE INDEX idx_quiz_questions_quiz ON quiz_questions(quiz_id, sort_order);
 // NUMERIC
 { "correct": 12.5, "tolerance": 0.05, "unit": "km/h" }
 
-// MATCHING
+// MATCHING — نمره: (جفت‌های درست / کل جفت‌های کلید) × بارم، بدون جریمه
+// (ADR-0011؛ سند اولیه قاعدهٔ نمرهٔ این نوع را تعیین نکرده بود).
 { "left": [{"id":"l1","text":"…"}], "right": [{"id":"r1","text":"…"}],
   "correct": [["l1","r1"]] }
 
@@ -813,19 +817,26 @@ CREATE TABLE quiz_attempts (
   manual_score  NUMERIC(6,2),
   total_score   NUMERIC(6,2),
   is_provisional BOOLEAN NOT NULL DEFAULT false,   -- منتظر تصحیح تشریحی
+  auto_closed   BOOLEAN NOT NULL DEFAULT false,   -- ADR-0011: زمان تمام شد یا خودش فرستاد؟
+  graded_by     UUID REFERENCES users(id),        -- چه کسی تصحیح دستی را تمام کرد
   integrity_events JSONB NOT NULL DEFAULT '[]'::jsonb,
   UNIQUE (quiz_id, student_id, attempt_no)
 );
 CREATE UNIQUE INDEX idx_one_active_attempt ON quiz_attempts(quiz_id, student_id)
   WHERE status = 'IN_PROGRESS';
-CREATE INDEX idx_attempts_grading ON quiz_attempts(quiz_id)
-  WHERE status = 'SUBMITTED' OR status = 'AUTO_SUBMITTED';
+-- صف تصحیح دستی `is_provisional` است، نه وضعیت: تصحیح خودکار هم‌زمان با
+-- ارسال انجام می‌شود و تلاش در `SUBMITTED`/`AUTO_SUBMITTED` نمی‌ماند
+-- ([ADR-0011](../adr/0011-quiz-grading-gaps.md)).
+CREATE INDEX idx_attempts_grading ON quiz_attempts(quiz_id) WHERE is_provisional;
+CREATE INDEX idx_attempts_expiring ON quiz_attempts(expires_at)
+  WHERE status = 'IN_PROGRESS';
 
 CREATE TABLE quiz_answers (
   attempt_id   UUID NOT NULL REFERENCES quiz_attempts(id) ON DELETE CASCADE,
   question_id  UUID NOT NULL REFERENCES quiz_questions(id),
   response     JSONB,                -- ساختار متناظر با kind
   is_flagged   BOOLEAN NOT NULL DEFAULT false,   -- دانشجو برای مرور نشان کرده
+  client_ts    TIMESTAMPTZ,          -- ادعای کلاینت دربارهٔ زمان نوشتن (§7.3 قاعدهٔ ۳)
   auto_score   NUMERIC(5,2),
   manual_score NUMERIC(5,2),
   grader_id    UUID REFERENCES users(id),
