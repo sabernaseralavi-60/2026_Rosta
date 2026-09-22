@@ -75,18 +75,38 @@ $$ LANGUAGE plpgsql;
 
 حیاتی برای جستجو. عربی/فارسی «ی» و «ک»، اعراب، و نیم‌فاصله را یکدست می‌کند.
 
+> **اصلاح شد — [ADR-0003](../adr/0003-fa-normalize-corrections.md).** نسخهٔ
+> پیش‌نویس این تابع دو اشکال داشت: نگاشت `translate` ناهم‌طول بود و
+> `ؤ`، `ى` و `ۀ` را به حرف اشتباه می‌برد، و اعراب را به‌جای حذف با فاصله
+> جایگزین می‌کرد («مُحَمَّد» ← «م ح م د»). نسخهٔ زیر درست است.
+
 ```sql
 CREATE OR REPLACE FUNCTION fa_normalize(input TEXT) RETURNS TEXT AS $$
-  SELECT lower(trim(regexp_replace(
-    translate(
-      COALESCE(input, ''),
-      'يكةأإآؤئىۀ' || U&'\0640',   -- عربی + کشیده
-      'یکهاااییه'  || ''
-    ),
-    '[ً-ٰٟ‌‏]+', ' ', 'g'   -- اعراب، نیم‌فاصله، علائم جهت
-  )));
-$$ LANGUAGE sql IMMUTABLE STRICT;
+  SELECT lower(btrim(
+    regexp_replace(
+      regexp_replace(
+        regexp_replace(
+          translate(
+            COALESCE(input, ''),
+            -- عربی → فارسی، نویسه‌به‌نویسه هم‌طول
+            'يكةأإآؤئىۀ',
+            'یکهاااوییه'
+          ),
+          -- اعراب و کشیده حذف می‌شوند، نه جایگزین با فاصله
+          U&'[\064B-\0670]+', '', 'g'
+        ),
+        -- نیم‌فاصله و علائم جهت به فاصله تبدیل می‌شوند
+        U&'[\200B-\200F\FEFF]+', ' ', 'g'
+      ),
+      -- فشرده‌سازی فاصله‌های پیاپی
+      '\s+', ' ', 'g'
+    )
+  ));
+$$ LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE;
 ```
+
+> کاراکترهای نامرئی با نویسه‌گریز `U&'\XXXX'` نوشته شده‌اند تا در diff و
+> در بازبینی کد دیده شوند.
 
 > هر ستون قابل جستجو یک ستون تولیدشده دارد:
 > `title_norm TEXT GENERATED ALWAYS AS (fa_normalize(title)) STORED`
@@ -192,7 +212,19 @@ CREATE TABLE user_roles (
   granted_by UUID REFERENCES users(id),
   granted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   expires_at TIMESTAMPTZ,
-  PRIMARY KEY (user_id, role_code, scope_type, COALESCE(scope_id, '00000000-0000-0000-0000-000000000000'::uuid))
+  PRIMARY KEY (user_id, role_code, scope_type),
+  -- قلمرو GLOBAL شناسه ندارد و قلمروهای دیگر بدون شناسه بی‌معنا هستند.
+  CONSTRAINT ck_user_roles_scope_id_matches_type CHECK (
+    (scope_type = 'GLOBAL' AND scope_id IS NULL)
+    OR (scope_type <> 'GLOBAL' AND scope_id IS NOT NULL)
+  )
+);
+
+-- NULL با NULL برابر نیست، پس یکتایی اعطا با ایندکس عبارتی گرفته می‌شود.
+-- کلید اصلی در PostgreSQL نمی‌تواند عبارت باشد — ADR-0003.
+CREATE UNIQUE INDEX uq_user_roles_grant ON user_roles (
+  user_id, role_code, scope_type,
+  COALESCE(scope_id, '00000000-0000-0000-0000-000000000000'::uuid)
 );
 CREATE INDEX idx_user_roles_scope ON user_roles(scope_type, scope_id);
 ```
@@ -1332,56 +1364,81 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
 
 ## ۴.۱۰ ترتیب مهاجرت‌ها
 
-مهاجرت‌ها باید به این ترتیب ساخته شوند تا وابستگی کلید خارجی نشکند:
+**ترتیب اجرا را `down_revision` تعیین می‌کند، نه شمارهٔ فایل.** شمارهٔ فایل
+می‌گوید کدام جدول‌ها داخل آن مهاجرت‌اند؛ زنجیره می‌گوید کِی اجرا می‌شود.
 
 ```
-001_extensions_and_functions   pgcrypto, pg_trgm, unaccent, citext,
+0001_extensions_and_functions  pgcrypto, pg_trgm, unaccent, citext,
                                uuidv7(), fa_normalize(), set_updated_at()
-002_identity                   users, roles, user_roles, refresh_tokens, otp_challenges
-003_taxonomy                   universities, skills, assets, interests
-004_profiles                   profiles, profile_skills/assets/interests, survey_versions
-005_files                      files
-006_education                  terms, courses, course_offerings, enrollments,
+0002_identity                  users, roles, user_roles, refresh_tokens, otp_challenges
+0003_taxonomy                  universities, skills, assets, interests
+                               + دادهٔ مرجع §14.1 تا §14.3
+0004_profiles                  profiles, profile_skills/assets/interests, survey_versions
+0010_projects          ◄────── اینجا اجرا می‌شود (ADR-0004)
+                               projects, project_required_*, project_interests,
+                               project_roles, teams, team_members,
+                               project_applications, recommendation_feedback
+0005_files                     files
+0006_education                 terms, courses, course_offerings, enrollments,
                                course_weeks, resources, resource_progress,
                                class_sessions, attendance_records, announcements
-007_quiz                       quizzes, question_bank, quiz_questions,
+                               + قید projects.offering_id
+                               + قید announcements.project_id
+0007_quiz                      quizzes, question_bank, quiz_questions,
                                quiz_attempts, quiz_answers, grade_appeals
-008_ideas                      ideas, idea_votes, idea_comments
-009_ventures                   ventures, venture_metrics
-010_projects                   projects, project_required_*, project_roles, project_interests,
-                               teams, team_members, project_applications,
-                               milestones, deliverables, deliverable_files,
+0008_ideas                     ideas, idea_votes, idea_comments
+                               + قید projects.origin_idea_id
+0009_ventures                  ventures, venture_metrics
+                               + قید projects.venture_id و teams.venture_id
+                               + قید venture_metrics.project_id
+0011_project_delivery          milestones, deliverables, deliverable_files,
                                project_tasks, project_messages, project_activities,
                                project_reflections, peer_evaluations,
                                certificates, team_openings
-                               + قیدهای رو به جلو (announcements, venture_metrics)
-011_research                   research_tracks, research_outputs, research_topics
-012_gamification               point_rules, point_entries, user_point_totals, badges, user_badges
-013_messaging                  notifications, notification_preferences,
+0012_research                  research_tracks, research_outputs, research_topics
+0013_gamification              point_rules, point_entries, user_point_totals, badges, user_badges
+0014_messaging                 notifications, notification_preferences,
                                outbox_messages, message_templates
-014_admin                      audit_logs, app_settings, qa_threads, qa_replies,
-                               recommendation_feedback
-015_seed_reference_data        داده‌های مرجع §14
+0015_admin                     audit_logs, app_settings, qa_threads, qa_replies
+0016_seed_reference_data       دادهٔ مرجع وابسته به مهاجرت‌های بالا (§14)
 ```
+
+> **چرا ۰۱۰ زودتر می‌آید؟** موتور توصیه‌گر در M1 بدون جدول `projects`
+> نامزدی برای امتیازدهی ندارد، و M1 پیش از M2 (پروژه) و M3 (آموزش)
+> تحویل می‌شود. تحلیل کامل گزینه‌ها در `docs/adr/0004`.
 
 ### کلیدهای خارجی با ارجاع رو به جلو
 
-سه ستون به جدولی ارجاع می‌دهند که در مهاجرتی **بعد از** خودشان ساخته می‌شود.
-این ستون‌ها بدون قید تعریف می‌شوند و قیدشان در مهاجرت ۰۱۰ افزوده می‌گردد:
+چون ۰۱۰ زودتر اجرا می‌شود، سه ستون آن به جدولی ارجاع می‌دهند که هنوز ساخته
+نشده. این ستون‌ها بدون قید تعریف می‌شوند و قیدشان در مهاجرت مقصد افزوده
+می‌گردد:
+
+| ستون | قید در مهاجرت |
+|------|----------------|
+| `projects.offering_id` → `course_offerings` | ۰۰۶ |
+| `projects.origin_idea_id` → `ideas` | ۰۰۸ |
+| `projects.venture_id` → `ventures` | ۰۰۹ |
+| `teams.venture_id` → `ventures` | ۰۰۹ |
 
 ```sql
--- در انتهای مهاجرت 010_projects
-ALTER TABLE announcements    ADD CONSTRAINT fk_announcements_project
+-- در انتهای مهاجرت 0006_education
+ALTER TABLE projects ADD CONSTRAINT fk_projects_offering_id_course_offerings
+  FOREIGN KEY (offering_id) REFERENCES course_offerings(id);
+ALTER TABLE announcements ADD CONSTRAINT fk_announcements_project
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
-ALTER TABLE venture_metrics  ADD CONSTRAINT fk_venture_metrics_project
+
+-- در انتهای مهاجرت 0009_ventures
+ALTER TABLE projects ADD CONSTRAINT fk_projects_venture_id_ventures
+  FOREIGN KEY (venture_id) REFERENCES ventures(id);
+ALTER TABLE venture_metrics ADD CONSTRAINT fk_venture_metrics_project
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE;
-ALTER TABLE venture_metrics  ADD CONSTRAINT venture_metrics_owner
+ALTER TABLE venture_metrics ADD CONSTRAINT venture_metrics_owner
   CHECK ((venture_id IS NOT NULL)::int + (project_id IS NOT NULL)::int >= 1);
 ```
 
-> **وابستگی چرخه‌ای:** `projects.venture_id` و `ventures.origin_idea_id` باعث می‌شود
-> ترتیب ۰۰۸ → ۰۰۹ → ۰۱۰ الزامی باشد. شکستن این ترتیب، مهاجرت را در محیط تازه
-> خراب می‌کند — تست `test_migrations_run_on_empty_database` این را می‌گیرد.
+> **وابستگی چرخه‌ای از بین نرفته، فقط نقطهٔ شکستنش عوض شده است.** تست
+> `test_migrations_run_on_empty_database` و مرحلهٔ `alembic downgrade base`
+> در CI، هر دو ترتیب را می‌پایند.
 
 ---
 
