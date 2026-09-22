@@ -1,6 +1,7 @@
 """مدل‌های SQLAlchemy. همه اینجا وارد می‌شوند تا Alembic آن‌ها را ببیند."""
 
 from silp.db.base import Base
+from silp.models.access import MaterialAccessEvent, Subscription, SubscriptionPlan
 from silp.models.delivery import (
     Certificate,
     Deliverable,
@@ -12,6 +13,20 @@ from silp.models.delivery import (
     ProjectReflection,
     ProjectTask,
     TeamOpening,
+)
+from silp.models.education import (
+    Announcement,
+    AttendanceRecord,
+    ClassSession,
+    Course,
+    CourseMaterial,
+    CourseOffering,
+    CourseWeek,
+    Enrollment,
+    Resource,
+    ResourceProgress,
+    Term,
+    WeekMaterial,
 )
 from silp.models.file import File
 from silp.models.identity import (
@@ -44,13 +59,22 @@ from silp.models.taxonomy import Asset, Interest, Skill, University
 
 __all__ = [
     "NULL_SCOPE",
+    "Announcement",
     "Asset",
+    "AttendanceRecord",
     "Base",
     "Certificate",
+    "ClassSession",
+    "Course",
+    "CourseMaterial",
+    "CourseOffering",
+    "CourseWeek",
     "Deliverable",
     "DeliverableFile",
+    "Enrollment",
     "File",
     "Interest",
+    "MaterialAccessEvent",
     "Milestone",
     "OTPChallenge",
     "PeerEvaluation",
@@ -71,12 +95,18 @@ __all__ = [
     "ProjectTask",
     "RecommendationFeedback",
     "RefreshToken",
+    "Resource",
+    "ResourceProgress",
     "Role",
     "Skill",
+    "Subscription",
+    "SubscriptionPlan",
     "Team",
     "TeamMember",
     "TeamOpening",
+    "Term",
     "University",
     "User",
     "UserRole",
+    "WeekMaterial",
 ]

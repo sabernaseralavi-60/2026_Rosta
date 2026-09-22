@@ -15,6 +15,10 @@ x-api-base: &api-base
     - ../../apps/api:/app/apps/api
     - ../../infra:/app/infra
     - ../../packages:/app/packages
+    # کتابخانهٔ دروس (ADR-0008) — `make courses-sync` از همین می‌خواند.
+    # فقط-خواندنی: همگام‌سازی هرگز فایل کاربر را عوض نمی‌کند، جز
+    # `course.yml` که با `--no-manifest` می‌توان نوشتنش را هم بست.
+    - ../../Courses:/app/Courses
     - api-venv:/app/.venv
   working_dir: /app/apps/api
   depends_on:

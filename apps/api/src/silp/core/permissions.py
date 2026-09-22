@@ -62,7 +62,18 @@ ROLE_TITLE_FA: dict[Role, str] = {
 }
 
 # نقش‌هایی که از عضویت مشتق می‌شوند و در user_roles ذخیره نمی‌گردند (§6.1).
-DERIVED_ROLES: frozenset[Role] = frozenset({Role.PROJECT_MEMBER, Role.PROJECT_LEAD})
+DERIVED_ROLES: frozenset[Role] = frozenset(
+    {Role.PROJECT_MEMBER, Role.PROJECT_LEAD, Role.INSTRUCTOR}
+)
+
+# §6.1 جدول نقش‌ها: قلمرو `TA` و `INSTRUCTOR` برابر OFFERING است —
+# «اختیار کامل روی **ارائهٔ خود**». پس اعطای سراسری این دو، برخلاف
+# `COORDINATOR` و `ADMIN` که ذاتاً سراسری‌اند، نباید همهٔ ارائه‌ها را
+# باز کند؛ وگرنه «استاد» عملاً یعنی «استاد همهٔ دروس دانشگاه».
+#
+# اعطای سراسری بی‌معنا نیست: هنوز مجوزهای بی‌قلمرو (مثل
+# `PROFILE_VIEW_FULL`) را می‌دهد. فقط دروازهٔ ارائه را باز نمی‌کند.
+OFFERING_SCOPED_ROLES: frozenset[Role] = frozenset({Role.TA, Role.INSTRUCTOR})
 
 
 class ScopeType(StrEnum):
@@ -100,6 +111,12 @@ class Permission(StrEnum):
     ATTENDANCE_RECORD = "course.attendance.record"
     ENROLLMENT_APPROVE = "course.enrollment.approve"
     GRADE_FINAL_SUBMIT = "course.grade.submit"
+    ANNOUNCEMENT_PUBLISH = "course.announcement.publish"
+    # ── کتابخانهٔ درس و اشتراک (M3، ADR-0008/0009) ─────────────────────
+    MATERIAL_MANAGE = "course.material.manage"
+    MATERIAL_VIEW_ALL = "course.material.view_all"
+    SUBSCRIPTION_GRANT = "subscription.grant"
+    SUBSCRIPTION_VIEW_ALL = "subscription.view_all"
 
     # ── آزمون (M4) ─────────────────────────────────────────────────────
     QUIZ_CREATE = "quiz.create"
@@ -174,6 +191,19 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     Permission.ATTENDANCE_RECORD: frozenset({Role.TA, Role.INSTRUCTOR, Role.ADMIN}),
     Permission.ENROLLMENT_APPROVE: frozenset({Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}),
     Permission.GRADE_FINAL_SUBMIT: frozenset({Role.INSTRUCTOR, Role.ADMIN}),
+    Permission.ANNOUNCEMENT_PUBLISH: frozenset(
+        {Role.TA, Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}
+    ),
+    # کتابخانه به درس تعلق دارد، نه به ارائه؛ پس قلمرو ندارد و
+    # فقط مدیر آموزشی و مدیر سامانه آن را می‌چینند (ADR-0008).
+    Permission.MATERIAL_MANAGE: frozenset({Role.COORDINATOR, Role.ADMIN}),
+    # «همهٔ مواد را ببین» دروازهٔ اشتراک را دور می‌زند — کارکنان آموزش
+    # برای پشتیبانی لازمش دارند (ADR-0009).
+    Permission.MATERIAL_VIEW_ALL: frozenset(
+        {Role.TA, Role.INSTRUCTOR, Role.COORDINATOR, Role.SUPPORT, Role.ADMIN}
+    ),
+    Permission.SUBSCRIPTION_GRANT: frozenset({Role.SUPPORT, Role.ADMIN}),
+    Permission.SUBSCRIPTION_VIEW_ALL: frozenset({Role.SUPPORT, Role.ADMIN}),
     # آزمون
     Permission.QUIZ_CREATE: frozenset({Role.TA, Role.INSTRUCTOR, Role.ADMIN}),
     Permission.QUIZ_GRADE: frozenset({Role.TA, Role.INSTRUCTOR, Role.ADMIN}),
@@ -210,6 +240,29 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     Permission.POINTS_RECALCULATE: frozenset({Role.ADMIN}),
 }
 
+# مجوزهایی که قلمروشان **ارائه** است. برای این‌ها، اعطای سراسری
+# `TA`/`INSTRUCTOR` کافی نیست و باید اعطای همان ارائه وجود داشته باشد —
+# چه ثبت‌شده در `user_roles`، چه مشتق از `course_offerings.instructor_id`.
+OFFERING_PERMISSIONS: frozenset[Permission] = frozenset(
+    {
+        Permission.OFFERING_MANAGE,
+        Permission.COURSE_WEEK_EDIT,
+        Permission.COURSE_WEEK_PUBLISH,
+        Permission.COURSE_WEEK_VIEW_DRAFT,
+        Permission.RESOURCE_UPLOAD,
+        Permission.ATTENDANCE_RECORD,
+        Permission.ENROLLMENT_APPROVE,
+        Permission.GRADE_FINAL_SUBMIT,
+        Permission.ANNOUNCEMENT_PUBLISH,
+        Permission.QUIZ_CREATE,
+        Permission.QUIZ_GRADE,
+        Permission.QUIZ_VIEW_OTHERS_RESULT,
+        Permission.QUIZ_ATTEMPT_INVALIDATE,
+        Permission.GRADE_OVERRIDE,
+        Permission.APPEAL_RESOLVE,
+    }
+)
+
 # مجوزهایی که قلمرو دارند: داشتن نقش کافی نیست، scope_id باید تطابق کند.
 SCOPED_PERMISSIONS: frozenset[Permission] = frozenset(
     {
@@ -221,6 +274,7 @@ SCOPED_PERMISSIONS: frozenset[Permission] = frozenset(
         Permission.ATTENDANCE_RECORD,
         Permission.ENROLLMENT_APPROVE,
         Permission.GRADE_FINAL_SUBMIT,
+        Permission.ANNOUNCEMENT_PUBLISH,
         Permission.QUIZ_CREATE,
         Permission.QUIZ_GRADE,
         Permission.QUIZ_VIEW_OTHERS_RESULT,
@@ -294,12 +348,21 @@ class CurrentUser:
         """
         allowed = PERMISSION_MATRIX.get(permission, frozenset())
         needs_scope = permission in SCOPED_PERMISSIONS
+        # قلمرو ارائه سخت‌گیرتر است: اعطای سراسریِ نقشِ ارائه‌ای کفایت
+        # نمی‌کند و باید اعطای همان ارائه باشد (§6.1).
+        offering_bound = permission in OFFERING_PERMISSIONS
 
         for grant in self.grants:
             if grant.role not in allowed:
                 continue
             if grant.role in GLOBAL_OVERRIDE_ROLES:
                 return True
+            if (
+                offering_bound
+                and grant.role in OFFERING_SCOPED_ROLES
+                and grant.scope_type is not ScopeType.OFFERING
+            ):
+                continue
             if not needs_scope or grant.covers(scope_id):
                 return True
         return False

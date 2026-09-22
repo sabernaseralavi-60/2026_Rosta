@@ -56,6 +56,12 @@ class StorageBackend(Protocol):
         self, key: str, *, content_type: str, max_bytes: int, expires_in: int
     ) -> UploadTicket: ...
 
+    # آپلود سمت سرور. کلاینت هرگز از این راه نمی‌رود (FR-EDU-03)؛ این
+    # برای محتوایی است که **خود سرور** منبعش است: همگام‌سازی پوشهٔ
+    # `Courses/` (ADR-0008) که روی همان ماشین اجرا می‌شود و فایلش را از
+    # دیسک می‌خواند، نه از یک درخواست HTTP.
+    async def upload_bytes(self, key: str, body: bytes, *, content_type: str) -> None: ...
+
     async def download_url(self, key: str, *, filename: str, expires_in: int) -> str: ...
 
     async def stat(self, key: str) -> ObjectInfo: ...
@@ -115,6 +121,11 @@ class S3Storage:
             method="PUT",
             headers={"Content-Type": content_type},
             expires_in=expires_in,
+        )
+
+    async def upload_bytes(self, key: str, body: bytes, *, content_type: str) -> None:
+        await self._call(
+            "put_object", Bucket=self._bucket, Key=key, Body=body, ContentType=content_type
         )
 
     async def download_url(self, key: str, *, filename: str, expires_in: int) -> str:
@@ -187,6 +198,9 @@ class MemoryStorage:
             headers={"Content-Type": content_type},
             expires_in=expires_in,
         )
+
+    async def upload_bytes(self, key: str, body: bytes, *, content_type: str) -> None:
+        self.objects[key] = (body, content_type)
 
     async def download_url(self, key: str, *, filename: str, expires_in: int) -> str:
         if key not in self.objects:

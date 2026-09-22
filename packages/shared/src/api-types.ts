@@ -208,6 +208,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * ویترین دروس
+         * @description فهرست دروس فعال. بدون احراز هویت کار می‌کند.
+         */
+        get: operations["list_courses_api_v1_courses_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * جزئیات درس و کتابخانهٔ آن
+         * @description درس، کتابخانه‌اش، ارائه‌های باز، و طرح‌های اشتراک.
+         *
+         *     مهمان هم می‌بیند؛ هر ماده سنجش دسترسی خودش را همراه دارد.
+         */
+        get: operations["course_detail_api_v1_courses__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/deliverables/{deliverable_id}/review": {
         parameters: {
             query?: never;
@@ -301,6 +343,50 @@ export interface paths {
          *     نشتی وجود ندارد.
          */
         get: operations["download_url_api_v1_files__file_id__download_url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/materials/tiers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * معنی سطوح دسترسی
+         * @description متن فارسی هر سطح — تا رابط کاربری آن را ننویسد.
+         */
+        get: operations["access_tiers_api_v1_materials_tiers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/materials/{material_id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * URL دانلود محتوای کتابخانه
+         * @description دروازهٔ اصلی اشتراک — ADR-0009.
+         *
+         *     مهمان اینجا ۴۰۱ می‌گیرد (نیازمند ورود)، کاربر بدون حق ۴۰۲، و
+         *     کاربری که دنبال مادهٔ `ENROLLED` است ۴۰۳. هر سه پیام فارسی
+         *     آماده‌ٔ نمایش دارند.
+         */
+        get: operations["download_material_api_v1_materials__material_id__download_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -467,6 +553,129 @@ export interface paths {
          * @description §7.6 — هر ارسال یک نسخهٔ تازه است؛ نسخهٔ قبلی دست‌نخورده می‌ماند.
          */
         post: operations["submit_deliverable_api_v1_milestones__milestone_id__deliverables_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offerings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ارائه‌های قابل ثبت‌نام */
+        get: operations["open_offerings_api_v1_offerings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offerings/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * دروس من
+         * @description §3.4 `/courses` — دروس من با نوار پیشرفت.
+         */
+        get: operations["my_offerings_api_v1_offerings_mine_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offerings/{offering_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** نمای کلی ارائه */
+        get: operations["offering_detail_api_v1_offerings__offering_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offerings/{offering_id}/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** اعلانات درس */
+        get: operations["offering_announcements_api_v1_offerings__offering_id__announcements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offerings/{offering_id}/enroll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ثبت‌نام در ارائه */
+        post: operations["enroll_api_v1_offerings__offering_id__enroll_post"];
+        /** انصراف از ارائه */
+        delete: operations["drop_api_v1_offerings__offering_id__enroll_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offerings/{offering_id}/weeks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** فهرست هفته‌ها */
+        get: operations["list_weeks_api_v1_offerings__offering_id__weeks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offerings/{offering_id}/weeks/{week_number}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** محتوای یک هفته */
+        get: operations["week_detail_api_v1_offerings__offering_id__weeks__week_number__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -916,6 +1125,161 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/resources/{resource_id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** URL دانلود موقت منبع */
+        get: operations["download_resource_api_v1_resources__resource_id__download_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/resources/{resource_id}/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ثبت پیشرفت مطالعه
+         * @description FR-EDU-04 — ویدئو خودش تمام می‌شود، PDF با دکمهٔ صریح.
+         */
+        post: operations["record_progress_api_v1_resources__resource_id__progress_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** اشتراک‌های من */
+        get: operations["my_subscriptions_api_v1_subscriptions_get"];
+        put?: never;
+        /**
+         * درخواست اشتراک
+         * @description ثبت درخواست — وضعیت `PENDING` تا تأیید پرداخت بیرونی.
+         *
+         *     پاسخ عمداً یک ردیف «در انتظار» است و نه یک دسترسی باز: کاربر باید
+         *     ببیند که چیزی ثبت شده و منتظر چیست.
+         */
+        post: operations["request_subscription_api_v1_subscriptions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subscriptions/grant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * فعال‌سازی اشتراک برای یک کاربر
+         * @description §02 — «پرداخت خارج از سامانه انجام می‌شود».
+         *
+         *     `payment_ref` شمارهٔ فیش یا کد رهگیری است و **باید** پر شود مگر
+         *     اشتراک هدیه باشد؛ بدون آن، بعداً معلوم نیست چرا فعال شده.
+         */
+        post: operations["grant_subscription_api_v1_subscriptions_grant_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subscriptions/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** درخواست‌های اشتراک در انتظار تأیید */
+        get: operations["pending_subscriptions_api_v1_subscriptions_pending_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subscriptions/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * طرح‌های اشتراک
+         * @description بدون ورود هم کار می‌کند — صفحهٔ قیمت باید برای مهمان باز باشد.
+         */
+        get: operations["list_plans_api_v1_subscriptions_plans_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subscriptions/{subscription_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** لغو اشتراک */
+        delete: operations["cancel_subscription_api_v1_subscriptions__subscription_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subscriptions/{subscription_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تأیید پرداخت و فعال‌سازی */
+        post: operations["activate_subscription_api_v1_subscriptions__subscription_id__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/taxonomy/assets": {
         parameters: {
             query?: never;
@@ -990,10 +1354,296 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teach/enrollments/{enrollment_id}/decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تأیید یا رد ثبت‌نام */
+        post: operations["decide_enrollment_api_v1_teach_enrollments__enrollment_id__decide_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/enrollments/{enrollment_id}/grade": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** ثبت نمرهٔ نهایی */
+        patch: operations["set_grade_api_v1_teach_enrollments__enrollment_id__grade_patch"];
+        trace?: never;
+    };
+    "/api/v1/teach/offerings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** ارائه‌های من */
+        get: operations["my_offerings_api_v1_teach_offerings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** انتشار اعلان درس */
+        post: operations["publish_announcement_api_v1_teach_offerings__offering_id__announcements_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ثبت گروهی حضور و غیاب
+         * @description FR-EDU-05 — یک درخواست برای کل کلاس، نه یکی به‌ازای هر دانشجو.
+         */
+        post: operations["record_attendance_api_v1_teach_offerings__offering_id__attendance_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/copy-content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * کپی محتوا از ارائهٔ قبلی
+         * @description هفته‌ها **پیش‌نویس** کپی می‌شوند؛ انتشار تصمیم تازه‌ای است.
+         */
+        post: operations["copy_content_api_v1_teach_offerings__offering_id__copy_content_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/enrollment-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** درخواست‌های ثبت‌نام در انتظار */
+        get: operations["pending_enrollments_api_v1_teach_offerings__offering_id__enrollment_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/grading-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** تعیین وزن‌های نمره */
+        put: operations["set_grading_policy_api_v1_teach_offerings__offering_id__grading_policy_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/students": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** دانشجویان ارائه */
+        get: operations["roster_api_v1_teach_offerings__offering_id__students_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/weeks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * ساخت یا ویرایش هفته
+         * @description شمارهٔ هفته کلید است — همان ۱ تا ۱۷ که استاد در ذهن دارد.
+         */
+        put: operations["upsert_week_api_v1_teach_offerings__offering_id__weeks_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/weeks/{week_id}/materials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** بستن محتوای کتابخانه به هفته */
+        post: operations["link_material_api_v1_teach_offerings__offering_id__weeks__week_id__materials_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/weeks/{week_id}/materials/{material_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** برداشتن پیوند محتوا از هفته */
+        delete: operations["unlink_material_api_v1_teach_offerings__offering_id__weeks__week_id__materials__material_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/weeks/{week_id}/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** افزودن منبع به هفته */
+        post: operations["add_resource_api_v1_teach_offerings__offering_id__weeks__week_id__resources_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/resources/{resource_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** حذف منبع */
+        delete: operations["remove_resource_api_v1_teach_resources__resource_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/weeks/{week_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** انتشار هفته (فوری یا زمان‌بندی‌شده) */
+        post: operations["publish_week_api_v1_teach_weeks__week_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AccessOut
+         * @description سنجش دسترسی یک ماده برای کاربر جاری — ADR-0009.
+         *
+         *     `note_fa` جمله‌ای است که کنار قفل نشان داده می‌شود. کلاینت آن را
+         *     نمی‌سازد تا منطق توضیح یکجا بماند.
+         */
+        AccessOut: {
+            /** Allowed */
+            allowed: boolean;
+            /** Blocker */
+            blocker?: ("SUBSCRIPTION" | "ENROLLMENT") | null;
+            /** Note Fa */
+            note_fa: string;
+            /** Reason */
+            reason?: ("PUBLIC" | "ENROLLED" | "SUBSCRIPTION" | "STAFF") | null;
+            /**
+             * Tier
+             * @enum {string}
+             */
+            tier: "PUBLIC" | "SUBSCRIBER" | "ENROLLED";
+        };
         /** ActivityOut */
         ActivityOut: {
             /** Actor Id */
@@ -1029,6 +1679,45 @@ export interface components {
             project: components["schemas"]["ProjectSummaryOut"];
             /** Reasons */
             reasons?: components["schemas"]["ReasonOut"][];
+        };
+        /** AnnouncementIn */
+        AnnouncementIn: {
+            /** Body */
+            body: string;
+            /** Expires At */
+            expires_at?: string | null;
+            /**
+             * Priority
+             * @default NORMAL
+             * @enum {string}
+             */
+            priority: "NORMAL" | "IMPORTANT" | "URGENT";
+            /** Title */
+            title: string;
+        };
+        /** AnnouncementOut */
+        AnnouncementOut: {
+            /** Body */
+            body: string;
+            /** Expires At */
+            expires_at?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Priority
+             * @enum {string}
+             */
+            priority: "NORMAL" | "IMPORTANT" | "URGENT";
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Title */
+            title: string;
         };
         /** ApplicationIn */
         ApplicationIn: {
@@ -1138,6 +1827,35 @@ export interface components {
             /** Asset Ids */
             asset_ids: string[];
         };
+        /** AttendanceEntryIn */
+        AttendanceEntryIn: {
+            /** Note */
+            note?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PRESENT" | "ABSENT" | "LATE" | "EXCUSED";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /** AttendanceIn */
+        AttendanceIn: {
+            /** Entries */
+            entries: components["schemas"]["AttendanceEntryIn"][];
+            /**
+             * Held On
+             * Format: date
+             */
+            held_on: string;
+            /** Topic */
+            topic?: string | null;
+            /** Week Number */
+            week_number?: number | null;
+        };
         /**
          * AuthUserOut
          * @description کاربر در پاسخ ورود — §5.2. اطلاعات تماس پوشانده می‌شود (NFR-01).
@@ -1182,6 +1900,115 @@ export interface components {
         CompleteProjectIn: {
             /** Final Report */
             final_report: string;
+        };
+        /** CopyContentIn */
+        CopyContentIn: {
+            /**
+             * Source Offering Id
+             * Format: uuid
+             */
+            source_offering_id: string;
+        };
+        /** CopyResultOut */
+        CopyResultOut: {
+            /** Weeks Copied */
+            weeks_copied: number;
+        };
+        /**
+         * CourseDetailOut
+         * @description جزئیات درس — §5.5 `GET /courses/{slug}`.
+         *
+         *     `plans` اینجا می‌آید تا صفحهٔ درس بتواند بدون درخواست دوم، دکمهٔ
+         *     «اشتراک بگیر» را با قیمت درست نشان دهد.
+         */
+        CourseDetailOut: {
+            /** Code */
+            code: string;
+            /** Credits */
+            credits?: number | null;
+            /** Degree Level */
+            degree_level?: ("BACHELOR" | "MASTER" | "PHD" | "PUBLIC") | null;
+            /** Degree Level Fa */
+            degree_level_fa?: string | null;
+            /** Description */
+            description?: string | null;
+            /**
+             * Free Material Count
+             * @default 0
+             */
+            free_material_count: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Material Count
+             * @default 0
+             */
+            material_count: number;
+            /** Materials */
+            materials?: components["schemas"]["MaterialOut"][];
+            /** My Enrollment Offering Id */
+            my_enrollment_offering_id?: string | null;
+            /** Offerings */
+            offerings?: components["schemas"]["OfferingRefOut"][];
+            /**
+             * Open Offering Count
+             * @default 0
+             */
+            open_offering_count: number;
+            /** Plans */
+            plans?: components["schemas"]["SubscriptionPlanRefOut"][];
+            /** Slug */
+            slug: string;
+            /** Title En */
+            title_en?: string | null;
+            /** Title Fa */
+            title_fa: string;
+            /** Topics */
+            topics?: string[];
+        };
+        /** CourseSummaryOut */
+        CourseSummaryOut: {
+            /** Code */
+            code: string;
+            /** Credits */
+            credits?: number | null;
+            /** Degree Level */
+            degree_level?: ("BACHELOR" | "MASTER" | "PHD" | "PUBLIC") | null;
+            /** Degree Level Fa */
+            degree_level_fa?: string | null;
+            /** Description */
+            description?: string | null;
+            /**
+             * Free Material Count
+             * @default 0
+             */
+            free_material_count: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Material Count
+             * @default 0
+             */
+            material_count: number;
+            /**
+             * Open Offering Count
+             * @default 0
+             */
+            open_offering_count: number;
+            /** Slug */
+            slug: string;
+            /** Title En */
+            title_en?: string | null;
+            /** Title Fa */
+            title_fa: string;
+            /** Topics */
+            topics?: string[];
         };
         /** DecisionIn */
         DecisionIn: {
@@ -1265,6 +2092,15 @@ export interface components {
             /** Version */
             version: number;
         };
+        /** DownloadOut */
+        DownloadOut: {
+            /** Download Url */
+            download_url: string;
+            /** Expires In */
+            expires_in: number;
+            /** Original Name */
+            original_name: string;
+        };
         /** DownloadUrlOut */
         DownloadUrlOut: {
             /** Download Url */
@@ -1273,6 +2109,48 @@ export interface components {
             expires_in: number;
             /** Original Name */
             original_name: string;
+        };
+        /** EnrollIn */
+        EnrollIn: {
+            /** Enrollment Code */
+            enrollment_code?: string | null;
+        };
+        /** EnrollmentDecisionIn */
+        EnrollmentDecisionIn: {
+            /** Approve */
+            approve: boolean;
+            /** Note */
+            note?: string | null;
+        };
+        /** EnrollmentOut */
+        EnrollmentOut: {
+            /**
+             * Enrolled At
+             * Format: date-time
+             */
+            enrolled_at: string;
+            /** Final Grade */
+            final_grade?: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Offering Id
+             * Format: uuid
+             */
+            offering_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACTIVE" | "DROPPED" | "COMPLETED" | "REJECTED";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
         };
         /** ErrorDetail */
         ErrorDetail: {
@@ -1319,6 +2197,34 @@ export interface components {
             size_bytes: number;
             /** Uploaded At */
             uploaded_at?: string | null;
+        };
+        /** FinalGradeIn */
+        FinalGradeIn: {
+            /** Grade */
+            grade: number;
+        };
+        /** GradingPolicyIn */
+        GradingPolicyIn: {
+            /**
+             * Attendance
+             * @default 0
+             */
+            attendance: number;
+            /**
+             * Participation
+             * @default 0
+             */
+            participation: number;
+            /**
+             * Project
+             * @default 0
+             */
+            project: number;
+            /**
+             * Quiz
+             * @default 0
+             */
+            quiz: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1386,6 +2292,26 @@ export interface components {
             /** Level */
             level: number;
         };
+        /** LinkMaterialIn */
+        LinkMaterialIn: {
+            /**
+             * Is Required
+             * @default true
+             */
+            is_required: boolean;
+            /**
+             * Material Id
+             * Format: uuid
+             */
+            material_id: string;
+            /** Section */
+            section?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+        };
         /** LoginOut */
         LoginOut: {
             /** Access Token */
@@ -1433,6 +2359,62 @@ export interface components {
             match_score: number;
             /** Reasons */
             reasons: components["schemas"]["ReasonOut"][];
+        };
+        /**
+         * MaterialOut
+         * @description یک ماده از کتابخانهٔ درس.
+         *
+         *     `download_url` فقط وقتی پر است که کاربر اجازه داشته باشد؛ در غیر
+         *     این صورت خودِ ماده دیده می‌شود و لینکش نه — کاربر باید بداند چه
+         *     چیزی پشت اشتراک است.
+         */
+        MaterialOut: {
+            access: components["schemas"]["AccessOut"];
+            /** Authors */
+            authors?: string[];
+            /** Description */
+            description?: string | null;
+            /** Duration Sec */
+            duration_sec?: number | null;
+            /** Edition */
+            edition?: string | null;
+            /** External Url */
+            external_url?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Downloadable
+             * @default true
+             */
+            is_downloadable: boolean;
+            /**
+             * Is Required
+             * @default true
+             */
+            is_required: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "BOOK" | "NOTE" | "SLIDE" | "VIDEO" | "PODCAST" | "DATASET" | "CODE" | "QUESTION_BANK" | "LINK" | "OTHER";
+            /** Kind Fa */
+            kind_fa: string;
+            /**
+             * Language
+             * @default fa
+             */
+            language: string;
+            /** Page Count */
+            page_count?: number | null;
+            /** Section */
+            section?: string | null;
+            /** Size Bytes */
+            size_bytes?: number | null;
+            /** Title Fa */
+            title_fa: string;
         };
         /**
          * MeOut
@@ -1580,6 +2562,18 @@ export interface components {
             title_fa: string;
         };
         /**
+         * MySubscriptionsOut
+         * @description وضعیت اشتراک کاربر — همان چیزی که صفحهٔ «اشتراک من» می‌خواهد.
+         */
+        MySubscriptionsOut: {
+            /** Covers All Courses */
+            covers_all_courses: boolean;
+            /** Has Active */
+            has_active: boolean;
+            /** Items */
+            items?: components["schemas"]["SubscriptionOut"][];
+        };
+        /**
          * OTPRequestIn
          * @example {
          *       "channel": "SMS",
@@ -1620,6 +2614,154 @@ export interface components {
             /** Code */
             code: string;
         };
+        /** OfferingDetailOut */
+        OfferingDetailOut: {
+            /**
+             * Active Students
+             * @default 0
+             */
+            active_students: number;
+            /** Announcements */
+            announcements?: components["schemas"]["AnnouncementOut"][];
+            /** Capacity */
+            capacity?: number | null;
+            /**
+             * Course Id
+             * Format: uuid
+             */
+            course_id: string;
+            /** Course Slug */
+            course_slug: string;
+            /** Course Title Fa */
+            course_title_fa: string;
+            /** Current Week Number */
+            current_week_number?: number | null;
+            /** Description */
+            description?: string | null;
+            /** Final Grade */
+            final_grade?: number | null;
+            /** Grading Policy */
+            grading_policy?: {
+                [key: string]: number;
+            };
+            /** Has Enrollment Code */
+            has_enrollment_code: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Instructor Id
+             * Format: uuid
+             */
+            instructor_id: string;
+            /** Instructor Name */
+            instructor_name?: string | null;
+            /** My Status */
+            my_status?: ("PENDING" | "ACTIVE" | "DROPPED" | "COMPLETED" | "REJECTED") | null;
+            /**
+             * Progress Percent
+             * @default 0
+             */
+            progress_percent: number;
+            /** Requires Approval */
+            requires_approval: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED";
+            /** Term Code */
+            term_code: string;
+            /** Term Title Fa */
+            term_title_fa: string;
+            /** Weeks */
+            weeks?: components["schemas"]["WeekSummaryOut"][];
+        };
+        /** OfferingRefOut */
+        OfferingRefOut: {
+            /**
+             * Active Students
+             * @default 0
+             */
+            active_students: number;
+            /** Capacity */
+            capacity?: number | null;
+            /** Has Enrollment Code */
+            has_enrollment_code: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Instructor Name */
+            instructor_name?: string | null;
+            /** Requires Approval */
+            requires_approval: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED";
+            /** Term Code */
+            term_code: string;
+            /** Term Title Fa */
+            term_title_fa: string;
+        };
+        /** OfferingSummaryOut */
+        OfferingSummaryOut: {
+            /**
+             * Active Students
+             * @default 0
+             */
+            active_students: number;
+            /** Capacity */
+            capacity?: number | null;
+            /**
+             * Course Id
+             * Format: uuid
+             */
+            course_id: string;
+            /** Course Slug */
+            course_slug: string;
+            /** Course Title Fa */
+            course_title_fa: string;
+            /** Current Week Number */
+            current_week_number?: number | null;
+            /** Has Enrollment Code */
+            has_enrollment_code: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Instructor Id
+             * Format: uuid
+             */
+            instructor_id: string;
+            /** Instructor Name */
+            instructor_name?: string | null;
+            /** My Status */
+            my_status?: ("PENDING" | "ACTIVE" | "DROPPED" | "COMPLETED" | "REJECTED") | null;
+            /**
+             * Progress Percent
+             * @default 0
+             */
+            progress_percent: number;
+            /** Requires Approval */
+            requires_approval: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED";
+            /** Term Code */
+            term_code: string;
+            /** Term Title Fa */
+            term_title_fa: string;
+        };
         /** OnboardingOut */
         OnboardingOut: {
             /** Completed Steps */
@@ -1633,6 +2775,19 @@ export interface components {
             state: "BASIC_INFO_REQUIRED" | "SURVEY_REQUIRED" | "SURVEY_INCOMPLETE" | "COMPLETE";
             /** Total Steps */
             total_steps: number;
+        };
+        /** Page[CourseSummaryOut] */
+        Page_CourseSummaryOut_: {
+            /** Has Next */
+            has_next: boolean;
+            /** Items */
+            items: components["schemas"]["CourseSummaryOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
         };
         /** Page[ProjectSummaryOut] */
         Page_ProjectSummaryOut_: {
@@ -1656,6 +2811,35 @@ export interface components {
             identifier: string;
             /** Password */
             password: string;
+        };
+        /** PlanOut */
+        PlanOut: {
+            /** Code */
+            code: string;
+            /** Description */
+            description?: string | null;
+            /** Duration Days */
+            duration_days: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Price Fa */
+            price_fa: string;
+            /** Price Irr */
+            price_irr: number;
+            /** Price Toman */
+            price_toman: number;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "ALL_COURSES" | "SINGLE_COURSE";
+            /** Scope Fa */
+            scope_fa: string;
+            /** Title Fa */
+            title_fa: string;
         };
         /** PreferencesStepIn */
         PreferencesStepIn: {
@@ -1735,6 +2919,15 @@ export interface components {
             student_number?: string | null;
             /** University Id */
             university_id?: string | null;
+        };
+        /** ProgressIn */
+        ProgressIn: {
+            /** Completed */
+            completed?: boolean | null;
+            /** Percent */
+            percent?: number | null;
+            /** Position Sec */
+            position_sec?: number | null;
         };
         /** ProjectDetailOut */
         ProjectDetailOut: {
@@ -1950,6 +3143,11 @@ export interface components {
              */
             work_style: "SOLO" | "TEAM" | "EITHER";
         };
+        /** PublishWeekIn */
+        PublishWeekIn: {
+            /** Publish At */
+            publish_at?: string | null;
+        };
         /**
          * ReasonIn
          * @description بدنهٔ اقدام‌هایی که سند برایشان «با ذکر دلیل» نوشته است — §7.4.
@@ -2019,6 +3217,93 @@ export interface components {
             /** Refresh Token */
             refresh_token: string;
         };
+        /** ResourceIn */
+        ResourceIn: {
+            /** Description */
+            description?: string | null;
+            /** Duration Sec */
+            duration_sec?: number | null;
+            /** External Url */
+            external_url?: string | null;
+            /** File Id */
+            file_id?: string | null;
+            /**
+             * Is Downloadable
+             * @default true
+             */
+            is_downloadable: boolean;
+            /**
+             * Is Required
+             * @default true
+             */
+            is_required: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PDF" | "VIDEO" | "LINK" | "SLIDE" | "DATASET" | "CODE" | "OTHER";
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** ResourceOut */
+        ResourceOut: {
+            /** Description */
+            description?: string | null;
+            /** Duration Sec */
+            duration_sec?: number | null;
+            /** External Url */
+            external_url?: string | null;
+            /**
+             * Has File
+             * @default false
+             */
+            has_file: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Downloadable
+             * @default true
+             */
+            is_downloadable: boolean;
+            /**
+             * Is Required
+             * @default true
+             */
+            is_required: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PDF" | "VIDEO" | "LINK" | "SLIDE" | "DATASET" | "CODE" | "OTHER";
+            progress?: components["schemas"]["ResourceProgressOut"] | null;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** ResourceProgressOut */
+        ResourceProgressOut: {
+            /** Completed At */
+            completed_at?: string | null;
+            /**
+             * Percent
+             * @default 0
+             */
+            percent: number;
+            /** Position Sec */
+            position_sec?: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+        };
         /** ReviewIn */
         ReviewIn: {
             /**
@@ -2053,6 +3338,38 @@ export interface components {
             scope_id?: string | null;
             /** Scope Type */
             scope_type: string;
+        };
+        /** RosterEntryOut */
+        RosterEntryOut: {
+            /**
+             * Enrolled At
+             * Format: date-time
+             */
+            enrolled_at: string;
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /** Final Grade */
+            final_grade?: number | null;
+            /**
+             * Progress Percent
+             * @default 0
+             */
+            progress_percent: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACTIVE" | "DROPPED" | "COMPLETED" | "REJECTED";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name?: string | null;
         };
         /**
          * SessionOut
@@ -2160,6 +3477,99 @@ export interface components {
         SkillsStepIn: {
             /** Skills */
             skills: components["schemas"]["SkillAnswerIn"][];
+        };
+        /** SubscriptionActivateIn */
+        SubscriptionActivateIn: {
+            /** Payment Ref */
+            payment_ref?: string | null;
+        };
+        /**
+         * SubscriptionGrantIn
+         * @description فعال‌سازی دستی توسط پشتیبانی — §02 «پرداخت خارج از سامانه».
+         */
+        SubscriptionGrantIn: {
+            /** Course Slug */
+            course_slug?: string | null;
+            /** Note */
+            note?: string | null;
+            /** Payment Ref */
+            payment_ref?: string | null;
+            /** Plan Code */
+            plan_code: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /** SubscriptionOut */
+        SubscriptionOut: {
+            /** Amount Irr */
+            amount_irr?: number | null;
+            /** Course Id */
+            course_id?: string | null;
+            /** Course Title Fa */
+            course_title_fa?: string | null;
+            /** Days Remaining */
+            days_remaining: number;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Payment Ref */
+            payment_ref?: string | null;
+            /** Plan Code */
+            plan_code: string;
+            /** Plan Title Fa */
+            plan_title_fa: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACTIVE" | "EXPIRED" | "CANCELLED";
+            /** Status Fa */
+            status_fa: string;
+        };
+        /** SubscriptionPlanRefOut */
+        SubscriptionPlanRefOut: {
+            /** Code */
+            code: string;
+            /** Duration Days */
+            duration_days: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Price Irr */
+            price_irr: number;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "ALL_COURSES" | "SINGLE_COURSE";
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** SubscriptionRequestIn */
+        SubscriptionRequestIn: {
+            /** Course Slug */
+            course_slug?: string | null;
+            /** Note */
+            note?: string | null;
+            /** Plan Code */
+            plan_code: string;
         };
         /** SurveyInterestOut */
         SurveyInterestOut: {
@@ -2425,6 +3835,84 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** WeekDetailOut */
+        WeekDetailOut: {
+            /** Description */
+            description?: string | null;
+            /** Materials */
+            materials?: components["schemas"]["MaterialOut"][];
+            /** Objectives */
+            objectives?: string[];
+            /** Published At */
+            published_at?: string | null;
+            /** Resources */
+            resources?: components["schemas"]["ResourceOut"][];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+            /** Title Fa */
+            title_fa: string;
+            /** Week Number */
+            week_number: number;
+        };
+        /** WeekIn */
+        WeekIn: {
+            /** Description */
+            description?: string | null;
+            /** Objectives */
+            objectives?: string[] | null;
+            /** Publish At */
+            publish_at?: string | null;
+            /** Title Fa */
+            title_fa: string;
+            /** Week Number */
+            week_number: number;
+        };
+        /** WeekSummaryOut */
+        WeekSummaryOut: {
+            /**
+             * Completed Count
+             * @default 0
+             */
+            completed_count: number;
+            /** Description */
+            description?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Material Count
+             * @default 0
+             */
+            material_count: number;
+            /**
+             * Progress Percent
+             * @default 0
+             */
+            progress_percent: number;
+            /** Publish At */
+            publish_at?: string | null;
+            /** Published At */
+            published_at?: string | null;
+            /**
+             * Resource Count
+             * @default 0
+             */
+            resource_count: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+            /** Title Fa */
+            title_fa: string;
+            /** Week Number */
+            week_number: number;
         };
     };
     responses: never;
@@ -2902,6 +4390,80 @@ export interface operations {
             };
         };
     };
+    list_courses_api_v1_courses_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                page_size?: number;
+                q?: string | null;
+                degree_level?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CourseSummaryOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    course_detail_api_v1_courses__slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     review_deliverable_api_v1_deliverables__deliverable_id__review_post: {
         parameters: {
             query?: never;
@@ -3111,6 +4673,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DownloadUrlOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    access_tiers_api_v1_materials_tiers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    download_material_api_v1_materials__material_id__download_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                material_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description SUBSCRIPTION_REQUIRED */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description ENROLLMENT_REQUIRED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Not Found */
@@ -3576,6 +5218,318 @@ export interface operations {
             };
             /** @description MILESTONE_NOT_OPEN */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    open_offerings_api_v1_offerings_get: {
+        parameters: {
+            query?: {
+                term_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferingSummaryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_offerings_api_v1_offerings_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferingSummaryOut"][];
+                };
+            };
+        };
+    };
+    offering_detail_api_v1_offerings__offering_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferingDetailOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    offering_announcements_api_v1_offerings__offering_id__announcements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    enroll_api_v1_offerings__offering_id__enroll_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnrollIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrollmentOut"];
+                };
+            };
+            /** @description ENROLLMENT_CODE_INVALID */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description ALREADY_ENROLLED | OFFERING_FULL */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    drop_api_v1_offerings__offering_id__enroll_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_weeks_api_v1_offerings__offering_id__weeks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekSummaryOut"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    week_detail_api_v1_offerings__offering_id__weeks__week_number__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+                week_number: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekDetailOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4863,6 +6817,354 @@ export interface operations {
             };
         };
     };
+    download_resource_api_v1_resources__resource_id__download_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_progress_api_v1_resources__resource_id__progress_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProgressIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceProgressOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_subscriptions_api_v1_subscriptions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MySubscriptionsOut"];
+                };
+            };
+        };
+    };
+    request_subscription_api_v1_subscriptions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscriptionRequestIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    grant_subscription_api_v1_subscriptions_grant_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscriptionGrantIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pending_subscriptions_api_v1_subscriptions_pending_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionOut"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_plans_api_v1_subscriptions_plans_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"][];
+                };
+            };
+        };
+    };
+    cancel_subscription_api_v1_subscriptions__subscription_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subscription_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_subscription_api_v1_subscriptions__subscription_id__activate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subscription_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscriptionActivateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_assets_api_v1_taxonomy_assets_get: {
         parameters: {
             query?: never;
@@ -4942,6 +7244,675 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UniversityOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_enrollment_api_v1_teach_enrollments__enrollment_id__decide_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enrollment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnrollmentDecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrollmentOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    set_grade_api_v1_teach_enrollments__enrollment_id__grade_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enrollment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FinalGradeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrollmentOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    my_offerings_api_v1_teach_offerings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferingSummaryOut"][];
+                };
+            };
+        };
+    };
+    publish_announcement_api_v1_teach_offerings__offering_id__announcements_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnouncementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_attendance_api_v1_teach_offerings__offering_id__attendance_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttendanceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    copy_content_api_v1_teach_offerings__offering_id__copy_content_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyContentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CopyResultOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pending_enrollments_api_v1_teach_offerings__offering_id__enrollment_requests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RosterEntryOut"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_grading_policy_api_v1_teach_offerings__offering_id__grading_policy_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GradingPolicyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    roster_api_v1_teach_offerings__offering_id__students_get: {
+        parameters: {
+            query?: {
+                status?: string | null;
+            };
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RosterEntryOut"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upsert_week_api_v1_teach_offerings__offering_id__weeks_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WeekIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekSummaryOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    link_material_api_v1_teach_offerings__offering_id__weeks__week_id__materials_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+                week_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkMaterialIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unlink_material_api_v1_teach_offerings__offering_id__weeks__week_id__materials__material_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+                week_id: string;
+                material_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_resource_api_v1_teach_offerings__offering_id__weeks__week_id__resources_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+                week_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResourceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_resource_api_v1_teach_resources__resource_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                resource_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_week_api_v1_teach_weeks__week_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                week_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishWeekIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekSummaryOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation Error */

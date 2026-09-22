@@ -37,3 +37,10 @@ apps/web/public/fonts/*.woff2
 apps/web/public/fonts/*.woff
 # اسکیمای OpenAPI و تایپ‌های تولیدشده **کامیت می‌شوند**: CI آن‌ها را با
 # خروجی کد مقایسه می‌کند تا تغییر شکننده در قرارداد دیده شود (§12.6).
+
+# محتوای درس منبع حقیقت روی دیسک است، نه در Git (ADR-0008): خودِ کتاب و
+# جزوه کامیت نمی‌شود — فقط `course.yml` که بگوید پوشه چه چیزی دارد.
+Courses/**
+!Courses/**/
+!Courses/**/course.yml
+!Courses/README.md

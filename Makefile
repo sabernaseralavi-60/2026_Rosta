@@ -23,6 +23,10 @@ setup: ## کپی .env، ساخت ایمیج‌ها، مهاجرت، داده‌�
 	$(DC_DEV) run --rm --entrypoint /app/infra/scripts/wait-for-db.sh api
 	$(MAKE) migrate
 	$(MAKE) seed
+	# محتوا پیش از ارائه‌ها لازم است: `seed` دوباره اجرا می‌شود تا
+	# ارائه‌های دروسِ تازه‌همگام‌شده هم ساخته شوند (ADR-0008).
+	$(MAKE) courses-sync
+	$(MAKE) seed
 	@echo ""
 	@echo "  آماده است. اکنون 'make dev' را اجرا کنید."
 	@echo ""
@@ -49,6 +53,13 @@ downgrade: ## بازگشت یک مهاجرت
 
 seed: ## ورود داده‌های اولیه و حساب‌های نمونهٔ توسعه
 	$(RUN_API_DB) python -m silp.scripts.seed
+
+# ── کتابخانهٔ دروس (ADR-0008) ─────────────────────────────────────────────
+courses-sync: ## همگام‌سازی پوشهٔ Courses/ با کتابخانه — make courses-sync a="--course 'Traffic Safety'"
+	$(RUN_API_DB) python -m silp.scripts.sync_courses $(a)
+
+courses-check: ## گزارش بدون نوشتن: چه چیزی تازه است، چه چیزی عوض شده
+	$(RUN_API_DB) python -m silp.scripts.sync_courses --dry-run
 
 psql: ## پوستهٔ تعاملی PostgreSQL
 	$(DC_DEV) exec postgres psql -U silp -d silp

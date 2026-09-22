@@ -65,6 +65,10 @@ class Settings(BaseSettings):
     upload_max_mb_dataset: Annotated[int, Field(ge=1, le=500)] = 200
     upload_max_mb_archive: Annotated[int, Field(ge=1, le=500)] = 200
 
+    # ── کتابخانهٔ درس (ADR-0008) ───────────────────────────────────────
+    # پوشه‌ای که هر زیرپوشه‌اش یک درس است. نسبی یعنی نسبت به ریشهٔ مخزن.
+    courses_dir: str = "Courses"
+
     # ── احراز هویت (FR-AUTH-01) ────────────────────────────────────────
     otp_length: Annotated[int, Field(ge=4, le=8)] = 6
     otp_ttl_seconds: Annotated[int, Field(ge=30, le=600)] = 120

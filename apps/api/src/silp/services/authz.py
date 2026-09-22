@@ -25,6 +25,7 @@ from silp.core.permissions import (
     ScopeType,
 )
 from silp.core.redis import ROLES_TTL_SECONDS, get_redis, key_roles
+from silp.models.education import CourseOffering
 from silp.models.identity import UserRole
 from silp.models.project import Project, Team, TeamMember
 
@@ -98,6 +99,21 @@ async def load_derived_grants(session: AsyncSession, user_id: uuid.UUID) -> tupl
         RoleGrant(role=Role.PROJECT_LEAD, scope_type=ScopeType.PROJECT, scope_id=project_id)
         for project_id in lead_project_ids
         if project_id not in known
+    )
+
+    # §6.1 — `INSTRUCTOR` قلمروش ارائه است: «اختیار کامل روی ارائهٔ خود».
+    # منبع حقیقت `course_offerings.instructor_id` است، نه یک ردیف دستی
+    # در `user_roles`. بدون این، استادی که ارائه‌اش را تازه ساخته باید
+    # منتظر بماند تا مدیر نقشش را در همان قلمرو ثبت کند — و مدیری که
+    # عجله دارد، نقش را سراسری می‌دهد و در عمل همهٔ دروس را باز می‌کند.
+    offering_ids = await session.scalars(
+        select(CourseOffering.id).where(
+            CourseOffering.instructor_id == user_id, CourseOffering.deleted_at.is_(None)
+        )
+    )
+    grants.extend(
+        RoleGrant(role=Role.INSTRUCTOR, scope_type=ScopeType.OFFERING, scope_id=offering_id)
+        for offering_id in offering_ids
     )
     return tuple(grants)
 

@@ -97,9 +97,36 @@ def test_scoped_permission_without_scope_id_is_denied() -> None:
 
 
 def test_global_grant_covers_every_scope() -> None:
+    """اعطای سراسریِ یک نقشِ سراسری، همهٔ قلمروها را می‌پوشاند.
+
+    `COORDINATOR` در جدول §6.1 قلمرو GLOBAL دارد — «مدیریت دروس و
+    نیم‌سال‌ها»، نه یک ارائهٔ خاص. پس اعطای سراسری‌اش دقیقاً همان چیزی
+    است که قرار بوده باشد.
+    """
+    coordinator = user_with(RoleGrant(Role.COORDINATOR, ScopeType.GLOBAL))
+    assert coordinator.has_permission(Permission.COURSE_WEEK_PUBLISH, OFFERING_A) is True
+    assert coordinator.has_permission(Permission.COURSE_WEEK_PUBLISH, OFFERING_B) is True
+
+
+def test_global_instructor_grant_does_not_open_every_offering() -> None:
+    """ADR-0010 — «استاد» یعنی استادِ ارائهٔ خودش، نه استادِ دانشگاه.
+
+    قلمرو `INSTRUCTOR` و `TA` در جدول §6.1 برابر OFFERING است. اگر
+    اعطای سراسریِ این دو همهٔ ارائه‌ها را باز کند، پانویس ۵ §6.4
+    («استاد ارائهٔ A نباید در ارائهٔ B کاری بکند») با یک ردیف اشتباه
+    در `user_roles` دور زده می‌شود.
+
+    اعطای سراسری بی‌اثر نیست: مجوزهای بی‌قلمرو همچنان می‌آیند.
+    """
     instructor = user_with(RoleGrant(Role.INSTRUCTOR, ScopeType.GLOBAL))
-    assert instructor.has_permission(Permission.COURSE_WEEK_PUBLISH, OFFERING_A) is True
-    assert instructor.has_permission(Permission.COURSE_WEEK_PUBLISH, OFFERING_B) is True
+    assert instructor.has_permission(Permission.COURSE_WEEK_PUBLISH, OFFERING_A) is False
+    assert instructor.has_permission(Permission.ATTENDANCE_RECORD, OFFERING_B) is False
+    assert instructor.has_permission(Permission.PROFILE_VIEW_FULL) is True
+
+
+def test_global_ta_grant_does_not_open_every_offering() -> None:
+    assistant = user_with(RoleGrant(Role.TA, ScopeType.GLOBAL))
+    assert assistant.has_permission(Permission.COURSE_WEEK_EDIT, OFFERING_A) is False
 
 
 def test_admin_is_not_limited_by_scope() -> None:

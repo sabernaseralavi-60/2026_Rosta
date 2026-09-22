@@ -1,0 +1,138 @@
+# مانیفست درس — SILP (ADR-0008)
+# این فایل را آزادانه ویرایش کنید. هر فایلی که در این پوشه
+# بگذارید و اینجا نامش نباشد، هنگام همگام‌سازی خودکار افزوده
+# می‌شود؛ ویرایش این فایل فقط حدسِ سامانه را دقیق‌تر می‌کند.
+#
+# access_tier: PUBLIC (برای همه) | SUBSCRIBER (دانشجوی درس رایگان،
+#              بقیه با اشتراک) | ENROLLED (فقط دانشجوی درس)
+
+code: TRAFFIC-ENG
+slug: traffic-engineering
+title_fa: مهندسی ترافیک و شبیه‌سازی
+title_en: Traffic Engineering and Simulation
+degree_level: MASTER
+credits: 3
+is_public: true
+default_access_tier: SUBSCRIBER
+description: 'درس عملیاتی شبیه‌سازی ترافیک با SUMO: از ساخت شبکه و تقاضا تا کنترل بلادرنگ
+  چراغ با پایتون. هر دانشجو یک محدودهٔ واقعی را تا گزارش مدیریتی جلو می‌برد — همان گردش‌کار
+  آزمایشگاه شهر هوشمند (§14 سند).'
+topics:
+- SUMO
+- شبیه‌سازی
+- TraCI
+- کنترل چراغ
+- OSM
+materials:
+- file: SUMO.docx
+  kind: BOOK
+  title_fa: مهندسی شبیه‌سازی ترافیک با SUMO
+  description: کتاب «مهندسی شبیه‌سازی ترافیک با SUMO» — از ساخت شبکه با netconvert و netedit
+    تا تقاضا، چراغ راهنمایی، TraCI، یادگیری تقویتی و داشبورد. سی فصل در هشت بخش.
+  authors:
+  - سید صابر ناصرعلوی
+  - اکرم مظاهری
+  edition: ۱۴۰۵
+  weeks:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+syllabus:
+- week: 1
+  title_fa: شبیه‌سازی ترافیک در عصر هوش مصنوعی
+  objectives:
+  - جایگاه SUMO میان ابزارهای شبیه‌سازی
+  - چرا متن‌باز و خط‌فرمان
+- week: 2
+  title_fa: اکوسیستم ابزارهای SUMO
+  objectives:
+  - netconvert، netedit، duarouter، sumo-gui
+  - نقش هر ابزار در گردش‌کار
+- week: 3
+  title_fa: 'پروژهٔ سریع: یک چهارراه واقعی'
+  objectives:
+  - از OSM تا اجرای شبیه‌سازی
+  - کمتر از یک جلسه تا اولین خروجی
+- week: 4
+  title_fa: فرمت‌های XML سومو
+  objectives:
+  - شبکه، مسیر، تنظیمات و افزونه
+  - خواندن و ویرایش دستی فایل‌ها
+- week: 5
+  title_fa: ساخت شبکه با netconvert
+  objectives:
+  - تبدیل OSM و Shapefile
+  - پاک‌سازی و ساده‌سازی شبکه
+- week: 6
+  title_fa: کار با netedit
+  objectives:
+  - ترسیم گره و لبه
+  - ویرایش اتصالات خط‌به‌خط
+- week: 7
+  title_fa: هندسهٔ میدان، دوربرگردان و رمپ
+  objectives:
+  - مدل‌سازی میدان
+  - رمپ ورودی و خروجی بزرگراه
+- week: 8
+  title_fa: مدل‌سازی چندوجهی
+  objectives:
+  - عابر پیاده و دوچرخه
+  - خطوط اتوبوس و ایستگاه
+- week: 9
+  title_fa: میان‌ترم و تحویل شبکه
+  objectives:
+  - ارائهٔ شبکهٔ محدودهٔ انتخابی
+  - راستی‌آزمایی با Google، نشان و بلد
+- week: 10
+  title_fa: تولید تقاضا
+  objectives:
+  - randomTrips.py
+  - تعریف جریان‌های متوالی
+- week: 11
+  title_fa: ماتریس مبدأ-مقصد و TAZ
+  objectives:
+  - od2trips
+  - مدل‌سازی نواحی ترافیکی
+- week: 12
+  title_fa: مسیریابی
+  objectives:
+  - duarouter و تعادل پویا
+  - jtrrouter و درصد گردش
+- week: 13
+  title_fa: کلاس وسیله و فیزیک حرکت
+  objectives:
+  - vType و پارامترهای رفتاری
+  - خودروی خودران و کاروان
+- week: 14
+  title_fa: کنترل چراغ راهنمایی
+  objectives:
+  - فازبندی زمان‌ثابت
+  - کنترل Actuated
+- week: 15
+  title_fa: سنسورها و خروجی‌ها
+  objectives:
+  - لوپ دتکتور E1، سنسور ناحیه‌ای E2 و مسیر E3
+  - استخراج داده به Pandas
+- week: 16
+  title_fa: برنامه‌نویسی با TraCI و libsumo
+  objectives:
+  - معماری سوکت TraCI
+  - کنترل پویای چراغ با پایتون
+- week: 17
+  title_fa: پروژهٔ نهایی
+  objectives:
+  - سناریوسازی و مقایسهٔ گزینه‌ها
+  - گزارش مدیریتی و داشبورد

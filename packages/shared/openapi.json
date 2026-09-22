@@ -1,6 +1,67 @@
 {
   "components": {
     "schemas": {
+      "AccessOut": {
+        "description": "سنجش دسترسی یک ماده برای کاربر جاری — ADR-0009.\n\n`note_fa` جمله‌ای است که کنار قفل نشان داده می‌شود. کلاینت آن را\nنمی‌سازد تا منطق توضیح یکجا بماند.",
+        "properties": {
+          "allowed": {
+            "title": "Allowed",
+            "type": "boolean"
+          },
+          "blocker": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SUBSCRIPTION",
+                  "ENROLLMENT"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blocker"
+          },
+          "note_fa": {
+            "title": "Note Fa",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PUBLIC",
+                  "ENROLLED",
+                  "SUBSCRIPTION",
+                  "STAFF"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "tier": {
+            "enum": [
+              "PUBLIC",
+              "SUBSCRIBER",
+              "ENROLLED"
+            ],
+            "title": "Tier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "allowed",
+          "tier",
+          "note_fa"
+        ],
+        "title": "AccessOut",
+        "type": "object"
+      },
       "ActivityOut": {
         "properties": {
           "actor_id": {
@@ -100,6 +161,103 @@
           "match_score"
         ],
         "title": "AlternativeOut",
+        "type": "object"
+      },
+      "AnnouncementIn": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Body",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "priority": {
+            "default": "NORMAL",
+            "enum": [
+              "NORMAL",
+              "IMPORTANT",
+              "URGENT"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ],
+        "title": "AnnouncementIn",
+        "type": "object"
+      },
+      "AnnouncementOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "NORMAL",
+              "IMPORTANT",
+              "URGENT"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "priority",
+          "published_at"
+        ],
+        "title": "AnnouncementOut",
         "type": "object"
       },
       "ApplicationIn": {
@@ -386,6 +544,93 @@
         "title": "AssetsStepIn",
         "type": "object"
       },
+      "AttendanceEntryIn": {
+        "additionalProperties": false,
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "status": {
+            "enum": [
+              "PRESENT",
+              "ABSENT",
+              "LATE",
+              "EXCUSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "student_id",
+          "status"
+        ],
+        "title": "AttendanceEntryIn",
+        "type": "object"
+      },
+      "AttendanceIn": {
+        "additionalProperties": false,
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/AttendanceEntryIn"
+            },
+            "maxItems": 500,
+            "title": "Entries",
+            "type": "array"
+          },
+          "held_on": {
+            "format": "date",
+            "title": "Held On",
+            "type": "string"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "week_number": {
+            "anyOf": [
+              {
+                "maximum": 17.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Number"
+          }
+        },
+        "required": [
+          "held_on",
+          "entries"
+        ],
+        "title": "AttendanceIn",
+        "type": "object"
+      },
       "AuthUserOut": {
         "description": "کاربر در پاسخ ورود — §5.2. اطلاعات تماس پوشانده می‌شود (NFR-01).",
         "properties": {
@@ -495,6 +740,292 @@
           "final_report"
         ],
         "title": "CompleteProjectIn",
+        "type": "object"
+      },
+      "CopyContentIn": {
+        "additionalProperties": false,
+        "properties": {
+          "source_offering_id": {
+            "format": "uuid",
+            "title": "Source Offering Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_offering_id"
+        ],
+        "title": "CopyContentIn",
+        "type": "object"
+      },
+      "CopyResultOut": {
+        "properties": {
+          "weeks_copied": {
+            "title": "Weeks Copied",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "weeks_copied"
+        ],
+        "title": "CopyResultOut",
+        "type": "object"
+      },
+      "CourseDetailOut": {
+        "description": "جزئیات درس — §5.5 `GET /courses/{slug}`.\n\n`plans` اینجا می‌آید تا صفحهٔ درس بتواند بدون درخواست دوم، دکمهٔ\n«اشتراک بگیر» را با قیمت درست نشان دهد.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "credits": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credits"
+          },
+          "degree_level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "BACHELOR",
+                  "MASTER",
+                  "PHD",
+                  "PUBLIC"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degree Level"
+          },
+          "degree_level_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degree Level Fa"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "free_material_count": {
+            "default": 0,
+            "title": "Free Material Count",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "material_count": {
+            "default": 0,
+            "title": "Material Count",
+            "type": "integer"
+          },
+          "materials": {
+            "items": {
+              "$ref": "#/components/schemas/MaterialOut"
+            },
+            "title": "Materials",
+            "type": "array"
+          },
+          "my_enrollment_offering_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Enrollment Offering Id"
+          },
+          "offerings": {
+            "items": {
+              "$ref": "#/components/schemas/OfferingRefOut"
+            },
+            "title": "Offerings",
+            "type": "array"
+          },
+          "open_offering_count": {
+            "default": 0,
+            "title": "Open Offering Count",
+            "type": "integer"
+          },
+          "plans": {
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionPlanRefOut"
+            },
+            "title": "Plans",
+            "type": "array"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "title_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title En"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "code",
+          "title_fa"
+        ],
+        "title": "CourseDetailOut",
+        "type": "object"
+      },
+      "CourseSummaryOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "credits": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credits"
+          },
+          "degree_level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "BACHELOR",
+                  "MASTER",
+                  "PHD",
+                  "PUBLIC"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degree Level"
+          },
+          "degree_level_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Degree Level Fa"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "free_material_count": {
+            "default": 0,
+            "title": "Free Material Count",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "material_count": {
+            "default": 0,
+            "title": "Material Count",
+            "type": "integer"
+          },
+          "open_offering_count": {
+            "default": 0,
+            "title": "Open Offering Count",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "title_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title En"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "code",
+          "title_fa"
+        ],
+        "title": "CourseSummaryOut",
         "type": "object"
       },
       "DecisionIn": {
@@ -736,6 +1267,29 @@
         "title": "DeliverableOut",
         "type": "object"
       },
+      "DownloadOut": {
+        "properties": {
+          "download_url": {
+            "title": "Download Url",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "original_name": {
+            "title": "Original Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "download_url",
+          "expires_in",
+          "original_name"
+        ],
+        "title": "DownloadOut",
+        "type": "object"
+      },
       "DownloadUrlOut": {
         "properties": {
           "download_url": {
@@ -757,6 +1311,106 @@
           "original_name"
         ],
         "title": "DownloadUrlOut",
+        "type": "object"
+      },
+      "EnrollIn": {
+        "additionalProperties": false,
+        "properties": {
+          "enrollment_code": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enrollment Code"
+          }
+        },
+        "title": "EnrollIn",
+        "type": "object"
+      },
+      "EnrollmentDecisionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "approve": {
+            "title": "Approve",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "approve"
+        ],
+        "title": "EnrollmentDecisionIn",
+        "type": "object"
+      },
+      "EnrollmentOut": {
+        "properties": {
+          "enrolled_at": {
+            "format": "date-time",
+            "title": "Enrolled At",
+            "type": "string"
+          },
+          "final_grade": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Grade"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "offering_id": {
+            "format": "uuid",
+            "title": "Offering Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "DROPPED",
+              "COMPLETED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "offering_id",
+          "student_id",
+          "status",
+          "enrolled_at"
+        ],
+        "title": "EnrollmentOut",
         "type": "object"
       },
       "ErrorDetail": {
@@ -862,6 +1516,57 @@
           "scan_status"
         ],
         "title": "FileOut",
+        "type": "object"
+      },
+      "FinalGradeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "grade": {
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Grade",
+            "type": "number"
+          }
+        },
+        "required": [
+          "grade"
+        ],
+        "title": "FinalGradeIn",
+        "type": "object"
+      },
+      "GradingPolicyIn": {
+        "additionalProperties": false,
+        "properties": {
+          "attendance": {
+            "default": 0,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Attendance",
+            "type": "integer"
+          },
+          "participation": {
+            "default": 0,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Participation",
+            "type": "integer"
+          },
+          "project": {
+            "default": 0,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Project",
+            "type": "integer"
+          },
+          "quiz": {
+            "default": 0,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Quiz",
+            "type": "integer"
+          }
+        },
+        "title": "GradingPolicyIn",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1018,6 +1723,43 @@
         "title": "LevelLabel",
         "type": "object"
       },
+      "LinkMaterialIn": {
+        "additionalProperties": false,
+        "properties": {
+          "is_required": {
+            "default": true,
+            "title": "Is Required",
+            "type": "boolean"
+          },
+          "material_id": {
+            "format": "uuid",
+            "title": "Material Id",
+            "type": "string"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          },
+          "sort_order": {
+            "default": 0,
+            "title": "Sort Order",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "material_id"
+        ],
+        "title": "LinkMaterialIn",
+        "type": "object"
+      },
       "LoginOut": {
         "properties": {
           "access_token": {
@@ -1110,6 +1852,151 @@
           "reasons"
         ],
         "title": "MatchOut",
+        "type": "object"
+      },
+      "MaterialOut": {
+        "description": "یک ماده از کتابخانهٔ درس.\n\n`download_url` فقط وقتی پر است که کاربر اجازه داشته باشد؛ در غیر\nاین صورت خودِ ماده دیده می‌شود و لینکش نه — کاربر باید بداند چه\nچیزی پشت اشتراک است.",
+        "properties": {
+          "access": {
+            "$ref": "#/components/schemas/AccessOut"
+          },
+          "authors": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Authors",
+            "type": "array"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "edition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edition"
+          },
+          "external_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Url"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_downloadable": {
+            "default": true,
+            "title": "Is Downloadable",
+            "type": "boolean"
+          },
+          "is_required": {
+            "default": true,
+            "title": "Is Required",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "BOOK",
+              "NOTE",
+              "SLIDE",
+              "VIDEO",
+              "PODCAST",
+              "DATASET",
+              "CODE",
+              "QUESTION_BANK",
+              "LINK",
+              "OTHER"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "language": {
+            "default": "fa",
+            "title": "Language",
+            "type": "string"
+          },
+          "page_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Count"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Section"
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Bytes"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "kind_fa",
+          "title_fa",
+          "access"
+        ],
+        "title": "MaterialOut",
         "type": "object"
       },
       "MeOut": {
@@ -1540,6 +2427,32 @@
         "title": "MilestoneOut",
         "type": "object"
       },
+      "MySubscriptionsOut": {
+        "description": "وضعیت اشتراک کاربر — همان چیزی که صفحهٔ «اشتراک من» می‌خواهد.",
+        "properties": {
+          "covers_all_courses": {
+            "title": "Covers All Courses",
+            "type": "boolean"
+          },
+          "has_active": {
+            "title": "Has Active",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "has_active",
+          "covers_all_courses"
+        ],
+        "title": "MySubscriptionsOut",
+        "type": "object"
+      },
       "OTPRequestIn": {
         "example": {
           "channel": "SMS",
@@ -1635,6 +2548,380 @@
         "title": "OTPVerifyIn",
         "type": "object"
       },
+      "OfferingDetailOut": {
+        "properties": {
+          "active_students": {
+            "default": 0,
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "announcements": {
+            "items": {
+              "$ref": "#/components/schemas/AnnouncementOut"
+            },
+            "title": "Announcements",
+            "type": "array"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "course_id": {
+            "format": "uuid",
+            "title": "Course Id",
+            "type": "string"
+          },
+          "course_slug": {
+            "title": "Course Slug",
+            "type": "string"
+          },
+          "course_title_fa": {
+            "title": "Course Title Fa",
+            "type": "string"
+          },
+          "current_week_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Week Number"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "final_grade": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Grade"
+          },
+          "grading_policy": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Grading Policy",
+            "type": "object"
+          },
+          "has_enrollment_code": {
+            "title": "Has Enrollment Code",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "instructor_id": {
+            "format": "uuid",
+            "title": "Instructor Id",
+            "type": "string"
+          },
+          "instructor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor Name"
+          },
+          "my_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PENDING",
+                  "ACTIVE",
+                  "DROPPED",
+                  "COMPLETED",
+                  "REJECTED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Status"
+          },
+          "progress_percent": {
+            "default": 0,
+            "title": "Progress Percent",
+            "type": "integer"
+          },
+          "requires_approval": {
+            "title": "Requires Approval",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "IN_PROGRESS",
+              "CLOSED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "term_code": {
+            "title": "Term Code",
+            "type": "string"
+          },
+          "term_title_fa": {
+            "title": "Term Title Fa",
+            "type": "string"
+          },
+          "weeks": {
+            "items": {
+              "$ref": "#/components/schemas/WeekSummaryOut"
+            },
+            "title": "Weeks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "course_id",
+          "course_slug",
+          "course_title_fa",
+          "term_code",
+          "term_title_fa",
+          "instructor_id",
+          "status",
+          "requires_approval",
+          "has_enrollment_code"
+        ],
+        "title": "OfferingDetailOut",
+        "type": "object"
+      },
+      "OfferingRefOut": {
+        "properties": {
+          "active_students": {
+            "default": 0,
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "has_enrollment_code": {
+            "title": "Has Enrollment Code",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "instructor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor Name"
+          },
+          "requires_approval": {
+            "title": "Requires Approval",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "IN_PROGRESS",
+              "CLOSED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "term_code": {
+            "title": "Term Code",
+            "type": "string"
+          },
+          "term_title_fa": {
+            "title": "Term Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "term_code",
+          "term_title_fa",
+          "status",
+          "requires_approval",
+          "has_enrollment_code"
+        ],
+        "title": "OfferingRefOut",
+        "type": "object"
+      },
+      "OfferingSummaryOut": {
+        "properties": {
+          "active_students": {
+            "default": 0,
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "course_id": {
+            "format": "uuid",
+            "title": "Course Id",
+            "type": "string"
+          },
+          "course_slug": {
+            "title": "Course Slug",
+            "type": "string"
+          },
+          "course_title_fa": {
+            "title": "Course Title Fa",
+            "type": "string"
+          },
+          "current_week_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Week Number"
+          },
+          "has_enrollment_code": {
+            "title": "Has Enrollment Code",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "instructor_id": {
+            "format": "uuid",
+            "title": "Instructor Id",
+            "type": "string"
+          },
+          "instructor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor Name"
+          },
+          "my_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PENDING",
+                  "ACTIVE",
+                  "DROPPED",
+                  "COMPLETED",
+                  "REJECTED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Status"
+          },
+          "progress_percent": {
+            "default": 0,
+            "title": "Progress Percent",
+            "type": "integer"
+          },
+          "requires_approval": {
+            "title": "Requires Approval",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "IN_PROGRESS",
+              "CLOSED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "term_code": {
+            "title": "Term Code",
+            "type": "string"
+          },
+          "term_title_fa": {
+            "title": "Term Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "course_id",
+          "course_slug",
+          "course_title_fa",
+          "term_code",
+          "term_title_fa",
+          "instructor_id",
+          "status",
+          "requires_approval",
+          "has_enrollment_code"
+        ],
+        "title": "OfferingSummaryOut",
+        "type": "object"
+      },
       "OnboardingOut": {
         "properties": {
           "completed_steps": {
@@ -1667,6 +2954,42 @@
           "next_route"
         ],
         "title": "OnboardingOut",
+        "type": "object"
+      },
+      "Page_CourseSummaryOut_": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CourseSummaryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "has_next"
+        ],
+        "title": "Page[CourseSummaryOut]",
         "type": "object"
       },
       "Page_ProjectSummaryOut_": {
@@ -1726,6 +3049,75 @@
           "password"
         ],
         "title": "PasswordLoginIn",
+        "type": "object"
+      },
+      "PlanOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_days": {
+            "title": "Duration Days",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "price_fa": {
+            "title": "Price Fa",
+            "type": "string"
+          },
+          "price_irr": {
+            "title": "Price Irr",
+            "type": "integer"
+          },
+          "price_toman": {
+            "title": "Price Toman",
+            "type": "integer"
+          },
+          "scope": {
+            "enum": [
+              "ALL_COURSES",
+              "SINGLE_COURSE"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "scope_fa": {
+            "title": "Scope Fa",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "title_fa",
+          "scope",
+          "scope_fa",
+          "duration_days",
+          "price_irr",
+          "price_toman",
+          "price_fa"
+        ],
+        "title": "PlanOut",
         "type": "object"
       },
       "PreferencesStepIn": {
@@ -2099,6 +3491,49 @@
           }
         },
         "title": "ProfileUpdateIn",
+        "type": "object"
+      },
+      "ProgressIn": {
+        "additionalProperties": false,
+        "properties": {
+          "completed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed"
+          },
+          "percent": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent"
+          },
+          "position_sec": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position Sec"
+          }
+        },
+        "title": "ProgressIn",
         "type": "object"
       },
       "ProjectDetailOut": {
@@ -2662,6 +4097,25 @@
         "title": "ProjectSummaryOut",
         "type": "object"
       },
+      "PublishWeekIn": {
+        "additionalProperties": false,
+        "properties": {
+          "publish_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publish At"
+          }
+        },
+        "title": "PublishWeekIn",
+        "type": "object"
+      },
       "ReasonIn": {
         "additionalProperties": false,
         "description": "بدنهٔ اقدام‌هایی که سند برایشان «با ذکر دلیل» نوشته است — §7.4.",
@@ -2820,6 +4274,236 @@
         "title": "RefreshIn",
         "type": "object"
       },
+      "ResourceIn": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "external_url": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Url"
+          },
+          "file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Id"
+          },
+          "is_downloadable": {
+            "default": true,
+            "title": "Is Downloadable",
+            "type": "boolean"
+          },
+          "is_required": {
+            "default": true,
+            "title": "Is Required",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "PDF",
+              "VIDEO",
+              "LINK",
+              "SLIDE",
+              "DATASET",
+              "CODE",
+              "OTHER"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "sort_order": {
+            "default": 0,
+            "title": "Sort Order",
+            "type": "integer"
+          },
+          "title_fa": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "title_fa"
+        ],
+        "title": "ResourceIn",
+        "type": "object"
+      },
+      "ResourceOut": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "external_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Url"
+          },
+          "has_file": {
+            "default": false,
+            "title": "Has File",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_downloadable": {
+            "default": true,
+            "title": "Is Downloadable",
+            "type": "boolean"
+          },
+          "is_required": {
+            "default": true,
+            "title": "Is Required",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "PDF",
+              "VIDEO",
+              "LINK",
+              "SLIDE",
+              "DATASET",
+              "CODE",
+              "OTHER"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "progress": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResourceProgressOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "title_fa"
+        ],
+        "title": "ResourceOut",
+        "type": "object"
+      },
+      "ResourceProgressOut": {
+        "properties": {
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "percent": {
+            "default": 0,
+            "title": "Percent",
+            "type": "number"
+          },
+          "position_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position Sec"
+          },
+          "status": {
+            "enum": [
+              "NOT_STARTED",
+              "IN_PROGRESS",
+              "COMPLETED"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "ResourceProgressOut",
+        "type": "object"
+      },
       "ReviewIn": {
         "additionalProperties": false,
         "properties": {
@@ -2927,6 +4611,71 @@
           "scope_type"
         ],
         "title": "RoleGrantOut",
+        "type": "object"
+      },
+      "RosterEntryOut": {
+        "properties": {
+          "enrolled_at": {
+            "format": "date-time",
+            "title": "Enrolled At",
+            "type": "string"
+          },
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "final_grade": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Grade"
+          },
+          "progress_percent": {
+            "default": 0,
+            "title": "Progress Percent",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "DROPPED",
+              "COMPLETED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          },
+          "student_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Name"
+          }
+        },
+        "required": [
+          "enrollment_id",
+          "student_id",
+          "status",
+          "enrolled_at"
+        ],
+        "title": "RosterEntryOut",
         "type": "object"
       },
       "SessionOut": {
@@ -3169,6 +4918,269 @@
           "skills"
         ],
         "title": "SkillsStepIn",
+        "type": "object"
+      },
+      "SubscriptionActivateIn": {
+        "additionalProperties": false,
+        "properties": {
+          "payment_ref": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Ref"
+          }
+        },
+        "title": "SubscriptionActivateIn",
+        "type": "object"
+      },
+      "SubscriptionGrantIn": {
+        "additionalProperties": false,
+        "description": "فعال‌سازی دستی توسط پشتیبانی — §02 «پرداخت خارج از سامانه».",
+        "properties": {
+          "course_slug": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Slug"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "payment_ref": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Ref"
+          },
+          "plan_code": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Plan Code",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "plan_code"
+        ],
+        "title": "SubscriptionGrantIn",
+        "type": "object"
+      },
+      "SubscriptionOut": {
+        "properties": {
+          "amount_irr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Irr"
+          },
+          "course_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Id"
+          },
+          "course_title_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Title Fa"
+          },
+          "days_remaining": {
+            "title": "Days Remaining",
+            "type": "integer"
+          },
+          "ends_at": {
+            "format": "date-time",
+            "title": "Ends At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "payment_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Ref"
+          },
+          "plan_code": {
+            "title": "Plan Code",
+            "type": "string"
+          },
+          "plan_title_fa": {
+            "title": "Plan Title Fa",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "title": "Starts At",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "EXPIRED",
+              "CANCELLED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "plan_code",
+          "plan_title_fa",
+          "status",
+          "status_fa",
+          "starts_at",
+          "ends_at",
+          "days_remaining"
+        ],
+        "title": "SubscriptionOut",
+        "type": "object"
+      },
+      "SubscriptionPlanRefOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "duration_days": {
+            "title": "Duration Days",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "price_irr": {
+            "title": "Price Irr",
+            "type": "integer"
+          },
+          "scope": {
+            "enum": [
+              "ALL_COURSES",
+              "SINGLE_COURSE"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "title_fa",
+          "price_irr",
+          "duration_days",
+          "scope"
+        ],
+        "title": "SubscriptionPlanRefOut",
+        "type": "object"
+      },
+      "SubscriptionRequestIn": {
+        "additionalProperties": false,
+        "properties": {
+          "course_slug": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Slug"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "plan_code": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Plan Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plan_code"
+        ],
+        "title": "SubscriptionRequestIn",
         "type": "object"
       },
       "SurveyInterestOut": {
@@ -3873,6 +5885,229 @@
         ],
         "title": "ValidationError",
         "type": "object"
+      },
+      "WeekDetailOut": {
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "materials": {
+            "items": {
+              "$ref": "#/components/schemas/MaterialOut"
+            },
+            "title": "Materials",
+            "type": "array"
+          },
+          "objectives": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Objectives",
+            "type": "array"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "resources": {
+            "items": {
+              "$ref": "#/components/schemas/ResourceOut"
+            },
+            "title": "Resources",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "week_number": {
+            "title": "Week Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "week_number",
+          "title_fa",
+          "status"
+        ],
+        "title": "WeekDetailOut",
+        "type": "object"
+      },
+      "WeekIn": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "objectives": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Objectives"
+          },
+          "publish_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publish At"
+          },
+          "title_fa": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "week_number": {
+            "maximum": 17.0,
+            "minimum": 1.0,
+            "title": "Week Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "week_number",
+          "title_fa"
+        ],
+        "title": "WeekIn",
+        "type": "object"
+      },
+      "WeekSummaryOut": {
+        "properties": {
+          "completed_count": {
+            "default": 0,
+            "title": "Completed Count",
+            "type": "integer"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "material_count": {
+            "default": 0,
+            "title": "Material Count",
+            "type": "integer"
+          },
+          "progress_percent": {
+            "default": 0,
+            "title": "Progress Percent",
+            "type": "integer"
+          },
+          "publish_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publish At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "resource_count": {
+            "default": 0,
+            "title": "Resource Count",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "week_number": {
+            "title": "Week Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "week_number",
+          "title_fa",
+          "status"
+        ],
+        "title": "WeekSummaryOut",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -4485,6 +6720,154 @@
         ]
       }
     },
+    "/api/v1/courses": {
+      "get": {
+        "description": "فهرست دروس فعال. بدون احراز هویت کار می‌کند.",
+        "operationId": "list_courses_api_v1_courses_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "degree_level",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Degree Level"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_CourseSummaryOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "ویترین دروس",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/courses/{slug}": {
+      "get": {
+        "description": "درس، کتابخانه‌اش، ارائه‌های باز، و طرح‌های اشتراک.\n\nمهمان هم می‌بیند؛ هر ماده سنجش دسترسی خودش را همراه دارد.",
+        "operationId": "course_detail_api_v1_courses__slug__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جزئیات درس و کتابخانهٔ آن",
+        "tags": [
+          "education"
+        ]
+      }
+    },
     "/api/v1/deliverables/{deliverable_id}/review": {
       "post": {
         "description": "§7.6 — «اصلاح کن» و «رد» بدون بازخورد متنی پذیرفته نمی‌شوند.",
@@ -4807,6 +7190,111 @@
         "summary": "URL دانلود موقت",
         "tags": [
           "files"
+        ]
+      }
+    },
+    "/api/v1/materials/tiers": {
+      "get": {
+        "description": "متن فارسی هر سطح — تا رابط کاربری آن را ننویسد.",
+        "operationId": "access_tiers_api_v1_materials_tiers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Access Tiers Api V1 Materials Tiers Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "معنی سطوح دسترسی",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/materials/{material_id}/download": {
+      "get": {
+        "description": "دروازهٔ اصلی اشتراک — ADR-0009.\n\nمهمان اینجا ۴۰۱ می‌گیرد (نیازمند ورود)، کاربر بدون حق ۴۰۲، و\nکاربری که دنبال مادهٔ `ENROLLED` است ۴۰۳. هر سه پیام فارسی\nآماده‌ٔ نمایش دارند.",
+        "operationId": "download_material_api_v1_materials__material_id__download_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "material_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Material Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "402": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "SUBSCRIPTION_REQUIRED"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "ENROLLMENT_REQUIRED"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "URL دانلود محتوای کتابخانه",
+        "tags": [
+          "education"
         ]
       }
     },
@@ -5437,6 +7925,482 @@
         "summary": "ارسال تحویل‌دادنی",
         "tags": [
           "projects"
+        ]
+      }
+    },
+    "/api/v1/offerings": {
+      "get": {
+        "operationId": "open_offerings_api_v1_offerings_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "term_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Term Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OfferingSummaryOut"
+                  },
+                  "title": "Response Open Offerings Api V1 Offerings Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ارائه‌های قابل ثبت‌نام",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/offerings/mine": {
+      "get": {
+        "description": "§3.4 `/courses` — دروس من با نوار پیشرفت.",
+        "operationId": "my_offerings_api_v1_offerings_mine_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OfferingSummaryOut"
+                  },
+                  "title": "Response My Offerings Api V1 Offerings Mine Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دروس من",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/offerings/{offering_id}": {
+      "get": {
+        "operationId": "offering_detail_api_v1_offerings__offering_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfferingDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "نمای کلی ارائه",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/offerings/{offering_id}/announcements": {
+      "get": {
+        "operationId": "offering_announcements_api_v1_offerings__offering_id__announcements_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AnnouncementOut"
+                  },
+                  "title": "Response Offering Announcements Api V1 Offerings  Offering Id  Announcements Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "اعلانات درس",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/offerings/{offering_id}/enroll": {
+      "delete": {
+        "operationId": "drop_api_v1_offerings__offering_id__enroll_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "انصراف از ارائه",
+        "tags": [
+          "education"
+        ]
+      },
+      "post": {
+        "operationId": "enroll_api_v1_offerings__offering_id__enroll_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "ENROLLMENT_CODE_INVALID"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "ALREADY_ENROLLED | OFFERING_FULL"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت‌نام در ارائه",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/offerings/{offering_id}/weeks": {
+      "get": {
+        "operationId": "list_weeks_api_v1_offerings__offering_id__weeks_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WeekSummaryOut"
+                  },
+                  "title": "Response List Weeks Api V1 Offerings  Offering Id  Weeks Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "فهرست هفته‌ها",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/offerings/{offering_id}/weeks/{week_number}": {
+      "get": {
+        "operationId": "week_detail_api_v1_offerings__offering_id__weeks__week_number__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "week_number",
+            "required": true,
+            "schema": {
+              "title": "Week Number",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "محتوای یک هفته",
+        "tags": [
+          "education"
         ]
       }
     },
@@ -7490,6 +10454,493 @@
         ]
       }
     },
+    "/api/v1/resources/{resource_id}/download": {
+      "get": {
+        "operationId": "download_resource_api_v1_resources__resource_id__download_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Resource Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "URL دانلود موقت منبع",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/resources/{resource_id}/progress": {
+      "post": {
+        "description": "FR-EDU-04 — ویدئو خودش تمام می‌شود، PDF با دکمهٔ صریح.",
+        "operationId": "record_progress_api_v1_resources__resource_id__progress_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Resource Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceProgressOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت پیشرفت مطالعه",
+        "tags": [
+          "education"
+        ]
+      }
+    },
+    "/api/v1/subscriptions": {
+      "get": {
+        "operationId": "my_subscriptions_api_v1_subscriptions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySubscriptionsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "اشتراک‌های من",
+        "tags": [
+          "subscriptions"
+        ]
+      },
+      "post": {
+        "description": "ثبت درخواست — وضعیت `PENDING` تا تأیید پرداخت بیرونی.\n\nپاسخ عمداً یک ردیف «در انتظار» است و نه یک دسترسی باز: کاربر باید\nببیند که چیزی ثبت شده و منتظر چیست.",
+        "operationId": "request_subscription_api_v1_subscriptions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionRequestIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "درخواست اشتراک",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
+    "/api/v1/subscriptions/grant": {
+      "post": {
+        "description": "§02 — «پرداخت خارج از سامانه انجام می‌شود».\n\n`payment_ref` شمارهٔ فیش یا کد رهگیری است و **باید** پر شود مگر\nاشتراک هدیه باشد؛ بدون آن، بعداً معلوم نیست چرا فعال شده.",
+        "operationId": "grant_subscription_api_v1_subscriptions_grant_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionGrantIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "فعال‌سازی اشتراک برای یک کاربر",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
+    "/api/v1/subscriptions/pending": {
+      "get": {
+        "operationId": "pending_subscriptions_api_v1_subscriptions_pending_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionOut"
+                  },
+                  "title": "Response Pending Subscriptions Api V1 Subscriptions Pending Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "درخواست‌های اشتراک در انتظار تأیید",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
+    "/api/v1/subscriptions/plans": {
+      "get": {
+        "description": "بدون ورود هم کار می‌کند — صفحهٔ قیمت باید برای مهمان باز باشد.",
+        "operationId": "list_plans_api_v1_subscriptions_plans_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlanOut"
+                  },
+                  "title": "Response List Plans Api V1 Subscriptions Plans Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "طرح‌های اشتراک",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
+    "/api/v1/subscriptions/{subscription_id}": {
+      "delete": {
+        "operationId": "cancel_subscription_api_v1_subscriptions__subscription_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscription_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Subscription Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "لغو اشتراک",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
+    "/api/v1/subscriptions/{subscription_id}/activate": {
+      "post": {
+        "operationId": "activate_subscription_api_v1_subscriptions__subscription_id__activate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscription_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Subscription Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionActivateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تأیید پرداخت و فعال‌سازی",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
     "/api/v1/taxonomy/assets": {
       "get": {
         "operationId": "list_assets_api_v1_taxonomy_assets_get",
@@ -7611,6 +11062,1052 @@
         "summary": "جستجوی دانشگاه",
         "tags": [
           "taxonomy"
+        ]
+      }
+    },
+    "/api/v1/teach/enrollments/{enrollment_id}/decide": {
+      "post": {
+        "operationId": "decide_enrollment_api_v1_teach_enrollments__enrollment_id__decide_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Enrollment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentDecisionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تأیید یا رد ثبت‌نام",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/enrollments/{enrollment_id}/grade": {
+      "patch": {
+        "operationId": "set_grade_api_v1_teach_enrollments__enrollment_id__grade_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Enrollment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinalGradeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت نمرهٔ نهایی",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings": {
+      "get": {
+        "operationId": "my_offerings_api_v1_teach_offerings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OfferingSummaryOut"
+                  },
+                  "title": "Response My Offerings Api V1 Teach Offerings Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ارائه‌های من",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/announcements": {
+      "post": {
+        "operationId": "publish_announcement_api_v1_teach_offerings__offering_id__announcements_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "انتشار اعلان درس",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/attendance": {
+      "post": {
+        "description": "FR-EDU-05 — یک درخواست برای کل کلاس، نه یکی به‌ازای هر دانشجو.",
+        "operationId": "record_attendance_api_v1_teach_offerings__offering_id__attendance_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttendanceIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Record Attendance Api V1 Teach Offerings  Offering Id  Attendance Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت گروهی حضور و غیاب",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/copy-content": {
+      "post": {
+        "description": "هفته‌ها **پیش‌نویس** کپی می‌شوند؛ انتشار تصمیم تازه‌ای است.",
+        "operationId": "copy_content_api_v1_teach_offerings__offering_id__copy_content_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyContentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopyResultOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "کپی محتوا از ارائهٔ قبلی",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/enrollment-requests": {
+      "get": {
+        "operationId": "pending_enrollments_api_v1_teach_offerings__offering_id__enrollment_requests_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RosterEntryOut"
+                  },
+                  "title": "Response Pending Enrollments Api V1 Teach Offerings  Offering Id  Enrollment Requests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "درخواست‌های ثبت‌نام در انتظار",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/grading-policy": {
+      "put": {
+        "operationId": "set_grading_policy_api_v1_teach_offerings__offering_id__grading_policy_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradingPolicyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Set Grading Policy Api V1 Teach Offerings  Offering Id  Grading Policy Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تعیین وزن‌های نمره",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/students": {
+      "get": {
+        "operationId": "roster_api_v1_teach_offerings__offering_id__students_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RosterEntryOut"
+                  },
+                  "title": "Response Roster Api V1 Teach Offerings  Offering Id  Students Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دانشجویان ارائه",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/weeks": {
+      "put": {
+        "description": "شمارهٔ هفته کلید است — همان ۱ تا ۱۷ که استاد در ذهن دارد.",
+        "operationId": "upsert_week_api_v1_teach_offerings__offering_id__weeks_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeekIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ساخت یا ویرایش هفته",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/weeks/{week_id}/materials": {
+      "post": {
+        "operationId": "link_material_api_v1_teach_offerings__offering_id__weeks__week_id__materials_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "week_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Week Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkMaterialIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بستن محتوای کتابخانه به هفته",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/weeks/{week_id}/materials/{material_id}": {
+      "delete": {
+        "operationId": "unlink_material_api_v1_teach_offerings__offering_id__weeks__week_id__materials__material_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "week_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Week Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "material_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Material Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "برداشتن پیوند محتوا از هفته",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/weeks/{week_id}/resources": {
+      "post": {
+        "operationId": "add_resource_api_v1_teach_offerings__offering_id__weeks__week_id__resources_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "week_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Week Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourceIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "افزودن منبع به هفته",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/resources/{resource_id}": {
+      "delete": {
+        "operationId": "remove_resource_api_v1_teach_resources__resource_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resource_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Resource Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف منبع",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/weeks/{week_id}/publish": {
+      "post": {
+        "operationId": "publish_week_api_v1_teach_weeks__week_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "week_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Week Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishWeekIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "انتشار هفته (فوری یا زمان‌بندی‌شده)",
+        "tags": [
+          "teaching"
         ]
       }
     }

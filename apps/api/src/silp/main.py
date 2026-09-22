@@ -21,7 +21,18 @@ from silp.core.middleware import RequestLogMiddleware, TraceMiddleware
 from silp.core.redis import close_redis
 from silp.db.session import dispose_engine
 from silp.routers import health
-from silp.routers.v1 import applications, auth, files, me, projects, taxonomy, workspace
+from silp.routers.v1 import (
+    applications,
+    auth,
+    courses,
+    files,
+    me,
+    projects,
+    subscriptions,
+    taxonomy,
+    teach,
+    workspace,
+)
 
 log = get_logger("silp.main")
 
@@ -109,6 +120,13 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(applications.router)
     v1.include_router(files.router)
     v1.include_router(projects.feedback_router)
+    # ── آموزش (M3) ─────────────────────────────────────────────────────
+    v1.include_router(courses.router)
+    v1.include_router(courses.offerings_router)
+    v1.include_router(courses.resources_router)
+    v1.include_router(courses.materials_router)
+    v1.include_router(teach.router)
+    v1.include_router(subscriptions.router)
     app.include_router(v1)
 
 

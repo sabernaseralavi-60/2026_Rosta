@@ -1,0 +1,136 @@
+# مانیفست درس — SILP (ADR-0008)
+# این فایل را آزادانه ویرایش کنید. هر فایلی که در این پوشه
+# بگذارید و اینجا نامش نباشد، هنگام همگام‌سازی خودکار افزوده
+# می‌شود؛ ویرایش این فایل فقط حدسِ سامانه را دقیق‌تر می‌کند.
+#
+# access_tier: PUBLIC (برای همه) | SUBSCRIBER (دانشجوی درس رایگان،
+#              بقیه با اشتراک) | ENROLLED (فقط دانشجوی درس)
+
+code: CIVIL-DATAMINING
+slug: data-mining-civil
+title_fa: داده‌کاوی و یادگیری ماشین در مهندسی عمران
+title_en: Data Mining and Machine Learning in Civil Engineering
+degree_level: MASTER
+credits: 3
+is_public: true
+default_access_tier: SUBSCRIBER
+description: 'یادگیری ماشین با دادهٔ واقعی مهندسی عمران و حمل‌ونقل: از پاک‌سازی داده تا مدل‌های
+  درختی، خوشه‌بندی، سری زمانی و تفسیرپذیری. تمرکز بر اجرا، نه بر اثبات ریاضی.'
+topics:
+- یادگیری ماشین
+- رگرسیون
+- طبقه‌بندی
+- خوشه‌بندی
+- تفسیرپذیری
+materials:
+- file: Machine learning essentials_FA+++.pdf
+  kind: BOOK
+  title_fa: مبانی یادگیری ماشین (نسخهٔ فارسی)
+  description: 'کتاب مرجع درس: مفاهیم پایه تا مدل‌های درختی و ارزیابی، با مثال اجرایی.'
+  weeks:
+  - 1
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+- file: mleسوال چهارگزینه ای .pdf
+  kind: QUESTION_BANK
+  title_fa: بانک سؤال چهارگزینه‌ای یادگیری ماشین
+  description: سؤالات مرور و آمادگی آزمون، به تفکیک فصل.
+  access_tier: ENROLLED
+  weeks:
+  - 9
+  - 17
+syllabus:
+- week: 1
+  title_fa: داده‌کاوی و یادگیری ماشین در عمران
+  objectives:
+  - تفاوت آمار کلاسیک و یادگیری ماشین
+  - نمونه‌های کاربردی در حمل‌ونقل و سازه
+- week: 2
+  title_fa: محیط کار
+  objectives:
+  - پایتون، نوت‌بوک و محیط مجازی
+  - کنترل نسخه و پژوهش تکرارپذیر
+- week: 3
+  title_fa: آماده‌سازی داده
+  objectives:
+  - دادهٔ گمشده و پرت
+  - مقیاس‌بندی و کدگذاری متغیر کیفی
+- week: 4
+  title_fa: تحلیل اکتشافی
+  objectives:
+  - آمار توصیفی و همبستگی
+  - مصورسازی مؤثر
+- week: 5
+  title_fa: رگرسیون خطی
+  objectives:
+  - برآورد و تفسیر ضرایب
+  - منظم‌سازی ریج و لاسو
+- week: 6
+  title_fa: رگرسیون لجستیک و ارزیابی
+  objectives:
+  - ماتریس درهم‌ریختگی
+  - ROC، AUC و انتخاب آستانه
+- week: 7
+  title_fa: درخت تصمیم و جنگل تصادفی
+  objectives:
+  - معیار تقسیم و هرس
+  - اهمیت ویژگی
+- week: 8
+  title_fa: گرادیان بوستینگ
+  objectives:
+  - XGBoost و LightGBM
+  - تنظیم ابرپارامترهای کلیدی
+- week: 9
+  title_fa: آزمون میان‌ترم و کارگاه
+  objectives:
+  - جمع‌بندی مدل‌های نظارت‌شده
+- week: 10
+  title_fa: SVM و KNN
+  objectives:
+  - حاشیه و کرنل
+  - فاصله و انتخاب k
+- week: 11
+  title_fa: اعتبارسنجی و بیش‌برازش
+  objectives:
+  - اعتبارسنجی متقابل
+  - جستجوی شبکه‌ای و بیزی
+- week: 12
+  title_fa: خوشه‌بندی
+  objectives:
+  - k-means و انتخاب k
+  - سلسله‌مراتبی و DBSCAN
+- week: 13
+  title_fa: کاهش بعد
+  objectives:
+  - PCA
+  - t-SNE و UMAP برای مصورسازی
+- week: 14
+  title_fa: سری زمانی
+  objectives:
+  - مؤلفه‌های روند و فصلی
+  - پیش‌بینی تقاضای سفر
+- week: 15
+  title_fa: شبکهٔ عصبی
+  objectives:
+  - پرسپترون چندلایه
+  - مقدمهٔ یادگیری عمیق
+- week: 16
+  title_fa: تفسیرپذیری مدل
+  objectives:
+  - SHAP و وابستگی جزئی
+  - چرا مدل جعبه‌سیاه در مهندسی خطرناک است
+- week: 17
+  title_fa: ارائهٔ پروژه
+  objectives:
+  - ارائهٔ پروژهٔ داده‌کاوی روی دادهٔ واقعی

@@ -142,6 +142,82 @@ class ConcurrentModification(Conflict):
     log_level = "warning"
 
 
+# ── آموزش — §5.5 ───────────────────────────────────────────────────────
+class AlreadyEnrolled(Conflict):
+    code = "ALREADY_ENROLLED"
+    message = "شما قبلاً در این درس ثبت‌نام کرده‌اید."
+
+
+class EnrollmentCodeInvalid(PermissionDenied):
+    code = "ENROLLMENT_CODE_INVALID"
+    message = "کد ثبت‌نام درست نیست."
+
+
+class OfferingFull(Conflict):
+    code = "OFFERING_FULL"
+    message = "ظرفیت این ارائه تکمیل شده است."
+
+
+class OfferingNotOpen(Conflict):
+    code = "OFFERING_NOT_OPEN"
+    message = "این ارائه پذیرش ثبت‌نام ندارد."
+
+
+class NotEnrolled(PermissionDenied):
+    code = "NOT_ENROLLED"
+    message = "شما در این درس ثبت‌نام نکرده‌اید."
+
+
+class WeekNotPublished(NotFound):
+    """هفتهٔ منتشرنشده برای دانشجو **وجود ندارد** — §6.4 قاعدهٔ ۴.
+
+    ۴۰۴ می‌دهد نه ۴۰۳: «این هفته هنوز آماده نیست» خودش افشای برنامهٔ
+    درسی است و ۴۰۳ در عمل همان را لو می‌دهد.
+    """
+
+    code = "WEEK_NOT_PUBLISHED"
+    message = "این هفته هنوز منتشر نشده است."
+
+
+# ── اشتراک و دسترسی به کتابخانه — ADR-0009 ─────────────────────────────
+class SubscriptionRequired(SILPError):
+    """پاسخ ۴۰۲: محتوا هست، ولی این کاربر حق دیدنش را نخریده.
+
+    ۴۰۳ نیست چون «اجازه نداری» غلط است؛ راهی برای داشتنِ اجازه هست و
+    کلاینت باید همان را نشان دهد. `details.course_slug` و
+    `details.plans` به رابط کاربری می‌گویند کدام طرح را پیشنهاد کند.
+    """
+
+    status_code = 402
+    code = "SUBSCRIPTION_REQUIRED"
+    message = "برای دسترسی به این محتوا، اشتراک لازم است."
+
+    def __init__(
+        self,
+        message: str | None = None,
+        *,
+        course_slug: str | None = None,
+        **kwargs: Any,
+    ) -> None:
+        details = kwargs.pop("details", {}) or {}
+        if course_slug:
+            details["course_slug"] = course_slug
+        super().__init__(message, details=details, **kwargs)
+
+
+class EnrollmentRequired(SubscriptionRequired):
+    """مادهٔ `ENROLLED` فروختنی نیست — اشتراک هم بازش نمی‌کند."""
+
+    status_code = 403
+    code = "ENROLLMENT_REQUIRED"
+    message = "این محتوا فقط برای دانشجویان ثبت‌نام‌شدهٔ همین درس است."
+
+
+class SubscriptionAlreadyActive(Conflict):
+    code = "SUBSCRIPTION_ALREADY_ACTIVE"
+    message = "شما هم‌اکنون اشتراک فعال دارید."
+
+
 # ── فایل — §5.13 ───────────────────────────────────────────────────────
 class FileTooLarge(SILPError):
     status_code = 413
@@ -182,6 +258,13 @@ class ValidationFailed(SILPError):
 class InvalidDestination(ValidationFailed):
     code = "INVALID_DESTINATION"
     message = "شمارهٔ موبایل یا ایمیل واردشده معتبر نیست."
+
+
+class PlanScopeMismatch(ValidationFailed):
+    """ADR-0009 — طرح «یک درس» بدون درس، یا طرح «همهٔ دروس» با درس."""
+
+    code = "PLAN_SCOPE_MISMATCH"
+    message = "این طرح با درس انتخاب‌شده سازگار نیست."
 
 
 # ── OTP — FR-AUTH-01 ───────────────────────────────────────────────────

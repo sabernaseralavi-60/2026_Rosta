@@ -33,11 +33,17 @@ from silp.models.identity import User
 from silp.services import authz
 from silp.services.application_service import ApplicationService
 from silp.services.auth_service import AuthService
+from silp.services.course_service import CourseService
 from silp.services.delivery_service import DeliveryService
+from silp.services.enrollment_service import EnrollmentService
+from silp.services.entitlement_service import EntitlementService
 from silp.services.file_service import FileService
 from silp.services.otp_service import OTPService
 from silp.services.profile_service import ProfileService
+from silp.services.progress_service import ProgressService
 from silp.services.project_service import ProjectService
+from silp.services.subscription_service import SubscriptionService
+from silp.services.teaching_service import TeachingService
 from silp.services.token_service import TokenService
 from silp.services.workspace_service import WorkspaceService
 
@@ -115,6 +121,34 @@ def get_workspace_service(session: SessionDep) -> WorkspaceService:
     return WorkspaceService(session)
 
 
+# ── آموزش (M3) ─────────────────────────────────────────────────────────
+def get_entitlement_service(session: SessionDep) -> EntitlementService:
+    return EntitlementService(session)
+
+
+def get_course_service(
+    session: SessionDep,
+    entitlements: Annotated[EntitlementService, Depends(get_entitlement_service)],
+) -> CourseService:
+    return CourseService(session, entitlements)
+
+
+def get_enrollment_service(session: SessionDep) -> EnrollmentService:
+    return EnrollmentService(session)
+
+
+def get_progress_service(session: SessionDep) -> ProgressService:
+    return ProgressService(session)
+
+
+def get_teaching_service(session: SessionDep) -> TeachingService:
+    return TeachingService(session)
+
+
+def get_subscription_service(session: SessionDep) -> SubscriptionService:
+    return SubscriptionService(session)
+
+
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 ProfileServiceDep = Annotated[ProfileService, Depends(get_profile_service)]
 TokenServiceDep = Annotated[TokenService, Depends(get_token_service)]
@@ -124,6 +158,12 @@ ProjectServiceDep = Annotated[ProjectService, Depends(get_project_service)]
 ApplicationServiceDep = Annotated[ApplicationService, Depends(get_application_service)]
 DeliveryServiceDep = Annotated[DeliveryService, Depends(get_delivery_service)]
 WorkspaceServiceDep = Annotated[WorkspaceService, Depends(get_workspace_service)]
+CourseServiceDep = Annotated[CourseService, Depends(get_course_service)]
+EnrollmentServiceDep = Annotated[EnrollmentService, Depends(get_enrollment_service)]
+EntitlementServiceDep = Annotated[EntitlementService, Depends(get_entitlement_service)]
+ProgressServiceDep = Annotated[ProgressService, Depends(get_progress_service)]
+TeachingServiceDep = Annotated[TeachingService, Depends(get_teaching_service)]
+SubscriptionServiceDep = Annotated[SubscriptionService, Depends(get_subscription_service)]
 
 
 async def get_current_user(
@@ -258,8 +298,8 @@ def _path_uuid_value(request: Request, param: str) -> uuid.UUID | None:
         return None
 
 
-def _lookup_project_scope(sql: str, param: str) -> ScopeResolver:
-    """قلمرو پروژه را از یک شناسهٔ وابسته در مسیر پیدا می‌کند.
+def _lookup_scope(sql: str, param: str) -> ScopeResolver:
+    """قلمرو را از یک شناسهٔ وابسته در مسیر پیدا می‌کند.
 
     کوئری خام است تا وابستگی حلقوی `deps → service → deps` نسازد؛ فقط
     یک شناسه لازم است، نه یک موجودیت کامل.
@@ -270,10 +310,14 @@ def _lookup_project_scope(sql: str, param: str) -> ScopeResolver:
         entity_id = _path_uuid_value(request, param)
         if entity_id is None:
             return None
-        project_id: uuid.UUID | None = await session.scalar(statement, {"id": entity_id})
-        return project_id
+        scope_id: uuid.UUID | None = await session.scalar(statement, {"id": entity_id})
+        return scope_id
 
     return resolver
+
+
+# نام قدیمی، برای خوانایی مسیرهای پروژه.
+_lookup_project_scope = _lookup_scope
 
 
 # قلمرو مجوزهای پروژه‌ای — §6.4. هر endpoint پروژه یکی از این‌ها را
@@ -294,6 +338,21 @@ project_of_deliverable = _lookup_project_scope(
 )
 
 
+# قلمرو مجوزهای آموزشی — §6.4. «استاد ارائهٔ الف» نباید بتواند در
+# ارائهٔ ب هفته منتشر کند یا حضور ثبت نماید.
+offering_from_path = path_uuid("offering_id")
+
+offering_of_week = _lookup_scope("SELECT offering_id FROM course_weeks WHERE id = :id", "week_id")
+offering_of_resource = _lookup_scope(
+    "SELECT w.offering_id FROM resources r"
+    " JOIN course_weeks w ON w.id = r.week_id WHERE r.id = :id",
+    "resource_id",
+)
+offering_of_enrollment = _lookup_scope(
+    "SELECT offering_id FROM enrollments WHERE id = :id", "enrollment_id"
+)
+
+
 # ── اطلاعات درخواست ────────────────────────────────────────────────────
 def get_client_ip(request: Request) -> str:
     return client_ip(request)
@@ -310,20 +369,30 @@ __all__ = [
     "ApplicationServiceDep",
     "AuthServiceDep",
     "ClientIPDep",
+    "CourseServiceDep",
     "CurrentUserDep",
     "DeliveryServiceDep",
+    "EnrollmentServiceDep",
+    "EntitlementServiceDep",
     "FileServiceDep",
     "OTPServiceDep",
     "OptionalUserDep",
     "ProfileServiceDep",
+    "ProgressServiceDep",
     "ProjectServiceDep",
     "RoleGrant",
     "SessionDep",
     "SettingsDep",
+    "SubscriptionServiceDep",
+    "TeachingServiceDep",
     "TokenServiceDep",
     "UserAgentDep",
     "WorkspaceServiceDep",
     "get_current_user",
+    "offering_from_path",
+    "offering_of_enrollment",
+    "offering_of_resource",
+    "offering_of_week",
     "path_uuid",
     "project_from_path",
     "project_of_application",

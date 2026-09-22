@@ -19,8 +19,10 @@ from silp.core.logging import configure_logging, get_logger
 from silp.core.permissions import Role, ScopeType
 from silp.db.session import dispose_engine, session_scope
 from silp.models.identity import User
+from silp.scripts.seed_courses import seed_offerings, seed_plans, seed_terms
 from silp.scripts.seed_profiles import seed_profiles
 from silp.scripts.seed_projects import ensure_lead, seed_projects
+from silp.scripts.sync_courses import resolve_root
 from silp.services import authz
 
 log = get_logger("silp.seed")
@@ -74,17 +76,27 @@ async def seed_dev_accounts() -> tuple[int, int]:
 INSTRUCTOR_MOBILE = "09120000002"
 
 
-async def seed_content() -> tuple[tuple[int, int], tuple[int, int]]:
-    """نیمرخ پرسوناها و بانک پروژهٔ §14.5.
+async def seed_content() -> tuple[tuple[int, int], ...]:
+    """نیمرخ پرسوناها، بانک پروژهٔ §14.5، و چارچوب آموزش.
 
-    ترتیب مهم است: پروژه‌ها به حساب استاد به‌عنوان مدیر نیاز دارند، و
-    نیمرخ‌ها به وجود کاربر.
+    ترتیب مهم است: پروژه‌ها و ارائه‌ها هر دو به حساب استاد نیاز دارند،
+    و نیمرخ‌ها به وجود کاربر.
+
+    **محتوای درس اینجا ساخته نمی‌شود.** کتاب و جزوه از پوشهٔ `Courses/`
+    می‌آیند و `make courses-sync` آن‌ها را وارد می‌کند (ADR-0008)؛ اگر
+    آن اجرا نشده باشد، ارائه‌ها ساخته می‌شوند ولی کتابخانه خالی است.
     """
     async with session_scope() as session:
         profiles = await seed_profiles(session)
         lead_id = await ensure_lead(session, INSTRUCTOR_MOBILE)
         projects = await seed_projects(session, lead_id)
-    return profiles, projects
+
+        await seed_terms(session)
+        plans = await seed_plans(session)
+        offerings = await seed_offerings(
+            session, instructor_id=lead_id, courses_root=resolve_root(None)
+        )
+    return profiles, projects, plans, offerings
 
 
 async def main() -> int:
@@ -97,7 +109,12 @@ async def main() -> int:
 
     try:
         created, existing = await seed_dev_accounts()
-        (p_created, p_existing), (j_created, j_existing) = await seed_content()
+        (
+            (p_created, p_existing),
+            (j_created, j_existing),
+            (pl_created, pl_existing),
+            (o_created, o_existing),
+        ) = await seed_content()
     finally:
         await dispose_engine()
 
@@ -105,9 +122,12 @@ async def main() -> int:
     print(f"  حساب‌های نمونه: {created} ساخته شد، {existing} از قبل موجود بود.")
     print(f"  نیمرخ‌ها:       {p_created} ساخته شد، {p_existing} از قبل موجود بود.")
     print(f"  پروژه‌ها:       {j_created} ساخته شد، {j_existing} از قبل موجود بود.")
+    print(f"  طرح اشتراک:    {pl_created} ساخته شد، {pl_existing} از قبل موجود بود.")
+    print(f"  ارائهٔ درس:     {o_created} ساخته شد، {o_existing} از قبل موجود بود.")
     if settings.dev_fixed_otp:
         print(f"  کد ورود در محیط توسعه: {settings.dev_fixed_otp}")
     print("  نمونه: 09120000010 (دانشجو) · 09120000001 (مدیر)")
+    print("  برای پر کردن کتابخانهٔ دروس: make courses-sync")
     print("")
     return 0
 
