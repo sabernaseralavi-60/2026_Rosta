@@ -12,6 +12,11 @@ export interface ProjectSummary {
   slug: string;
   title_fa: string;
   summary: string;
+  /**
+   * مدیر پروژه. روی کارت پیشنهاد `null` است، چون آن کارت از منطق
+   * امتیازدهی ساخته می‌شود و «مدیر کیست» به امتیازدهی ربطی ندارد.
+   */
+  lead_id: string | null;
   kind: ProjectKind;
   kind_fa: string;
   status: string;

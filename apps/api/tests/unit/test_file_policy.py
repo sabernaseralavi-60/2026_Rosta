@@ -130,7 +130,9 @@ def test_storage_key_is_built_from_the_id_not_the_name() -> None:
 )
 def test_hostile_names_never_reach_the_key(name: str) -> None:
     key = policy.storage_key(
-        purpose=FilePurpose.RESOURCE, file_id="018f0000-0000-7000-8000-000000000002", original_name=name
+        purpose=FilePurpose.RESOURCE,
+        file_id="018f0000-0000-7000-8000-000000000002",
+        original_name=name,
     )
     assert key.startswith("resource/018f0000-0000-7000-8000-000000000002")
     assert ".." not in key

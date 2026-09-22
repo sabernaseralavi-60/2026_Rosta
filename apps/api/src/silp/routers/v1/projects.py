@@ -117,6 +117,7 @@ def _summary_of_row(project: Project, active_members: int) -> ProjectSummaryOut:
         slug=project.slug,
         title_fa=project.title_fa,
         summary=project.summary,
+        lead_id=project.lead_id,
         kind=project.kind,
         kind_fa=KIND_TITLE_FA[project.kind],
         status=project.status,

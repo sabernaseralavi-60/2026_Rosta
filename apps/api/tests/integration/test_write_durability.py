@@ -249,9 +249,7 @@ async def test_completed_upload_survives_the_request(  # type: ignore[no-untyped
     file_id = uuid.UUID(payload["file_id"])
 
     try:
-        storage.put_object(
-            payload["upload_url"].split("/", 3)[-1], body, "application/pdf"
-        )
+        storage.put_object(payload["upload_url"].split("/", 3)[-1], body, "application/pdf")
         completed = await committing_client.post(
             f"/api/v1/files/{file_id}/complete", headers=auth(account)
         )

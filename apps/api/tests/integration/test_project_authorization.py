@@ -15,7 +15,6 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-
 from tests.integration.helpers import (
     auth,
     complete_profile,
@@ -132,9 +131,7 @@ async def test_member_cannot_do_lead_only_actions(client, db_session) -> None:  
             headers=auth(member_token),
             json=milestone_payload(title_fa="تغییر خودسرانه"),
         ),
-        await client.get(
-            f"/api/v1/projects/{project_id}/applications", headers=auth(member_token)
-        ),
+        await client.get(f"/api/v1/projects/{project_id}/applications", headers=auth(member_token)),
         await client.post(
             f"/api/v1/projects/{project_id}/cancel",
             headers=auth(member_token),
@@ -210,13 +207,9 @@ async def test_lead_of_one_project_has_no_power_over_another(client, db_session)
             headers=auth(lead_a_token),
             json=milestone_payload(),
         ),
-        await client.get(
-            f"/api/v1/projects/{project_b}/applications", headers=auth(lead_a_token)
-        ),
+        await client.get(f"/api/v1/projects/{project_b}/applications", headers=auth(lead_a_token)),
         await client.get(f"/api/v1/projects/{project_b}/review-queue", headers=auth(lead_a_token)),
-        await client.post(
-            f"/api/v1/projects/{project_b}/publish", headers=auth(lead_a_token)
-        ),
+        await client.post(f"/api/v1/projects/{project_b}/publish", headers=auth(lead_a_token)),
     ]
     assert [r.status_code for r in blocked] == [403] * len(blocked)
 

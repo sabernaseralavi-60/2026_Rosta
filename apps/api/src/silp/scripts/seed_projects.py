@@ -373,9 +373,7 @@ async def seed_projects(session: AsyncSession, lead_id: uuid.UUID) -> tuple[int,
         team = Team(project_id=project.id, name=f"تیم {seed.title_fa}")
         session.add(team)
         await session.flush()
-        session.add(
-            TeamMember(team_id=team.id, user_id=lead_id, is_lead=True, status="ACTIVE")
-        )
+        session.add(TeamMember(team_id=team.id, user_id=lead_id, is_lead=True, status="ACTIVE"))
 
         for order, (title, description, points, output_kind) in enumerate(
             MILESTONE_TEMPLATE, start=1

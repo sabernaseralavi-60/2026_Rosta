@@ -166,9 +166,15 @@ async def db_session() -> AsyncIterator[object]:
         transaction = await connection.begin()
         # نشست داخل یک تراکنش بیرونی اجرا می‌شود و commitهای سرویس به
         # savepoint تبدیل می‌شوند؛ rollback پایانی همه را برمی‌گرداند.
+        # `autoflush=False` عمدی است و باید با `get_session_factory`
+        # یکی بماند (D-01). با `autoflush=True` پیش‌فرض، سرویسی که
+        # نوشتهٔ هنوز flush‌نشدهٔ خودش را دوباره می‌خواند در تست درست
+        # کار می‌کند و روی سرور واقعی جواب کهنه می‌گیرد — دقیقاً همان
+        # جنس اشکالی که این فیکسچر باید نشان بدهد، نه پنهان کند.
         session = AsyncSession(
             bind=connection,
             expire_on_commit=False,
+            autoflush=False,
             join_transaction_mode="create_savepoint",
         )
         try:

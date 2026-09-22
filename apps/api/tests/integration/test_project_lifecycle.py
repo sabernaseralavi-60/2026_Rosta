@@ -12,7 +12,6 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-
 from tests.integration.helpers import (
     auth,
     complete_profile,
@@ -49,9 +48,7 @@ async def _publishable_payload(client: Any, **overrides: Any) -> dict[str, Any]:
     return project_payload(**overrides)
 
 
-async def _published_project(
-    client: Any, db_session: Any, token: str, **overrides: Any
-) -> str:
+async def _published_project(client: Any, db_session: Any, token: str, **overrides: Any) -> str:
     """پروژه‌ای که مرحله و مهارت لازم دارد و منتشر شده است."""
     response = await client.post(
         "/api/v1/projects",
@@ -79,9 +76,7 @@ async def test_full_loop_from_application_to_approved_deliverable(  # type: igno
 ) -> None:
     """تعریف انجام‌شدهٔ M2 — یک مسیر، از ابتدا تا انتها."""
     lead_token, lead_id = await _actor(client, db_session, LEAD_MOBILE, first_name="صابر")
-    student_token, student_id = await _actor(
-        client, db_session, STUDENT_MOBILE, first_name="زهرا"
-    )
+    student_token, student_id = await _actor(client, db_session, STUDENT_MOBILE, first_name="زهرا")
     project_id = await _published_project(client, db_session, lead_token)
 
     # ۱. دانشجو درخواست می‌دهد و امتیاز تطابق عکس‌برداری می‌شود.
@@ -176,9 +171,7 @@ async def test_full_loop_from_application_to_approved_deliverable(  # type: igno
     assert response.json()["status"] == "COMPLETED"
 
     # ۸. جریان فعالیت همهٔ این‌ها را ثبت کرده است.
-    response = await client.get(
-        f"/api/v1/projects/{project_id}/activity", headers=auth(lead_token)
-    )
+    response = await client.get(f"/api/v1/projects/{project_id}/activity", headers=auth(lead_token))
     kinds = {a["kind"] for a in response.json()}
     assert {
         "PROJECT_PUBLISHED",
@@ -221,9 +214,7 @@ async def test_instructor_can_create_venture_project(client, db_session) -> None
 async def test_draft_project_is_hidden_from_the_project_bank(client, db_session) -> None:  # type: ignore[no-untyped-def]
     """پروژهٔ منتشرنشده در فهرست عمومی نیست ولی در «پروژه‌های من» هست."""
     token, _ = await _actor(client, db_session, LEAD_MOBILE)
-    created = await client.post(
-        "/api/v1/projects", headers=auth(token), json=project_payload()
-    )
+    created = await client.post("/api/v1/projects", headers=auth(token), json=project_payload())
     project_id = created.json()["id"]
 
     public = await client.get("/api/v1/projects")
@@ -236,9 +227,7 @@ async def test_draft_project_is_hidden_from_the_project_bank(client, db_session)
 async def test_publishing_requires_a_milestone_and_a_skill(client, db_session) -> None:  # type: ignore[no-untyped-def]
     """§7.4 — بدون مرحله، پروژه تحویل‌دادنی ندارد."""
     token, _ = await _actor(client, db_session, LEAD_MOBILE)
-    created = await client.post(
-        "/api/v1/projects", headers=auth(token), json=project_payload()
-    )
+    created = await client.post("/api/v1/projects", headers=auth(token), json=project_payload())
     project_id = created.json()["id"]
 
     blocked = await client.post(f"/api/v1/projects/{project_id}/publish", headers=auth(token))

@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-
 from tests.integration.helpers import (
     auth,
     complete_profile,
@@ -207,9 +206,7 @@ async def test_author_can_delete_their_own_message(client, db_session) -> None: 
     )
     assert removed.status_code == 204, removed.text
 
-    listed = await client.get(
-        f"/api/v1/projects/{project_id}/discussion", headers=auth(lead_token)
-    )
+    listed = await client.get(f"/api/v1/projects/{project_id}/discussion", headers=auth(lead_token))
     assert listed.json() == []
 
 

@@ -46,6 +46,14 @@ class ProjectSummaryOut(BaseModel):
     slug: str
     title_fa: str
     summary: str
+    # مدیر پروژه عمومی است. بدون آن کلاینت نمی‌تواند بفهمد کاربر جاری
+    # مدیرِ یک پروژهٔ `DRAFT` است، چون پیش‌نویس هنوز تیم ندارد (§7.12
+    # تیم هنگام انتشار ساخته می‌شود) و عضویت، سیگنال نیست.
+    #
+    # روی کارت پیشنهاد `None` است: آن کارت از `ProjectSpec` ساخته
+    # می‌شود که عمداً فقط چیزهای لازم برای امتیازدهی را دارد، و
+    # «مدیر کیست» جزو آن‌ها نیست.
+    lead_id: uuid.UUID | None = None
     kind: ProjectKind
     kind_fa: str
     status: ProjectStatus

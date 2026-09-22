@@ -390,6 +390,13 @@ class DeliveryService:
         raise ConcurrentModification
 
     async def _all_required_approved(self, project_id: uuid.UUID) -> bool:
+        """§7.6 — آیا همهٔ مراحل الزامی تأیید شده‌اند؟
+
+        `flush` صریح لازم است: نشست اپ `autoflush=False` دارد (D-01)، پس
+        وضعیت تازهٔ مرحله که هنوز در حافظه است، در این `SELECT` دیده
+        نمی‌شود و نتیجه همیشه «هنوز نه» می‌شود.
+        """
+        await self.session.flush()
         pending = await self.session.scalar(
             select(func.count())
             .select_from(Milestone)

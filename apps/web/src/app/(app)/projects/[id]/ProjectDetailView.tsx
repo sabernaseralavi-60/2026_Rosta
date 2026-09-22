@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { MatchRing } from '@/components/domain/MatchRing';
+import { ApplyPanel } from './ApplyPanel';
 import { ReasonList } from '@/components/domain/ReasonList';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -17,8 +18,9 @@ import { toPersianDigits } from '@/lib/format/digits';
 /**
  * `/projects/[id]` — §3.4.
  *
- * «جزئیات، تطابق من، تیم، مراحل، درخواست پیوستن.» تیم و مراحل در M2
- * می‌آیند؛ اینجا جزئیات و تطابق کامل است.
+ * «جزئیات، تطابق من، تیم، مراحل، درخواست پیوستن.» تیم و مراحل داخل
+ * فضای کاری (`/projects/[id]/workspace`) هستند، چون فقط برای عضو تیم
+ * معنا دارند؛ این صفحه عمومی است.
  *
  * تفکیک شش‌گانهٔ امتیاز عمداً نمایش داده می‌شود — اصل ۳ §00: «دانشجو
  * باید بتواند روی هر عدد کلیک کند و ببیند از کجا آمده. جعبهٔ سیاه
@@ -211,16 +213,7 @@ export function ProjectDetailView({ id }: { id: string }) {
         </p>
       </Card>
 
-      {/* درخواست پیوستن در M2 (FR-PRJ-04) فعال می‌شود. دکمهٔ غیرفعال با
-          توضیح، بهتر از نبودِ دکمه است: کاربر می‌داند این قابلیت می‌آید. */}
-      <div className="flex flex-col gap-2">
-        <Button size="lg" disabled>
-          درخواست پیوستن
-        </Button>
-        <p className="text-[12.5px] text-[var(--fg-tertiary)]">
-          ارسال درخواست در نسخهٔ بعدی فعال می‌شود.
-        </p>
-      </div>
+      <ApplyPanel project={project} accessToken={accessToken} />
     </article>
   );
 }

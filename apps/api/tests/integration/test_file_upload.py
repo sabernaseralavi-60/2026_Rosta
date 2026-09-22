@@ -10,7 +10,6 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-
 from tests.integration.helpers import (
     auth,
     complete_profile,
@@ -274,8 +273,9 @@ async def test_someone_elses_file_cannot_be_attached(client, db_session, storage
     milestone_id = await _running_project(client, owner_token)
 
     other_token = await login(client, OTHER)
-    foreign_file = await _upload(client, storage, other_token, body=PNG_BYTES,
-                                 name="shot.png", content_type="image/png")
+    foreign_file = await _upload(
+        client, storage, other_token, body=PNG_BYTES, name="shot.png", content_type="image/png"
+    )
 
     response = await client.post(
         f"/api/v1/milestones/{milestone_id}/deliverables",

@@ -2174,6 +2174,18 @@
             "title": "Kind Fa",
             "type": "string"
           },
+          "lead_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
+          },
           "match": {
             "anyOf": [
               {
@@ -2555,6 +2567,18 @@
           "kind_fa": {
             "title": "Kind Fa",
             "type": "string"
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Id"
           },
           "open_seats": {
             "default": 0,

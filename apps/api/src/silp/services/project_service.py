@@ -585,10 +585,7 @@ class ProjectService:
             ]
         )
         self.session.add_all(
-            [
-                ProjectInterest(project_id=project.id, interest_id=i)
-                for i in (draft.interests or [])
-            ]
+            [ProjectInterest(project_id=project.id, interest_id=i) for i in (draft.interests or [])]
         )
 
         if draft.roles is not None:

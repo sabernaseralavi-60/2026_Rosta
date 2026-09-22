@@ -1769,6 +1769,8 @@ export interface components {
             kind: "A_VENTURE" | "B_RESEARCH" | "C_PROBLEM" | "D_PERSONAL";
             /** Kind Fa */
             kind_fa: string;
+            /** Lead Id */
+            lead_id?: string | null;
             match?: components["schemas"]["MatchOut"] | null;
             /**
              * Open Seats
@@ -1916,6 +1918,8 @@ export interface components {
             kind: "A_VENTURE" | "B_RESEARCH" | "C_PROBLEM" | "D_PERSONAL";
             /** Kind Fa */
             kind_fa: string;
+            /** Lead Id */
+            lead_id?: string | null;
             /**
              * Open Seats
              * @default 0

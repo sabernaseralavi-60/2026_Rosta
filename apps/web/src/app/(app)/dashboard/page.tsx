@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { MyWork } from './MyWork';
 import { OnboardingNotice } from './OnboardingNotice';
 
 export const metadata: Metadata = {
@@ -10,11 +11,12 @@ export const metadata: Metadata = {
 /**
  * `/dashboard` — §3.4.
  *
- * تعریف انجام‌شدهٔ M0: «وارد می‌شود و صفحهٔ خالی داشبورد را می‌بیند.»
+ * از M2 دو چیز واقعی اینجاست: پروژه‌هایی که کاربر در آن‌هاست و
+ * درخواست‌هایی که داده. بدون این‌ها، دانشجو پس از ارسال درخواست هیچ
+ * جایی ندارد که ببیند چه شد.
  *
- * محتوای واقعی (`NextStepCard`، دروس، پروژه‌ها، امتیاز) در M5-10
- * می‌آید. اینجا عمداً خالی است و **می‌گوید** که خالی است — نه یک
- * داشبورد جعلی با اعداد ساختگی.
+ * دروس (M3)، امتیاز و `NextStepCard` (M5-10) بعداً اضافه می‌شوند —
+ * نه با عدد ساختگی، که با دادهٔ واقعی همان مرحله.
  */
 export default function DashboardPage() {
   return (
@@ -27,6 +29,7 @@ export default function DashboardPage() {
       </div>
 
       <OnboardingNotice />
+      <MyWork />
     </div>
   );
 }
