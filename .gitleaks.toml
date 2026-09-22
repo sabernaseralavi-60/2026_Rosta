@@ -1,0 +1,21 @@
+# NFR-04 — هیچ رمزی در مخزن کد.
+title = "SILP"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "مقادیر ساختگی که عمداً در مخزن هستند"
+paths = [
+  '''\.env\.example$''',
+  '''docs/prd/.*\.md$''',
+  '''infra/docker/compose\.(dev|test)\.yml$''',
+  '''apps/api/tests/.*''',
+  '''\.github/workflows/ci\.yml$''',
+]
+regexes = [
+  '''dev-only-change-me''',
+  '''(test|ci)-(secret|jwt)-key-not-used''',
+  '''silpminio''',
+  '''postgresql\+asyncpg://silp:silp@''',
+]

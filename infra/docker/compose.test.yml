@@ -1,0 +1,59 @@
+# SILP — پشتهٔ تست (CI و make test)
+# دیتابیس کاملاً در حافظه اجرا می‌شود: سریع، و پس از هر اجرا دور ریخته می‌شود.
+name: silp-test
+
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: silp
+      POSTGRES_PASSWORD: silp
+      POSTGRES_DB: silp_test
+      POSTGRES_INITDB_ARGS: "--locale-provider=icu --icu-locale=fa-IR --encoding=UTF8"
+    command: >
+      postgres
+      -c fsync=off
+      -c synchronous_commit=off
+      -c full_page_writes=off
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U silp -d silp_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  redis-test:
+    image: redis:7-alpine
+    command: redis-server --save "" --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  api-test:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+      target: dev
+    environment:
+      ENVIRONMENT: test
+      SECRET_KEY: test-secret-key-not-used-anywhere-else-000000000000000000000000
+      JWT_SECRET_KEY: test-jwt-key-not-used-anywhere-else-11111111111111111111111111
+      DATABASE_URL: postgresql+asyncpg://silp:silp@postgres-test:5432/silp_test
+      REDIS_URL: redis://redis-test:6379/0
+      PYTHONPATH: /app/apps/api/src
+      PYTHONUNBUFFERED: "1"
+      SMS_PROVIDER: memory
+      LOG_LEVEL: WARNING
+    volumes:
+      - ../../apps/api:/app/apps/api
+      - ../../infra:/app/infra
+    working_dir: /app/apps/api
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    command: pytest
