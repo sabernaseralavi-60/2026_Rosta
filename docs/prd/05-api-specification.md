@@ -371,20 +371,30 @@ Authorization: Bearer <access_token>
 | `GET` | `/projects/{id}` | همه | جزئیات + تطابق من |
 | `POST` | `/projects` | LEAD+ | ساخت پروژه |
 | `PATCH` | `/projects/{id}` | مدیر پروژه | ویرایش |
+| `GET` | `/projects/mine` | کاربر | پروژه‌هایی که مدیر یا عضوشانم (شامل پیش‌نویس) |
 | `POST` | `/projects/{id}/publish` | مدیر پروژه | انتشار (DRAFT→OPEN) |
+| `POST` | `/projects/{id}/start` | مدیر پروژه | شروع کار (OPEN→IN_PROGRESS) |
+| `POST` | `/projects/{id}/pause` | مدیر پروژه | توقف موقت، با ذکر دلیل |
+| `POST` | `/projects/{id}/resume` | مدیر پروژه | از سرگیری (PAUSED→OPEN) |
+| `POST` | `/projects/{id}/cancel` | مدیر پروژه | لغو، با ذکر دلیل |
 | `POST` | `/projects/{id}/applications` | دانشجو | درخواست پیوستن |
 | `GET` | `/projects/{id}/applications` | مدیر پروژه | فهرست درخواست‌ها |
+| `GET` | `/applications/mine` | دانشجو | درخواست‌های من |
 | `POST` | `/applications/{id}/decide` | مدیر پروژه | تصمیم |
 | `DELETE` | `/applications/{id}` | متقاضی | انصراف از درخواست |
 | `GET` | `/projects/{id}/team` | عضو | اعضای تیم |
-| `DELETE` | `/projects/{id}/team/{uid}` | مدیر پروژه | حذف عضو |
+| `DELETE` | `/projects/{id}/team/{uid}?reason=…` | مدیر پروژه | حذف عضو، با ذکر دلیل |
 | `POST` | `/projects/{id}/leave` | عضو | ترک تیم |
 | `GET/POST` | `/projects/{id}/milestones` | عضو / مدیر | مراحل |
-| `POST` | `/milestones/{id}/deliverables` | عضو | ارسال تحویل‌دادنی |
+| `PATCH/DELETE` | `/milestones/{id}` | مدیر پروژه | ویرایش و حذف مرحله |
+| `GET/POST` | `/milestones/{id}/deliverables` | عضو | تاریخچهٔ نسخه‌ها و ارسال |
 | `POST` | `/deliverables/{id}/review` | مدیر پروژه | بررسی و بازخورد |
-| `GET/POST/PATCH` | `/projects/{id}/tasks` | عضو | تخته وظایف |
+| `GET` | `/projects/{id}/review-queue` | مدیر پروژه | صف بررسی پروژه |
+| `GET/POST` | `/projects/{id}/tasks` | عضو | تخته وظایف |
+| `PATCH/DELETE` | `/projects/{id}/tasks/{task_id}` | عضو | ویرایش و حذف وظیفه |
 | `GET/POST` | `/projects/{id}/announcements` | عضو / مدیر | اعلان‌های پروژه |
 | `GET/POST` | `/projects/{id}/discussion` | عضو | گفتگوی تیمی |
+| `DELETE` | `/projects/{id}/discussion/{message_id}` | نویسنده / مدیر | حذف پیام |
 | `GET` | `/projects/{id}/activity` | عضو | جریان فعالیت پروژه |
 | `POST` | `/projects/{id}/complete` | مدیر پروژه | بستن پروژه |
 | `POST` | `/projects/{id}/reflection` | عضو | ثبت بازتاب |
@@ -648,6 +658,8 @@ Authorization: Bearer <access_token>
 | `FILE_TOO_LARGE` | 413 | حجم فایل بیش از حد مجاز است. |
 | `CONTENT_TYPE_NOT_ALLOWED` | 415 | این نوع فایل مجاز نیست. |
 | `FILE_SCAN_PENDING` | 409 | فایل در حال بررسی است. کمی صبر کنید. |
+| `UPLOAD_INCOMPLETE` | 409 | آپلود این فایل کامل نشده است. |
+| `CONCURRENT_MODIFICATION` | 409 | هم‌زمان کس دیگری همین را تغییر داد. دوباره تلاش کنید. |
 | `DUPLICATE_VOTE` | 409 | شما قبلاً به این ایده رأی داده‌اید. |
 | `VALIDATION_ERROR` | 422 | اطلاعات واردشده معتبر نیست. |
 | `RATE_LIMITED` | 429 | درخواست‌های شما بیش از حد مجاز است. |

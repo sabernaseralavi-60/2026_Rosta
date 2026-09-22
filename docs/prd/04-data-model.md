@@ -896,8 +896,11 @@ CREATE TABLE milestones (
   checklist   JSONB NOT NULL DEFAULT '[]'::jsonb,   -- معیارهای کیفیت
   status      TEXT NOT NULL DEFAULT 'PENDING'
               CHECK (status IN ('PENDING','IN_PROGRESS','SUBMITTED','APPROVED','OVERDUE')),
+  approved_at TIMESTAMPTZ,                      -- ADR-0007
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT ck_milestones_approved_at_matches_status
+    CHECK ((status = 'APPROVED') = (approved_at IS NOT NULL))
 );
 CREATE INDEX idx_milestones_project ON milestones(project_id, sort_order);
 CREATE INDEX idx_milestones_due ON milestones(due_on)
@@ -912,6 +915,8 @@ CREATE TABLE deliverables (
   links        TEXT[] NOT NULL DEFAULT '{}',
   status       TEXT NOT NULL DEFAULT 'SUBMITTED'
                CHECK (status IN ('SUBMITTED','UNDER_REVIEW','APPROVED','CHANGES_REQUESTED','REJECTED')),
+  -- عکس لحظهٔ ارسال، نه محاسبه از روی due_on فعلی — ADR-0007
+  is_late      BOOLEAN NOT NULL DEFAULT false,
   score        NUMERIC(6,2),
   feedback     TEXT,
   rubric_scores JSONB,
@@ -1244,6 +1249,10 @@ CREATE TABLE files (
   uploaded_by   UUID NOT NULL REFERENCES users(id),
   scan_status   TEXT NOT NULL DEFAULT 'PENDING'
                 CHECK (scan_status IN ('PENDING','CLEAN','INFECTED','SKIPPED')),
+  -- هدف آپلود: سقف حجم و نوع مجاز از همین می‌آید (§5.9) — ADR-0007
+  purpose       TEXT NOT NULL,
+  -- تا وقتی NULL است، ردیف فقط «رزرو» است و هیچ‌جا قابل استناد نیست
+  uploaded_at   TIMESTAMPTZ,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at    TIMESTAMPTZ
 );
@@ -1379,6 +1388,11 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
                                project_roles, teams, team_members,
                                project_applications, recommendation_feedback
 0005_files                     files
+0011_project_delivery  ◄────── اینجا اجرا می‌شود (M2)
+                               milestones, deliverables, deliverable_files,
+                               project_tasks, project_messages, project_activities,
+                               project_reflections, peer_evaluations,
+                               certificates, team_openings
 0006_education                 terms, courses, course_offerings, enrollments,
                                course_weeks, resources, resource_progress,
                                class_sessions, attendance_records, announcements
@@ -1391,10 +1405,6 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
 0009_ventures                  ventures, venture_metrics
                                + قید projects.venture_id و teams.venture_id
                                + قید venture_metrics.project_id
-0011_project_delivery          milestones, deliverables, deliverable_files,
-                               project_tasks, project_messages, project_activities,
-                               project_reflections, peer_evaluations,
-                               certificates, team_openings
 0012_research                  research_tracks, research_outputs, research_topics
 0013_gamification              point_rules, point_entries, user_point_totals, badges, user_badges
 0014_messaging                 notifications, notification_preferences,
@@ -1419,6 +1429,8 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
 | `projects.origin_idea_id` → `ideas` | ۰۰۸ |
 | `projects.venture_id` → `ventures` | ۰۰۹ |
 | `teams.venture_id` → `ventures` | ۰۰۹ |
+| `team_openings.idea_id` → `ideas` | ۰۰۸ |
+| `team_openings.venture_id` → `ventures` | ۰۰۹ |
 
 ```sql
 -- در انتهای مهاجرت 0006_education
