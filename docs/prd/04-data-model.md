@@ -446,6 +446,12 @@ CREATE TABLE courses (
   cover_key    TEXT,
   is_public    BOOLEAN NOT NULL DEFAULT false,  -- قابل ثبت‌نام برای PUBLIC_LEARNER
   is_active    BOOLEAN NOT NULL DEFAULT true,
+  -- ADR-0008: نام پوشهٔ درس در `Courses/` — کلید همگام‌سازی کتابخانه.
+  source_dir   TEXT UNIQUE,
+  -- ADR-0009: سطح دسترسی پیش‌فرض موادی که در مانیفست سطح صریح ندارند.
+  default_access_tier TEXT NOT NULL DEFAULT 'SUBSCRIBER'
+                      CHECK (default_access_tier IN ('PUBLIC','SUBSCRIBER','ENROLLED')),
+  topics       TEXT[] NOT NULL DEFAULT '{}',
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at   TIMESTAMPTZ,
@@ -550,6 +556,118 @@ CREATE TABLE resource_progress (
   PRIMARY KEY (user_id, resource_id)
 );
 ```
+
+### `course_materials` و `week_materials` — ADR-0008
+
+`resources` بالا به **ارائه** تعلق دارد و با نیم‌سال می‌رود. کتاب و
+جزوه‌ای که چند ترم و چند درس می‌مانند، به **درس** تعلق دارند:
+
+```sql
+CREATE TABLE course_materials (
+  id           UUID PRIMARY KEY DEFAULT uuidv7(),
+  course_id    UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+  kind         TEXT NOT NULL CHECK (kind IN ('BOOK','NOTE','SLIDE','VIDEO','PODCAST',
+                                             'DATASET','CODE','QUESTION_BANK','LINK','OTHER')),
+  title_fa     TEXT NOT NULL,
+  description  TEXT,
+  authors      TEXT[] NOT NULL DEFAULT '{}',
+  edition      TEXT,
+  language     TEXT NOT NULL DEFAULT 'fa',
+  -- مسیر نسبی فایل داخل `Courses/` — کلید همگام‌سازی.
+  source_path  TEXT,
+  content_sha256 TEXT,                 -- «فایل عوض شده؟» بدون آپلود دوباره
+  file_id      UUID REFERENCES files(id),
+  external_url TEXT,
+  size_bytes   BIGINT,
+  page_count   INT,
+  duration_sec INT,
+  -- ADR-0009
+  access_tier  TEXT NOT NULL DEFAULT 'SUBSCRIBER'
+               CHECK (access_tier IN ('PUBLIC','SUBSCRIBER','ENROLLED')),
+  is_downloadable BOOLEAN NOT NULL DEFAULT true,
+  status       TEXT NOT NULL DEFAULT 'PUBLISHED'
+               CHECK (status IN ('DRAFT','PUBLISHED','ARCHIVED')),
+  sort_order   INT NOT NULL DEFAULT 0,
+  added_by     UUID REFERENCES users(id),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at   TIMESTAMPTZ,
+  title_norm   TEXT GENERATED ALWAYS AS (fa_normalize(title_fa)) STORED,
+  CONSTRAINT course_materials_source_required
+    CHECK (file_id IS NOT NULL OR external_url IS NOT NULL)
+);
+-- یک فایل، یک ردیف. همگام‌سازی دوباره نسخهٔ دوم نمی‌سازد.
+CREATE UNIQUE INDEX idx_course_materials_source ON course_materials(course_id, source_path)
+  WHERE source_path IS NOT NULL AND deleted_at IS NULL;
+CREATE INDEX idx_course_materials_search ON course_materials USING GIN (title_norm gin_trgm_ops);
+
+CREATE TABLE week_materials (
+  week_id     UUID NOT NULL REFERENCES course_weeks(id) ON DELETE CASCADE,
+  material_id UUID NOT NULL REFERENCES course_materials(id) ON DELETE CASCADE,
+  section     TEXT,                    -- «فصل ۲ تا ۴»
+  is_required BOOLEAN NOT NULL DEFAULT true,
+  sort_order  INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (week_id, material_id)
+);
+```
+
+**تفاوت `resources` و `course_materials` در نوع نیست، در عمر است:**
+ماده با درس می‌ماند، منبع با ارائه می‌رود.
+
+---
+
+### `subscription_plans`, `subscriptions`, `material_access_events` — ADR-0009
+
+```sql
+CREATE TABLE subscription_plans (
+  id            UUID PRIMARY KEY DEFAULT uuidv7(),
+  code          TEXT NOT NULL UNIQUE,   -- 'MONTHLY_ALL'
+  title_fa      TEXT NOT NULL,
+  description   TEXT,
+  scope         TEXT NOT NULL CHECK (scope IN ('ALL_COURSES','SINGLE_COURSE')),
+  duration_days INT NOT NULL CHECK (duration_days BETWEEN 1 AND 3650),
+  price_irr     BIGINT NOT NULL CHECK (price_irr >= 0),   -- §4.0: پول همیشه BIGINT ریال
+  is_active     BOOLEAN NOT NULL DEFAULT true,
+  sort_order    INT NOT NULL DEFAULT 0,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- رسید، نه تراکنش: پرداخت بیرون از سامانه انجام می‌شود (§02).
+CREATE TABLE subscriptions (
+  id           UUID PRIMARY KEY DEFAULT uuidv7(),
+  user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  plan_id      UUID NOT NULL REFERENCES subscription_plans(id),
+  course_id    UUID REFERENCES courses(id) ON DELETE CASCADE,  -- فقط SINGLE_COURSE
+  status       TEXT NOT NULL DEFAULT 'PENDING'
+               CHECK (status IN ('PENDING','ACTIVE','EXPIRED','CANCELLED')),
+  starts_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  ends_at      TIMESTAMPTZ NOT NULL,
+  payment_ref  TEXT,                   -- شمارهٔ فیش یا کد رهگیری
+  amount_irr   BIGINT,
+  note         TEXT,
+  granted_by   UUID REFERENCES users(id),
+  cancelled_at TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT subscriptions_date_order CHECK (ends_at > starts_at),
+  CONSTRAINT subscriptions_cancelled_at_matches_status
+    CHECK ((status = 'CANCELLED') = (cancelled_at IS NOT NULL))
+);
+CREATE INDEX idx_subscriptions_active ON subscriptions(user_id, ends_at)
+  WHERE status = 'ACTIVE';
+
+-- رویداد `resource_accessed` — FR-EDU-03. فقط افزودنی.
+CREATE TABLE material_access_events (
+  id          UUID PRIMARY KEY DEFAULT uuidv7(),
+  material_id UUID NOT NULL REFERENCES course_materials(id) ON DELETE CASCADE,
+  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  granted_by_reason TEXT NOT NULL,     -- ENROLLED / SUBSCRIPTION / PUBLIC / STAFF
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+---
 
 ### `attendance` و `announcements`
 
@@ -1396,6 +1514,9 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
 0006_education                 terms, courses, course_offerings, enrollments,
                                course_weeks, resources, resource_progress,
                                class_sessions, attendance_records, announcements
+                               + course_materials, week_materials      (ADR-0008)
+                               + subscription_plans, subscriptions,
+                                 material_access_events                (ADR-0009)
                                + قید projects.offering_id
                                + قید announcements.project_id
 0007_quiz                      quizzes, question_bank, quiz_questions,

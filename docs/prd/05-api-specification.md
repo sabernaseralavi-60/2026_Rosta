@@ -261,6 +261,49 @@ Authorization: Bearer <access_token>
 | `GET` | `/offerings/{id}/announcements` | ثبت‌نام‌شده | اعلانات |
 | `POST` | `/resources/{id}/progress` | ثبت‌نام‌شده | ثبت پیشرفت مطالعه |
 | `GET` | `/resources/{id}/download` | ثبت‌نام‌شده | URL دانلود موقت |
+| `GET` | `/offerings/mine` | STUDENT | دروس من با نوار پیشرفت |
+| `GET` | `/materials/{id}/download` | **بسته به سطح** | URL دانلود محتوای کتابخانه |
+| `GET` | `/materials/tiers` | عمومی | متن فارسی سطوح دسترسی |
+
+**`GET /materials/{id}/download` — دروازهٔ اشتراک (ADR-0009)**
+
+```jsonc
+// 200 → { "download_url": "…", "expires_in": 900, "original_name": "…" }
+// 402 SUBSCRIPTION_REQUIRED  — محتوا هست، این کاربر حق دیدنش را نخریده.
+//     details: { "course_slug": "road-safety-modeling" }
+// 403 ENROLLMENT_REQUIRED    — سطح ENROLLED؛ فروختنی نیست، اشتراک بازش نمی‌کند.
+```
+
+**سنجش دسترسی همراه هر ماده می‌آید.** `GET /courses/{slug}` و
+`GET /offerings/{id}/weeks/{n}` برای هر محتوا یک شیء `access` برمی‌گردانند:
+
+```jsonc
+{ "allowed": false, "tier": "SUBSCRIBER", "reason": null,
+  "blocker": "SUBSCRIPTION",
+  "note_fa": "برای دیدن این محتوا اشتراک بگیرید — یا در همین درس ثبت‌نام کنید." }
+```
+
+`note_fa` را **سرور** می‌سازد و مستقیماً نمایش داده می‌شود؛ کلاینت هرگز
+متن قفل را خودش نمی‌نویسد. محتوای قفل‌شده از فهرست حذف نمی‌شود — فقط
+`external_url` و لینک دانلودش بسته است.
+
+---
+
+## ۵.۵.۱ اشتراک — `/subscriptions` (ADR-0009)
+
+| متد | مسیر | نقش | توضیح |
+|-----|------|-----|-------|
+| `GET` | `/subscriptions/plans` | عمومی | طرح‌ها با قیمت آمادهٔ نمایش |
+| `GET` | `/subscriptions` | کاربر | اشتراک‌های من |
+| `POST` | `/subscriptions` | کاربر | ثبت درخواست (وضعیت `PENDING`) |
+| `DELETE` | `/subscriptions/{id}` | کاربر | لغو |
+| `GET` | `/subscriptions/pending` | SUPPORT | درخواست‌های در انتظار تأیید |
+| `POST` | `/subscriptions/{id}/activate` | SUPPORT | تأیید پرداخت بیرونی |
+| `POST` | `/subscriptions/grant` | SUPPORT | ساخت و فعال‌سازی در یک گام |
+
+**پرداخت درون سامانه انجام نمی‌شود** (§02). `POST /subscriptions` یک
+رسید «در انتظار» می‌سازد و `activate` آن را فعال می‌کند. وقتی درگاه
+آمد، فقط `activate` یک صداکنندهٔ تازه پیدا می‌کند.
 
 **`POST /offerings/{id}/enroll`**
 ```jsonc
@@ -558,10 +601,13 @@ Authorization: Bearer <access_token>
 |-----|------|-------|
 | `GET` | `/teach/dashboard` | داشبورد استثنامحور |
 | `GET` | `/teach/offerings` | ارائه‌های من |
-| `POST` | `/teach/offerings/{id}/weeks` | ساخت هفته |
-| `PATCH` | `/teach/weeks/{id}` | ویرایش هفته |
+| `PUT` | `/teach/offerings/{id}/weeks` | ساخت یا ویرایش هفته (کلید: شمارهٔ هفته) |
 | `POST` | `/teach/weeks/{id}/publish` | انتشار (فوری یا زمان‌بندی‌شده) |
-| `POST` | `/teach/offerings/{id}/copy-from/{src}` | کپی محتوا از ارائهٔ قبلی |
+| `POST` | `/teach/offerings/{id}/copy-content` | کپی محتوا از ارائهٔ قبلی |
+| `POST` | `/teach/offerings/{id}/weeks/{wid}/resources` | افزودن منبع هفته |
+| `DELETE` | `/teach/resources/{id}` | حذف منبع |
+| `POST` | `/teach/offerings/{id}/weeks/{wid}/materials` | بستن محتوای کتابخانه به هفته |
+| `PUT` | `/teach/offerings/{id}/grading-policy` | وزن‌های نمره (مجموع = ۱۰۰) |
 | `GET` | `/teach/offerings/{id}/students` | دانشجویان با پیشرفت و پرچم خطر |
 | `POST` | `/teach/offerings/{id}/attendance` | ثبت گروهی حضور |
 | `GET` | `/teach/offerings/{id}/gradebook` | دفتر نمره |
