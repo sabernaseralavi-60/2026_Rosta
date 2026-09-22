@@ -152,12 +152,20 @@ export function OfferingView({ offeringId }: { offeringId: string }) {
       <section className="flex flex-col gap-3">
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="text-[19px] font-semibold text-[var(--fg-primary)]">سرفصل هفتگی</h2>
-          <Link
-            href={`/library/${offering.course_slug}`}
-            className="text-[13.5px] text-[var(--brand-700)]"
-          >
-            کتابخانهٔ این درس
-          </Link>
+          <div className="flex items-baseline gap-4">
+            <Link
+              href={`/courses/${offering.id}/quizzes`}
+              className="text-[13.5px] text-[var(--brand-700)]"
+            >
+              آزمون‌های این درس
+            </Link>
+            <Link
+              href={`/library/${offering.course_slug}`}
+              className="text-[13.5px] text-[var(--brand-700)]"
+            >
+              کتابخانهٔ این درس
+            </Link>
+          </div>
         </div>
         <WeekTimeline
           weeks={offering.weeks}
