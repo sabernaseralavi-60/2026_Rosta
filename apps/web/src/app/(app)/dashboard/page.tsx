@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { DashboardView } from './DashboardView';
 import { MyWork } from './MyWork';
 import { OnboardingNotice } from './OnboardingNotice';
 
@@ -11,12 +12,10 @@ export const metadata: Metadata = {
 /**
  * `/dashboard` — §3.4.
  *
- * از M2 دو چیز واقعی اینجاست: پروژه‌هایی که کاربر در آن‌هاست و
- * درخواست‌هایی که داده. بدون این‌ها، دانشجو پس از ارسال درخواست هیچ
- * جایی ندارد که ببیند چه شد.
- *
- * دروس (M3)، امتیاز و `NextStepCard` (M5-10) بعداً اضافه می‌شوند —
- * نه با عدد ساختگی، که با دادهٔ واقعی همان مرحله.
+ * از M5 داشبورد کامل است (FR-DASH-01): «قدم بعدی تو»، امتیاز و روندش،
+ * دروس با نمرهٔ یادگیری، پروژه‌ها با سلامت، رویدادهای پیش‌رو و نشان‌ها
+ * (`DashboardView`). زیرش درخواست‌های در جریان (M2) و پیشنهادهای
+ * پروژه (M1) می‌مانند.
  */
 export default function DashboardPage() {
   return (
@@ -28,8 +27,9 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <OnboardingNotice />
+      <DashboardView />
       <MyWork />
+      <OnboardingNotice />
     </div>
   );
 }

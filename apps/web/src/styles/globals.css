@@ -261,3 +261,41 @@ bdi {
     padding-inline: var(--space-8);
   }
 }
+
+/* ── جشن و Toast امتیاز — §9.10، §10.7 ─────────────────────────────────
+ * جشن ≤ ۱٫۲ ثانیه و قابل رد کردن: «جشنی که مزاحم شود، دفعهٔ دوم آزاردهنده
+ * است». `--dur-celebrate` برابر ۹۰۰ms است. با `prefers-reduced-motion`،
+ * قاعدهٔ سراسری بالا همهٔ این‌ها را به یک فریم کوتاه می‌کند. */
+@keyframes silp-celebrate {
+  0% {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes silp-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.silp-celebrate {
+  animation: silp-celebrate var(--dur-celebrate) var(--ease-spring) both;
+}
+
+.silp-toast[data-state='open'] {
+  animation: silp-toast-in var(--dur-normal) var(--ease-out) both;
+}

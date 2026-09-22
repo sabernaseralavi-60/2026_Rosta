@@ -1,9 +1,10 @@
 /**
  * کلاینت API — قرارداد §5.1.
  *
- * دو مسئولیت، و فقط همین دو:
+ * سه مسئولیت، و فقط همین سه:
  *   ۱. تبدیل قالب خطای سرور به یک استثنای تایپ‌دار.
  *   ۲. حمل توکن و انتشار `X-Trace-Id`.
+ *   ۳. اعلام نوشتن موفق (`WRITE_EVENT`) — تا امتیاز تازه بی‌درنگ دیده شود.
  *
  * تایپ‌های بدنه از `packages/shared` می‌آیند که از OpenAPI تولید می‌شوند
  * (`make types`) — نه دست‌نویس، تا قرارداد و کد از هم جدا نیفتند.
@@ -104,7 +105,22 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     throw new ApiError(response.status, extractError(payload, response));
   }
 
+  if (init.method && init.method.toUpperCase() !== 'GET') announceWrite();
   return payload as T;
+}
+
+/**
+ * رویداد «نوشتنی موفق انجام شد» — M5.
+ *
+ * هر نوشتن ممکن است امتیاز داده باشد: تأیید مرحله، ارسال آزمون، «خواندم».
+ * به‌جای اینکه هر صفحه جداگانه هدر را خبر کند، کلاینت API یک بار اعلام
+ * می‌کند و `PointsBadge` (§9.10 «فوریت») گوش می‌دهد.
+ */
+export const WRITE_EVENT = 'silp:write';
+
+function announceWrite(): void {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new Event(WRITE_EVENT));
 }
 
 function safeParse(text: string): unknown {

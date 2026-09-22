@@ -4,15 +4,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { PointsBadge } from '@/components/domain/PointsBadge';
 import { Button } from '@/components/ui/Button';
 import { logout } from '@/lib/api/auth';
 import { clearSession, readSession } from '@/lib/auth/session';
 
 /**
- * هدر اپلیکیشن — نسخهٔ M3.
+ * هدر اپلیکیشن — نسخهٔ M5.
  *
- * ناوبری عمدی کوتاه است: چهار مقصدی که دانشجو هر روز می‌خواهد. سایدبار
- * کامل، `PointsBadge`، مرکز اعلان و جستجوی سراسری در M5 تا M7 می‌آیند.
+ * ناوبری عمدی کوتاه است: مقصدهایی که دانشجو هر روز می‌خواهد، به‌علاوهٔ
+ * `PointsBadge` (§9.10 «نوار سطح همیشه در هدر»). سایدبار کامل، مرکز
+ * اعلان و جستجوی سراسری در M6 و M7 می‌آیند.
  */
 
 const NAV: { href: string; label: string }[] = [
@@ -20,6 +22,7 @@ const NAV: { href: string; label: string }[] = [
   { href: '/courses', label: 'دروس من' },
   { href: '/library', label: 'کتابخانه' },
   { href: '/projects', label: 'پروژه‌ها' },
+  { href: '/leaderboard', label: 'رتبه‌بندی' },
 ];
 export function AppHeader() {
   const router = useRouter();
@@ -65,6 +68,7 @@ export function AppHeader() {
         </div>
 
         <div className="flex items-center gap-3">
+          <PointsBadge />
           {displayName && (
             <span className="text-[13.5px] text-[var(--fg-secondary)]">{displayName}</span>
           )}
