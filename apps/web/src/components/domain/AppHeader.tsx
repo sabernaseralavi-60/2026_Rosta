@@ -9,10 +9,18 @@ import { logout } from '@/lib/api/auth';
 import { clearSession, readSession } from '@/lib/auth/session';
 
 /**
- * هدر اپلیکیشن — نسخهٔ M0.
+ * هدر اپلیکیشن — نسخهٔ M3.
  *
- * `PointsBadge`، مرکز اعلان و جستجوی سراسری در M5 تا M7 اضافه می‌شوند.
+ * ناوبری عمدی کوتاه است: چهار مقصدی که دانشجو هر روز می‌خواهد. سایدبار
+ * کامل، `PointsBadge`، مرکز اعلان و جستجوی سراسری در M5 تا M7 می‌آیند.
  */
+
+const NAV: { href: string; label: string }[] = [
+  { href: '/dashboard', label: 'داشبورد' },
+  { href: '/courses', label: 'دروس من' },
+  { href: '/library', label: 'کتابخانه' },
+  { href: '/projects', label: 'پروژه‌ها' },
+];
 export function AppHeader() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState<string | null>(null);
@@ -39,9 +47,22 @@ export function AppHeader() {
   return (
     <header className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
       <div className="page flex h-16 items-center justify-between">
-        <Link href="/dashboard" className="text-[17px] font-bold text-[var(--brand-700)]">
-          سیلپ
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link href="/dashboard" className="text-[17px] font-bold text-[var(--brand-700)]">
+            سیلپ
+          </Link>
+          <nav aria-label="ناوبری اصلی" className="hidden items-center gap-4 sm:flex">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-[14px] text-[var(--fg-secondary)] transition-colors hover:text-[var(--brand-700)]"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
         <div className="flex items-center gap-3">
           {displayName && (
