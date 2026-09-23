@@ -27,6 +27,8 @@ import { useSession } from '@/lib/auth/use-session';
 import { cn } from '@/lib/cn';
 import { toPersianDigits } from '@/lib/format/digits';
 
+import { MetricsView } from '@/components/domain/MetricsView';
+
 import { ActivityTab, DiscussionTab } from './DiscussionTab';
 import { MilestonesTab } from './MilestonesTab';
 import { TasksTab } from './TasksTab';
@@ -44,7 +46,7 @@ import { TeamTab } from './TeamTab';
  * نقش تصمیم نمی‌گیرد (§6.4).
  */
 
-type TabKey = 'milestones' | 'team' | 'tasks' | 'discussion' | 'activity';
+type TabKey = 'milestones' | 'team' | 'tasks' | 'discussion' | 'activity' | 'metrics';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'milestones', label: 'مراحل' },
@@ -53,6 +55,9 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'discussion', label: 'گفتگو' },
   { key: 'activity', label: 'فعالیت' },
 ];
+
+/** FR-VEN-02 — پروژهٔ کارآفرینی تماس، جلسه و فروش هر عضو را ثبت می‌کند. */
+const VENTURE_TAB: { key: TabKey; label: string } = { key: 'metrics', label: 'فروش و فعالیت' };
 
 const STATUS_TONES: Record<string, 'neutral' | 'success' | 'info' | 'warning'> = {
   DRAFT: 'neutral',
@@ -201,7 +206,7 @@ export function WorkspaceView({ id }: { id: string }) {
       )}
 
       <div role="tablist" aria-label="بخش‌های فضای کاری" className="flex flex-wrap gap-1 border-b border-[var(--border-subtle)]">
-        {TABS.map((item) => (
+        {(project?.kind === 'A_VENTURE' ? [...TABS, VENTURE_TAB] : TABS).map((item) => (
           <button
             key={item.key}
             role="tab"
@@ -262,6 +267,7 @@ export function WorkspaceView({ id }: { id: string }) {
           />
         )}
         {tab === 'activity' && <ActivityTab activity={activity} />}
+        {tab === 'metrics' && <MetricsView owner={{ kind: 'project', id }} embedded />}
       </div>
     </div>
   );

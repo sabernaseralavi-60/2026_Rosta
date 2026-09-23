@@ -11,7 +11,7 @@ import { logout } from '@/lib/api/auth';
 import { clearSession, readSession } from '@/lib/auth/session';
 
 /**
- * هدر اپلیکیشن — نسخهٔ M6.
+ * هدر اپلیکیشن — نسخهٔ M7.
  *
  * ناوبری عمدی کوتاه است: مقصدهایی که دانشجو هر روز می‌خواهد، به‌علاوهٔ
  * `PointsBadge` (§9.10 «نوار سطح همیشه در هدر») و زنگولهٔ اعلان
@@ -23,6 +23,8 @@ const NAV: { href: string; label: string }[] = [
   { href: '/courses', label: 'دروس من' },
   { href: '/library', label: 'کتابخانه' },
   { href: '/projects', label: 'پروژه‌ها' },
+  { href: '/ideas', label: 'ایده‌ها' },
+  { href: '/ventures', label: 'کسب‌وکار' },
   { href: '/leaderboard', label: 'رتبه‌بندی' },
 ];
 export function AppHeader() {
