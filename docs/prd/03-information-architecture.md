@@ -129,7 +129,8 @@ silp.ir
 | `/projects/[id]/board` | MEMBER | CSR | تخته وظایف تیم |
 | `/projects/[id]/milestones` | MEMBER | RSC | مراحل و وضعیت تحویل |
 | `/projects/[id]/milestones/[mid]/submit` | MEMBER | CSR | فرم تحویل‌دادنی |
-| `/projects/[id]/files` | MEMBER | RSC | کتابخانهٔ فایل |
+| `/projects/[id]/files` | MEMBER | CSR | کتابخانهٔ فایل؛ نسخه‌های `.osm`، `.net.xml` و `.rou.xml` پروژهٔ شهری |
+| `/projects/[id]/city` | MEMBER | CSR | گردش‌کار هشت‌مرحله‌ای شهر هوشمند: تحویل با شاهد و بررسی ([ADR-0016](../adr/0016-city-lab-workflow-template.md)) |
 | `/projects/[id]/discussion` | MEMBER | CSR | گفتگوی تیمی |
 | `/projects/[id]/manage` | LEAD | CSR | مدیریت: درخواست‌ها، اعضا، مراحل، تنظیمات |
 | `/projects/[id]/review/[did]` | LEAD | CSR | بررسی تحویل‌دادنی و بازخورد |
@@ -143,6 +144,7 @@ silp.ir
 | `/research/level/[n]` | STUDENT | راهنما، الگو، تحویل‌دادنی سطح |
 | `/research/topics` | همه | بانک موضوع پژوهشی |
 | `/research/outputs` | STUDENT | مقالات و خروجی‌های من |
+| `/city` | همه | آزمایشگاه شهر هوشمند: الگوی هشت‌مرحله‌ای و پروژه‌های شهری |
 | `/ventures` | همه | فهرست کسب‌وکارها |
 | `/ventures/[id]` | همه | صفحهٔ کسب‌وکار، مرحلهٔ بلوغ، تیم |
 | `/ventures/new` | STUDENT | ثبت کسب‌وکار |

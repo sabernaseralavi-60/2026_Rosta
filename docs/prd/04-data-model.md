@@ -900,6 +900,11 @@ CREATE TABLE projects (
   health         TEXT NOT NULL DEFAULT 'HEALTHY'
                  CHECK (health IN ('HEALTHY','AT_RISK','STALLED')),
   last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  -- الگوی گردش‌کار ثابت (0015، ADR-0016) — فقط نوع C، پس از ساخت عوض نمی‌شود
+  workflow       TEXT CHECK (workflow IN ('CITY')),
+  workflow_completed_at TIMESTAMPTZ,   -- هر هشت مرحله تأیید شد؛ منبع نشان CITY_BUILDER
+  CHECK (workflow IS NULL OR kind = 'C_PROBLEM'),
+  CHECK (workflow_completed_at IS NULL OR workflow IS NOT NULL),
 
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -1026,12 +1031,20 @@ CREATE TABLE milestones (
   status      TEXT NOT NULL DEFAULT 'PENDING'
               CHECK (status IN ('PENDING','IN_PROGRESS','SUBMITTED','APPROVED','OVERDUE')),
   approved_at TIMESTAMPTZ,                      -- ADR-0007
+  -- 0015 (ADR-0016): شمارهٔ مرحله در الگو و «مسئول» مرحله (FR-CITY-01)
+  workflow_stage INT CHECK (workflow_stage BETWEEN 1 AND 8),
+  owner_id    UUID REFERENCES users(id),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   CONSTRAINT ck_milestones_approved_at_matches_status
-    CHECK ((status = 'APPROVED') = (approved_at IS NOT NULL))
+    CHECK ((status = 'APPROVED') = (approved_at IS NOT NULL)),
+  -- مرحلهٔ الگو همیشه مسئول دارد — پیش‌فرض مدیر پروژه
+  CHECK (workflow_stage IS NULL OR owner_id IS NOT NULL)
 );
 CREATE INDEX idx_milestones_project ON milestones(project_id, sort_order);
+CREATE UNIQUE INDEX idx_milestones_workflow_stage ON milestones(project_id, workflow_stage)
+  WHERE workflow_stage IS NOT NULL;
+CREATE INDEX idx_milestones_owner ON milestones(owner_id) WHERE owner_id IS NOT NULL;
 CREATE INDEX idx_milestones_due ON milestones(due_on)
   WHERE status IN ('PENDING','IN_PROGRESS');
 
@@ -1049,6 +1062,8 @@ CREATE TABLE deliverables (
   score        NUMERIC(6,2),
   feedback     TEXT,
   rubric_scores JSONB,
+  -- شاهد ساختاریافتهٔ مرحلهٔ الگو: محدوده، جدول راستی‌آزمایی، سناریوها، … (ADR-0016)
+  evidence     JSONB CHECK (evidence IS NULL OR jsonb_typeof(evidence) = 'object'),
   reviewed_by  UUID REFERENCES users(id),
   reviewed_at  TIMESTAMPTZ,
   submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -1061,6 +1076,22 @@ CREATE TABLE deliverable_files (
   deliverable_id UUID NOT NULL REFERENCES deliverables(id) ON DELETE CASCADE,
   file_id        UUID NOT NULL REFERENCES files(id),
   PRIMARY KEY (deliverable_id, file_id)
+);
+-- فایل پیوست یک تحویل حذف نرم نمی‌شود — «نسخه‌ها هرگز پاک نمی‌شوند» (§7.6، ADR-0016)
+
+-- نسخهٔ فایل‌های مدل شهری در کتابخانهٔ پروژه — FR-CITY-01 (0015، ADR-0016).
+-- شماره مال پروژه است؛ وضعیت از تحویل خوانده می‌شود، «جاری» = آخرین تأییدشده.
+CREATE TABLE project_artifact_versions (
+  id             UUID PRIMARY KEY DEFAULT uuidv7(),
+  project_id     UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  artifact       TEXT NOT NULL CHECK (artifact IN ('OSM','SUMO_NET','SUMO_ROUTES')),
+  version        INT NOT NULL CHECK (version >= 1),
+  file_id        UUID NOT NULL REFERENCES files(id),
+  deliverable_id UUID NOT NULL REFERENCES deliverables(id) ON DELETE CASCADE,
+  created_by     UUID NOT NULL REFERENCES users(id),
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (project_id, artifact, version),
+  UNIQUE (deliverable_id, artifact)
 );
 ```
 
@@ -1717,8 +1748,11 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
                                research_topics, research_tracks, research_submissions,
                                research_submission_files, research_outputs,
                                opening_applications + بازشکل team_openings
-0015_admin                     audit_logs, app_settings, qa_threads, qa_replies
-0016_seed_reference_data       دادهٔ مرجع وابسته به مهاجرت‌های بالا (§14)
+0015_city_lab         ◄────── پس از ۰۰۱۴ (M7 بخش ج، ADR-0016)
+                               project_artifact_versions + projects.workflow،
+                               milestones.workflow_stage/owner_id، deliverables.evidence
+0016_admin                     audit_logs, app_settings, qa_threads, qa_replies
+0017_seed_reference_data       دادهٔ مرجع وابسته به مهاجرت‌های بالا (§14)
 ```
 
 > **چرا ۰۱۰ زودتر می‌آید؟** موتور توصیه‌گر در M1 بدون جدول `projects`

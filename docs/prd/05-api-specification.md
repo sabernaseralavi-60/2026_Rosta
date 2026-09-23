@@ -460,10 +460,13 @@ Authorization: Bearer <access_token>
 | `DELETE` | `/projects/{id}/team/{uid}?reason=…` | مدیر پروژه | حذف عضو، با ذکر دلیل |
 | `POST` | `/projects/{id}/leave` | عضو | ترک تیم |
 | `GET/POST` | `/projects/{id}/milestones` | عضو / مدیر | مراحل |
-| `PATCH/DELETE` | `/milestones/{id}` | مدیر پروژه | ویرایش و حذف مرحله |
+| `PATCH/DELETE` | `/milestones/{id}` | مدیر پروژه | ویرایش و حذف مرحله؛ مرحلهٔ الگوی شهری فقط شرح، مهلت و بارم را تغییر می‌دهد و حذف نمی‌شود (۴۰۹) |
+| `PUT` | `/milestones/{id}/owner` | `project.milestone.manage` | مسئول مرحله — مدیر یا عضو فعال؛ مرحلهٔ الگو بی‌مسئول نمی‌ماند (ADR-0016) |
 | `GET/POST` | `/milestones/{id}/deliverables` | عضو | تاریخچهٔ نسخه‌ها و ارسال |
 | `POST` | `/deliverables/{id}/review` | مدیر پروژه | بررسی و بازخورد |
 | `GET` | `/projects/{id}/review-queue` | مدیر پروژه | صف بررسی پروژه |
+| `GET` | `/projects/{id}/files` | عضو / سرپرست | کتابخانهٔ فایل: پیوست تحویل‌ها و پیام‌ها، و نسخه‌های فایل مدل شهری |
+| `GET` | `/projects/{id}/files/{file_id}/download-url` | عضو / سرپرست | دانلود فایلی که به همین پروژه پیوست شده؛ بقیه ۴۰۴ |
 | `GET/POST` | `/projects/{id}/tasks` | عضو | تخته وظایف |
 | `PATCH/DELETE` | `/projects/{id}/tasks/{task_id}` | عضو | ویرایش و حذف وظیفه |
 | `GET/POST` | `/projects/{id}/announcements` | عضو / مدیر | اعلان‌های پروژه |
@@ -515,9 +518,13 @@ Authorization: Bearer <access_token>
 ```jsonc
 { "body": "گزارش مرحلهٔ اول …",
   "file_ids": ["018f…","018f…"],
-  "links": ["https://github.com/…"] }
-// 201 → { "id": "…", "version": 1, "status": "SUBMITTED" }
-// 409 MILESTONE_NOT_OPEN | 403 NOT_TEAM_MEMBER
+  "links": ["https://github.com/…"],
+  // فقط مرحلهٔ الگوی شهری — شکلش را GET /city/workflow می‌گوید (ADR-0016)
+  "evidence": { "node_count": 1840, "edge_count": 3920 },
+  "checklist_confirmed": [1, 2] }
+// 201 → { "id": "…", "version": 1, "status": "SUBMITTED", "evidence": { … } }
+// 409 MILESTONE_NOT_OPEN | 409 CITY_STAGE_LOCKED { blocked_by } | 403 NOT_TEAM_MEMBER
+// 422 VALIDATION_FAILED { missing: [ … همهٔ کمبودها … ] }
 ```
 
 **`POST /deliverables/{id}/review`**
@@ -618,6 +625,16 @@ Authorization: Bearer <access_token>
 `STAFF` (کادر آموزشی؛ در رقابت دانشجویان رتبه ندارد — [ADR-0012](../adr/0012-ledger-revisions-and-gamification-gaps.md)). صدک
 برای جمع کمتر از ۵ نفر `null` است. رتبه‌بندی ارائه برای غیرعضو ۴۰۴ است.
 
+### شهر هوشمند — `/city` (M7 بخش ج، FR-CITY-01)
+
+| متد | مسیر | دسترسی | توضیح |
+|-----|------|--------|-------|
+| `GET` | `/city/workflow` | عمومی | الگوی هشت‌مرحله‌ای: راهنما، چک‌لیست (خودکار یا دستی)، شاهدها، فایل‌های لازم، منابع و شاخص‌های سناریو |
+| `GET` | `/city/projects` | عمومی | پروژه‌های شهری منتشرشده با مرحلهٔ جاری، شمار تأییدشده و مساحت محدوده |
+| `GET` | `/projects/{id}/city` | عضو / سرپرست | تختهٔ گردش‌کار: هشت مرحله با قفل، مسئول و «تحویل من»، محدوده، خلاصهٔ فایل‌های مدل، `can_review` و `can_manage` |
+
+مرحلهٔ n فقط پس از تأیید n−۱ تحویل می‌پذیرد؛ تأیید مرحلهٔ ۳ بی‌شاهد تصویری `409 CITY_EVIDENCE_MISSING` است؛ تأیید مرحلهٔ ۸ در پاسخ بررسی `workflow_completed: true` برمی‌گرداند ([ADR-0016](../adr/0016-city-lab-workflow-template.md)).
+
 ---
 
 ## ۵.۹ فایل — `/files`
@@ -627,7 +644,7 @@ Authorization: Bearer <access_token>
 | `POST` | `/files/upload-url` | دریافت URL آپلود مستقیم |
 | `POST` | `/files/{id}/complete` | اعلام پایان آپلود |
 | `GET` | `/files/{id}/download-url` | URL دانلود موقت |
-| `DELETE` | `/files/{id}` | حذف نرم |
+| `DELETE` | `/files/{id}` | حذف نرم — پیوست تحویل حذف نمی‌شود (۴۰۹، ADR-0016) |
 
 **`POST /files/upload-url`**
 ```jsonc
@@ -791,6 +808,8 @@ Authorization: Bearer <access_token>
 | `TOPIC_ALREADY_RESERVED` | 409 | این موضوع رزرو شده است. |
 | `RESERVATION_LIMIT` | 409 | هم‌اکنون یک موضوع رزروشده داری؛ اول آن را آزاد کن یا کار رویش را شروع کن. |
 | `OPENING_CLOSED` | 409 | این آگهی دیگر درخواست نمی‌پذیرد. |
+| `CITY_STAGE_LOCKED` | 409 | این مرحله هنوز قفل است؛ اول مرحلهٔ قبل باید تأیید شود. |
+| `CITY_EVIDENCE_MISSING` | 409 | راستی‌آزمایی بدون شواهد تصویری تأیید نمی‌شود. |
 | `FILE_TOO_LARGE` | 413 | حجم فایل بیش از حد مجاز است. |
 | `CONTENT_TYPE_NOT_ALLOWED` | 415 | این نوع فایل مجاز نیست. |
 | `FILE_SCAN_PENDING` | 409 | فایل در حال بررسی است. کمی صبر کنید. |
