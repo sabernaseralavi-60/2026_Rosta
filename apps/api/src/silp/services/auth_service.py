@@ -27,7 +27,7 @@ from silp.domain.identity.normalize import (
 from silp.domain.identity.onboarding import Onboarding, ProfileSnapshot, resolve
 from silp.models.identity import OTPChallenge, User
 from silp.models.profile import Profile
-from silp.services import authz
+from silp.services import authz, events
 from silp.services.otp_service import ChallengeIssued, OTPService, Purpose
 from silp.services.token_service import TokenPair, TokenService
 
@@ -81,6 +81,9 @@ class AuthService:
             raise AccountSuspended
 
         await self._mark_verified(user, challenge)
+        if is_new:
+            # پس از `_mark_verified`: خوش‌آمد ایمیلی فقط به نشانی تأییدشده می‌رود.
+            await events.publish(self.session, events.UserRegistered(user_id=user.id))
         return await self._complete_login(
             user,
             is_new_user=is_new,

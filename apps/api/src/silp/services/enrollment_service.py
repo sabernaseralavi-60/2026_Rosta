@@ -79,6 +79,7 @@ class EnrollmentService:
             existing.decided_at = None
             existing.decided_by = None
             await self._assert_capacity(offering, exclude_enrollment_id=existing.id)
+            await self._announce_request(existing)
             await self.session.commit()
             log.info("enrollment_reactivated", offering_id=str(offering_id))
             return existing
@@ -91,6 +92,8 @@ class EnrollmentService:
             status="PENDING" if offering.requires_approval else "ACTIVE",
         )
         self.session.add(enrollment)
+        await self.session.flush()
+        await self._announce_request(enrollment)
         await self.session.commit()
         log.info(
             "enrollment_created",
@@ -98,6 +101,13 @@ class EnrollmentService:
             status=enrollment.status,
         )
         return enrollment
+
+    async def _announce_request(self, enrollment: Enrollment) -> None:
+        """§7.2 — `→ PENDING` ⇒ اعلان به استاد. ثبت‌نام آزاد اعلانی ندارد."""
+        if enrollment.status == "PENDING":
+            await events.publish(
+                self.session, events.EnrollmentRequested(enrollment_id=enrollment.id)
+            )
 
     async def _lock_offering(self, offering_id: uuid.UUID) -> CourseOffering:
         offering = await self.session.scalar(
@@ -168,6 +178,9 @@ class EnrollmentService:
         enrollment.status = "ACTIVE" if approve else "REJECTED"
         enrollment.decided_at = _now()
         enrollment.decided_by = decided_by
+        await events.publish(
+            self.session, events.EnrollmentDecided(enrollment_id=enrollment.id, approved=approve)
+        )
         await self.session.commit()
         log.info(
             "enrollment_decided",

@@ -84,13 +84,37 @@ class Settings(BaseSettings):
     sms_sender: str = ""
     sms_otp_template: str = "silp-otp"
 
+    sms_api_base: str = "https://api.kavenegar.com/v1"
+
     # ── ایمیل ──────────────────────────────────────────────────────────
+    # `disabled` یعنی کانال ایمیل در ترجیحات کاربر پیشنهاد نمی‌شود.
+    email_provider: Literal["console", "memory", "smtp", "disabled"] = "console"
     smtp_host: str = ""
     smtp_port: int = 1025
     smtp_user: str = ""
     smtp_password: str = ""
     smtp_tls: bool = False
     mail_from: str = "noreply@silp.local"
+
+    # ── پیام‌رسان‌ها (M6-06) ───────────────────────────────────────────
+    # تلگرام در ایران فیلتر است؛ `TELEGRAM_API_BASE` می‌تواند به یک
+    # پروکسی خارج از کشور اشاره کند. شکست این کانال بقیه را متوقف
+    # نمی‌کند (FR-MSG-02).
+    telegram_provider: Literal["disabled", "console", "memory", "bot"] = "disabled"
+    telegram_bot_token: str = ""
+    telegram_bot_username: str = ""
+    telegram_api_base: str = "https://api.telegram.org"
+    # هدر `X-Telegram-Bot-Api-Secret-Token` وب‌هوک — بدون آن هر کسی
+    # می‌تواند خود را «تلگرام» جا بزند و حساب دیگری را پیوند دهد.
+    telegram_webhook_secret: str = ""
+    eitaa_provider: Literal["disabled", "console", "memory", "eitaayar"] = "disabled"
+    eitaa_api_token: str = ""
+    eitaa_api_base: str = "https://eitaayar.ir/api"
+    messaging_timeout_seconds: Annotated[float, Field(gt=0, le=60)] = 10.0
+
+    # ── صف ارسال (§7.10) ───────────────────────────────────────────────
+    outbox_batch_size: Annotated[int, Field(ge=1, le=500)] = 50
+    outbox_concurrency: Annotated[int, Field(ge=1, le=50)] = 8
 
     # ── رصد ────────────────────────────────────────────────────────────
     sentry_dsn: str = ""
@@ -161,6 +185,25 @@ class Settings(BaseSettings):
             problems.append("کلیدهای نمونهٔ .env.example در تولید قابل استفاده نیستند.")
         if self.secret_key == self.jwt_secret_key:
             problems.append("SECRET_KEY و JWT_SECRET_KEY باید متفاوت باشند.")
+        if self.sms_provider == "kavenegar" and not self.sms_api_key:
+            problems.append("SMS_API_KEY برای کاوه‌نگار لازم است.")
+        if self.email_provider in ("console", "memory"):
+            problems.append("EMAIL_PROVIDER در تولید باید smtp یا disabled باشد.")
+        if self.email_provider == "smtp" and not self.smtp_host:
+            problems.append("SMTP_HOST برای EMAIL_PROVIDER=smtp لازم است.")
+        if self.telegram_provider in ("console", "memory") or self.eitaa_provider in (
+            "console",
+            "memory",
+        ):
+            problems.append("پیام‌رسان‌ها در تولید باید bot/eitaayar یا disabled باشند.")
+        if self.telegram_provider == "bot" and not (
+            self.telegram_bot_token and self.telegram_bot_username and self.telegram_webhook_secret
+        ):
+            problems.append(
+                "TELEGRAM_BOT_TOKEN، TELEGRAM_BOT_USERNAME و TELEGRAM_WEBHOOK_SECRET لازم‌اند."
+            )
+        if self.eitaa_provider == "eitaayar" and not self.eitaa_api_token:
+            problems.append("EITAA_API_TOKEN برای ایتایار لازم است.")
         if problems:
             raise ValueError(" ".join(problems))
         return self

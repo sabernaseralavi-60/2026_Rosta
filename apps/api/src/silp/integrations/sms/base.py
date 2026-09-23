@@ -1,8 +1,7 @@
 """آداپتور پیامک — رابط مشترک و پیاده‌سازی‌های توسعه.
 
 در توسعه، OTP در لاگ چاپ می‌شود و پیامک ارسال نمی‌گردد (PRD §12.3).
-آداپتور کاوه‌نگار در M6 اضافه می‌شود (M6-04)؛ رابط از حالا ثابت است تا
-سرویس احراز هویت بعداً تغییر نکند.
+در تولید، کاوه‌نگار (`kavenegar.py`، M6-04).
 """
 
 from __future__ import annotations
@@ -21,6 +20,8 @@ class SMSResult:
     delivered: bool
     provider_message_id: str | None = None
     error: str | None = None
+    #: تکرار بی‌فایده است (گیرندهٔ نامعتبر، الگوی ناموجود) — صف مستقیم `DEAD` می‌کند.
+    permanent: bool = False
 
 
 class SMSSender(Protocol):
@@ -77,18 +78,24 @@ _memory_sender = MemorySMSSender()
 
 
 def get_sms_sender(settings: Settings) -> SMSSender:
-    """انتخاب آداپتور بر اساس پیکربندی.
-
-    کاوه‌نگار در M6-04 اضافه می‌شود. تا آن زمان انتخاب `kavenegar` در
-    تولید توسط اعتبارسنجی پیکربندی رد نمی‌شود ولی اینجا صریح شکست
-    می‌خورد — بهتر از ارسال بی‌صدای هیچ.
-    """
+    """انتخاب آداپتور بر اساس پیکربندی."""
     match settings.sms_provider:
         case "console":
             return ConsoleSMSSender()
         case "memory":
             return _memory_sender
         case "kavenegar":
-            # پیکربندی Literal است، پس شاخهٔ پیش‌فرض لازم نیست.
-            msg = "آداپتور کاوه‌نگار هنوز پیاده‌سازی نشده است (M6-04)."
-            raise NotImplementedError(msg)
+            # import درون تابع: httpx فقط وقتی لازم است که واقعاً پیامک برود.
+            from silp.integrations.sms.kavenegar import KavenegarSMSSender
+
+            return KavenegarSMSSender(
+                api_key=settings.sms_api_key,
+                sender=settings.sms_sender,
+                api_base=settings.sms_api_base,
+                timeout=settings.messaging_timeout_seconds,
+            )
+
+
+def get_memory_sms_sender() -> MemorySMSSender:
+    """همان نمونه‌ای که اپ در `SMS_PROVIDER=memory` استفاده می‌کند — برای تست."""
+    return _memory_sender

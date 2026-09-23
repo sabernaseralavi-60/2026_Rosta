@@ -375,8 +375,10 @@ async def on_enrollment_completed(session: AsyncSession, event: events.Enrollmen
     )
 
 
-@events.subscribe(events.ApplicationAccepted)
-async def on_application_accepted(session: AsyncSession, event: events.ApplicationAccepted) -> None:
+@events.subscribe(events.ApplicationDecided)
+async def on_application_accepted(session: AsyncSession, event: events.ApplicationDecided) -> None:
+    if event.decision != "ACCEPTED":
+        return
     application = await session.get(ProjectApplication, event.application_id)
     if application is None or application.status != "ACCEPTED":
         return

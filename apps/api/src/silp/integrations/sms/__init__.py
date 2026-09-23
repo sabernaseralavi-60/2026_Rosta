@@ -3,6 +3,7 @@ from silp.integrations.sms.base import (
     MemorySMSSender,
     SMSResult,
     SMSSender,
+    get_memory_sms_sender,
     get_sms_sender,
 )
 
@@ -11,5 +12,6 @@ __all__ = [
     "MemorySMSSender",
     "SMSResult",
     "SMSSender",
+    "get_memory_sms_sender",
     "get_sms_sender",
 ]

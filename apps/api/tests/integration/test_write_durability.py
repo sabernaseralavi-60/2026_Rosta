@@ -287,3 +287,49 @@ async def test_points_from_a_listener_survive_the_request(  # type: ignore[no-un
             )
         )
     assert rules == ["PROFILE_COMPLETED"]
+
+
+async def test_notification_and_its_outbox_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """M6 — اعلان و ردیف صف را شنونده در همان تراکنش درخواست می‌نویسد (D-08).
+
+    حساب تازه با ورود اول اعلان «خوش‌آمد» می‌گیرد؛ اگر شنونده پس از commit
+    اجرا می‌شد یا commit نمی‌خورد، اتصال دوم آن را نمی‌دید.
+    """
+    from silp.models.messaging import Notification
+
+    async with other_connection() as verifier:
+        kinds = list(
+            await verifier.scalars(
+                select(Notification.kind).where(Notification.user_id == account["user_id"])
+            )
+        )
+    assert kinds == ["WELCOME"]
+
+    response = await committing_client.post("/api/v1/notifications/read-all", headers=auth(account))
+    assert response.status_code == 200, response.text
+    async with other_connection() as verifier:
+        unread = await verifier.scalar(
+            select(Notification.id).where(
+                Notification.user_id == account["user_id"], Notification.read_at.is_(None)
+            )
+        )
+    assert unread is None, "«همه خوانده شد» commit نشده است"
+
+
+async def test_notification_preferences_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    from silp.models.messaging import NotificationPreference
+
+    response = await committing_client.put(
+        "/api/v1/notifications/preferences",
+        headers=auth(account),
+        json={"groups": {"COURSE": ["SMS"]}},
+    )
+    assert response.status_code == 200, response.text
+    async with other_connection() as verifier:
+        stored = await verifier.get(NotificationPreference, (account["user_id"], "COURSE"))
+    assert stored is not None, "ترجیح commit نشده است"
+    assert stored.channels == ["IN_APP", "SMS"]

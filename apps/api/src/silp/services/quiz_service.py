@@ -200,6 +200,7 @@ class QuizService:
             raise QuizHasNoQuestions()
 
         quiz.status = "PUBLISHED"
+        await events.publish(self.session, events.QuizPublished(quiz_id=quiz.id))
         await self.session.commit()
         await self.session.refresh(quiz)
         log.info("quiz_published", quiz_id=str(quiz.id), questions=count)

@@ -198,7 +198,7 @@ class GradingService:
         answer.feedback = feedback
 
         await self._recalculate(attempt)
-        await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id))
+        await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id, manual=True))
         await self.session.commit()
         await self.session.refresh(answer)
 
@@ -257,7 +257,7 @@ class GradingService:
         attempt = await self._attempt_of(attempt_id, quiz_id)
         await self._recalculate(attempt)
         attempt.graded_by = grader_id
-        await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id))
+        await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id, manual=True))
         await self.session.commit()
         await self.session.refresh(attempt)
         return attempt

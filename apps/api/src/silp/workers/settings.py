@@ -2,7 +2,8 @@
 
 کارهای نگهداری از M0 هستند. `close_expired_attempts` در M4 افزوده شد
 (§7.11، FR-QUIZ-02). چهار کار گیمیفیکیشن و سلامت پروژه از M5 هستند؛
-کارهای اعلان در M6 می‌آیند.
+ارسال صف، یادآوری مهلت، خلاصهٔ هفتگی، انتشار زمان‌بندی‌شدهٔ هفته و
+پاک‌سازی اعلان از M6.
 
 همهٔ زمان‌بندی‌ها به وقت UTC است. «ساعت ۲ بامداد» سند به وقت تهران است،
 یعنی ۲۲:۳۰ UTC شب قبل.
@@ -22,10 +23,14 @@ from silp.db.session import dispose_engine, session_scope
 from silp.integrations.sms import MemorySMSSender
 from silp.services.attempt_service import AttemptService
 from silp.services.badge_service import BadgeService
+from silp.services.notification_service import NotificationService
 from silp.services.otp_service import OTPService
+from silp.services.outbox_service import OutboxService
 from silp.services.point_listeners import LearningPoints
 from silp.services.points_service import PointsService
 from silp.services.project_health_service import ProjectHealthService
+from silp.services.reminder_service import ReminderService
+from silp.services.teaching_service import TeachingService
 from silp.services.token_service import TokenService
 
 log = get_logger("silp.worker")
@@ -109,6 +114,47 @@ async def compute_project_health(ctx: dict[str, Any]) -> int:
     return changed
 
 
+async def dispatch_outbox(ctx: dict[str, Any]) -> int:
+    """§7.10 — هر ۵ ثانیه. `SKIP LOCKED`: چند کارگر هم‌زمان با هم تداخل ندارند."""
+    async with session_scope() as session:
+        stats = await OutboxService(session).dispatch()
+    return stats.sent
+
+
+async def send_deadline_reminders(ctx: dict[str, Any]) -> int:
+    """§7.11 — یادآوری مهلت‌های ۳ و ۱ روزه. بی‌اثر در تکرار (`dedup_key`)."""
+    async with session_scope() as session:
+        stats = await ReminderService(session).send_deadline_reminders()
+    return stats.milestones + stats.quizzes
+
+
+async def weekly_digest(ctx: dict[str, Any]) -> int:
+    """§7.11 — خلاصهٔ هفتگی دانشجو و استاد. بی‌اثر در تکرار."""
+    async with session_scope() as session:
+        stats = await ReminderService(session).weekly_digest()
+    return stats.students + stats.teachers
+
+
+async def publish_scheduled_weeks(ctx: dict[str, Any]) -> int:
+    """§7.11، FR-EDU-02 — هفته‌هایی که زمان انتشارشان رسیده. اعلان هم همین‌جا."""
+    published = 0
+    async with session_scope() as session:
+        service = TeachingService(session)
+        for week in await service.due_weeks():
+            await service.publish_week(week_id=week.id)
+            published += 1
+    if published:
+        log.info("scheduled_weeks_published", count=published)
+    return published
+
+
+async def cleanup_notifications(ctx: dict[str, Any]) -> None:
+    """§4.12 — آرشیو اعلان خوانده‌شدهٔ ۹۰ روزه، حذف پیام ارسال‌شدهٔ ۳۰ روزه."""
+    async with session_scope() as session:
+        archived, purged = await NotificationService(session).cleanup()
+    log.info("notifications_cleaned", archived=archived, outbox_purged=purged)
+
+
 async def startup(ctx: dict[str, Any]) -> None:
     settings = get_settings()
     configure_logging(
@@ -134,6 +180,11 @@ class WorkerSettings:
         evaluate_all_badges,
         release_quiz_points,
         compute_project_health,
+        dispatch_outbox,
+        send_deadline_reminders,
+        weekly_digest,
+        publish_scheduled_weeks,
+        cleanup_notifications,
     ]
     cron_jobs: ClassVar[list[Any]] = [
         # هر ساعت، دقیقهٔ ۷ — عمداً سر ساعت نیست تا با بقیهٔ کارها تصادم نکند.
@@ -152,6 +203,17 @@ class WorkerSettings:
         cron(evaluate_all_badges, hour=1, minute=10),
         # §7.11 — ۲ بامداد تهران.
         cron(compute_project_health, hour=22, minute=30),
+        # §7.10 — هر ۵ ثانیه. `unique` پیش‌فرض ARQ دو اجرای هم‌زمان یک
+        # نوبت را نمی‌گذارد؛ هم‌پوشانی نوبت‌ها را `SKIP LOCKED` مدیریت می‌کند.
+        cron(dispatch_outbox, second=set(range(0, 60, 5)), run_at_startup=True),
+        # §7.11 — ۹ صبح تهران = ۵:۳۰ UTC.
+        cron(send_deadline_reminders, hour=5, minute=30),
+        # §7.11 — شنبه ۹ صبح تهران. ARQ دوشنبه را ۰ می‌شمارد، پس شنبه ۵ است.
+        cron(weekly_digest, weekday=5, hour=5, minute=35),
+        # §7.11 — هر ۵ دقیقه.
+        cron(publish_scheduled_weeks, minute=set(range(3, 60, 5))),
+        # §7.11 «cleanup_expired_data» — یکشنبه ۴ بامداد تهران = ۰:۳۰ UTC.
+        cron(cleanup_notifications, weekday=6, hour=0, minute=30),
     ]
     on_startup = startup
     on_shutdown = shutdown

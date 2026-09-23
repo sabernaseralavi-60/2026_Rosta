@@ -145,6 +145,11 @@ class Permission(StrEnum):
     POINTS_RULE_EDIT = "points.rule.edit"
     POINTS_RECALCULATE = "points.recalculate"
 
+    # ── اعلان (M6) ─────────────────────────────────────────────────────
+    OUTBOX_VIEW = "message.outbox.view"
+    OUTBOX_RETRY = "message.outbox.retry"
+    MESSAGE_TEMPLATE_EDIT = "message.template.edit"
+
 
 _SELF_SERVICE_ROLES: frozenset[Role] = frozenset(
     {
@@ -238,6 +243,11 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     Permission.POINTS_AWARD_MANUAL: frozenset({Role.INSTRUCTOR, Role.ADMIN}),
     Permission.POINTS_RULE_EDIT: frozenset({Role.ADMIN}),
     Permission.POINTS_RECALCULATE: frozenset({Role.ADMIN}),
+    # اعلان — FR-ADM-04 «سلامت فنی: صف اعلان‌ها». پشتیبانی می‌بیند چرا
+    # پیامک کاربری نرسید؛ فرستادن دوباره و ویرایش متن با مدیر است.
+    Permission.OUTBOX_VIEW: frozenset({Role.SUPPORT, Role.ADMIN}),
+    Permission.OUTBOX_RETRY: frozenset({Role.ADMIN}),
+    Permission.MESSAGE_TEMPLATE_EDIT: frozenset({Role.ADMIN}),
 }
 
 # مجوزهایی که قلمروشان **ارائه** است. برای این‌ها، اعطای سراسری

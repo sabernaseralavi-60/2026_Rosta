@@ -35,6 +35,7 @@ from silp.core.security import (
     hash_refresh_token,
 )
 from silp.models.identity import RefreshToken
+from silp.services import events
 
 log = get_logger("silp.token")
 
@@ -145,6 +146,7 @@ class TokenService:
                 revoked_count=revoked,
                 previous_reason=record.revoked_reason,
             )
+            await events.publish(self.session, events.SessionsRevoked(user_id=record.user_id))
             await self.session.commit()
             raise TokenReuseDetected
 

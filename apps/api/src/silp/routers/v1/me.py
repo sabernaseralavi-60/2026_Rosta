@@ -1,8 +1,7 @@
 """مسیر /me — §5.3.
 
-بخش هویتی از M0 است؛ نیمرخ و ارزیابی چهارگامی در M1 و امتیاز در M5
-افزوده شده. شمارندهٔ اعلان (M6) بعداً به همین پاسخ می‌آید و شکل پاسخ از
-حالا همان شکل نهایی است تا کلاینت دوباره نوشته نشود.
+بخش هویتی از M0 است؛ نیمرخ و ارزیابی چهارگامی در M1، امتیاز در M5 و
+شمارندهٔ اعلان در M6 افزوده شده.
 
 مسیرهای امتیاز، نشان و داشبورد زیر همین `/me` در `gamification.py` هستند.
 
@@ -39,6 +38,7 @@ from silp.schemas.profile import (
     UniversityRef,
 )
 from silp.schemas.project import RecommendationItemOut, breakdown_of, reasons_of
+from silp.services.notification_service import NotificationService
 from silp.services.points_service import PointsService
 from silp.services.profile_service import InterestAnswer, SkillAnswer
 
@@ -112,6 +112,7 @@ async def get_me(
             next_route=onboarding.next_route,
         ),
         points=MePointsOut(total=level.total, level=level.level, next_level_at=level.next_at),
+        unread_notifications=await NotificationService(session).unread_count(current.id),
     )
 
 

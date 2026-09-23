@@ -38,6 +38,13 @@ from silp.models.identity import (
     User,
     UserRole,
 )
+from silp.models.messaging import (
+    MessageTemplate,
+    Notification,
+    NotificationPreference,
+    OutboxMessage,
+    UserChannel,
+)
 from silp.models.profile import (
     Profile,
     ProfileAsset,
@@ -86,8 +93,12 @@ __all__ = [
     "GradeAppeal",
     "Interest",
     "MaterialAccessEvent",
+    "MessageTemplate",
     "Milestone",
+    "Notification",
+    "NotificationPreference",
     "OTPChallenge",
+    "OutboxMessage",
     "PeerEvaluation",
     "PointEntry",
     "PointRule",
@@ -126,6 +137,7 @@ __all__ = [
     "University",
     "User",
     "UserBadge",
+    "UserChannel",
     "UserRole",
     "WeekMaterial",
 ]

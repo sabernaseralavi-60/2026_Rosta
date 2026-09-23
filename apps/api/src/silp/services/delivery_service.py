@@ -259,6 +259,9 @@ class DeliveryService:
             entity_id=deliverable.id,
             commit=False,
         )
+        await events.publish(
+            self.session, events.DeliverableSubmitted(deliverable_id=deliverable.id)
+        )
         await self.session.commit()
         log.info(
             "deliverable_submitted",

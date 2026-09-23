@@ -173,6 +173,7 @@ class TeachingService:
             raise NotFound("این هفته پیدا نشد.")
 
         now = _now()
+        first_time = week.published_at is None
         if at is not None and at > now:
             week.publish_at = at
             week.status = "DRAFT"
@@ -180,6 +181,9 @@ class TeachingService:
             week.status = "PUBLISHED"
             week.published_at = week.published_at or now
             week.publish_at = None
+            # بازانتشار هفته‌ای که یک بار منتشر شده، کلاس را دوباره خبر نمی‌کند.
+            if first_time:
+                await events.publish(self.session, events.WeekPublished(week_id=week.id))
         await self.session.commit()
         log.info("week_published", week_id=str(week_id), status=week.status)
         return week
@@ -385,9 +389,12 @@ class TeachingService:
             expires_at=expires_at,
         )
         self.session.add(announcement)
+        await self.session.flush()
+        # FR-EDU-06 — URGENT علاوه بر اعلان داخلی، پیامک و پیام‌رسان هم دارد.
+        await events.publish(
+            self.session, events.AnnouncementPublished(announcement_id=announcement.id)
+        )
         await self.session.commit()
-        # ارسال پیامک برای اولویت URGENT در M6 (§MSG) اضافه می‌شود؛
-        # تا آن زمان اعلان فقط درون سامانه دیده می‌شود.
         log.info("announcement_published", offering_id=str(offering_id), priority=priority)
         return announcement
 

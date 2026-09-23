@@ -18,6 +18,7 @@ from silp.domain.gamification.formulas import LOCAL_TZ
 from silp.domain.project_health import MilestoneState, compute_health
 from silp.models.delivery import Milestone
 from silp.models.project import Project
+from silp.services import events
 
 log = get_logger("silp.project_health")
 
@@ -65,6 +66,15 @@ class ProjectHealthService:
                 )
                 project.health = verdict.health
                 changed += 1
+                # FR-PRJ-07 — «STALLED ⇒ اعلان به مدیر پروژه و استاد». فقط
+                # لحظهٔ رسیدن به STALLED، نه هر شب که STALLED می‌ماند.
+                if verdict.health == "STALLED":
+                    await events.publish(
+                        self.session,
+                        events.ProjectStalled(
+                            project_id=project.id, days_inactive=verdict.days_inactive
+                        ),
+                    )
         await self.session.commit()
         return changed
 

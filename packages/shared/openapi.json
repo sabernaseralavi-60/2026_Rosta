@@ -1145,6 +1145,148 @@
         "title": "AuthUserOut",
         "type": "object"
       },
+      "BadgeOut": {
+        "properties": {
+          "awarded_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Awarded At"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "earned": {
+            "title": "Earned",
+            "type": "boolean"
+          },
+          "icon": {
+            "title": "Icon",
+            "type": "string"
+          },
+          "progress_current": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Progress Current",
+            "type": "string"
+          },
+          "progress_ratio": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Progress Ratio",
+            "type": "string"
+          },
+          "progress_target": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Progress Target",
+            "type": "string"
+          },
+          "seen": {
+            "default": true,
+            "title": "Seen",
+            "type": "boolean"
+          },
+          "tier": {
+            "enum": [
+              "BRONZE",
+              "SILVER",
+              "GOLD",
+              "PLATINUM"
+            ],
+            "title": "Tier",
+            "type": "string"
+          },
+          "tier_fa": {
+            "title": "Tier Fa",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title_fa",
+          "description",
+          "icon",
+          "tier",
+          "tier_fa",
+          "earned",
+          "progress_current",
+          "progress_target",
+          "progress_ratio"
+        ],
+        "title": "BadgeOut",
+        "type": "object"
+      },
+      "BadgesOut": {
+        "properties": {
+          "earned": {
+            "items": {
+              "$ref": "#/components/schemas/BadgeOut"
+            },
+            "title": "Earned",
+            "type": "array"
+          },
+          "locked": {
+            "items": {
+              "$ref": "#/components/schemas/BadgeOut"
+            },
+            "title": "Locked",
+            "type": "array"
+          }
+        },
+        "required": [
+          "earned",
+          "locked"
+        ],
+        "title": "BadgesOut",
+        "type": "object"
+      },
+      "BadgesSeenIn": {
+        "properties": {
+          "codes": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codes"
+          }
+        },
+        "title": "BadgesSeenIn",
+        "type": "object"
+      },
+      "BadgesSeenOut": {
+        "properties": {
+          "updated": {
+            "title": "Updated",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "updated"
+        ],
+        "title": "BadgesSeenOut",
+        "type": "object"
+      },
       "BankItemIn": {
         "properties": {
           "body": {
@@ -1333,6 +1475,154 @@
         "title": "BreakdownOut",
         "type": "object"
       },
+      "ChannelConfirmIn": {
+        "properties": {
+          "code": {
+            "maxLength": 12,
+            "minLength": 4,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "ChannelConfirmIn",
+        "type": "object"
+      },
+      "ChannelLinkIn": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          }
+        },
+        "title": "ChannelLinkIn",
+        "type": "object"
+      },
+      "ChannelLinkOut": {
+        "properties": {
+          "channel": {
+            "enum": [
+              "TELEGRAM",
+              "EITAA"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "deep_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deep Link"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "flow": {
+            "enum": [
+              "DEEP_LINK",
+              "CODE"
+            ],
+            "title": "Flow",
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel",
+          "flow",
+          "expires_at"
+        ],
+        "title": "ChannelLinkOut",
+        "type": "object"
+      },
+      "ChannelStatusOut": {
+        "properties": {
+          "address_masked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Masked"
+          },
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "channel": {
+            "enum": [
+              "IN_APP",
+              "EMAIL",
+              "SMS",
+              "TELEGRAM",
+              "EITAA",
+              "WHATSAPP"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "link_flow": {
+            "anyOf": [
+              {
+                "enum": [
+                  "DEEP_LINK",
+                  "CODE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Flow"
+          },
+          "linked": {
+            "title": "Linked",
+            "type": "boolean"
+          },
+          "pending_link": {
+            "default": false,
+            "title": "Pending Link",
+            "type": "boolean"
+          },
+          "requires_link": {
+            "title": "Requires Link",
+            "type": "boolean"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel",
+          "title_fa",
+          "available",
+          "requires_link",
+          "linked"
+        ],
+        "title": "ChannelStatusOut",
+        "type": "object"
+      },
       "CompleteProjectIn": {
         "additionalProperties": false,
         "properties": {
@@ -1407,6 +1697,65 @@
           "weeks_copied"
         ],
         "title": "CopyResultOut",
+        "type": "object"
+      },
+      "CourseCardOut": {
+        "properties": {
+          "course_title_fa": {
+            "title": "Course Title Fa",
+            "type": "string"
+          },
+          "current_week_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Week Number"
+          },
+          "learning_score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Score"
+          },
+          "offering_id": {
+            "format": "uuid",
+            "title": "Offering Id",
+            "type": "string"
+          },
+          "study_ratio": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Study Ratio"
+          },
+          "term_title_fa": {
+            "title": "Term Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "offering_id",
+          "course_title_fa",
+          "term_title_fa"
+        ],
+        "title": "CourseCardOut",
         "type": "object"
       },
       "CourseDetailOut": {
@@ -2344,6 +2693,51 @@
         "title": "GradingQueueOut",
         "type": "object"
       },
+      "GroupPreferenceOut": {
+        "properties": {
+          "channels": {
+            "items": {
+              "enum": [
+                "IN_APP",
+                "EMAIL",
+                "SMS",
+                "TELEGRAM",
+                "EITAA",
+                "WHATSAPP"
+              ],
+              "type": "string"
+            },
+            "title": "Channels",
+            "type": "array"
+          },
+          "description_fa": {
+            "title": "Description Fa",
+            "type": "string"
+          },
+          "group": {
+            "enum": [
+              "COURSE",
+              "PROJECT",
+              "SOCIAL",
+              "SYSTEM"
+            ],
+            "title": "Group",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "group",
+          "title_fa",
+          "description_fa",
+          "channels"
+        ],
+        "title": "GroupPreferenceOut",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2523,6 +2917,270 @@
         "title": "InterestsStepIn",
         "type": "object"
       },
+      "LeaderRowOut": {
+        "properties": {
+          "is_me": {
+            "default": false,
+            "title": "Is Me",
+            "type": "boolean"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "integer"
+          },
+          "total": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total",
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/LeaderUserOut"
+          }
+        },
+        "required": [
+          "rank",
+          "user",
+          "total",
+          "level"
+        ],
+        "title": "LeaderRowOut",
+        "type": "object"
+      },
+      "LeaderUserOut": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "LeaderUserOut",
+        "type": "object"
+      },
+      "LeaderboardOut": {
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "LEARNING",
+                  "RESEARCH",
+                  "STARTUP",
+                  "COMMUNITY"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/LeaderRowOut"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "growth": {
+            "items": {
+              "$ref": "#/components/schemas/LeaderRowOut"
+            },
+            "title": "Growth",
+            "type": "array"
+          },
+          "me": {
+            "$ref": "#/components/schemas/MyStandingOut"
+          },
+          "scope": {
+            "enum": [
+              "GLOBAL",
+              "OFFERING",
+              "UNIVERSITY"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "scope_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Id"
+          },
+          "term_title_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Title Fa"
+          }
+        },
+        "required": [
+          "scope",
+          "entries",
+          "growth",
+          "me"
+        ],
+        "title": "LeaderboardOut",
+        "type": "object"
+      },
+      "LearningComponentOut": {
+        "properties": {
+          "earned": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Earned",
+            "type": "string"
+          },
+          "key": {
+            "enum": [
+              "quiz",
+              "study",
+              "project",
+              "attendance"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "possible": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Possible",
+            "type": "string"
+          },
+          "ratio": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratio"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "weight": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Weight",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "title_fa",
+          "weight",
+          "earned",
+          "possible"
+        ],
+        "title": "LearningComponentOut",
+        "type": "object"
+      },
+      "LearningScoreOut": {
+        "properties": {
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/LearningComponentOut"
+            },
+            "title": "Components",
+            "type": "array"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "offering_id": {
+            "format": "uuid",
+            "title": "Offering Id",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          },
+          "suggested_grade": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Grade"
+          }
+        },
+        "required": [
+          "offering_id",
+          "student_id",
+          "components"
+        ],
+        "title": "LearningScoreOut",
+        "type": "object"
+      },
       "LevelLabel": {
         "description": "متن توصیفی هر سطح — FR-PROF-01.\n\nسرور این متن‌ها را می‌فرستد تا `SkillSlider` آن‌ها را در خود ثابت\nنکند؛ تعریف سطح باید در فرم و در توضیح توصیه‌گر یکی باشد.",
         "properties": {
@@ -2540,6 +3198,52 @@
           "label"
         ],
         "title": "LevelLabel",
+        "type": "object"
+      },
+      "LevelOut": {
+        "properties": {
+          "current_at": {
+            "title": "Current At",
+            "type": "integer"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "next_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next At"
+          },
+          "ratio": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Ratio",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "to_next": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "To Next",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "title_fa",
+          "current_at",
+          "to_next",
+          "ratio"
+        ],
+        "title": "LevelOut",
         "type": "object"
       },
       "LinkMaterialIn": {
@@ -2819,7 +3523,7 @@
         "type": "object"
       },
       "MeOut": {
-        "description": "§5.3 `GET /me` — نسخهٔ M1.\n\nامتیاز (M5) و شمارندهٔ اعلان (M6) بعداً افزوده می‌شوند. آنچه هست، همان\nشکل نهایی را دارد تا کلاینت بعداً بازنویسی نشود.",
+        "description": "§5.3 `GET /me`.\n\nامتیاز از M5 و شمارندهٔ اعلان از M6 است.",
         "properties": {
           "email": {
             "anyOf": [
@@ -2861,6 +3565,16 @@
           "onboarding": {
             "$ref": "#/components/schemas/OnboardingOut"
           },
+          "points": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MePointsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "profile": {
             "anyOf": [
               {
@@ -2877,6 +3591,11 @@
             },
             "title": "Roles",
             "type": "array"
+          },
+          "unread_notifications": {
+            "default": 0,
+            "title": "Unread Notifications",
+            "type": "integer"
           },
           "username": {
             "anyOf": [
@@ -2896,6 +3615,37 @@
           "onboarding"
         ],
         "title": "MeOut",
+        "type": "object"
+      },
+      "MePointsOut": {
+        "description": "خلاصهٔ امتیاز در پاسخ `GET /me` — §5.3.",
+        "properties": {
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "next_level_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Level At"
+          },
+          "total": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total",
+            "type": "string"
+          }
+        },
+        "required": [
+          "total",
+          "level"
+        ],
+        "title": "MePointsOut",
         "type": "object"
       },
       "MessageIn": {
@@ -3246,6 +3996,67 @@
         "title": "MilestoneOut",
         "type": "object"
       },
+      "MyStandingOut": {
+        "properties": {
+          "excluded_reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "OPTED_OUT",
+                  "STAFF"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Excluded Reason"
+          },
+          "hidden": {
+            "default": false,
+            "title": "Hidden",
+            "type": "boolean"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "percentile": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentile"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "total": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total",
+            "type": "string"
+          }
+        },
+        "required": [
+          "total",
+          "level"
+        ],
+        "title": "MyStandingOut",
+        "type": "object"
+      },
       "MySubscriptionsOut": {
         "description": "وضعیت اشتراک کاربر — همان چیزی که صفحهٔ «اشتراک من» می‌خواهد.",
         "properties": {
@@ -3270,6 +4081,203 @@
           "covers_all_courses"
         ],
         "title": "MySubscriptionsOut",
+        "type": "object"
+      },
+      "NeedsAttentionOut": {
+        "properties": {
+          "deliverables_pending": {
+            "$ref": "#/components/schemas/QueueOut"
+          },
+          "enrollment_requests": {
+            "$ref": "#/components/schemas/QueueOut"
+          },
+          "essays_pending": {
+            "$ref": "#/components/schemas/QueueOut"
+          },
+          "grade_appeals": {
+            "$ref": "#/components/schemas/QueueOut"
+          },
+          "projects_at_risk": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectAtRiskOut"
+            },
+            "title": "Projects At Risk",
+            "type": "array"
+          },
+          "students_at_risk": {
+            "items": {
+              "$ref": "#/components/schemas/StudentAtRiskOut"
+            },
+            "title": "Students At Risk",
+            "type": "array"
+          }
+        },
+        "required": [
+          "deliverables_pending",
+          "essays_pending",
+          "enrollment_requests",
+          "grade_appeals",
+          "projects_at_risk",
+          "students_at_risk"
+        ],
+        "title": "NeedsAttentionOut",
+        "type": "object"
+      },
+      "NextStepOut": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "due_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due At"
+          },
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "title",
+          "description",
+          "href"
+        ],
+        "title": "NextStepOut",
+        "type": "object"
+      },
+      "NotificationFeedOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "NotificationFeedOut",
+        "type": "object"
+      },
+      "NotificationOut": {
+        "properties": {
+          "action_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Url"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "group": {
+            "enum": [
+              "COURSE",
+              "PROJECT",
+              "SOCIAL",
+              "SYSTEM"
+            ],
+            "title": "Group",
+            "type": "string"
+          },
+          "group_fa": {
+            "title": "Group Fa",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_read": {
+            "title": "Is Read",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "LOW",
+              "NORMAL",
+              "IMPORTANT",
+              "URGENT"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "group",
+          "group_fa",
+          "title",
+          "body",
+          "priority",
+          "created_at",
+          "is_read"
+        ],
+        "title": "NotificationOut",
         "type": "object"
       },
       "OTPRequestIn": {
@@ -3612,6 +4620,71 @@
         "title": "OfferingRefOut",
         "type": "object"
       },
+      "OfferingStatsOut": {
+        "properties": {
+          "avg_learning_score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Learning Score"
+          },
+          "avg_progress": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Progress"
+          },
+          "avg_quiz_score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Quiz Score"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "students": {
+            "title": "Students",
+            "type": "integer"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa",
+          "status",
+          "students"
+        ],
+        "title": "OfferingStatsOut",
+        "type": "object"
+      },
       "OfferingSummaryOut": {
         "properties": {
           "active_students": {
@@ -3773,6 +4846,188 @@
           "next_route"
         ],
         "title": "OnboardingOut",
+        "type": "object"
+      },
+      "OutboxMessageOut": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "channel": {
+            "enum": [
+              "IN_APP",
+              "EMAIL",
+              "SMS",
+              "TELEGRAM",
+              "EITAA",
+              "WHATSAPP"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "next_attempt_at": {
+            "format": "date-time",
+            "title": "Next Attempt At",
+            "type": "string"
+          },
+          "notification_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notification Id"
+          },
+          "priority": {
+            "enum": [
+              "LOW",
+              "NORMAL",
+              "IMPORTANT",
+              "URGENT"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "recipient_masked": {
+            "title": "Recipient Masked",
+            "type": "string"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "SENDING",
+              "SENT",
+              "FAILED",
+              "DEAD"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "template": {
+            "title": "Template",
+            "type": "string"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          }
+        },
+        "required": [
+          "id",
+          "channel",
+          "recipient_masked",
+          "template",
+          "priority",
+          "status",
+          "status_fa",
+          "attempts",
+          "next_attempt_at",
+          "created_at"
+        ],
+        "title": "OutboxMessageOut",
+        "type": "object"
+      },
+      "OutboxPageOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "enum": [
+                "QUEUED",
+                "SENDING",
+                "SENT",
+                "FAILED",
+                "DEAD"
+              ]
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OutboxMessageOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "has_next",
+          "counts"
+        ],
+        "title": "OutboxPageOut",
         "type": "object"
       },
       "Page_CourseSummaryOut_": {
@@ -4049,6 +5304,478 @@
           "price_fa"
         ],
         "title": "PlanOut",
+        "type": "object"
+      },
+      "PointEntryOut": {
+        "properties": {
+          "amount": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Amount",
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "LEARNING",
+              "RESEARCH",
+              "STARTUP",
+              "COMMUNITY"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "category_fa": {
+            "title": "Category Fa",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_reversed": {
+            "default": false,
+            "title": "Is Reversed",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "reverses_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reverses Id"
+          },
+          "rule_code": {
+            "title": "Rule Code",
+            "type": "string"
+          },
+          "rule_title_fa": {
+            "title": "Rule Title Fa",
+            "type": "string"
+          },
+          "source_href": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Href"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "source_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Label"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "source_type_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Type Fa"
+          }
+        },
+        "required": [
+          "id",
+          "rule_code",
+          "rule_title_fa",
+          "category",
+          "category_fa",
+          "amount",
+          "source_type",
+          "created_at"
+        ],
+        "title": "PointEntryOut",
+        "type": "object"
+      },
+      "PointLedgerOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PointEntryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "PointLedgerOut",
+        "type": "object"
+      },
+      "PointRuleOut": {
+        "properties": {
+          "base_points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Base Points",
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "LEARNING",
+              "RESEARCH",
+              "STARTUP",
+              "COMMUNITY"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "daily_cap": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Cap"
+          },
+          "formula": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Formula"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "term_cap": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Cap"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "weekly_cap": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Cap"
+          }
+        },
+        "required": [
+          "code",
+          "title_fa",
+          "category",
+          "base_points",
+          "is_active",
+          "updated_at"
+        ],
+        "title": "PointRuleOut",
+        "type": "object"
+      },
+      "PointRuleUpdateIn": {
+        "description": "`PATCH` جزئی. **گذشته‌نگر نیست** — برای بازنویسی گذشته، بازمحاسبه.",
+        "properties": {
+          "base_points": {
+            "anyOf": [
+              {
+                "maximum": 9999.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Points"
+          },
+          "clear_caps": {
+            "items": {
+              "enum": [
+                "daily_cap",
+                "weekly_cap",
+                "term_cap"
+              ],
+              "type": "string"
+            },
+            "title": "Clear Caps",
+            "type": "array"
+          },
+          "daily_cap": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Daily Cap"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          },
+          "term_cap": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Cap"
+          },
+          "title_fa": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title Fa"
+          },
+          "weekly_cap": {
+            "anyOf": [
+              {
+                "maximum": 10000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Cap"
+          }
+        },
+        "title": "PointRuleUpdateIn",
+        "type": "object"
+      },
+      "PointsSummaryOut": {
+        "properties": {
+          "by_category": {
+            "additionalProperties": {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            "title": "By Category",
+            "type": "object"
+          },
+          "latest_entry_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Entry Id"
+          },
+          "level": {
+            "$ref": "#/components/schemas/LevelOut"
+          },
+          "recent": {
+            "items": {
+              "$ref": "#/components/schemas/PointEntryOut"
+            },
+            "title": "Recent",
+            "type": "array"
+          },
+          "term_by_category": {
+            "additionalProperties": {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            "title": "Term By Category",
+            "type": "object"
+          },
+          "term_total": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Term Total",
+            "type": "string"
+          },
+          "total": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total",
+            "type": "string"
+          }
+        },
+        "required": [
+          "total",
+          "level",
+          "by_category",
+          "term_total",
+          "term_by_category"
+        ],
+        "title": "PointsSummaryOut",
+        "type": "object"
+      },
+      "PreferencesIn": {
+        "properties": {
+          "groups": {
+            "additionalProperties": {
+              "items": {
+                "enum": [
+                  "IN_APP",
+                  "EMAIL",
+                  "SMS",
+                  "TELEGRAM",
+                  "EITAA",
+                  "WHATSAPP"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "description": "دسته ⇒ کانال‌ها. «داخل سامانه» همیشه افزوده می‌شود.",
+            "propertyNames": {
+              "enum": [
+                "COURSE",
+                "PROJECT",
+                "SOCIAL",
+                "SYSTEM"
+              ]
+            },
+            "title": "Groups",
+            "type": "object"
+          }
+        },
+        "required": [
+          "groups"
+        ],
+        "title": "PreferencesIn",
+        "type": "object"
+      },
+      "PreferencesOut": {
+        "properties": {
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/ChannelStatusOut"
+            },
+            "title": "Channels",
+            "type": "array"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/GroupPreferenceOut"
+            },
+            "title": "Groups",
+            "type": "array"
+          },
+          "quiet_hours": {
+            "$ref": "#/components/schemas/QuietHoursOut"
+          }
+        },
+        "required": [
+          "groups",
+          "channels",
+          "quiet_hours"
+        ],
+        "title": "PreferencesOut",
         "type": "object"
       },
       "PreferencesStepIn": {
@@ -4465,6 +6192,133 @@
           }
         },
         "title": "ProgressIn",
+        "type": "object"
+      },
+      "ProjectAtRiskOut": {
+        "properties": {
+          "days_inactive": {
+            "title": "Days Inactive",
+            "type": "integer"
+          },
+          "health": {
+            "enum": [
+              "HEALTHY",
+              "AT_RISK",
+              "STALLED"
+            ],
+            "title": "Health",
+            "type": "string"
+          },
+          "health_fa": {
+            "title": "Health Fa",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa",
+          "health",
+          "health_fa",
+          "days_inactive"
+        ],
+        "title": "ProjectAtRiskOut",
+        "type": "object"
+      },
+      "ProjectCardOut": {
+        "properties": {
+          "approved_milestones": {
+            "title": "Approved Milestones",
+            "type": "integer"
+          },
+          "health": {
+            "enum": [
+              "HEALTHY",
+              "AT_RISK",
+              "STALLED"
+            ],
+            "title": "Health",
+            "type": "string"
+          },
+          "health_fa": {
+            "title": "Health Fa",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "next_milestone_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Milestone Due On"
+          },
+          "next_milestone_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Milestone Status"
+          },
+          "next_milestone_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Milestone Title"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "required_milestones": {
+            "title": "Required Milestones",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "title_fa",
+          "kind",
+          "status",
+          "health",
+          "health_fa",
+          "approved_milestones",
+          "required_milestones"
+        ],
+        "title": "ProjectCardOut",
         "type": "object"
       },
       "ProjectDetailOut": {
@@ -5322,6 +7176,48 @@
         "title": "QuestionStatsOut",
         "type": "object"
       },
+      "QueueOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "oldest_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest Days"
+          }
+        },
+        "required": [
+          "count"
+        ],
+        "title": "QueueOut",
+        "type": "object"
+      },
+      "QuietHoursOut": {
+        "properties": {
+          "end": {
+            "title": "End",
+            "type": "integer"
+          },
+          "start": {
+            "title": "Start",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "QuietHoursOut",
+        "type": "object"
+      },
       "QuizDetailOut": {
         "description": "آزمون از دید استاد — با سؤال‌ها و کلید پاسخ.",
         "properties": {
@@ -5723,6 +7619,19 @@
         "title": "QuizSummaryOut",
         "type": "object"
       },
+      "ReadAllOut": {
+        "properties": {
+          "updated": {
+            "title": "Updated",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "updated"
+        ],
+        "title": "ReadAllOut",
+        "type": "object"
+      },
       "ReasonIn": {
         "additionalProperties": false,
         "description": "بدنهٔ اقدام‌هایی که سند برایشان «با ذکر دلیل» نوشته است — §7.4.",
@@ -5771,6 +7680,71 @@
           "text"
         ],
         "title": "ReasonOut",
+        "type": "object"
+      },
+      "RecalculateIn": {
+        "properties": {
+          "rule_code": {
+            "title": "Rule Code",
+            "type": "string"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Until"
+          }
+        },
+        "required": [
+          "rule_code"
+        ],
+        "title": "RecalculateIn",
+        "type": "object"
+      },
+      "RecalculateOut": {
+        "properties": {
+          "reawarded": {
+            "title": "Reawarded",
+            "type": "integer"
+          },
+          "reversed": {
+            "title": "Reversed",
+            "type": "integer"
+          },
+          "rule_code": {
+            "title": "Rule Code",
+            "type": "string"
+          },
+          "users": {
+            "title": "Users",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule_code",
+          "reversed",
+          "reawarded",
+          "users"
+        ],
+        "title": "RecalculateOut",
         "type": "object"
       },
       "RecommendationFeedbackIn": {
@@ -6226,6 +8200,34 @@
           "points"
         ],
         "title": "ResultQuestionOut",
+        "type": "object"
+      },
+      "RetriedOut": {
+        "properties": {
+          "retried": {
+            "title": "Retried",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "retried"
+        ],
+        "title": "RetriedOut",
+        "type": "object"
+      },
+      "ReverseEntryIn": {
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "ReverseEntryIn",
         "type": "object"
       },
       "ReviewIn": {
@@ -6696,6 +8698,109 @@
           "skills"
         ],
         "title": "SkillsStepIn",
+        "type": "object"
+      },
+      "StudentAtRiskOut": {
+        "properties": {
+          "course_title_fa": {
+            "title": "Course Title Fa",
+            "type": "string"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "offering_id": {
+            "format": "uuid",
+            "title": "Offering Id",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "reason",
+          "offering_id",
+          "course_title_fa"
+        ],
+        "title": "StudentAtRiskOut",
+        "type": "object"
+      },
+      "StudentDashboardOut": {
+        "properties": {
+          "courses": {
+            "items": {
+              "$ref": "#/components/schemas/CourseCardOut"
+            },
+            "title": "Courses",
+            "type": "array"
+          },
+          "next_step": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextStepOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "points": {
+            "$ref": "#/components/schemas/PointsSummaryOut"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectCardOut"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "recent_badges": {
+            "items": {
+              "$ref": "#/components/schemas/BadgeOut"
+            },
+            "title": "Recent Badges",
+            "type": "array"
+          },
+          "trend": {
+            "items": {
+              "$ref": "#/components/schemas/TrendPointOut"
+            },
+            "title": "Trend",
+            "type": "array"
+          },
+          "upcoming": {
+            "items": {
+              "$ref": "#/components/schemas/UpcomingEventOut"
+            },
+            "title": "Upcoming",
+            "type": "array"
+          }
+        },
+        "required": [
+          "points",
+          "courses",
+          "projects",
+          "recent_badges",
+          "trend",
+          "upcoming"
+        ],
+        "title": "StudentDashboardOut",
         "type": "object"
       },
       "SubmitIn": {
@@ -7454,6 +9559,26 @@
         "title": "TaskOut",
         "type": "object"
       },
+      "TeachDashboardOut": {
+        "properties": {
+          "needs_attention": {
+            "$ref": "#/components/schemas/NeedsAttentionOut"
+          },
+          "offerings": {
+            "items": {
+              "$ref": "#/components/schemas/OfferingStatsOut"
+            },
+            "title": "Offerings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "needs_attention",
+          "offerings"
+        ],
+        "title": "TeachDashboardOut",
+        "type": "object"
+      },
       "TeamMemberOut": {
         "properties": {
           "full_name": {
@@ -7582,6 +9707,202 @@
         "title": "TeamOut",
         "type": "object"
       },
+      "TemplateOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "channel": {
+            "enum": [
+              "IN_APP",
+              "EMAIL",
+              "SMS",
+              "TELEGRAM",
+              "EITAA",
+              "WHATSAPP"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "kind_title_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind Title Fa"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Variables",
+            "type": "array"
+          }
+        },
+        "required": [
+          "code",
+          "channel",
+          "body",
+          "variables",
+          "is_active",
+          "updated_at"
+        ],
+        "title": "TemplateOut",
+        "type": "object"
+      },
+      "TemplatePreviewIn": {
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Body",
+            "type": "string"
+          },
+          "channel": {
+            "enum": [
+              "IN_APP",
+              "EMAIL",
+              "SMS",
+              "TELEGRAM",
+              "EITAA",
+              "WHATSAPP"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "values": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Values",
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "channel",
+          "body"
+        ],
+        "title": "TemplatePreviewIn",
+        "type": "object"
+      },
+      "TemplatePreviewOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "length": {
+            "title": "Length",
+            "type": "integer"
+          },
+          "sms_parts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Parts"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          }
+        },
+        "required": [
+          "body",
+          "length"
+        ],
+        "title": "TemplatePreviewOut",
+        "type": "object"
+      },
+      "TemplateUpdateIn": {
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Body",
+            "type": "string"
+          },
+          "is_active": {
+            "default": true,
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "TemplateUpdateIn",
+        "type": "object"
+      },
       "TokenPairOut": {
         "properties": {
           "access_token": {
@@ -7608,6 +9929,26 @@
           "expires_in"
         ],
         "title": "TokenPairOut",
+        "type": "object"
+      },
+      "TrendPointOut": {
+        "properties": {
+          "total": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total",
+            "type": "string"
+          },
+          "week_start": {
+            "format": "date",
+            "title": "Week Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "week_start",
+          "total"
+        ],
+        "title": "TrendPointOut",
         "type": "object"
       },
       "UniversityOut": {
@@ -7690,6 +10031,53 @@
           "title_fa"
         ],
         "title": "UniversityRef",
+        "type": "object"
+      },
+      "UnreadCountOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "count"
+        ],
+        "title": "UnreadCountOut",
+        "type": "object"
+      },
+      "UpcomingEventOut": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "QUIZ_OPENS",
+              "QUIZ_CLOSES",
+              "MILESTONE_DUE"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "title",
+          "at",
+          "href"
+        ],
+        "title": "UpcomingEventOut",
         "type": "object"
       },
       "UploadUrlIn": {
@@ -8114,6 +10502,730 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/admin/message-templates": {
+      "get": {
+        "operationId": "templates_api_v1_admin_message_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateOut"
+                  },
+                  "title": "Response Templates Api V1 Admin Message Templates Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "الگوهای پیام — FR-MSG-03",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/message-templates/preview": {
+      "post": {
+        "operationId": "preview_template_api_v1_admin_message_templates_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplatePreviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplatePreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پیش‌نمایش پیش از ذخیره",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/message-templates/{code}/{channel}": {
+      "put": {
+        "operationId": "put_template_api_v1_admin_message_templates__code___channel__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "channel",
+            "required": true,
+            "schema": {
+              "title": "Channel",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateUpdateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ساخت یا ویرایش الگو",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/outbox": {
+      "get": {
+        "operationId": "outbox_api_v1_admin_outbox_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "QUEUED",
+                    "SENDING",
+                    "SENT",
+                    "FAILED",
+                    "DEAD"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "channel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Channel"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutboxPageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "صف ارسال — §7.10",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/outbox/retry-dead": {
+      "post": {
+        "operationId": "retry_dead_api_v1_admin_outbox_retry_dead_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "channel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Channel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetriedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "همهٔ پیام‌های DEAD به صف",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/outbox/{message_id}/retry": {
+      "post": {
+        "operationId": "retry_message_api_v1_admin_outbox__message_id__retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Message Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutboxMessageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تلاش دوباره",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/point-entries/{entry_id}/reverse": {
+      "post": {
+        "operationId": "reverse_point_entry_api_v1_admin_point_entries__entry_id__reverse_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReverseEntryIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointEntryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "اصلاح یک ردیف امتیاز با رکورد معکوس",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/point-rules": {
+      "get": {
+        "operationId": "list_point_rules_api_v1_admin_point_rules_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PointRuleOut"
+                  },
+                  "title": "Response List Point Rules Api V1 Admin Point Rules Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "قواعد امتیاز",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/point-rules/recalculate": {
+      "post": {
+        "description": "§9.9 — معکوس و ثبت دوباره در یک تراکنش. **هیچ ردیفی پاک نمی‌شود.**",
+        "operationId": "recalculate_points_api_v1_admin_point_rules_recalculate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecalculateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecalculateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بازمحاسبهٔ گذشته‌نگر",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/point-rules/{code}": {
+      "patch": {
+        "description": "FR-GAM-02 — **گذشته‌نگر نیست.** برای اعمال به گذشته، بازمحاسبه.",
+        "operationId": "update_point_rule_api_v1_admin_point_rules__code__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PointRuleUpdateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointRuleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش قاعدهٔ امتیاز",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/v1/applications/mine": {
       "get": {
         "operationId": "my_applications_api_v1_applications_mine_get",
@@ -9699,6 +12811,127 @@
         ]
       }
     },
+    "/api/v1/leaderboard": {
+      "get": {
+        "description": "§9.7 — فقط ۱۰ نفر برتر، رتبهٔ خودت، و جدول رشد ۳۰ روزه.\n\nرتبه‌بندی درس فقط برای دانشجویان همان درس و کادر آموزشی‌اش است؛ برای\nبقیه ۴۰۴، نه ۴۰۳ (§6.4).",
+        "operationId": "leaderboard_api_v1_leaderboard_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "GLOBAL",
+              "pattern": "^(GLOBAL|OFFERING|UNIVERSITY)$",
+              "title": "Scope",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "scope_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scope Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "LEARNING",
+                    "RESEARCH",
+                    "STARTUP",
+                    "COMMUNITY"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 10,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaderboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جدول رتبه‌بندی",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
     "/api/v1/materials/tiers": {
       "get": {
         "description": "متن فارسی هر سطح — تا رابط کاربری آن را ننویسد.",
@@ -9838,6 +13071,373 @@
         "summary": "اطلاعات کاربر جاری",
         "tags": [
           "me"
+        ]
+      }
+    },
+    "/api/v1/me/badges": {
+      "get": {
+        "description": "قفل‌ها با شرط و پیشرفت — «این خودش یک راهنمای مسیر است» (§9.5).",
+        "operationId": "my_badges_api_v1_me_badges_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "نشان‌های کسب‌شده و قفل‌شده",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/badges/seen": {
+      "post": {
+        "operationId": "mark_badges_seen_api_v1_me_badges_seen_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BadgesSeenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgesSeenOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جشن نشان دیده شد",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/dashboard": {
+      "get": {
+        "operationId": "my_dashboard_api_v1_me_dashboard_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentDashboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "داشبورد دانشجو",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/learning-score/{offering_id}": {
+      "get": {
+        "operationId": "my_learning_score_api_v1_me_learning_score__offering_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearningScoreOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "نمرهٔ یادگیری من در یک درس",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/points": {
+      "get": {
+        "description": "تازه‌ترین اول، کرسری. فیلتر `source_*` همان پیوند «این امتیاز از کجا\nآمد» است (§9.10 شفافیت).",
+        "operationId": "my_points_api_v1_me_points_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "LEARNING",
+                    "RESEARCH",
+                    "STARTUP",
+                    "COMMUNITY"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointLedgerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دفتر کل امتیاز شخصی",
+        "tags": [
+          "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/points/summary": {
+      "get": {
+        "operationId": "my_points_summary_api_v1_me_points_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointsSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "امتیاز کل، سطح و امتیاز نیم‌سال",
+        "tags": [
+          "gamification"
         ]
       }
     },
@@ -10431,6 +14031,552 @@
         "summary": "ارسال تحویل‌دادنی",
         "tags": [
           "projects"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "feed_api_v1_notifications_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "unread_only",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Unread Only",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "group",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "COURSE",
+                    "PROJECT",
+                    "SOCIAL",
+                    "SYSTEM"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Group"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationFeedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "فهرست اعلان‌ها (کرسری)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/channels/{channel}": {
+      "delete": {
+        "operationId": "unlink_api_v1_notifications_channels__channel__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "channel",
+            "required": true,
+            "schema": {
+              "title": "Channel",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "قطع اتصال پیام‌رسان",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/channels/{channel}/confirm": {
+      "post": {
+        "operationId": "confirm_link_api_v1_notifications_channels__channel__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "channel",
+            "required": true,
+            "schema": {
+              "title": "Channel",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferencesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تأیید اتصال ایتا با کد",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/channels/{channel}/link": {
+      "post": {
+        "operationId": "start_link_api_v1_notifications_channels__channel__link_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "channel",
+            "required": true,
+            "schema": {
+              "title": "Channel",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelLinkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelLinkOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "شروع اتصال تلگرام یا ایتا",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/preferences": {
+      "get": {
+        "operationId": "get_preferences_api_v1_notifications_preferences_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferencesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تنظیمات کانال",
+        "tags": [
+          "notifications"
+        ]
+      },
+      "put": {
+        "operationId": "put_preferences_api_v1_notifications_preferences_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencesIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferencesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ذخیرهٔ تنظیمات کانال",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "post": {
+        "operationId": "mark_all_read_api_v1_notifications_read_all_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadAllOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "همه را خوانده‌شده کن",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/stream": {
+      "get": {
+        "description": "رویدادها: `unread` با `{count}`، و `notification` با یک اعلان کامل.\n\nپس از ۱۰ دقیقه بسته می‌شود؛ کلاینت با توکن تازه دوباره وصل می‌شود.",
+        "operationId": "stream_api_v1_notifications_stream_get",
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {}
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جریان بی‌درنگ اعلان (SSE)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/unread-count": {
+      "get": {
+        "operationId": "unread_count_api_v1_notifications_unread_count_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "شمارندهٔ زنگوله",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{notification_id}/read": {
+      "post": {
+        "operationId": "mark_read_api_v1_notifications__notification_id__read_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "notification_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Notification Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "علامت خوانده‌شده",
+        "tags": [
+          "notifications"
         ]
       }
     },
@@ -13827,6 +17973,43 @@
         ]
       }
     },
+    "/api/v1/teach/dashboard": {
+      "get": {
+        "description": "فقط آنچه اقدام می‌خواهد (FR-DASH-02). کاربری که ارائه‌ای ندارد، صف‌های\nخالی می‌بیند — همان رفتار `GET /teach/offerings`.",
+        "operationId": "teach_dashboard_api_v1_teach_dashboard_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachDashboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "داشبورد استثنامحور",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
     "/api/v1/teach/enrollments/{enrollment_id}/decide": {
       "post": {
         "operationId": "decide_enrollment_api_v1_teach_enrollments__enrollment_id__decide_post",
@@ -14332,6 +18515,79 @@
           }
         ],
         "summary": "تعیین وزن‌های نمره",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/learning-scores": {
+      "get": {
+        "description": "§9.6 — «Learning Score یک پیشنهاد است، نه یک الزام.» این مسیر هیچ\nچیزی نمی‌نویسد؛ نمرهٔ نهایی با `PATCH /teach/enrollments/{id}/grade`.",
+        "operationId": "offering_learning_scores_api_v1_teach_offerings__offering_id__learning_scores_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LearningScoreOut"
+                  },
+                  "title": "Response Offering Learning Scores Api V1 Teach Offerings  Offering Id  Learning Scores Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "نمرهٔ یادگیری همهٔ دانشجویان — ستون پیشنهادی دفتر نمره",
         "tags": [
           "teaching"
         ]

@@ -134,7 +134,7 @@ async def backfill() -> int:
             "درخواست پذیرفته",
             accepted,
             lambda aid: point_listeners.on_application_accepted(
-                session, events.ApplicationAccepted(application_id=aid)
+                session, events.ApplicationDecided(application_id=aid, decision="ACCEPTED")
             ),
         )
 

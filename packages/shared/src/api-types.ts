@@ -4,6 +4,182 @@
  */
 
 export interface paths {
+    "/api/v1/admin/message-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** الگوهای پیام — FR-MSG-03 */
+        get: operations["templates_api_v1_admin_message_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/message-templates/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** پیش‌نمایش پیش از ذخیره */
+        post: operations["preview_template_api_v1_admin_message_templates_preview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/message-templates/{code}/{channel}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** ساخت یا ویرایش الگو */
+        put: operations["put_template_api_v1_admin_message_templates__code___channel__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** صف ارسال — §7.10 */
+        get: operations["outbox_api_v1_admin_outbox_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox/retry-dead": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** همهٔ پیام‌های DEAD به صف */
+        post: operations["retry_dead_api_v1_admin_outbox_retry_dead_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/outbox/{message_id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تلاش دوباره */
+        post: operations["retry_message_api_v1_admin_outbox__message_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/point-entries/{entry_id}/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** اصلاح یک ردیف امتیاز با رکورد معکوس */
+        post: operations["reverse_point_entry_api_v1_admin_point_entries__entry_id__reverse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/point-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** قواعد امتیاز */
+        get: operations["list_point_rules_api_v1_admin_point_rules_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/point-rules/recalculate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * بازمحاسبهٔ گذشته‌نگر
+         * @description §9.9 — معکوس و ثبت دوباره در یک تراکنش. **هیچ ردیفی پاک نمی‌شود.**
+         */
+        post: operations["recalculate_points_api_v1_admin_point_rules_recalculate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/point-rules/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * ویرایش قاعدهٔ امتیاز
+         * @description FR-GAM-02 — **گذشته‌نگر نیست.** برای اعمال به گذشته، بازمحاسبه.
+         */
+        patch: operations["update_point_rule_api_v1_admin_point_rules__code__patch"];
+        trace?: never;
+    };
     "/api/v1/applications/mine": {
         parameters: {
             query?: never;
@@ -470,6 +646,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * جدول رتبه‌بندی
+         * @description §9.7 — فقط ۱۰ نفر برتر، رتبهٔ خودت، و جدول رشد ۳۰ روزه.
+         *
+         *     رتبه‌بندی درس فقط برای دانشجویان همان درس و کادر آموزشی‌اش است؛ برای
+         *     بقیه ۴۰۴، نه ۴۰۳ (§6.4).
+         */
+        get: operations["leaderboard_api_v1_leaderboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/materials/tiers": {
         parameters: {
             query?: never;
@@ -526,6 +725,115 @@ export interface paths {
          * @description اطلاعات تماس پوشانده برمی‌گردد (NFR-01): `0912***4567`.
          */
         get: operations["get_me_api_v1_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/badges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * نشان‌های کسب‌شده و قفل‌شده
+         * @description قفل‌ها با شرط و پیشرفت — «این خودش یک راهنمای مسیر است» (§9.5).
+         */
+        get: operations["my_badges_api_v1_me_badges_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/badges/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** جشن نشان دیده شد */
+        post: operations["mark_badges_seen_api_v1_me_badges_seen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** داشبورد دانشجو */
+        get: operations["my_dashboard_api_v1_me_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/learning-score/{offering_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** نمرهٔ یادگیری من در یک درس */
+        get: operations["my_learning_score_api_v1_me_learning_score__offering_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/points": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * دفتر کل امتیاز شخصی
+         * @description تازه‌ترین اول، کرسری. فیلتر `source_*` همان پیوند «این امتیاز از کجا
+         *     آمد» است (§9.10 شفافیت).
+         */
+        get: operations["my_points_api_v1_me_points_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/points/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** امتیاز کل، سطح و امتیاز نیم‌سال */
+        get: operations["my_points_summary_api_v1_me_points_summary_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -672,6 +980,165 @@ export interface paths {
          * @description §7.6 — هر ارسال یک نسخهٔ تازه است؛ نسخهٔ قبلی دست‌نخورده می‌ماند.
          */
         post: operations["submit_deliverable_api_v1_milestones__milestone_id__deliverables_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** فهرست اعلان‌ها (کرسری) */
+        get: operations["feed_api_v1_notifications_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/channels/{channel}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** قطع اتصال پیام‌رسان */
+        delete: operations["unlink_api_v1_notifications_channels__channel__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/channels/{channel}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تأیید اتصال ایتا با کد */
+        post: operations["confirm_link_api_v1_notifications_channels__channel__confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/channels/{channel}/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** شروع اتصال تلگرام یا ایتا */
+        post: operations["start_link_api_v1_notifications_channels__channel__link_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** تنظیمات کانال */
+        get: operations["get_preferences_api_v1_notifications_preferences_get"];
+        /** ذخیرهٔ تنظیمات کانال */
+        put: operations["put_preferences_api_v1_notifications_preferences_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** همه را خوانده‌شده کن */
+        post: operations["mark_all_read_api_v1_notifications_read_all_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * جریان بی‌درنگ اعلان (SSE)
+         * @description رویدادها: `unread` با `{count}`، و `notification` با یک اعلان کامل.
+         *
+         *     پس از ۱۰ دقیقه بسته می‌شود؛ کلاینت با توکن تازه دوباره وصل می‌شود.
+         */
+        get: operations["stream_api_v1_notifications_stream_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** شمارندهٔ زنگوله */
+        get: operations["unread_count_api_v1_notifications_unread_count_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{notification_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** علامت خوانده‌شده */
+        post: operations["mark_read_api_v1_notifications__notification_id__read_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1541,6 +2008,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teach/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * داشبورد استثنامحور
+         * @description فقط آنچه اقدام می‌خواهد (FR-DASH-02). کاربری که ارائه‌ای ندارد، صف‌های
+         *     خالی می‌بیند — همان رفتار `GET /teach/offerings`.
+         */
+        get: operations["teach_dashboard_api_v1_teach_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teach/enrollments/{enrollment_id}/decide": {
         parameters: {
             query?: never;
@@ -1676,6 +2164,27 @@ export interface paths {
         get?: never;
         /** تعیین وزن‌های نمره */
         put: operations["set_grading_policy_api_v1_teach_offerings__offering_id__grading_policy_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/learning-scores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * نمرهٔ یادگیری همهٔ دانشجویان — ستون پیشنهادی دفتر نمره
+         * @description §9.6 — «Learning Score یک پیشنهاد است، نه یک الزام.» این مسیر هیچ
+         *     چیزی نمی‌نویسد؛ نمرهٔ نهایی با `PATCH /teach/enrollments/{id}/grade`.
+         */
+        get: operations["offering_learning_scores_api_v1_teach_offerings__offering_id__learning_scores_get"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -2588,6 +3097,56 @@ export interface components {
             /** Username */
             username?: string | null;
         };
+        /** BadgeOut */
+        BadgeOut: {
+            /** Awarded At */
+            awarded_at?: string | null;
+            /** Code */
+            code: string;
+            /** Description */
+            description: string;
+            /** Earned */
+            earned: boolean;
+            /** Icon */
+            icon: string;
+            /** Progress Current */
+            progress_current: string;
+            /** Progress Ratio */
+            progress_ratio: string;
+            /** Progress Target */
+            progress_target: string;
+            /**
+             * Seen
+             * @default true
+             */
+            seen: boolean;
+            /**
+             * Tier
+             * @enum {string}
+             */
+            tier: "BRONZE" | "SILVER" | "GOLD" | "PLATINUM";
+            /** Tier Fa */
+            tier_fa: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** BadgesOut */
+        BadgesOut: {
+            /** Earned */
+            earned: components["schemas"]["BadgeOut"][];
+            /** Locked */
+            locked: components["schemas"]["BadgeOut"][];
+        };
+        /** BadgesSeenIn */
+        BadgesSeenIn: {
+            /** Codes */
+            codes?: string[] | null;
+        };
+        /** BadgesSeenOut */
+        BadgesSeenOut: {
+            /** Updated */
+            updated: number;
+        };
         /** BankItemIn */
         BankItemIn: {
             /** Body */
@@ -2651,6 +3210,61 @@ export interface components {
             /** Time */
             time: number;
         };
+        /** ChannelConfirmIn */
+        ChannelConfirmIn: {
+            /** Code */
+            code: string;
+        };
+        /** ChannelLinkIn */
+        ChannelLinkIn: {
+            /** Address */
+            address?: string | null;
+        };
+        /** ChannelLinkOut */
+        ChannelLinkOut: {
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "TELEGRAM" | "EITAA";
+            /** Deep Link */
+            deep_link?: string | null;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Flow
+             * @enum {string}
+             */
+            flow: "DEEP_LINK" | "CODE";
+        };
+        /** ChannelStatusOut */
+        ChannelStatusOut: {
+            /** Address Masked */
+            address_masked?: string | null;
+            /** Available */
+            available: boolean;
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            /** Link Flow */
+            link_flow?: ("DEEP_LINK" | "CODE") | null;
+            /** Linked */
+            linked: boolean;
+            /**
+             * Pending Link
+             * @default false
+             */
+            pending_link: boolean;
+            /** Requires Link */
+            requires_link: boolean;
+            /** Title Fa */
+            title_fa: string;
+        };
         /** CompleteProjectIn */
         CompleteProjectIn: {
             /** Final Report */
@@ -2678,6 +3292,24 @@ export interface components {
         CopyResultOut: {
             /** Weeks Copied */
             weeks_copied: number;
+        };
+        /** CourseCardOut */
+        CourseCardOut: {
+            /** Course Title Fa */
+            course_title_fa: string;
+            /** Current Week Number */
+            current_week_number?: number | null;
+            /** Learning Score */
+            learning_score?: string | null;
+            /**
+             * Offering Id
+             * Format: uuid
+             */
+            offering_id: string;
+            /** Study Ratio */
+            study_ratio?: string | null;
+            /** Term Title Fa */
+            term_title_fa: string;
         };
         /**
          * CourseDetailOut
@@ -3037,6 +3669,20 @@ export interface components {
             /** Rubric */
             rubric?: string | null;
         };
+        /** GroupPreferenceOut */
+        GroupPreferenceOut: {
+            /** Channels */
+            channels: ("IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP")[];
+            /** Description Fa */
+            description_fa: string;
+            /**
+             * Group
+             * @enum {string}
+             */
+            group: "COURSE" | "PROJECT" | "SOCIAL" | "SYSTEM";
+            /** Title Fa */
+            title_fa: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -3107,6 +3753,91 @@ export interface components {
             /** Interests */
             interests: components["schemas"]["InterestAnswerIn"][];
         };
+        /** LeaderRowOut */
+        LeaderRowOut: {
+            /**
+             * Is Me
+             * @default false
+             */
+            is_me: boolean;
+            /** Level */
+            level: number;
+            /** Rank */
+            rank: number;
+            /** Total */
+            total: string;
+            user: components["schemas"]["LeaderUserOut"];
+        };
+        /** LeaderUserOut */
+        LeaderUserOut: {
+            /** Display Name */
+            display_name?: string | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Username */
+            username?: string | null;
+        };
+        /** LeaderboardOut */
+        LeaderboardOut: {
+            /** Category */
+            category?: ("LEARNING" | "RESEARCH" | "STARTUP" | "COMMUNITY") | null;
+            /** Entries */
+            entries: components["schemas"]["LeaderRowOut"][];
+            /** Growth */
+            growth: components["schemas"]["LeaderRowOut"][];
+            me: components["schemas"]["MyStandingOut"];
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "GLOBAL" | "OFFERING" | "UNIVERSITY";
+            /** Scope Id */
+            scope_id?: string | null;
+            /** Term Title Fa */
+            term_title_fa?: string | null;
+        };
+        /** LearningComponentOut */
+        LearningComponentOut: {
+            /** Earned */
+            earned: string;
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "quiz" | "study" | "project" | "attendance";
+            /** Possible */
+            possible: string;
+            /** Ratio */
+            ratio?: string | null;
+            /** Title Fa */
+            title_fa: string;
+            /** Weight */
+            weight: string;
+        };
+        /** LearningScoreOut */
+        LearningScoreOut: {
+            /** Components */
+            components: components["schemas"]["LearningComponentOut"][];
+            /** Display Name */
+            display_name?: string | null;
+            /**
+             * Offering Id
+             * Format: uuid
+             */
+            offering_id: string;
+            /** Score */
+            score?: string | null;
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Suggested Grade */
+            suggested_grade?: string | null;
+        };
         /**
          * LevelLabel
          * @description متن توصیفی هر سطح — FR-PROF-01.
@@ -3119,6 +3850,21 @@ export interface components {
             label: string;
             /** Level */
             level: number;
+        };
+        /** LevelOut */
+        LevelOut: {
+            /** Current At */
+            current_at: number;
+            /** Level */
+            level: number;
+            /** Next At */
+            next_at?: number | null;
+            /** Ratio */
+            ratio: string;
+            /** Title Fa */
+            title_fa: string;
+            /** To Next */
+            to_next: string;
         };
         /** LinkMaterialIn */
         LinkMaterialIn: {
@@ -3246,10 +3992,9 @@ export interface components {
         };
         /**
          * MeOut
-         * @description §5.3 `GET /me` — نسخهٔ M1.
+         * @description §5.3 `GET /me`.
          *
-         *     امتیاز (M5) و شمارندهٔ اعلان (M6) بعداً افزوده می‌شوند. آنچه هست، همان
-         *     شکل نهایی را دارد تا کلاینت بعداً بازنویسی نشود.
+         *     امتیاز از M5 و شمارندهٔ اعلان از M6 است.
          */
         MeOut: {
             /** Email */
@@ -3272,11 +4017,29 @@ export interface components {
              */
             mobile_verified: boolean;
             onboarding: components["schemas"]["OnboardingOut"];
+            points?: components["schemas"]["MePointsOut"] | null;
             profile?: components["schemas"]["ProfileOut"] | null;
             /** Roles */
             roles: components["schemas"]["RoleGrantOut"][];
+            /**
+             * Unread Notifications
+             * @default 0
+             */
+            unread_notifications: number;
             /** Username */
             username?: string | null;
+        };
+        /**
+         * MePointsOut
+         * @description خلاصهٔ امتیاز در پاسخ `GET /me` — §5.3.
+         */
+        MePointsOut: {
+            /** Level */
+            level: number;
+            /** Next Level At */
+            next_level_at?: number | null;
+            /** Total */
+            total: string;
         };
         /** MessageIn */
         MessageIn: {
@@ -3389,6 +4152,24 @@ export interface components {
             /** Title Fa */
             title_fa: string;
         };
+        /** MyStandingOut */
+        MyStandingOut: {
+            /** Excluded Reason */
+            excluded_reason?: ("OPTED_OUT" | "STAFF") | null;
+            /**
+             * Hidden
+             * @default false
+             */
+            hidden: boolean;
+            /** Level */
+            level: number;
+            /** Percentile */
+            percentile?: number | null;
+            /** Rank */
+            rank?: number | null;
+            /** Total */
+            total: string;
+        };
         /**
          * MySubscriptionsOut
          * @description وضعیت اشتراک کاربر — همان چیزی که صفحهٔ «اشتراک من» می‌خواهد.
@@ -3400,6 +4181,74 @@ export interface components {
             has_active: boolean;
             /** Items */
             items?: components["schemas"]["SubscriptionOut"][];
+        };
+        /** NeedsAttentionOut */
+        NeedsAttentionOut: {
+            deliverables_pending: components["schemas"]["QueueOut"];
+            enrollment_requests: components["schemas"]["QueueOut"];
+            essays_pending: components["schemas"]["QueueOut"];
+            grade_appeals: components["schemas"]["QueueOut"];
+            /** Projects At Risk */
+            projects_at_risk: components["schemas"]["ProjectAtRiskOut"][];
+            /** Students At Risk */
+            students_at_risk: components["schemas"]["StudentAtRiskOut"][];
+        };
+        /** NextStepOut */
+        NextStepOut: {
+            /** Description */
+            description: string;
+            /** Due At */
+            due_at?: string | null;
+            /** Href */
+            href: string;
+            /** Kind */
+            kind: string;
+            /** Title */
+            title: string;
+        };
+        /** NotificationFeedOut */
+        NotificationFeedOut: {
+            /** Items */
+            items: components["schemas"]["NotificationOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /** NotificationOut */
+        NotificationOut: {
+            /** Action Url */
+            action_url?: string | null;
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Group
+             * @enum {string}
+             */
+            group: "COURSE" | "PROJECT" | "SOCIAL" | "SYSTEM";
+            /** Group Fa */
+            group_fa: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Read */
+            is_read: boolean;
+            /** Kind */
+            kind: string;
+            /**
+             * Priority
+             * @enum {string}
+             */
+            priority: "LOW" | "NORMAL" | "IMPORTANT" | "URGENT";
+            /** Read At */
+            read_at?: string | null;
+            /** Title */
+            title: string;
         };
         /**
          * OTPRequestIn
@@ -3537,6 +4386,26 @@ export interface components {
             /** Term Title Fa */
             term_title_fa: string;
         };
+        /** OfferingStatsOut */
+        OfferingStatsOut: {
+            /** Avg Learning Score */
+            avg_learning_score?: string | null;
+            /** Avg Progress */
+            avg_progress?: string | null;
+            /** Avg Quiz Score */
+            avg_quiz_score?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Students */
+            students: number;
+            /** Title Fa */
+            title_fa: string;
+        };
         /** OfferingSummaryOut */
         OfferingSummaryOut: {
             /**
@@ -3603,6 +4472,72 @@ export interface components {
             state: "BASIC_INFO_REQUIRED" | "SURVEY_REQUIRED" | "SURVEY_INCOMPLETE" | "COMPLETE";
             /** Total Steps */
             total_steps: number;
+        };
+        /** OutboxMessageOut */
+        OutboxMessageOut: {
+            /** Attempts */
+            attempts: number;
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Last Error */
+            last_error?: string | null;
+            /**
+             * Next Attempt At
+             * Format: date-time
+             */
+            next_attempt_at: string;
+            /** Notification Id */
+            notification_id?: string | null;
+            /**
+             * Priority
+             * @enum {string}
+             */
+            priority: "LOW" | "NORMAL" | "IMPORTANT" | "URGENT";
+            /** Recipient Masked */
+            recipient_masked: string;
+            /** Sent At */
+            sent_at?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "QUEUED" | "SENDING" | "SENT" | "FAILED" | "DEAD";
+            /** Status Fa */
+            status_fa: string;
+            /** Template */
+            template: string;
+            /** User Id */
+            user_id?: string | null;
+        };
+        /** OutboxPageOut */
+        OutboxPageOut: {
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /** Has Next */
+            has_next: boolean;
+            /** Items */
+            items: components["schemas"]["OutboxMessageOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
         };
         /** Page[CourseSummaryOut] */
         Page_CourseSummaryOut_: {
@@ -3708,6 +4643,145 @@ export interface components {
             /** Title Fa */
             title_fa: string;
         };
+        /** PointEntryOut */
+        PointEntryOut: {
+            /** Amount */
+            amount: string;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "LEARNING" | "RESEARCH" | "STARTUP" | "COMMUNITY";
+            /** Category Fa */
+            category_fa: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Reversed
+             * @default false
+             */
+            is_reversed: boolean;
+            /** Note */
+            note?: string | null;
+            /** Reverses Id */
+            reverses_id?: string | null;
+            /** Rule Code */
+            rule_code: string;
+            /** Rule Title Fa */
+            rule_title_fa: string;
+            /** Source Href */
+            source_href?: string | null;
+            /** Source Id */
+            source_id?: string | null;
+            /** Source Label */
+            source_label?: string | null;
+            /** Source Type */
+            source_type: string;
+            /** Source Type Fa */
+            source_type_fa?: string | null;
+        };
+        /** PointLedgerOut */
+        PointLedgerOut: {
+            /** Items */
+            items: components["schemas"]["PointEntryOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /** PointRuleOut */
+        PointRuleOut: {
+            /** Base Points */
+            base_points: string;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "LEARNING" | "RESEARCH" | "STARTUP" | "COMMUNITY";
+            /** Code */
+            code: string;
+            /** Daily Cap */
+            daily_cap?: number | null;
+            /** Formula */
+            formula?: string | null;
+            /** Is Active */
+            is_active: boolean;
+            /** Term Cap */
+            term_cap?: number | null;
+            /** Title Fa */
+            title_fa: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Weekly Cap */
+            weekly_cap?: number | null;
+        };
+        /**
+         * PointRuleUpdateIn
+         * @description `PATCH` جزئی. **گذشته‌نگر نیست** — برای بازنویسی گذشته، بازمحاسبه.
+         */
+        PointRuleUpdateIn: {
+            /** Base Points */
+            base_points?: number | string | null;
+            /** Clear Caps */
+            clear_caps?: ("daily_cap" | "weekly_cap" | "term_cap")[];
+            /** Daily Cap */
+            daily_cap?: number | null;
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Term Cap */
+            term_cap?: number | null;
+            /** Title Fa */
+            title_fa?: string | null;
+            /** Weekly Cap */
+            weekly_cap?: number | null;
+        };
+        /** PointsSummaryOut */
+        PointsSummaryOut: {
+            /** By Category */
+            by_category: {
+                [key: string]: string;
+            };
+            /** Latest Entry Id */
+            latest_entry_id?: string | null;
+            level: components["schemas"]["LevelOut"];
+            /** Recent */
+            recent?: components["schemas"]["PointEntryOut"][];
+            /** Term By Category */
+            term_by_category: {
+                [key: string]: string;
+            };
+            /** Term Total */
+            term_total: string;
+            /** Total */
+            total: string;
+        };
+        /** PreferencesIn */
+        PreferencesIn: {
+            /**
+             * Groups
+             * @description دسته ⇒ کانال‌ها. «داخل سامانه» همیشه افزوده می‌شود.
+             */
+            groups: {
+                [key: string]: ("IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP")[];
+            };
+        };
+        /** PreferencesOut */
+        PreferencesOut: {
+            /** Channels */
+            channels: components["schemas"]["ChannelStatusOut"][];
+            /** Groups */
+            groups: components["schemas"]["GroupPreferenceOut"][];
+            quiet_hours: components["schemas"]["QuietHoursOut"];
+        };
         /** PreferencesStepIn */
         PreferencesStepIn: {
             /** Primary Goal */
@@ -3795,6 +4869,56 @@ export interface components {
             percent?: number | null;
             /** Position Sec */
             position_sec?: number | null;
+        };
+        /** ProjectAtRiskOut */
+        ProjectAtRiskOut: {
+            /** Days Inactive */
+            days_inactive: number;
+            /**
+             * Health
+             * @enum {string}
+             */
+            health: "HEALTHY" | "AT_RISK" | "STALLED";
+            /** Health Fa */
+            health_fa: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** ProjectCardOut */
+        ProjectCardOut: {
+            /** Approved Milestones */
+            approved_milestones: number;
+            /**
+             * Health
+             * @enum {string}
+             */
+            health: "HEALTHY" | "AT_RISK" | "STALLED";
+            /** Health Fa */
+            health_fa: string;
+            /** Kind */
+            kind: string;
+            /** Next Milestone Due On */
+            next_milestone_due_on?: string | null;
+            /** Next Milestone Status */
+            next_milestone_status?: string | null;
+            /** Next Milestone Title */
+            next_milestone_title?: string | null;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Required Milestones */
+            required_milestones: number;
+            /** Status */
+            status: string;
+            /** Title Fa */
+            title_fa: string;
         };
         /** ProjectDetailOut */
         ProjectDetailOut: {
@@ -4109,6 +5233,20 @@ export interface components {
              */
             question_id: string;
         };
+        /** QueueOut */
+        QueueOut: {
+            /** Count */
+            count: number;
+            /** Oldest Days */
+            oldest_days?: number | null;
+        };
+        /** QuietHoursOut */
+        QuietHoursOut: {
+            /** End */
+            end: number;
+            /** Start */
+            start: number;
+        };
         /**
          * QuizDetailOut
          * @description آزمون از دید استاد — با سؤال‌ها و کلید پاسخ.
@@ -4282,6 +5420,11 @@ export interface components {
             /** Week Number */
             week_number?: number | null;
         };
+        /** ReadAllOut */
+        ReadAllOut: {
+            /** Updated */
+            updated: number;
+        };
         /**
          * ReasonIn
          * @description بدنهٔ اقدام‌هایی که سند برایشان «با ذکر دلیل» نوشته است — §7.4.
@@ -4306,6 +5449,26 @@ export interface components {
             text: string;
             /** Type */
             type: string;
+        };
+        /** RecalculateIn */
+        RecalculateIn: {
+            /** Rule Code */
+            rule_code: string;
+            /** Since */
+            since?: string | null;
+            /** Until */
+            until?: string | null;
+        };
+        /** RecalculateOut */
+        RecalculateOut: {
+            /** Reawarded */
+            reawarded: number;
+            /** Reversed */
+            reversed: number;
+            /** Rule Code */
+            rule_code: string;
+            /** Users */
+            users: number;
         };
         /** RecommendationFeedbackIn */
         RecommendationFeedbackIn: {
@@ -4472,6 +5635,16 @@ export interface components {
             review?: components["schemas"]["QuestionReviewOut"] | null;
             /** Score */
             score?: string | null;
+        };
+        /** RetriedOut */
+        RetriedOut: {
+            /** Retried */
+            retried: number;
+        };
+        /** ReverseEntryIn */
+        ReverseEntryIn: {
+            /** Reason */
+            reason: string;
         };
         /** ReviewIn */
         ReviewIn: {
@@ -4670,6 +5843,40 @@ export interface components {
         SkillsStepIn: {
             /** Skills */
             skills: components["schemas"]["SkillAnswerIn"][];
+        };
+        /** StudentAtRiskOut */
+        StudentAtRiskOut: {
+            /** Course Title Fa */
+            course_title_fa: string;
+            /** Display Name */
+            display_name?: string | null;
+            /**
+             * Offering Id
+             * Format: uuid
+             */
+            offering_id: string;
+            /** Reason */
+            reason: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /** StudentDashboardOut */
+        StudentDashboardOut: {
+            /** Courses */
+            courses: components["schemas"]["CourseCardOut"][];
+            next_step?: components["schemas"]["NextStepOut"] | null;
+            points: components["schemas"]["PointsSummaryOut"];
+            /** Projects */
+            projects: components["schemas"]["ProjectCardOut"][];
+            /** Recent Badges */
+            recent_badges: components["schemas"]["BadgeOut"][];
+            /** Trend */
+            trend: components["schemas"]["TrendPointOut"][];
+            /** Upcoming */
+            upcoming: components["schemas"]["UpcomingEventOut"][];
         };
         /** SubmitIn */
         SubmitIn: {
@@ -4946,6 +6153,12 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** TeachDashboardOut */
+        TeachDashboardOut: {
+            needs_attention: components["schemas"]["NeedsAttentionOut"];
+            /** Offerings */
+            offerings: components["schemas"]["OfferingStatsOut"][];
+        };
         /** TeamMemberOut */
         TeamMemberOut: {
             /** Full Name */
@@ -5001,6 +6214,72 @@ export interface components {
              */
             project_id: string;
         };
+        /** TemplateOut */
+        TemplateOut: {
+            /** Body */
+            body: string;
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            /** Code */
+            code: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Kind Title Fa */
+            kind_title_fa?: string | null;
+            /** Subject */
+            subject?: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Variables */
+            variables: string[];
+        };
+        /** TemplatePreviewIn */
+        TemplatePreviewIn: {
+            /** Body */
+            body: string;
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            /** Code */
+            code: string;
+            /** Subject */
+            subject?: string | null;
+            /** Values */
+            values?: {
+                [key: string]: string;
+            };
+        };
+        /** TemplatePreviewOut */
+        TemplatePreviewOut: {
+            /** Body */
+            body: string;
+            /** Length */
+            length: number;
+            /** Sms Parts */
+            sms_parts?: number | null;
+            /** Subject */
+            subject?: string | null;
+        };
+        /** TemplateUpdateIn */
+        TemplateUpdateIn: {
+            /** Body */
+            body: string;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /** Subject */
+            subject?: string | null;
+        };
         /** TokenPairOut */
         TokenPairOut: {
             /** Access Token */
@@ -5014,6 +6293,16 @@ export interface components {
              * @default Bearer
              */
             token_type: string;
+        };
+        /** TrendPointOut */
+        TrendPointOut: {
+            /** Total */
+            total: string;
+            /**
+             * Week Start
+             * Format: date
+             */
+            week_start: string;
         };
         /** UniversityOut */
         UniversityOut: {
@@ -5042,6 +6331,28 @@ export interface components {
             id: string;
             /** Title Fa */
             title_fa: string;
+        };
+        /** UnreadCountOut */
+        UnreadCountOut: {
+            /** Count */
+            count: number;
+        };
+        /** UpcomingEventOut */
+        UpcomingEventOut: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Href */
+            href: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "QUIZ_OPENS" | "QUIZ_CLOSES" | "MILESTONE_DUE";
+            /** Title */
+            title: string;
         };
         /** UploadUrlIn */
         UploadUrlIn: {
@@ -5208,6 +6519,468 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    templates_api_v1_admin_message_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateOut"][];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    preview_template_api_v1_admin_message_templates_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplatePreviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplatePreviewOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_template_api_v1_admin_message_templates__code___channel__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+                channel: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    outbox_api_v1_admin_outbox_get: {
+        parameters: {
+            query?: {
+                status?: ("QUEUED" | "SENDING" | "SENT" | "FAILED" | "DEAD") | null;
+                channel?: string | null;
+                user_id?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutboxPageOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_dead_api_v1_admin_outbox_retry_dead_post: {
+        parameters: {
+            query?: {
+                channel?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RetriedOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_message_api_v1_admin_outbox__message_id__retry_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutboxMessageOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reverse_point_entry_api_v1_admin_point_entries__entry_id__reverse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReverseEntryIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PointEntryOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_point_rules_api_v1_admin_point_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PointRuleOut"][];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    recalculate_points_api_v1_admin_point_rules_recalculate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecalculateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecalculateOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_point_rule_api_v1_admin_point_rules__code__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PointRuleUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PointRuleOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     my_applications_api_v1_applications_mine_get: {
         parameters: {
             query?: never;
@@ -6326,6 +8099,58 @@ export interface operations {
             };
         };
     };
+    leaderboard_api_v1_leaderboard_get: {
+        parameters: {
+            query?: {
+                scope?: string;
+                scope_id?: string | null;
+                category?: ("LEARNING" | "RESEARCH" | "STARTUP" | "COMMUNITY") | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaderboardOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     access_tiers_api_v1_materials_tiers_get: {
         parameters: {
             query?: never;
@@ -6422,6 +8247,228 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    my_badges_api_v1_me_badges_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BadgesOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    mark_badges_seen_api_v1_me_badges_seen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BadgesSeenIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BadgesSeenOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_dashboard_api_v1_me_dashboard_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentDashboardOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    my_learning_score_api_v1_me_learning_score__offering_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningScoreOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_points_api_v1_me_points_get: {
+        parameters: {
+            query?: {
+                category?: ("LEARNING" | "RESEARCH" | "STARTUP" | "COMMUNITY") | null;
+                source_type?: string | null;
+                source_id?: string | null;
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PointLedgerOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_points_summary_api_v1_me_points_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PointsSummaryOut"];
                 };
             };
             /** @description احراز هویت نشده */
@@ -6849,6 +8896,373 @@ export interface operations {
             };
             /** @description MILESTONE_NOT_OPEN */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    feed_api_v1_notifications_get: {
+        parameters: {
+            query?: {
+                cursor?: string | null;
+                limit?: number;
+                unread_only?: boolean;
+                group?: ("COURSE" | "PROJECT" | "SOCIAL" | "SYSTEM") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationFeedOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unlink_api_v1_notifications_channels__channel__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                channel: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirm_link_api_v1_notifications_channels__channel__confirm_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                channel: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChannelConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_link_api_v1_notifications_channels__channel__link_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                channel: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChannelLinkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelLinkOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_preferences_api_v1_notifications_preferences_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    put_preferences_api_v1_notifications_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreferencesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_all_read_api_v1_notifications_read_all_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReadAllOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    stream_api_v1_notifications_stream_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    unread_count_api_v1_notifications_unread_count_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadCountOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    mark_read_api_v1_notifications__notification_id__read_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                notification_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -9061,6 +11475,35 @@ export interface operations {
             };
         };
     };
+    teach_dashboard_api_v1_teach_dashboard_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeachDashboardOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     decide_enrollment_api_v1_teach_enrollments__enrollment_id__decide_post: {
         parameters: {
             query?: never;
@@ -9385,6 +11828,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    offering_learning_scores_api_v1_teach_offerings__offering_id__learning_scores_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningScoreOut"][];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

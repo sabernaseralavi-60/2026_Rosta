@@ -36,6 +36,7 @@ from silp.core.exceptions import (
 from silp.core.logging import get_logger
 from silp.domain.quiz import appeal_window_open
 from silp.models.quiz import GradeAppeal, Quiz, QuizAttempt, QuizQuestion
+from silp.services import events
 from silp.services.grading_service import GradingService
 
 log = get_logger("silp.appeal")
@@ -172,6 +173,7 @@ class AppealService:
         appeal.response = cleaned
         appeal.resolved_by = resolver_id
         appeal.resolved_at = datetime.now(UTC)
+        await events.publish(self.session, events.AppealResolved(appeal_id=appeal.id))
         await self.session.commit()
         await self.session.refresh(appeal)
 

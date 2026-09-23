@@ -55,6 +55,7 @@ from silp.models.delivery import Deliverable
 from silp.models.gamification import POINT_CATEGORIES, Badge, PointEntry, UserBadge
 from silp.models.identity import User
 from silp.models.project import Project, ProjectApplication, TeamMember
+from silp.services import events
 
 log = get_logger("silp.badges")
 
@@ -197,6 +198,9 @@ class BadgeService:
             )
             if inserted is not None:
                 awarded.append(inserted)
+                await events.publish(
+                    self.session, events.BadgeAwarded(user_id=user_id, badge_code=inserted)
+                )
         if awarded:
             log.info("badges_awarded", user_id=str(user_id), badges=awarded)
         return awarded

@@ -134,6 +134,7 @@ class ApplicationService:
                 status="PENDING",
             )
             self.session.add(application)
+            await self.session.flush()
 
         await self.projects.record_activity(
             project,
@@ -142,6 +143,9 @@ class ApplicationService:
             "یک درخواست پیوستن تازه رسید.",
             entity_type="application",
             commit=False,
+        )
+        await events.publish(
+            self.session, events.ApplicationSubmitted(application_id=application.id)
         )
         await self.session.commit()
         log.info("application_submitted", project_id=str(project.id), applicant=str(actor.id))
@@ -211,10 +215,10 @@ class ApplicationService:
         application.decision_note = (note or "").strip() or None
         application.decided_by = actor.id
         application.decided_at = _now()
-        if decision == "ACCEPTED":
-            await events.publish(
-                self.session, events.ApplicationAccepted(application_id=application.id)
-            )
+        await events.publish(
+            self.session,
+            events.ApplicationDecided(application_id=application.id, decision=decision),
+        )
         await self.session.commit()
 
         if decision == "ACCEPTED":

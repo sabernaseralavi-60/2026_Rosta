@@ -39,8 +39,12 @@ from silp.core.logging import get_logger
 
 log = get_logger("silp.events")
 
-#: ماژول‌هایی که شنونده ثبت می‌کنند. M6 شنوندهٔ اعلان را اینجا می‌افزاید.
-LISTENER_MODULES: tuple[str, ...] = ("silp.services.point_listeners",)
+#: ماژول‌هایی که شنونده ثبت می‌کنند. ترتیب مهم است: اعلان پس از امتیاز
+#: اجرا می‌شود تا «… و ۵۰ امتیاز گرفتی» امتیاز همین رویداد را ببیند.
+LISTENER_MODULES: tuple[str, ...] = (
+    "silp.services.point_listeners",
+    "silp.services.notification_listeners",
+)
 
 #: خطای شنونده بالا بیاید؟ فقط در تست روشن می‌شود.
 STRICT = False
@@ -58,6 +62,9 @@ class QuizGraded:
     """نمرهٔ یک تلاش ثبت یا عوض شد — تصحیح خودکار، دستی، اعتراض، یا ابطال."""
 
     attempt_id: uuid.UUID
+    #: تصحیح به دست استاد (تشریحی، نهایی کردن) — فقط این به دانشجو اعلان
+    #: می‌شود؛ نتیجهٔ تصحیح خودکار را دانشجو همان لحظه روی صفحه می‌بیند.
+    manual: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,8 +84,21 @@ class EnrollmentCompleted:
 
 
 @dataclass(frozen=True, slots=True)
-class ApplicationAccepted:
+class ApplicationSubmitted:
     application_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class ApplicationDecided:
+    """پذیرش، رد یا فهرست انتظار — §7.13. تا M5 فقط پذیرش رویداد داشت."""
+
+    application_id: uuid.UUID
+    decision: str
+
+
+@dataclass(frozen=True, slots=True)
+class DeliverableSubmitted:
+    deliverable_id: uuid.UUID
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,6 +117,66 @@ class ProjectCompleted:
 class SurveyStepCompleted:
     user_id: uuid.UUID
     completed_steps: int
+
+
+# ── از M6 — فقط شنوندهٔ اعلان دارند ─────────────────────────────────────
+@dataclass(frozen=True, slots=True)
+class UserRegistered:
+    user_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class SessionsRevoked:
+    """FR-AUTH-03 — استفادهٔ دوباره از توکن باطل‌شده؛ همهٔ نشست‌ها بسته شد."""
+
+    user_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class EnrollmentRequested:
+    """ثبت‌نامی که تأیید استاد می‌خواهد (`PENDING`)."""
+
+    enrollment_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class EnrollmentDecided:
+    enrollment_id: uuid.UUID
+    approved: bool
+
+
+@dataclass(frozen=True, slots=True)
+class WeekPublished:
+    week_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class QuizPublished:
+    quiz_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class AppealResolved:
+    appeal_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class AnnouncementPublished:
+    announcement_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class BadgeAwarded:
+    user_id: uuid.UUID
+    badge_code: str
+
+
+@dataclass(frozen=True, slots=True)
+class ProjectStalled:
+    """شاخص سلامت تازه به `STALLED` رسید — FR-PRJ-07."""
+
+    project_id: uuid.UUID
+    days_inactive: int
 
 
 # ── ناظر ───────────────────────────────────────────────────────────────
@@ -142,15 +222,27 @@ async def publish(session: AsyncSession, event: object) -> None:
 
 
 __all__ = [
-    "ApplicationAccepted",
+    "AnnouncementPublished",
+    "AppealResolved",
+    "ApplicationDecided",
+    "ApplicationSubmitted",
     "AttendanceRecorded",
+    "BadgeAwarded",
     "DeliverableReviewed",
+    "DeliverableSubmitted",
     "EnrollmentCompleted",
+    "EnrollmentDecided",
+    "EnrollmentRequested",
     "ProjectCompleted",
+    "ProjectStalled",
     "QuizGraded",
+    "QuizPublished",
     "QuizResultsPublished",
     "ResourceCompleted",
+    "SessionsRevoked",
     "SurveyStepCompleted",
+    "UserRegistered",
+    "WeekPublished",
     "publish",
     "subscribe",
 ]
