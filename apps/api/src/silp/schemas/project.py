@@ -221,6 +221,9 @@ class ProjectIn(BaseModel):
     )
     interests: Annotated[list[uuid.UUID], Field(max_length=20)] = Field(default_factory=list)
     roles: Annotated[list[ProjectRoleIn], Field(max_length=20)] = Field(default_factory=list)
+    # پروژهٔ یک کسب‌وکار (§7.7). فقط هنگام ساخت خوانده می‌شود؛ پیوند
+    # پروژه به کسب‌وکار پس از ساخت عوض نمی‌شود، مثل `kind`.
+    venture_id: uuid.UUID | None = None
 
 
 class ReasonIn(BaseModel):

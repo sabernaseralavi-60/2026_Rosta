@@ -150,6 +150,13 @@ class Permission(StrEnum):
     OUTBOX_RETRY = "message.outbox.retry"
     MESSAGE_TEMPLATE_EDIT = "message.template.edit"
 
+    # ── ایده و کارآفرینی (M7) ──────────────────────────────────────────
+    IDEA_PROMOTE = "idea.promote"
+    IDEA_MODERATE = "idea.moderate"
+    VENTURE_MANAGE = "venture.manage"
+    VENTURE_METRIC_VERIFY = "venture.metric.verify"
+    PROJECT_METRIC_VERIFY = "project.metric.verify"
+
 
 _SELF_SERVICE_ROLES: frozenset[Role] = frozenset(
     {
@@ -248,6 +255,24 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     Permission.OUTBOX_VIEW: frozenset({Role.SUPPORT, Role.ADMIN}),
     Permission.OUTBOX_RETRY: frozenset({Role.ADMIN}),
     Permission.MESSAGE_TEMPLATE_EDIT: frozenset({Role.ADMIN}),
+    # ایده — FR-IDEA-03 «استاد یا مدیر می‌تواند ارتقا دهد». استاد اینجا
+    # قلمرو ندارد: ایده به هیچ ارائه‌ای تعلق ندارد و هر استادی که ارائه‌ای
+    # دارد، داور ایده هم هست.
+    Permission.IDEA_PROMOTE: frozenset({Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}),
+    Permission.IDEA_MODERATE: frozenset({Role.COORDINATOR, Role.SUPPORT, Role.ADMIN}),
+    # کارآفرینی — ADR-0014. شاخص کسب‌وکار را کارکنان تأیید می‌کنند، نه
+    # هم‌بنیان‌گذار: امتیاز `STARTUP` از «نتیجهٔ واقعی» می‌آید و تأیید
+    # درون‌تیمی همان خوداظهاری است.
+    Permission.VENTURE_MANAGE: frozenset({Role.COORDINATOR, Role.ADMIN}),
+    Permission.VENTURE_METRIC_VERIFY: frozenset(
+        {Role.MENTOR, Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}
+    ),
+    # شاخص پروژهٔ عملیاتی را مدیر همان پروژه تأیید می‌کند (FR-VEN-02
+    # «داشبورد پروژه عملکرد هر عضو را نشان می‌دهد»)، و شاخص خود مدیر را
+    # منتور یا استاد.
+    Permission.PROJECT_METRIC_VERIFY: frozenset(
+        {Role.PROJECT_LEAD, Role.MENTOR, Role.INSTRUCTOR, Role.ADMIN}
+    ),
 }
 
 # مجوزهایی که قلمروشان **ارائه** است. برای این‌ها، اعطای سراسری
@@ -300,6 +325,7 @@ SCOPED_PERMISSIONS: frozenset[Permission] = frozenset(
         Permission.PROJECT_CLOSE,
         Permission.DELIVERABLE_SUBMIT,
         Permission.DELIVERABLE_REVIEW,
+        Permission.PROJECT_METRIC_VERIFY,
     }
 )
 

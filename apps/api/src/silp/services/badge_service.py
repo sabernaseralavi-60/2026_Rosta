@@ -23,8 +23,10 @@
 | `TEAM_JOINED` | `team_members` — ترک‌کرده هم عضو بوده، اخراج‌شده نه |
 | `APPLICATION_SUBMITTED` | فاصلهٔ ثبت‌نام تا اولین درخواست پروژه |
 
-واقعیت‌های ماژول‌های M7 (فروش، مقالهٔ Q1، شهر هوشمند) هنوز منبعی ندارند و
-صفرند؛ نشانشان قفل می‌ماند و بقیه ارزیابی می‌شوند.
+| `SALES_AMOUNT` (جمع و بیشینه) | `venture_metrics` **تأییدشده** ثبت‌کننده (M7) |
+
+واقعیت‌های پژوهش (مقالهٔ Q1) و شهر هوشمند هنوز منبعی ندارند و صفرند؛
+نشانشان قفل می‌ماند و بقیه ارزیابی می‌شوند.
 """
 
 from __future__ import annotations
@@ -55,6 +57,7 @@ from silp.models.delivery import Deliverable
 from silp.models.gamification import POINT_CATEGORIES, Badge, PointEntry, UserBadge
 from silp.models.identity import User
 from silp.models.project import Project, ProjectApplication, TeamMember
+from silp.models.venture import VentureMetric
 from silp.services import events
 
 log = get_logger("silp.badges")
@@ -152,6 +155,21 @@ class BadgeService:
         if row is not None and row[1] is not None:
             days_to_first["APPLICATION_SUBMITTED"] = max((row[1] - row[0]).days, 0)
 
+        sales_total, sales_max = (
+            await self.session.execute(
+                select(
+                    func.coalesce(func.sum(VentureMetric.value), 0),
+                    func.max(VentureMetric.value),
+                ).where(
+                    VentureMetric.user_id == user_id,
+                    VentureMetric.metric == "SALES_AMOUNT",
+                    VentureMetric.status == "VERIFIED",
+                )
+            )
+        ).one()
+        sums = {"SALES_AMOUNT": Decimal(int(sales_total or 0))}
+        maxima = {"SALES_AMOUNT": Decimal(int(sales_max))} if sales_max is not None else {}
+
         return BadgeFacts(
             points_by_category=points,
             counts=dict(counts),
@@ -161,6 +179,8 @@ class BadgeService:
                 )
             },
             days_to_first=days_to_first,
+            sums=sums,
+            maxima=maxima,
         )
 
     # ── ارزیابی ────────────────────────────────────────────────────────

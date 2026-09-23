@@ -21,7 +21,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from silp.core.exceptions import NotFound, ValidationFailed
 from silp.core.logging import get_logger
 from silp.domain.identity.onboarding import ProfileSnapshot
+from silp.domain.identity.username import pick_username, slugify_fa
 from silp.domain.recommendation import service as recommendation
+from silp.models.identity import User
 from silp.models.profile import (
     TOTAL_SURVEY_STEPS,
     Profile,
@@ -93,14 +95,41 @@ class ProfileService:
                 raise ValidationFailed("نام و نام خانوادگی برای ساخت نیمرخ لازم است.")
             profile = Profile(user_id=user_id, **known)
             self.session.add(profile)
+            await self.ensure_username(user_id, profile.first_name, profile.last_name)
             await self.session.commit()
             log.info("profile_created", user_id=str(user_id))
             return profile
 
         for key, value in known.items():
             setattr(profile, key, value)
+        await self.ensure_username(user_id, profile.first_name, profile.last_name)
         await self.session.commit()
         return profile
+
+    async def ensure_username(
+        self, user_id: uuid.UUID, first: str | None, last: str | None
+    ) -> None:
+        """§7.1 — نام کاربری خودکار، یک‌بار، هنگامی که نام شناخته شد.
+
+        نیمرخ عمومی (`/u/{username}`) و دعوت به تیم با نام کاربری به آن
+        نیاز دارند. نام کاربری موجود هرگز عوض نمی‌شود: لینک‌های
+        به‌اشتراک‌گذاشته‌شده نباید بشکنند.
+
+        نام‌های گرفته‌شدهٔ هم‌ریشه در یک کوئری خوانده می‌شوند و انتخاب در
+        حافظه انجام می‌گیرد. برخورد هم‌زمان دو ثبت‌نام «مریم کریمی» را
+        قید یکتای `users.username` می‌گیرد؛ آن درخواست یک بار شکست
+        می‌خورد و تکرارش نام بعدی را می‌گیرد.
+        """
+        if not first or not last:
+            return
+        user = await self.session.get(User, user_id)
+        if user is None or user.username is not None:
+            return
+        base = slugify_fa(f"{first}-{last}")[:28].strip("-") or "user"
+        taken = set(
+            await self.session.scalars(select(User.username).where(User.username.like(f"{base}%")))
+        )
+        user.username = pick_username(first, last, is_taken=lambda name: name in taken)
 
     # ── گام‌های ارزیابی ────────────────────────────────────────────────
     async def save_skills(self, user_id: uuid.UUID, answers: list[SkillAnswer]) -> Profile:

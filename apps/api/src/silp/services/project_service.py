@@ -45,6 +45,7 @@ from silp.models.project import (
     TeamMember,
 )
 from silp.services import authz, events
+from silp.services.venture_service import require_venture_member_or_manager
 
 log = get_logger("silp.project")
 
@@ -114,6 +115,8 @@ class ProjectDraft:
     required_assets: list[AssetRequirement] | None = None
     interests: list[uuid.UUID] | None = None
     roles: list[RoleSpec] | None = None
+    #: پروژهٔ یک کسب‌وکار (§7.7 «تحویل‌دادنی در پروژه‌های کسب‌وکار»).
+    venture_id: uuid.UUID | None = None
 
 
 def _now() -> datetime:
@@ -202,6 +205,29 @@ class ProjectService:
                 " شما می‌توانید پروژهٔ شخصی بسازید.",
                 permission=Permission.PROJECT_CREATE_MANAGED.value,
             )
+        if draft.venture_id is not None:
+            await require_venture_member_or_manager(self.session, draft.venture_id, actor)
+        project = await self.build(lead_id=actor.id, draft=draft)
+        await self.session.commit()
+
+        # نقش `PROJECT_LEAD` مشتق است و همین حالا برای سازنده برقرار شد.
+        await authz.invalidate_roles(actor.id)
+        log.info("project_created", project_id=str(project.id), kind=draft.kind)
+        return project
+
+    async def build(
+        self,
+        *,
+        lead_id: uuid.UUID,
+        draft: ProjectDraft,
+        origin_idea_id: uuid.UUID | None = None,
+    ) -> Project:
+        """درج پروژهٔ `DRAFT` بدون commit و بدون بررسی مجوز ساخت.
+
+        فراخوان مسئول مجوز است: `create` مجوز ساخت را می‌سنجد، و ارتقای
+        ایده (FR-IDEA-03) مجوز `idea.promote` را — استادی که ایده‌ای را
+        ارتقا می‌دهد، پروژه را در همان تراکنشِ تغییر وضعیت ایده می‌سازد.
+        """
         _validate_sizes(draft.team_size_min, draft.team_size_max)
         _validate_dates(draft.starts_on, draft.deadline_on)
 
@@ -212,7 +238,7 @@ class ProjectService:
             description=draft.description.strip(),
             kind=draft.kind,
             status="DRAFT",
-            lead_id=actor.id,
+            lead_id=lead_id,
             expected_output=draft.expected_output.strip(),
             difficulty=draft.difficulty,
             work_style=draft.work_style,
@@ -224,16 +250,31 @@ class ProjectService:
             starts_on=draft.starts_on,
             deadline_on=draft.deadline_on,
             applications_close_at=draft.applications_close_at,
+            venture_id=draft.venture_id,
+            origin_idea_id=origin_idea_id,
         )
         self.session.add(project)
         await self.session.flush()
         await self._replace_requirements(project, draft)
-        await self.session.commit()
-
-        # نقش `PROJECT_LEAD` مشتق است و همین حالا برای سازنده برقرار شد.
-        await authz.invalidate_roles(actor.id)
-        log.info("project_created", project_id=str(project.id), kind=draft.kind)
         return project
+
+    async def ensure_team(self, project: Project) -> Team:
+        """تیم پروژه، با مدیر به‌عنوان عضو `is_lead` — اگر هنوز نیست، ساخته می‌شود.
+
+        معمولاً انتشار تیم را می‌سازد (§7.12). ارتقای ایده زودتر می‌سازد
+        تا نویسندهٔ ایده بتواند دعوت را پیش از انتشار هم بپذیرد.
+        """
+        team = await self.team_of(project.id)
+        if team is not None:
+            return team
+        team = Team(project_id=project.id, name=project.title_fa)
+        self.session.add(team)
+        await self.session.flush()
+        self.session.add(
+            TeamMember(team_id=team.id, user_id=project.lead_id, is_lead=True, status="ACTIVE")
+        )
+        await self.session.flush()
+        return team
 
     async def update(self, *, project: Project, actor: CurrentUser, draft: ProjectDraft) -> Project:
         """ویرایش پروژه. نوع و مدیر عوض نمی‌شوند."""
@@ -278,14 +319,7 @@ class ProjectService:
         project.status = "OPEN"
         project.last_activity_at = _now()
 
-        team = await self.team_of(project.id)
-        if team is None:
-            team = Team(project_id=project.id, name=project.title_fa)
-            self.session.add(team)
-            await self.session.flush()
-            self.session.add(
-                TeamMember(team_id=team.id, user_id=project.lead_id, is_lead=True, status="ACTIVE")
-            )
+        await self.ensure_team(project)
         await self._record(project, actor.id, "PROJECT_PUBLISHED", "پروژه منتشر شد.")
         await self.session.commit()
         await authz.invalidate_roles(project.lead_id)

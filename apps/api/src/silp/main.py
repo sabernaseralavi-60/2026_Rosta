@@ -27,6 +27,7 @@ from silp.routers.v1 import (
     courses,
     files,
     gamification,
+    ideas,
     me,
     notifications,
     projects,
@@ -35,6 +36,7 @@ from silp.routers.v1 import (
     taxonomy,
     teach,
     teach_quiz,
+    ventures,
     workspace,
 )
 
@@ -143,6 +145,12 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(notifications.router)
     v1.include_router(notifications.admin_router)
     v1.include_router(notifications.integrations_router)
+    # ── ایده، کارآفرینی و تیم (M7) ─────────────────────────────────────
+    v1.include_router(ideas.router)
+    v1.include_router(ventures.router)
+    v1.include_router(ventures.metrics_router)
+    v1.include_router(ventures.project_metrics_router)
+    v1.include_router(ventures.invitations_router)
     app.include_router(v1)
 
 

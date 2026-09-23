@@ -1,6 +1,34 @@
 {
   "components": {
     "schemas": {
+      "AcceptedOut": {
+        "properties": {
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "target_id": {
+            "format": "uuid",
+            "title": "Target Id",
+            "type": "string"
+          },
+          "target_type": {
+            "enum": [
+              "PROJECT",
+              "VENTURE"
+            ],
+            "title": "Target Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_type",
+          "target_id",
+          "href"
+        ],
+        "title": "AcceptedOut",
+        "type": "object"
+      },
       "AccessOut": {
         "description": "سنجش دسترسی یک ماده برای کاربر جاری — ADR-0009.\n\n`note_fa` جمله‌ای است که کنار قفل نشان داده می‌شود. کلاینت آن را\nنمی‌سازد تا منطق توضیح یکجا بماند.",
         "properties": {
@@ -578,6 +606,22 @@
         "title": "ApplicationOut",
         "type": "object"
       },
+      "ArchiveIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "ArchiveIn",
+        "type": "object"
+      },
       "AssetOut": {
         "properties": {
           "category": {
@@ -1145,6 +1189,45 @@
         "title": "AuthUserOut",
         "type": "object"
       },
+      "AuthorOut": {
+        "description": "نویسنده — برای ایدهٔ ناشناس `None` است، مگر برای خودش.",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "username"
+        ],
+        "title": "AuthorOut",
+        "type": "object"
+      },
       "BadgeOut": {
         "properties": {
           "awarded_at": {
@@ -1475,6 +1558,34 @@
         "title": "BreakdownOut",
         "type": "object"
       },
+      "CategoryOut": {
+        "properties": {
+          "code": {
+            "enum": [
+              "TRANSPORT",
+              "AGRICULTURE",
+              "COMMERCE",
+              "EDUCATION",
+              "TECHNOLOGY",
+              "ENVIRONMENT",
+              "SOCIAL",
+              "OTHER"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title_fa"
+        ],
+        "title": "CategoryOut",
+        "type": "object"
+      },
       "ChannelConfirmIn": {
         "properties": {
           "code": {
@@ -1621,6 +1732,104 @@
           "linked"
         ],
         "title": "ChannelStatusOut",
+        "type": "object"
+      },
+      "CommentIn": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Body",
+            "type": "string"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "CommentIn",
+        "type": "object"
+      },
+      "CommentOut": {
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthorOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "can_delete": {
+            "default": false,
+            "title": "Can Delete",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_deleted": {
+            "default": false,
+            "title": "Is Deleted",
+            "type": "boolean"
+          },
+          "is_mine": {
+            "default": false,
+            "title": "Is Mine",
+            "type": "boolean"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          }
+        },
+        "required": [
+          "id",
+          "body",
+          "author",
+          "created_at"
+        ],
+        "title": "CommentOut",
         "type": "object"
       },
       "CompleteProjectIn": {
@@ -2014,6 +2223,39 @@
           "title_fa"
         ],
         "title": "CourseSummaryOut",
+        "type": "object"
+      },
+      "CriterionOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "current": {
+            "title": "Current",
+            "type": "integer"
+          },
+          "met": {
+            "title": "Met",
+            "type": "boolean"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "text",
+          "met",
+          "current",
+          "target"
+        ],
+        "title": "CriterionOut",
         "type": "object"
       },
       "DecisionIn": {
@@ -2751,6 +2993,418 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "IdeaDetailOut": {
+        "properties": {
+          "archived_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived Reason"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthorOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "can_edit": {
+            "default": false,
+            "title": "Can Edit",
+            "type": "boolean"
+          },
+          "can_moderate": {
+            "default": false,
+            "title": "Can Moderate",
+            "type": "boolean"
+          },
+          "can_promote": {
+            "default": false,
+            "title": "Can Promote",
+            "type": "boolean"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "TRANSPORT",
+                  "AGRICULTURE",
+                  "COMMERCE",
+                  "EDUCATION",
+                  "TECHNOLOGY",
+                  "ENVIRONMENT",
+                  "SOCIAL",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "category_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Fa"
+          },
+          "comment_count": {
+            "title": "Comment Count",
+            "type": "integer"
+          },
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/CommentOut"
+            },
+            "title": "Comments",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "excerpt": {
+            "title": "Excerpt",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_anonymous": {
+            "title": "Is Anonymous",
+            "type": "boolean"
+          },
+          "is_mine": {
+            "default": false,
+            "title": "Is Mine",
+            "type": "boolean"
+          },
+          "problem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem"
+          },
+          "promoted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoted At"
+          },
+          "promoted_to_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoted To Id"
+          },
+          "promoted_to_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PROJECT",
+                  "VENTURE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoted To Type"
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "PROMOTED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "vote_count": {
+            "title": "Vote Count",
+            "type": "integer"
+          },
+          "voted_by_me": {
+            "default": false,
+            "title": "Voted By Me",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "excerpt",
+          "status",
+          "is_anonymous",
+          "vote_count",
+          "comment_count",
+          "created_at",
+          "body"
+        ],
+        "title": "IdeaDetailOut",
+        "type": "object"
+      },
+      "IdeaIn": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 10,
+            "title": "Body",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "TRANSPORT",
+                  "AGRICULTURE",
+                  "COMMERCE",
+                  "EDUCATION",
+                  "TECHNOLOGY",
+                  "ENVIRONMENT",
+                  "SOCIAL",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "is_anonymous": {
+            "default": false,
+            "title": "Is Anonymous",
+            "type": "boolean"
+          },
+          "problem": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 8,
+            "title": "Tags",
+            "type": "array"
+          },
+          "title": {
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ],
+        "title": "IdeaIn",
+        "type": "object"
+      },
+      "IdeaSummaryOut": {
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AuthorOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "TRANSPORT",
+                  "AGRICULTURE",
+                  "COMMERCE",
+                  "EDUCATION",
+                  "TECHNOLOGY",
+                  "ENVIRONMENT",
+                  "SOCIAL",
+                  "OTHER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "category_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Fa"
+          },
+          "comment_count": {
+            "title": "Comment Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "excerpt": {
+            "title": "Excerpt",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_anonymous": {
+            "title": "Is Anonymous",
+            "type": "boolean"
+          },
+          "is_mine": {
+            "default": false,
+            "title": "Is Mine",
+            "type": "boolean"
+          },
+          "promoted_to_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoted To Id"
+          },
+          "promoted_to_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PROJECT",
+                  "VENTURE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoted To Type"
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "PROMOTED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "vote_count": {
+            "title": "Vote Count",
+            "type": "integer"
+          },
+          "voted_by_me": {
+            "default": false,
+            "title": "Voted By Me",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "excerpt",
+          "status",
+          "is_anonymous",
+          "vote_count",
+          "comment_count",
+          "created_at"
+        ],
+        "title": "IdeaSummaryOut",
+        "type": "object"
+      },
       "IntegrityEventIn": {
         "properties": {
           "detail": {
@@ -2915,6 +3569,162 @@
           "interests"
         ],
         "title": "InterestsStepIn",
+        "type": "object"
+      },
+      "InvitationOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "invitee_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invitee Name"
+          },
+          "inviter_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inviter Name"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "role_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Title"
+          },
+          "source": {
+            "enum": [
+              "DIRECT",
+              "IDEA_PROMOTION",
+              "OPENING"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "DECLINED",
+              "CANCELLED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "target_id": {
+            "format": "uuid",
+            "title": "Target Id",
+            "type": "string"
+          },
+          "target_title": {
+            "title": "Target Title",
+            "type": "string"
+          },
+          "target_type": {
+            "enum": [
+              "PROJECT",
+              "VENTURE"
+            ],
+            "title": "Target Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "target_type",
+          "target_id",
+          "target_title",
+          "href",
+          "source",
+          "status",
+          "expires_at",
+          "created_at"
+        ],
+        "title": "InvitationOut",
+        "type": "object"
+      },
+      "InviteIn": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "role_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Id"
+          },
+          "username": {
+            "maxLength": 40,
+            "minLength": 3,
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username"
+        ],
+        "title": "InviteIn",
         "type": "object"
       },
       "LeaderRowOut": {
@@ -3283,6 +4093,35 @@
         "title": "LinkMaterialIn",
         "type": "object"
       },
+      "LinkedProjectOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa",
+          "status",
+          "kind"
+        ],
+        "title": "LinkedProjectOut",
+        "type": "object"
+      },
       "LoginOut": {
         "properties": {
           "access_token": {
@@ -3648,6 +4487,94 @@
         "title": "MePointsOut",
         "type": "object"
       },
+      "MemberOut": {
+        "properties": {
+          "is_founder": {
+            "title": "Is Founder",
+            "type": "boolean"
+          },
+          "joined_at": {
+            "format": "date-time",
+            "title": "Joined At",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "user_id",
+          "name",
+          "username",
+          "is_founder",
+          "joined_at"
+        ],
+        "title": "MemberOut",
+        "type": "object"
+      },
+      "MemberTotalsOut": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "pending": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Pending",
+            "type": "object"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "verified": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Verified",
+            "type": "object"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "MemberTotalsOut",
+        "type": "object"
+      },
       "MessageIn": {
         "additionalProperties": false,
         "properties": {
@@ -3764,6 +4691,333 @@
           "created_at"
         ],
         "title": "MessageOut",
+        "type": "object"
+      },
+      "MetricIn": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence File Id"
+          },
+          "metric": {
+            "enum": [
+              "CALLS",
+              "MEETINGS",
+              "LEADS",
+              "SALES_COUNT",
+              "SALES_AMOUNT",
+              "CONTENT_PIECES",
+              "CUSTOMERS"
+            ],
+            "title": "Metric",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "occurred_on": {
+            "format": "date",
+            "title": "Occurred On",
+            "type": "string"
+          },
+          "value": {
+            "exclusiveMinimum": 0.0,
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "metric",
+          "value",
+          "occurred_on"
+        ],
+        "title": "MetricIn",
+        "type": "object"
+      },
+      "MetricOut": {
+        "properties": {
+          "can_review": {
+            "default": false,
+            "title": "Can Review",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "evidence_file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence File Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_mine": {
+            "default": false,
+            "title": "Is Mine",
+            "type": "boolean"
+          },
+          "metric": {
+            "enum": [
+              "CALLS",
+              "MEETINGS",
+              "LEADS",
+              "SALES_COUNT",
+              "SALES_AMOUNT",
+              "CONTENT_PIECES",
+              "CUSTOMERS"
+            ],
+            "title": "Metric",
+            "type": "string"
+          },
+          "metric_fa": {
+            "title": "Metric Fa",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "occurred_on": {
+            "format": "date",
+            "title": "Occurred On",
+            "type": "string"
+          },
+          "owner_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Title"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Note"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewed_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By Name"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "VERIFIED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "user_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Name"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          },
+          "venture_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venture Id"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "metric",
+          "metric_fa",
+          "value",
+          "occurred_on",
+          "status",
+          "status_fa",
+          "created_at"
+        ],
+        "title": "MetricOut",
+        "type": "object"
+      },
+      "MetricReviewIn": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "VERIFIED",
+              "REJECTED"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "MetricReviewIn",
+        "type": "object"
+      },
+      "MetricTotalsOut": {
+        "properties": {
+          "pending": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Pending",
+            "type": "object"
+          },
+          "verified": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Verified",
+            "type": "object"
+          }
+        },
+        "title": "MetricTotalsOut",
+        "type": "object"
+      },
+      "MetricsOut": {
+        "properties": {
+          "by_member": {
+            "items": {
+              "$ref": "#/components/schemas/MemberTotalsOut"
+            },
+            "title": "By Member",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MetricOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "metric_titles": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Metric Titles",
+            "type": "object"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/MetricTotalsOut"
+          }
+        },
+        "required": [
+          "items",
+          "totals"
+        ],
+        "title": "MetricsOut",
         "type": "object"
       },
       "MilestoneIn": {
@@ -5066,6 +6320,42 @@
         "title": "Page[CourseSummaryOut]",
         "type": "object"
       },
+      "Page_IdeaSummaryOut_": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IdeaSummaryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "has_next"
+        ],
+        "title": "Page[IdeaSummaryOut]",
+        "type": "object"
+      },
       "Page_ProjectSummaryOut_": {
         "properties": {
           "has_next": {
@@ -5100,6 +6390,42 @@
           "has_next"
         ],
         "title": "Page[ProjectSummaryOut]",
+        "type": "object"
+      },
+      "Page_VentureSummaryOut_": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/VentureSummaryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "has_next"
+        ],
+        "title": "Page[VentureSummaryOut]",
         "type": "object"
       },
       "PasswordLoginIn": {
@@ -6673,6 +7999,18 @@
             "title": "Title Fa",
             "type": "string"
           },
+          "venture_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venture Id"
+          },
           "work_style": {
             "default": "EITHER",
             "enum": [
@@ -6880,6 +8218,75 @@
           "team_size_max"
         ],
         "title": "ProjectSummaryOut",
+        "type": "object"
+      },
+      "PromoteIn": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_output": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Output"
+          },
+          "project_kind": {
+            "default": "C_PROBLEM",
+            "enum": [
+              "A_VENTURE",
+              "B_RESEARCH",
+              "C_PROBLEM",
+              "D_PERSONAL"
+            ],
+            "title": "Project Kind",
+            "type": "string"
+          },
+          "target": {
+            "enum": [
+              "PROJECT",
+              "VENTURE"
+            ],
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "title": "PromoteIn",
+        "type": "object"
+      },
+      "PromotionOut": {
+        "properties": {
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "target_id": {
+            "format": "uuid",
+            "title": "Target Id",
+            "type": "string"
+          },
+          "target_type": {
+            "enum": [
+              "PROJECT",
+              "VENTURE"
+            ],
+            "title": "Target Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_type",
+          "target_id",
+          "href"
+        ],
+        "title": "PromotionOut",
         "type": "object"
       },
       "PublishWeekIn": {
@@ -7632,6 +9039,60 @@
         "title": "ReadAllOut",
         "type": "object"
       },
+      "ReadinessOut": {
+        "properties": {
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/CriterionOut"
+            },
+            "title": "Criteria",
+            "type": "array"
+          },
+          "next_stage": {
+            "anyOf": [
+              {
+                "enum": [
+                  "IDEA",
+                  "VALIDATION",
+                  "MVP",
+                  "FIRST_REVENUE",
+                  "GROWTH",
+                  "PAUSED",
+                  "CLOSED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Stage"
+          },
+          "next_stage_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Stage Fa"
+          },
+          "ready": {
+            "title": "Ready",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "next_stage",
+          "next_stage_fa",
+          "ready",
+          "criteria"
+        ],
+        "title": "ReadinessOut",
+        "type": "object"
+      },
       "ReasonIn": {
         "additionalProperties": false,
         "description": "بدنهٔ اقدام‌هایی که سند برایشان «با ذکر دلیل» نوشته است — §7.4.",
@@ -7853,6 +9314,22 @@
           "refresh_token"
         ],
         "title": "RefreshIn",
+        "type": "object"
+      },
+      "RemoveMemberIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "RemoveMemberIn",
         "type": "object"
       },
       "ReorderIn": {
@@ -8698,6 +10175,118 @@
           "skills"
         ],
         "title": "SkillsStepIn",
+        "type": "object"
+      },
+      "StageChangeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "ADVANCE",
+              "PAUSE",
+              "RESUME",
+              "CLOSE"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "StageChangeIn",
+        "type": "object"
+      },
+      "StageChangeOut": {
+        "properties": {
+          "changed_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Changed By Name"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "from_stage": {
+            "enum": [
+              "IDEA",
+              "VALIDATION",
+              "MVP",
+              "FIRST_REVENUE",
+              "GROWTH",
+              "PAUSED",
+              "CLOSED"
+            ],
+            "title": "From Stage",
+            "type": "string"
+          },
+          "from_stage_fa": {
+            "title": "From Stage Fa",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "to_stage": {
+            "enum": [
+              "IDEA",
+              "VALIDATION",
+              "MVP",
+              "FIRST_REVENUE",
+              "GROWTH",
+              "PAUSED",
+              "CLOSED"
+            ],
+            "title": "To Stage",
+            "type": "string"
+          },
+          "to_stage_fa": {
+            "title": "To Stage Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "from_stage",
+          "to_stage",
+          "from_stage_fa",
+          "to_stage_fa",
+          "created_at"
+        ],
+        "title": "StageChangeOut",
         "type": "object"
       },
       "StudentAtRiskOut": {
@@ -10196,6 +11785,408 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "VentureDetailOut": {
+        "properties": {
+          "can_manage": {
+            "default": false,
+            "title": "Can Manage",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Status"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "founder": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MemberOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/StageChangeOut"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_member": {
+            "default": false,
+            "title": "Is Member",
+            "type": "boolean"
+          },
+          "looking_for_cofounder": {
+            "title": "Looking For Cofounder",
+            "type": "boolean"
+          },
+          "member_count": {
+            "default": 0,
+            "title": "Member Count",
+            "type": "integer"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needed_roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Needed Roles",
+            "type": "array"
+          },
+          "origin_idea_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin Idea Id"
+          },
+          "paused_from_stage": {
+            "anyOf": [
+              {
+                "enum": [
+                  "IDEA",
+                  "VALIDATION",
+                  "MVP",
+                  "FIRST_REVENUE",
+                  "GROWTH",
+                  "PAUSED",
+                  "CLOSED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paused From Stage"
+          },
+          "pitch": {
+            "title": "Pitch",
+            "type": "string"
+          },
+          "problem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/LinkedProjectOut"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "readiness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReadinessOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revenue_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Model"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "stage": {
+            "enum": [
+              "IDEA",
+              "VALIDATION",
+              "MVP",
+              "FIRST_REVENUE",
+              "GROWTH",
+              "PAUSED",
+              "CLOSED"
+            ],
+            "title": "Stage",
+            "type": "string"
+          },
+          "stage_changed_at": {
+            "format": "date-time",
+            "title": "Stage Changed At",
+            "type": "string"
+          },
+          "stage_fa": {
+            "title": "Stage Fa",
+            "type": "string"
+          },
+          "target_market": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Market"
+          },
+          "totals": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MetricTotalsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "pitch",
+          "stage",
+          "stage_fa",
+          "looking_for_cofounder",
+          "created_at",
+          "stage_changed_at"
+        ],
+        "title": "VentureDetailOut",
+        "type": "object"
+      },
+      "VentureIn": {
+        "additionalProperties": false,
+        "properties": {
+          "current_status": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Status"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "looking_for_cofounder": {
+            "default": false,
+            "title": "Looking For Cofounder",
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name",
+            "type": "string"
+          },
+          "needed_roles": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Needed Roles",
+            "type": "array"
+          },
+          "pitch": {
+            "maxLength": 280,
+            "minLength": 10,
+            "title": "Pitch",
+            "type": "string"
+          },
+          "problem": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem"
+          },
+          "revenue_model": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Model"
+          },
+          "target_market": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Market"
+          }
+        },
+        "required": [
+          "name",
+          "pitch"
+        ],
+        "title": "VentureIn",
+        "type": "object"
+      },
+      "VentureSummaryOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "founder": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MemberOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "looking_for_cofounder": {
+            "title": "Looking For Cofounder",
+            "type": "boolean"
+          },
+          "member_count": {
+            "default": 0,
+            "title": "Member Count",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needed_roles": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Needed Roles",
+            "type": "array"
+          },
+          "pitch": {
+            "title": "Pitch",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "stage": {
+            "enum": [
+              "IDEA",
+              "VALIDATION",
+              "MVP",
+              "FIRST_REVENUE",
+              "GROWTH",
+              "PAUSED",
+              "CLOSED"
+            ],
+            "title": "Stage",
+            "type": "string"
+          },
+          "stage_fa": {
+            "title": "Stage Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "pitch",
+          "stage",
+          "stage_fa",
+          "looking_for_cofounder",
+          "created_at"
+        ],
+        "title": "VentureSummaryOut",
+        "type": "object"
+      },
       "VisibleQuestionOut": {
         "description": "سؤال در تلاش فعال — `payload` هرگز کلید پاسخ ندارد (§5.6).",
         "properties": {
@@ -10262,6 +12253,30 @@
           "payload"
         ],
         "title": "VisibleQuestionOut",
+        "type": "object"
+      },
+      "VoteOut": {
+        "properties": {
+          "idea_id": {
+            "format": "uuid",
+            "title": "Idea Id",
+            "type": "string"
+          },
+          "vote_count": {
+            "title": "Vote Count",
+            "type": "integer"
+          },
+          "voted_by_me": {
+            "title": "Voted By Me",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "idea_id",
+          "vote_count",
+          "voted_by_me"
+        ],
+        "title": "VoteOut",
         "type": "object"
       },
       "WeekDetailOut": {
@@ -12811,6 +14826,887 @@
         ]
       }
     },
+    "/api/v1/ideas": {
+      "get": {
+        "description": "FR-IDEA-01/02 — «داغ» با زوال زمانی، «تازه»، یا «پررأی».\n\n`mine=true` ایده‌های خود کاربر را با هر وضعیتی می‌دهد، حتی بایگانی‌شده.",
+        "operationId": "list_ideas_api_v1_ideas_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "TRANSPORT",
+                    "AGRICULTURE",
+                    "COMMERCE",
+                    "EDUCATION",
+                    "TECHNOLOGY",
+                    "ENVIRONMENT",
+                    "SOCIAL",
+                    "OTHER"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tag",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 30,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tag"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "OPEN",
+                    "PROMOTED",
+                    "ARCHIVED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "OPEN",
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Mine",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "hot",
+              "enum": [
+                "hot",
+                "new",
+                "top"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_IdeaSummaryOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بانک ایده",
+        "tags": [
+          "ideas"
+        ]
+      },
+      "post": {
+        "operationId": "create_idea_api_v1_ideas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeaIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeaDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت ایده",
+        "tags": [
+          "ideas"
+        ]
+      }
+    },
+    "/api/v1/ideas/categories": {
+      "get": {
+        "operationId": "categories_api_v1_ideas_categories_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryOut"
+                  },
+                  "title": "Response Categories Api V1 Ideas Categories Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "دسته‌های ایده",
+        "tags": [
+          "ideas"
+        ]
+      }
+    },
+    "/api/v1/ideas/comments/{comment_id}": {
+      "delete": {
+        "operationId": "delete_comment_api_v1_ideas_comments__comment_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "comment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Comment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف نظر",
+        "tags": [
+          "ideas"
+        ]
+      }
+    },
+    "/api/v1/ideas/{idea_id}": {
+      "delete": {
+        "operationId": "delete_idea_api_v1_ideas__idea_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idea_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idea Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف ایده (نویسنده)",
+        "tags": [
+          "ideas"
+        ]
+      },
+      "get": {
+        "operationId": "get_idea_api_v1_ideas__idea_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idea_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idea Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeaDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جزئیات ایده و نظرها",
+        "tags": [
+          "ideas"
+        ]
+      },
+      "patch": {
+        "operationId": "update_idea_api_v1_ideas__idea_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idea_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idea Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdeaIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeaDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش ایده (نویسنده)",
+        "tags": [
+          "ideas"
+        ]
+      }
+    },
+    "/api/v1/ideas/{idea_id}/archive": {
+      "post": {
+        "operationId": "archive_idea_api_v1_ideas__idea_id__archive_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idea_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idea Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArchiveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IdeaDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بایگانی (ناظر)",
+        "tags": [
+          "ideas"
+        ]
+      }
+    },
+    "/api/v1/ideas/{idea_id}/comments": {
+      "post": {
+        "operationId": "add_comment_api_v1_ideas__idea_id__comments_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idea_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idea Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "نظر یا پاسخ",
+        "tags": [
+          "ideas"
+        ]
+      }
+    },
+    "/api/v1/ideas/{idea_id}/promote": {
+      "post": {
+        "description": "§7.8 — مجوز `idea.promote`. پروژه `DRAFT` می‌ماند تا استاد کاملش کند.",
+        "operationId": "promote_api_v1_ideas__idea_id__promote_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idea_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idea Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromoteIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ارتقا به پروژه یا کسب‌وکار",
+        "tags": [
+          "ideas"
+        ]
+      }
+    },
+    "/api/v1/ideas/{idea_id}/vote": {
+      "delete": {
+        "operationId": "unvote_api_v1_ideas__idea_id__vote_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idea_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idea Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoteOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پس گرفتن رأی",
+        "tags": [
+          "ideas"
+        ]
+      },
+      "post": {
+        "operationId": "vote_api_v1_ideas__idea_id__vote_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "idea_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Idea Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoteOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "رأی مثبت",
+        "tags": [
+          "ideas"
+        ]
+      }
+    },
+    "/api/v1/invitations/{invitation_id}": {
+      "delete": {
+        "operationId": "cancel_invitation_api_v1_invitations__invitation_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invitation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Invitation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "لغو دعوت",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/invitations/{invitation_id}/accept": {
+      "post": {
+        "operationId": "accept_invitation_api_v1_invitations__invitation_id__accept_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invitation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Invitation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پذیرش دعوت",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/invitations/{invitation_id}/decline": {
+      "post": {
+        "operationId": "decline_invitation_api_v1_invitations__invitation_id__decline_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invitation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Invitation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "رد دعوت",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
     "/api/v1/leaderboard": {
       "get": {
         "description": "§9.7 — فقط ۱۰ نفر برتر، رتبهٔ خودت، و جدول رشد ۳۰ روزه.\n\nرتبه‌بندی درس فقط برای دانشجویان همان درس و کادر آموزشی‌اش است؛ برای\nبقیه ۴۰۴، نه ۴۰۳ (§6.4).",
@@ -13200,6 +16096,36 @@
         "summary": "داشبورد دانشجو",
         "tags": [
           "gamification"
+        ]
+      }
+    },
+    "/api/v1/me/invitations": {
+      "get": {
+        "operationId": "my_invitations_api_v1_me_invitations_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InvitationOut"
+                  },
+                  "title": "Response My Invitations Api V1 Me Invitations Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دعوت‌های باز من",
+        "tags": [
+          "teams"
         ]
       }
     },
@@ -13755,6 +16681,155 @@
         "summary": "گام ۱ — مهارت‌ها",
         "tags": [
           "me"
+        ]
+      }
+    },
+    "/api/v1/metrics/review-queue": {
+      "get": {
+        "operationId": "review_queue_api_v1_metrics_review_queue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MetricOut"
+                  },
+                  "title": "Response Review Queue Api V1 Metrics Review Queue Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "صف تأیید شاخص",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/metrics/{metric_id}": {
+      "delete": {
+        "operationId": "delete_metric_api_v1_metrics__metric_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "metric_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Metric Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف ثبت در انتظار",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/metrics/{metric_id}/review": {
+      "post": {
+        "operationId": "review_metric_api_v1_metrics__metric_id__review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "metric_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Metric Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricReviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تأیید یا رد شاخص",
+        "tags": [
+          "ventures"
         ]
       }
     },
@@ -16093,6 +19168,64 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/invitations": {
+      "post": {
+        "operationId": "invite_to_project_api_v1_projects__project_id__invitations_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دعوت مستقیم به تیم پروژه",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/leave": {
       "post": {
         "operationId": "leave_team_api_v1_projects__project_id__leave_post",
@@ -16161,6 +19294,132 @@
         "summary": "ترک تیم",
         "tags": [
           "projects"
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/metrics": {
+      "get": {
+        "description": "FR-VEN-02 — `by_member` همان «داشبورد عملکرد هر عضو» است.",
+        "operationId": "project_metrics_api_v1_projects__project_id__metrics_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PENDING",
+                    "VERIFIED",
+                    "REJECTED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "فعالیت و فروش پروژه",
+        "tags": [
+          "ventures"
+        ]
+      },
+      "post": {
+        "operationId": "record_project_metric_api_v1_projects__project_id__metrics_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت فعالیت یا فروش در پروژه",
+        "tags": [
+          "ventures"
         ]
       }
     },
@@ -20805,6 +24064,751 @@
         "summary": "انتشار هفته (فوری یا زمان‌بندی‌شده)",
         "tags": [
           "teaching"
+        ]
+      }
+    },
+    "/api/v1/ventures": {
+      "get": {
+        "operationId": "list_ventures_api_v1_ventures_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "stage",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "IDEA",
+                    "VALIDATION",
+                    "MVP",
+                    "FIRST_REVENUE",
+                    "GROWTH",
+                    "PAUSED",
+                    "CLOSED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Stage"
+            }
+          },
+          {
+            "in": "query",
+            "name": "looking_for_cofounder",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Looking For Cofounder"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_VentureSummaryOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "فهرست کسب‌وکارها",
+        "tags": [
+          "ventures"
+        ]
+      },
+      "post": {
+        "operationId": "create_venture_api_v1_ventures_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VentureIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VentureDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت کسب‌وکار",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/ventures/mine": {
+      "get": {
+        "operationId": "my_ventures_api_v1_ventures_mine_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/VentureSummaryOut"
+                  },
+                  "title": "Response My Ventures Api V1 Ventures Mine Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "کسب‌وکارهای من",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/ventures/{venture_id}": {
+      "delete": {
+        "operationId": "delete_venture_api_v1_ventures__venture_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف (فقط مرحلهٔ ایده)",
+        "tags": [
+          "ventures"
+        ]
+      },
+      "get": {
+        "operationId": "get_venture_api_v1_ventures__venture_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VentureDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "صفحهٔ کسب‌وکار",
+        "tags": [
+          "ventures"
+        ]
+      },
+      "patch": {
+        "operationId": "update_venture_api_v1_ventures__venture_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VentureIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VentureDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش کسب‌وکار",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/ventures/{venture_id}/invitations": {
+      "get": {
+        "operationId": "venture_invitations_api_v1_ventures__venture_id__invitations_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InvitationOut"
+                  },
+                  "title": "Response Venture Invitations Api V1 Ventures  Venture Id  Invitations Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دعوت‌های باز",
+        "tags": [
+          "ventures"
+        ]
+      },
+      "post": {
+        "operationId": "invite_to_venture_api_v1_ventures__venture_id__invitations_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دعوت به تیم کسب‌وکار",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/ventures/{venture_id}/leave": {
+      "post": {
+        "operationId": "leave_venture_api_v1_ventures__venture_id__leave_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ترک تیم",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/ventures/{venture_id}/members/{user_id}/remove": {
+      "post": {
+        "operationId": "remove_member_api_v1_ventures__venture_id__members__user_id__remove_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveMemberIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف عضو با ذکر دلیل",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/ventures/{venture_id}/metrics": {
+      "get": {
+        "operationId": "venture_metrics_api_v1_ventures__venture_id__metrics_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PENDING",
+                    "VERIFIED",
+                    "REJECTED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "فعالیت و فروش",
+        "tags": [
+          "ventures"
+        ]
+      },
+      "post": {
+        "operationId": "record_venture_metric_api_v1_ventures__venture_id__metrics_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت فعالیت یا فروش",
+        "tags": [
+          "ventures"
+        ]
+      }
+    },
+    "/api/v1/ventures/{venture_id}/stage": {
+      "post": {
+        "description": "§7.7 — ارتقا فقط یک گام و با معیار خروج؛ کمبودها در `details.missing`.",
+        "operationId": "change_stage_api_v1_ventures__venture_id__stage_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "venture_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Venture Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StageChangeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VentureDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ارتقا، توقف، ازسرگیری یا بستن",
+        "tags": [
+          "ventures"
         ]
       }
     }

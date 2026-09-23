@@ -41,8 +41,8 @@ GROUP_TITLE_FA: dict[Group, str] = {
 
 GROUP_DESCRIPTION_FA: dict[Group, str] = {
     "COURSE": "هفتهٔ تازه، آزمون، نتیجه و اعلان‌های استاد",
-    "PROJECT": "درخواست پیوستن، تحویل‌دادنی، مهلت مرحله و سلامت پروژه",
-    "SOCIAL": "نشان‌های تازه",
+    "PROJECT": "درخواست پیوستن، دعوت به تیم، تحویل‌دادنی، مهلت مرحله و کسب‌وکار",
+    "SOCIAL": "نشان‌های تازه و ایده‌های تو",
     "SYSTEM": "امنیت حساب، خوش‌آمد و خلاصهٔ هفتگی",
 }
 
@@ -209,8 +209,52 @@ _KINDS: tuple[Kind, ...] = (
         "بی‌تحرکی پروژه",
         ("project", "days"),
     ),
-    # ── نشان ───────────────────────────────────────────────────────────
+    # ── تیم و کارآفرینی (M7) ───────────────────────────────────────────
+    Kind(
+        "TEAM_INVITATION",
+        "PROJECT",
+        "IMPORTANT",
+        "دعوت به تیم",
+        ("inviter", "team", "message"),
+        allow_sms=True,
+    ),
+    Kind(
+        "INVITATION_ACCEPTED",
+        "PROJECT",
+        "NORMAL",
+        "پذیرش دعوت (دعوت‌کننده)",
+        ("invitee", "team"),
+    ),
+    Kind(
+        "METRIC_REVIEWED",
+        "PROJECT",
+        "NORMAL",
+        "نتیجهٔ بررسی فعالیت یا فروش",
+        ("metric", "value", "owner", "decision", "detail"),
+    ),
+    Kind(
+        "VENTURE_STAGE_CHANGED",
+        "PROJECT",
+        "NORMAL",
+        "تغییر مرحلهٔ کسب‌وکار",
+        ("venture", "stage", "from_stage"),
+    ),
+    # ── نشان و جامعه ───────────────────────────────────────────────────
     Kind("BADGE_AWARDED", "SOCIAL", "LOW", "نشان تازه", ("badge",)),
+    Kind(
+        "IDEA_COMMENTED",
+        "SOCIAL",
+        "LOW",
+        "نظر تازه روی ایدهٔ من",
+        ("idea", "commenter", "excerpt"),
+    ),
+    Kind(
+        "IDEA_PROMOTED",
+        "SOCIAL",
+        "IMPORTANT",
+        "ارتقای ایدهٔ من",
+        ("idea", "target", "title", "next_step"),
+    ),
     # ── حساب و سامانه ──────────────────────────────────────────────────
     Kind("WELCOME", "SYSTEM", "LOW", "خوش‌آمد"),
     Kind(

@@ -29,8 +29,16 @@ from silp.models.education import (
     Resource,
 )
 from silp.models.gamification import PointEntry
+from silp.models.idea import Idea
 from silp.models.project import Project, ProjectApplication
 from silp.models.quiz import Quiz, QuizAttempt
+from silp.models.venture import (
+    METRIC_TITLE_FA,
+    STAGE_TITLE_FA,
+    Venture,
+    VentureMetric,
+    VentureStageChange,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -172,6 +180,54 @@ async def _profile(session: AsyncSession, ids: set[uuid.UUID]) -> dict[uuid.UUID
     return {uid: SourceLabel("تکمیل نیمرخ", "/onboarding/results") for uid in ids}
 
 
+async def _ideas(session: AsyncSession, ids: set[uuid.UUID]) -> dict[uuid.UUID, SourceLabel]:
+    rows = await session.execute(select(Idea.id, Idea.title).where(Idea.id.in_(ids)))
+    return {iid: SourceLabel(f"ایدهٔ «{title}»", f"/ideas/{iid}") for iid, title in rows}
+
+
+async def _ventures(session: AsyncSession, ids: set[uuid.UUID]) -> dict[uuid.UUID, SourceLabel]:
+    rows = await session.execute(select(Venture.id, Venture.name).where(Venture.id.in_(ids)))
+    return {vid: SourceLabel(f"کسب‌وکار {name}", f"/ventures/{vid}") for vid, name in rows}
+
+
+async def _stage_changes(
+    session: AsyncSession, ids: set[uuid.UUID]
+) -> dict[uuid.UUID, SourceLabel]:
+    rows = await session.execute(
+        select(VentureStageChange.id, VentureStageChange.to_stage, Venture.id, Venture.name)
+        .join(Venture, Venture.id == VentureStageChange.venture_id)
+        .where(VentureStageChange.id.in_(ids))
+    )
+    return {
+        cid: SourceLabel(f"{name} — مرحلهٔ {STAGE_TITLE_FA.get(stage, stage)}", f"/ventures/{vid}")
+        for cid, stage, vid, name in rows
+    }
+
+
+async def _metrics(session: AsyncSession, ids: set[uuid.UUID]) -> dict[uuid.UUID, SourceLabel]:
+    rows = await session.execute(
+        select(
+            VentureMetric.id,
+            VentureMetric.metric,
+            VentureMetric.venture_id,
+            VentureMetric.project_id,
+            Venture.name,
+            Project.title_fa,
+        )
+        .outerjoin(Venture, Venture.id == VentureMetric.venture_id)
+        .outerjoin(Project, Project.id == VentureMetric.project_id)
+        .where(VentureMetric.id.in_(ids))
+    )
+    labels: dict[uuid.UUID, SourceLabel] = {}
+    for mid, metric, vid, pid, venture, project in rows:
+        title = METRIC_TITLE_FA.get(metric, metric)
+        if vid is not None:
+            labels[mid] = SourceLabel(f"{title} — {venture}", f"/ventures/{vid}")
+        else:
+            labels[mid] = SourceLabel(f"{title} — {project}", f"/projects/{pid}/workspace")
+    return labels
+
+
 _RESOLVERS = {
     "RESOURCE": _resources,
     "COURSE_WEEK": _weeks,
@@ -184,6 +240,10 @@ _RESOLVERS = {
     "MILESTONE": _milestones,
     "DELIVERABLE": _deliverables,
     "PROFILE": _profile,
+    "IDEA": _ideas,
+    "VENTURE": _ventures,
+    "VENTURE_STAGE": _stage_changes,
+    "METRIC": _metrics,
 }
 
 SOURCE_TYPE_TITLE_FA: dict[str, str] = {
@@ -198,6 +258,10 @@ SOURCE_TYPE_TITLE_FA: dict[str, str] = {
     "MILESTONE": "مرحلهٔ پروژه",
     "DELIVERABLE": "تحویل‌دادنی",
     "PROFILE": "نیمرخ",
+    "IDEA": "ایده",
+    "VENTURE": "کسب‌وکار",
+    "VENTURE_STAGE": "مرحلهٔ کسب‌وکار",
+    "METRIC": "فعالیت و فروش",
 }
 
 

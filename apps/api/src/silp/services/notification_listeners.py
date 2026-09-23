@@ -27,19 +27,22 @@ from decimal import Decimal
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from silp.domain import ventures as venture_rules
 from silp.domain.calendar import format_datetime_fa
 from silp.domain.notifications.templating import excerpt
-from silp.domain.text import to_persian_digits
+from silp.domain.text import format_number_fa, to_persian_digits
 from silp.models.delivery import Deliverable, Milestone
 from silp.models.education import Announcement, Course, CourseOffering, CourseWeek, Enrollment
 from silp.models.gamification import Badge, PointEntry
-from silp.models.project import Project, ProjectApplication
+from silp.models.idea import Idea, IdeaComment
+from silp.models.project import Project, ProjectApplication, Team, TeamInvitation
 from silp.models.quiz import GradeAppeal, Quiz, QuizAttempt
+from silp.models.venture import METRIC_TITLE_FA, Venture, VentureMetric, VentureStageChange
 from silp.services import events
 from silp.services.directory import display_names, name_of
 from silp.services.grading_service import results_visible
 from silp.services.notification_service import NotificationService
-from silp.services.point_listeners import active_member_ids
+from silp.services.point_listeners import active_member_ids, venture_member_ids
 
 #: وقتی نام کاربر هنوز ثبت نشده (پیش از ورود اولیه).
 UNKNOWN_NAME = "یک کاربر"
@@ -437,6 +440,177 @@ async def on_badge_awarded(session: AsyncSession, event: events.BadgeAwarded) ->
         {"badge": badge.title_fa},
         action_url="/me/badges",
         dedup_key=f"BADGE:{badge.code}",
+    )
+
+
+# ── ایده — M7 ──────────────────────────────────────────────────────────
+@events.subscribe(events.IdeaCommented)
+async def on_idea_commented(session: AsyncSession, event: events.IdeaCommented) -> None:
+    """نویسندهٔ ایده، و نویسندهٔ نظری که به آن پاسخ داده شد — نه خودِ نظردهنده."""
+    comment = await session.get(IdeaComment, event.comment_id)
+    if comment is None:
+        return
+    idea = await session.get(Idea, comment.idea_id)
+    if idea is None:
+        return
+    recipients = [idea.author_id]
+    if comment.parent_id is not None:
+        parent = await session.get(IdeaComment, comment.parent_id)
+        if parent is not None:
+            recipients.append(parent.author_id)
+    recipients = [uid for uid in recipients if uid != comment.author_id]
+    await NotificationService(session).notify(
+        "IDEA_COMMENTED",
+        recipients,
+        {
+            "idea": idea.title,
+            "commenter": await _name(session, comment.author_id),
+            "excerpt": excerpt(comment.body, 120),
+        },
+        action_url=f"/ideas/{idea.id}",
+        dedup_key=f"IDEA_COMMENTED:{comment.id}",
+    )
+
+
+@events.subscribe(events.IdeaPromoted)
+async def on_idea_promoted(session: AsyncSession, event: events.IdeaPromoted) -> None:
+    idea = await session.get(Idea, event.idea_id)
+    if idea is None or idea.promoted_to_id is None or idea.promoted_by == idea.author_id:
+        return
+    if idea.promoted_to_type == "VENTURE":
+        venture = await session.get(Venture, idea.promoted_to_id)
+        values = {
+            "target": "کسب‌وکار",
+            "title": venture.name if venture else idea.title,
+            "next_step": "تو بنیان‌گذار آنی؛ مشخصاتش را کامل کن.",
+        }
+        url = f"/ventures/{idea.promoted_to_id}"
+    else:
+        project = await session.get(Project, idea.promoted_to_id)
+        values = {
+            "target": "پروژه",
+            "title": project.title_fa if project else idea.title,
+            "next_step": "دعوت پیوستن به تیمش برایت فرستاده شد.",
+        }
+        url = "/me/invitations"
+    await NotificationService(session).notify(
+        "IDEA_PROMOTED",
+        [idea.author_id],
+        {"idea": idea.title, **values},
+        action_url=url,
+        dedup_key=f"IDEA_PROMOTED:{idea.id}",
+    )
+
+
+# ── تیم و کارآفرینی — M7 ───────────────────────────────────────────────
+async def _team_title(session: AsyncSession, invitation: TeamInvitation) -> str:
+    team = await session.get(Team, invitation.team_id)
+    return team.name if team is not None else "تیم"
+
+
+@events.subscribe(events.InvitationSent)
+async def on_invitation_sent(session: AsyncSession, event: events.InvitationSent) -> None:
+    invitation = await session.get(TeamInvitation, event.invitation_id)
+    if invitation is None:
+        return
+    await NotificationService(session).notify(
+        "TEAM_INVITATION",
+        [invitation.invitee_id],
+        {
+            "inviter": await _name(session, invitation.inviter_id),
+            "team": await _team_title(session, invitation),
+            "message": excerpt(invitation.message or "", 200),
+        },
+        action_url="/me/invitations",
+        dedup_key=f"TEAM_INVITATION:{invitation.id}",
+    )
+
+
+@events.subscribe(events.InvitationAccepted)
+async def on_invitation_accepted(session: AsyncSession, event: events.InvitationAccepted) -> None:
+    invitation = await session.get(TeamInvitation, event.invitation_id)
+    if invitation is None:
+        return
+    await NotificationService(session).notify(
+        "INVITATION_ACCEPTED",
+        [invitation.inviter_id],
+        {
+            "invitee": await _name(session, invitation.invitee_id),
+            "team": await _team_title(session, invitation),
+        },
+        dedup_key=f"INVITATION_ACCEPTED:{invitation.id}",
+    )
+
+
+@events.subscribe(events.MetricReviewed)
+async def on_metric_reviewed(session: AsyncSession, event: events.MetricReviewed) -> None:
+    row = await session.get(VentureMetric, event.metric_id)
+    if row is None or row.status == "PENDING":
+        return
+    if row.venture_id is not None:
+        venture = await session.get(Venture, row.venture_id)
+        owner = venture.name if venture else "کسب‌وکار"
+        url = f"/ventures/{row.venture_id}"
+    else:
+        project = await session.get(Project, row.project_id)
+        owner = project.title_fa if project else "پروژه"
+        url = f"/projects/{row.project_id}/workspace"
+
+    if row.status == "VERIFIED":
+        # امتیاز پیش از اعلان ثبت شده (ترتیب `LISTENER_MODULES`).
+        earned = await session.scalar(
+            select(func.sum(PointEntry.amount)).where(
+                PointEntry.user_id == row.user_id,
+                PointEntry.source_type == "METRIC",
+                PointEntry.source_id == row.id,
+            )
+        )
+        detail = f"{fa_number(earned)} امتیاز کارآفرینی گرفتی." if earned else ""
+        decision = "تأیید شد"
+    else:
+        detail = excerpt(row.review_note or "", 200)
+        decision = "رد شد"
+    value = format_number_fa(row.value)
+    if row.metric == "SALES_AMOUNT":
+        value = f"{value} ریال"
+    await NotificationService(session).notify(
+        "METRIC_REVIEWED",
+        [row.user_id],
+        {
+            "metric": METRIC_TITLE_FA.get(row.metric, row.metric),
+            "value": value,
+            "owner": owner,
+            "decision": decision,
+            "detail": detail,
+        },
+        action_url=url,
+        dedup_key=f"METRIC_REVIEWED:{row.id}",
+    )
+
+
+@events.subscribe(events.VentureStageChanged)
+async def on_venture_stage_changed(
+    session: AsyncSession, event: events.VentureStageChanged
+) -> None:
+    change = await session.get(VentureStageChange, event.change_id)
+    if change is None:
+        return
+    venture = await session.get(Venture, change.venture_id)
+    if venture is None:
+        return
+    recipients = [
+        uid for uid in await venture_member_ids(session, venture.id) if uid != change.changed_by
+    ]
+    await NotificationService(session).notify(
+        "VENTURE_STAGE_CHANGED",
+        recipients,
+        {
+            "venture": venture.name,
+            "stage": venture_rules.stage_title(change.to_stage),
+            "from_stage": venture_rules.stage_title(change.from_stage),
+        },
+        action_url=f"/ventures/{venture.id}",
+        dedup_key=f"VENTURE_STAGE_CHANGED:{change.id}",
     )
 
 

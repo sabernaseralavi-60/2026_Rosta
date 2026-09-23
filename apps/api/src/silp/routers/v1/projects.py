@@ -432,6 +432,7 @@ def _draft_of(payload: ProjectIn) -> ProjectDraft:
         starts_on=payload.starts_on,
         deadline_on=payload.deadline_on,
         applications_close_at=payload.applications_close_at,
+        venture_id=payload.venture_id,
         required_skills=[
             SkillRequirement(
                 skill_id=r.skill_id,

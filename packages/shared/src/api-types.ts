@@ -646,6 +646,205 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ideas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * بانک ایده
+         * @description FR-IDEA-01/02 — «داغ» با زوال زمانی، «تازه»، یا «پررأی».
+         *
+         *     `mine=true` ایده‌های خود کاربر را با هر وضعیتی می‌دهد، حتی بایگانی‌شده.
+         */
+        get: operations["list_ideas_api_v1_ideas_get"];
+        put?: never;
+        /** ثبت ایده */
+        post: operations["create_idea_api_v1_ideas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideas/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** دسته‌های ایده */
+        get: operations["categories_api_v1_ideas_categories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideas/comments/{comment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** حذف نظر */
+        delete: operations["delete_comment_api_v1_ideas_comments__comment_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideas/{idea_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** جزئیات ایده و نظرها */
+        get: operations["get_idea_api_v1_ideas__idea_id__get"];
+        put?: never;
+        post?: never;
+        /** حذف ایده (نویسنده) */
+        delete: operations["delete_idea_api_v1_ideas__idea_id__delete"];
+        options?: never;
+        head?: never;
+        /** ویرایش ایده (نویسنده) */
+        patch: operations["update_idea_api_v1_ideas__idea_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/ideas/{idea_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** بایگانی (ناظر) */
+        post: operations["archive_idea_api_v1_ideas__idea_id__archive_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideas/{idea_id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** نظر یا پاسخ */
+        post: operations["add_comment_api_v1_ideas__idea_id__comments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideas/{idea_id}/promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ارتقا به پروژه یا کسب‌وکار
+         * @description §7.8 — مجوز `idea.promote`. پروژه `DRAFT` می‌ماند تا استاد کاملش کند.
+         */
+        post: operations["promote_api_v1_ideas__idea_id__promote_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ideas/{idea_id}/vote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** رأی مثبت */
+        post: operations["vote_api_v1_ideas__idea_id__vote_post"];
+        /** پس گرفتن رأی */
+        delete: operations["unvote_api_v1_ideas__idea_id__vote_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{invitation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** لغو دعوت */
+        delete: operations["cancel_invitation_api_v1_invitations__invitation_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{invitation_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** پذیرش دعوت */
+        post: operations["accept_invitation_api_v1_invitations__invitation_id__accept_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{invitation_id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** رد دعوت */
+        post: operations["decline_invitation_api_v1_invitations__invitation_id__decline_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/leaderboard": {
         parameters: {
             query?: never;
@@ -779,6 +978,23 @@ export interface paths {
         };
         /** داشبورد دانشجو */
         get: operations["my_dashboard_api_v1_me_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** دعوت‌های باز من */
+        get: operations["my_invitations_api_v1_me_invitations_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -945,6 +1161,57 @@ export interface paths {
         head?: never;
         /** گام ۱ — مهارت‌ها */
         patch: operations["save_skills_api_v1_me_survey_skills_patch"];
+        trace?: never;
+    };
+    "/api/v1/metrics/review-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** صف تأیید شاخص */
+        get: operations["review_queue_api_v1_metrics_review_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/{metric_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** حذف ثبت در انتظار */
+        delete: operations["delete_metric_api_v1_metrics__metric_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metrics/{metric_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تأیید یا رد شاخص */
+        post: operations["review_metric_api_v1_metrics__metric_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/milestones/{milestone_id}": {
@@ -1487,6 +1754,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** دعوت مستقیم به تیم پروژه */
+        post: operations["invite_to_project_api_v1_projects__project_id__invitations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/leave": {
         parameters: {
             query?: never;
@@ -1498,6 +1782,27 @@ export interface paths {
         put?: never;
         /** ترک تیم */
         post: operations["leave_team_api_v1_projects__project_id__leave_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * فعالیت و فروش پروژه
+         * @description FR-VEN-02 — `by_member` همان «داشبورد عملکرد هر عضو» است.
+         */
+        get: operations["project_metrics_api_v1_projects__project_id__metrics_get"];
+        put?: never;
+        /** ثبت فعالیت یا فروش در پروژه */
+        post: operations["record_project_metric_api_v1_projects__project_id__metrics_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2642,10 +2947,169 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ventures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** فهرست کسب‌وکارها */
+        get: operations["list_ventures_api_v1_ventures_get"];
+        put?: never;
+        /** ثبت کسب‌وکار */
+        post: operations["create_venture_api_v1_ventures_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ventures/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** کسب‌وکارهای من */
+        get: operations["my_ventures_api_v1_ventures_mine_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ventures/{venture_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** صفحهٔ کسب‌وکار */
+        get: operations["get_venture_api_v1_ventures__venture_id__get"];
+        put?: never;
+        post?: never;
+        /** حذف (فقط مرحلهٔ ایده) */
+        delete: operations["delete_venture_api_v1_ventures__venture_id__delete"];
+        options?: never;
+        head?: never;
+        /** ویرایش کسب‌وکار */
+        patch: operations["update_venture_api_v1_ventures__venture_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/ventures/{venture_id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** دعوت‌های باز */
+        get: operations["venture_invitations_api_v1_ventures__venture_id__invitations_get"];
+        put?: never;
+        /** دعوت به تیم کسب‌وکار */
+        post: operations["invite_to_venture_api_v1_ventures__venture_id__invitations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ventures/{venture_id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ترک تیم */
+        post: operations["leave_venture_api_v1_ventures__venture_id__leave_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ventures/{venture_id}/members/{user_id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** حذف عضو با ذکر دلیل */
+        post: operations["remove_member_api_v1_ventures__venture_id__members__user_id__remove_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ventures/{venture_id}/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** فعالیت و فروش */
+        get: operations["venture_metrics_api_v1_ventures__venture_id__metrics_get"];
+        put?: never;
+        /** ثبت فعالیت یا فروش */
+        post: operations["record_venture_metric_api_v1_ventures__venture_id__metrics_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ventures/{venture_id}/stage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ارتقا، توقف، ازسرگیری یا بستن
+         * @description §7.7 — ارتقا فقط یک گام و با معیار خروج؛ کمبودها در `details.missing`.
+         */
+        post: operations["change_stage_api_v1_ventures__venture_id__stage_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcceptedOut */
+        AcceptedOut: {
+            /** Href */
+            href: string;
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "PROJECT" | "VENTURE";
+        };
         /**
          * AccessOut
          * @description سنجش دسترسی یک ماده برای کاربر جاری — ADR-0009.
@@ -2848,6 +3312,11 @@ export interface components {
             status: "PENDING" | "ACCEPTED" | "REJECTED" | "WAITLISTED" | "WITHDRAWN";
             /** Status Fa */
             status_fa: string;
+        };
+        /** ArchiveIn */
+        ArchiveIn: {
+            /** Reason */
+            reason: string;
         };
         /** AssetOut */
         AssetOut: {
@@ -3097,6 +3566,21 @@ export interface components {
             /** Username */
             username?: string | null;
         };
+        /**
+         * AuthorOut
+         * @description نویسنده — برای ایدهٔ ناشناس `None` است، مگر برای خودش.
+         */
+        AuthorOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string | null;
+            /** Username */
+            username: string | null;
+        };
         /** BadgeOut */
         BadgeOut: {
             /** Awarded At */
@@ -3210,6 +3694,16 @@ export interface components {
             /** Time */
             time: number;
         };
+        /** CategoryOut */
+        CategoryOut: {
+            /**
+             * Code
+             * @enum {string}
+             */
+            code: "TRANSPORT" | "AGRICULTURE" | "COMMERCE" | "EDUCATION" | "TECHNOLOGY" | "ENVIRONMENT" | "SOCIAL" | "OTHER";
+            /** Title Fa */
+            title_fa: string;
+        };
         /** ChannelConfirmIn */
         ChannelConfirmIn: {
             /** Code */
@@ -3264,6 +3758,46 @@ export interface components {
             requires_link: boolean;
             /** Title Fa */
             title_fa: string;
+        };
+        /** CommentIn */
+        CommentIn: {
+            /** Body */
+            body: string;
+            /** Parent Id */
+            parent_id?: string | null;
+        };
+        /** CommentOut */
+        CommentOut: {
+            author: components["schemas"]["AuthorOut"] | null;
+            /** Body */
+            body: string | null;
+            /**
+             * Can Delete
+             * @default false
+             */
+            can_delete: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Deleted
+             * @default false
+             */
+            is_deleted: boolean;
+            /**
+             * Is Mine
+             * @default false
+             */
+            is_mine: boolean;
+            /** Parent Id */
+            parent_id?: string | null;
         };
         /** CompleteProjectIn */
         CompleteProjectIn: {
@@ -3406,6 +3940,19 @@ export interface components {
             title_fa: string;
             /** Topics */
             topics?: string[];
+        };
+        /** CriterionOut */
+        CriterionOut: {
+            /** Code */
+            code: string;
+            /** Current */
+            current: number;
+            /** Met */
+            met: boolean;
+            /** Target */
+            target: number;
+            /** Text */
+            text: string;
         };
         /** DecisionIn */
         DecisionIn: {
@@ -3688,6 +4235,147 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** IdeaDetailOut */
+        IdeaDetailOut: {
+            /** Archived Reason */
+            archived_reason?: string | null;
+            author?: components["schemas"]["AuthorOut"] | null;
+            /** Body */
+            body: string;
+            /**
+             * Can Edit
+             * @default false
+             */
+            can_edit: boolean;
+            /**
+             * Can Moderate
+             * @default false
+             */
+            can_moderate: boolean;
+            /**
+             * Can Promote
+             * @default false
+             */
+            can_promote: boolean;
+            /** Category */
+            category?: ("TRANSPORT" | "AGRICULTURE" | "COMMERCE" | "EDUCATION" | "TECHNOLOGY" | "ENVIRONMENT" | "SOCIAL" | "OTHER") | null;
+            /** Category Fa */
+            category_fa?: string | null;
+            /** Comment Count */
+            comment_count: number;
+            /** Comments */
+            comments?: components["schemas"]["CommentOut"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Excerpt */
+            excerpt: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Anonymous */
+            is_anonymous: boolean;
+            /**
+             * Is Mine
+             * @default false
+             */
+            is_mine: boolean;
+            /** Problem */
+            problem?: string | null;
+            /** Promoted At */
+            promoted_at?: string | null;
+            /** Promoted To Id */
+            promoted_to_id?: string | null;
+            /** Promoted To Type */
+            promoted_to_type?: ("PROJECT" | "VENTURE") | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "OPEN" | "PROMOTED" | "ARCHIVED";
+            /** Tags */
+            tags?: string[];
+            /** Title */
+            title: string;
+            /** Vote Count */
+            vote_count: number;
+            /**
+             * Voted By Me
+             * @default false
+             */
+            voted_by_me: boolean;
+        };
+        /** IdeaIn */
+        IdeaIn: {
+            /** Body */
+            body: string;
+            /** Category */
+            category?: ("TRANSPORT" | "AGRICULTURE" | "COMMERCE" | "EDUCATION" | "TECHNOLOGY" | "ENVIRONMENT" | "SOCIAL" | "OTHER") | null;
+            /**
+             * Is Anonymous
+             * @default false
+             */
+            is_anonymous: boolean;
+            /** Problem */
+            problem?: string | null;
+            /** Tags */
+            tags?: string[];
+            /** Title */
+            title: string;
+        };
+        /** IdeaSummaryOut */
+        IdeaSummaryOut: {
+            author?: components["schemas"]["AuthorOut"] | null;
+            /** Category */
+            category?: ("TRANSPORT" | "AGRICULTURE" | "COMMERCE" | "EDUCATION" | "TECHNOLOGY" | "ENVIRONMENT" | "SOCIAL" | "OTHER") | null;
+            /** Category Fa */
+            category_fa?: string | null;
+            /** Comment Count */
+            comment_count: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Excerpt */
+            excerpt: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Anonymous */
+            is_anonymous: boolean;
+            /**
+             * Is Mine
+             * @default false
+             */
+            is_mine: boolean;
+            /** Promoted To Id */
+            promoted_to_id?: string | null;
+            /** Promoted To Type */
+            promoted_to_type?: ("PROJECT" | "VENTURE") | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "OPEN" | "PROMOTED" | "ARCHIVED";
+            /** Tags */
+            tags?: string[];
+            /** Title */
+            title: string;
+            /** Vote Count */
+            vote_count: number;
+            /**
+             * Voted By Me
+             * @default false
+             */
+            voted_by_me: boolean;
+        };
         /** IntegrityEventIn */
         IntegrityEventIn: {
             /** Detail */
@@ -3752,6 +4440,65 @@ export interface components {
         InterestsStepIn: {
             /** Interests */
             interests: components["schemas"]["InterestAnswerIn"][];
+        };
+        /** InvitationOut */
+        InvitationOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Href */
+            href: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Invitee Name */
+            invitee_name?: string | null;
+            /** Inviter Name */
+            inviter_name?: string | null;
+            /** Message */
+            message?: string | null;
+            /** Role Title */
+            role_title?: string | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "DIRECT" | "IDEA_PROMOTION" | "OPENING";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACCEPTED" | "DECLINED" | "CANCELLED";
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+            /** Target Title */
+            target_title: string;
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "PROJECT" | "VENTURE";
+        };
+        /** InviteIn */
+        InviteIn: {
+            /** Message */
+            message?: string | null;
+            /** Role Id */
+            role_id?: string | null;
+            /** Username */
+            username: string;
         };
         /** LeaderRowOut */
         LeaderRowOut: {
@@ -3885,6 +4632,20 @@ export interface components {
              * @default 0
              */
             sort_order: number;
+        };
+        /** LinkedProjectOut */
+        LinkedProjectOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Status */
+            status: string;
+            /** Title Fa */
+            title_fa: string;
         };
         /** LoginOut */
         LoginOut: {
@@ -4041,6 +4802,43 @@ export interface components {
             /** Total */
             total: string;
         };
+        /** MemberOut */
+        MemberOut: {
+            /** Is Founder */
+            is_founder: boolean;
+            /**
+             * Joined At
+             * Format: date-time
+             */
+            joined_at: string;
+            /** Name */
+            name: string | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Username */
+            username: string | null;
+        };
+        /** MemberTotalsOut */
+        MemberTotalsOut: {
+            /** Name */
+            name?: string | null;
+            /** Pending */
+            pending?: {
+                [key: string]: number;
+            };
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Verified */
+            verified?: {
+                [key: string]: number;
+            };
+        };
         /** MessageIn */
         MessageIn: {
             /** Body */
@@ -4077,6 +4875,125 @@ export interface components {
             id: string;
             /** Parent Id */
             parent_id?: string | null;
+        };
+        /** MetricIn */
+        MetricIn: {
+            /** Evidence File Id */
+            evidence_file_id?: string | null;
+            /**
+             * Metric
+             * @enum {string}
+             */
+            metric: "CALLS" | "MEETINGS" | "LEADS" | "SALES_COUNT" | "SALES_AMOUNT" | "CONTENT_PIECES" | "CUSTOMERS";
+            /** Note */
+            note?: string | null;
+            /**
+             * Occurred On
+             * Format: date
+             */
+            occurred_on: string;
+            /** Value */
+            value: number;
+        };
+        /** MetricOut */
+        MetricOut: {
+            /**
+             * Can Review
+             * @default false
+             */
+            can_review: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Evidence File Id */
+            evidence_file_id?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Mine
+             * @default false
+             */
+            is_mine: boolean;
+            /**
+             * Metric
+             * @enum {string}
+             */
+            metric: "CALLS" | "MEETINGS" | "LEADS" | "SALES_COUNT" | "SALES_AMOUNT" | "CONTENT_PIECES" | "CUSTOMERS";
+            /** Metric Fa */
+            metric_fa: string;
+            /** Note */
+            note?: string | null;
+            /**
+             * Occurred On
+             * Format: date
+             */
+            occurred_on: string;
+            /** Owner Title */
+            owner_title?: string | null;
+            /** Project Id */
+            project_id?: string | null;
+            /** Review Note */
+            review_note?: string | null;
+            /** Reviewed At */
+            reviewed_at?: string | null;
+            /** Reviewed By Name */
+            reviewed_by_name?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "VERIFIED" | "REJECTED";
+            /** Status Fa */
+            status_fa: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name?: string | null;
+            /** Value */
+            value: number;
+            /** Venture Id */
+            venture_id?: string | null;
+        };
+        /** MetricReviewIn */
+        MetricReviewIn: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "VERIFIED" | "REJECTED";
+            /** Note */
+            note?: string | null;
+        };
+        /** MetricTotalsOut */
+        MetricTotalsOut: {
+            /** Pending */
+            pending?: {
+                [key: string]: number;
+            };
+            /** Verified */
+            verified?: {
+                [key: string]: number;
+            };
+        };
+        /** MetricsOut */
+        MetricsOut: {
+            /** By Member */
+            by_member?: components["schemas"]["MemberTotalsOut"][];
+            /** Items */
+            items: components["schemas"]["MetricOut"][];
+            /** Metric Titles */
+            metric_titles?: {
+                [key: string]: string;
+            };
+            totals: components["schemas"]["MetricTotalsOut"];
         };
         /** MilestoneIn */
         MilestoneIn: {
@@ -4552,12 +5469,38 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[IdeaSummaryOut] */
+        Page_IdeaSummaryOut_: {
+            /** Has Next */
+            has_next: boolean;
+            /** Items */
+            items: components["schemas"]["IdeaSummaryOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
         /** Page[ProjectSummaryOut] */
         Page_ProjectSummaryOut_: {
             /** Has Next */
             has_next: boolean;
             /** Items */
             items: components["schemas"]["ProjectSummaryOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[VentureSummaryOut] */
+        Page_VentureSummaryOut_: {
+            /** Has Next */
+            has_next: boolean;
+            /** Items */
+            items: components["schemas"]["VentureSummaryOut"][];
             /** Page */
             page: number;
             /** Page Size */
@@ -5053,6 +5996,8 @@ export interface components {
             time_commitment_hpw?: number | null;
             /** Title Fa */
             title_fa: string;
+            /** Venture Id */
+            venture_id?: string | null;
             /**
              * Work Style
              * @default EITHER
@@ -5133,6 +6078,37 @@ export interface components {
              * @enum {string}
              */
             work_style: "SOLO" | "TEAM" | "EITHER";
+        };
+        /** PromoteIn */
+        PromoteIn: {
+            /** Expected Output */
+            expected_output?: string | null;
+            /**
+             * Project Kind
+             * @default C_PROBLEM
+             * @enum {string}
+             */
+            project_kind: "A_VENTURE" | "B_RESEARCH" | "C_PROBLEM" | "D_PERSONAL";
+            /**
+             * Target
+             * @enum {string}
+             */
+            target: "PROJECT" | "VENTURE";
+        };
+        /** PromotionOut */
+        PromotionOut: {
+            /** Href */
+            href: string;
+            /**
+             * Target Id
+             * Format: uuid
+             */
+            target_id: string;
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "PROJECT" | "VENTURE";
         };
         /** PublishWeekIn */
         PublishWeekIn: {
@@ -5425,6 +6401,17 @@ export interface components {
             /** Updated */
             updated: number;
         };
+        /** ReadinessOut */
+        ReadinessOut: {
+            /** Criteria */
+            criteria: components["schemas"]["CriterionOut"][];
+            /** Next Stage */
+            next_stage: ("IDEA" | "VALIDATION" | "MVP" | "FIRST_REVENUE" | "GROWTH" | "PAUSED" | "CLOSED") | null;
+            /** Next Stage Fa */
+            next_stage_fa: string | null;
+            /** Ready */
+            ready: boolean;
+        };
         /**
          * ReasonIn
          * @description بدنهٔ اقدام‌هایی که سند برایشان «با ذکر دلیل» نوشته است — §7.4.
@@ -5513,6 +6500,11 @@ export interface components {
         RefreshIn: {
             /** Refresh Token */
             refresh_token: string;
+        };
+        /** RemoveMemberIn */
+        RemoveMemberIn: {
+            /** Reason */
+            reason: string;
         };
         /** ReorderIn */
         ReorderIn: {
@@ -5843,6 +6835,47 @@ export interface components {
         SkillsStepIn: {
             /** Skills */
             skills: components["schemas"]["SkillAnswerIn"][];
+        };
+        /** StageChangeIn */
+        StageChangeIn: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "ADVANCE" | "PAUSE" | "RESUME" | "CLOSE";
+            /** Reason */
+            reason?: string | null;
+        };
+        /** StageChangeOut */
+        StageChangeOut: {
+            /** Changed By Name */
+            changed_by_name?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * From Stage
+             * @enum {string}
+             */
+            from_stage: "IDEA" | "VALIDATION" | "MVP" | "FIRST_REVENUE" | "GROWTH" | "PAUSED" | "CLOSED";
+            /** From Stage Fa */
+            from_stage_fa: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reason */
+            reason?: string | null;
+            /**
+             * To Stage
+             * @enum {string}
+             */
+            to_stage: "IDEA" | "VALIDATION" | "MVP" | "FIRST_REVENUE" | "GROWTH" | "PAUSED" | "CLOSED";
+            /** To Stage Fa */
+            to_stage_fa: string;
         };
         /** StudentAtRiskOut */
         StudentAtRiskOut: {
@@ -6397,6 +7430,139 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /** VentureDetailOut */
+        VentureDetailOut: {
+            /**
+             * Can Manage
+             * @default false
+             */
+            can_manage: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Current Status */
+            current_status?: string | null;
+            /** Description */
+            description?: string | null;
+            founder?: components["schemas"]["MemberOut"] | null;
+            /** History */
+            history?: components["schemas"]["StageChangeOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Member
+             * @default false
+             */
+            is_member: boolean;
+            /** Looking For Cofounder */
+            looking_for_cofounder: boolean;
+            /**
+             * Member Count
+             * @default 0
+             */
+            member_count: number;
+            /** Members */
+            members?: components["schemas"]["MemberOut"][];
+            /** Name */
+            name: string;
+            /** Needed Roles */
+            needed_roles?: string[];
+            /** Origin Idea Id */
+            origin_idea_id?: string | null;
+            /** Paused From Stage */
+            paused_from_stage?: ("IDEA" | "VALIDATION" | "MVP" | "FIRST_REVENUE" | "GROWTH" | "PAUSED" | "CLOSED") | null;
+            /** Pitch */
+            pitch: string;
+            /** Problem */
+            problem?: string | null;
+            /** Projects */
+            projects?: components["schemas"]["LinkedProjectOut"][];
+            readiness?: components["schemas"]["ReadinessOut"] | null;
+            /** Revenue Model */
+            revenue_model?: string | null;
+            /** Slug */
+            slug: string;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "IDEA" | "VALIDATION" | "MVP" | "FIRST_REVENUE" | "GROWTH" | "PAUSED" | "CLOSED";
+            /**
+             * Stage Changed At
+             * Format: date-time
+             */
+            stage_changed_at: string;
+            /** Stage Fa */
+            stage_fa: string;
+            /** Target Market */
+            target_market?: string | null;
+            totals?: components["schemas"]["MetricTotalsOut"] | null;
+        };
+        /** VentureIn */
+        VentureIn: {
+            /** Current Status */
+            current_status?: string | null;
+            /** Description */
+            description?: string | null;
+            /**
+             * Looking For Cofounder
+             * @default false
+             */
+            looking_for_cofounder: boolean;
+            /** Name */
+            name: string;
+            /** Needed Roles */
+            needed_roles?: string[];
+            /** Pitch */
+            pitch: string;
+            /** Problem */
+            problem?: string | null;
+            /** Revenue Model */
+            revenue_model?: string | null;
+            /** Target Market */
+            target_market?: string | null;
+        };
+        /** VentureSummaryOut */
+        VentureSummaryOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            founder?: components["schemas"]["MemberOut"] | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Looking For Cofounder */
+            looking_for_cofounder: boolean;
+            /**
+             * Member Count
+             * @default 0
+             */
+            member_count: number;
+            /** Name */
+            name: string;
+            /** Needed Roles */
+            needed_roles?: string[];
+            /** Pitch */
+            pitch: string;
+            /** Slug */
+            slug: string;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "IDEA" | "VALIDATION" | "MVP" | "FIRST_REVENUE" | "GROWTH" | "PAUSED" | "CLOSED";
+            /** Stage Fa */
+            stage_fa: string;
+        };
         /**
          * VisibleQuestionOut
          * @description سؤال در تلاش فعال — `payload` هرگز کلید پاسخ ندارد (§5.6).
@@ -6431,6 +7597,18 @@ export interface components {
             };
             /** Points */
             points: string;
+        };
+        /** VoteOut */
+        VoteOut: {
+            /**
+             * Idea Id
+             * Format: uuid
+             */
+            idea_id: string;
+            /** Vote Count */
+            vote_count: number;
+            /** Voted By Me */
+            voted_by_me: boolean;
         };
         /** WeekDetailOut */
         WeekDetailOut: {
@@ -8099,6 +9277,531 @@ export interface operations {
             };
         };
     };
+    list_ideas_api_v1_ideas_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                page_size?: number;
+                q?: string | null;
+                category?: ("TRANSPORT" | "AGRICULTURE" | "COMMERCE" | "EDUCATION" | "TECHNOLOGY" | "ENVIRONMENT" | "SOCIAL" | "OTHER") | null;
+                tag?: string | null;
+                status?: ("OPEN" | "PROMOTED" | "ARCHIVED") | null;
+                mine?: boolean;
+                sort?: "hot" | "new" | "top";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_IdeaSummaryOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_idea_api_v1_ideas_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdeaIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdeaDetailOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    categories_api_v1_ideas_categories_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryOut"][];
+                };
+            };
+        };
+    };
+    delete_comment_api_v1_ideas_comments__comment_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_idea_api_v1_ideas__idea_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdeaDetailOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_idea_api_v1_ideas__idea_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_idea_api_v1_ideas__idea_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IdeaIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdeaDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    archive_idea_api_v1_ideas__idea_id__archive_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArchiveIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IdeaDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_comment_api_v1_ideas__idea_id__comments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    promote_api_v1_ideas__idea_id__promote_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromotionOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    vote_api_v1_ideas__idea_id__vote_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoteOut"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unvote_api_v1_ideas__idea_id__vote_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                idea_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_invitation_api_v1_invitations__invitation_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_invitation_api_v1_invitations__invitation_id__accept_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptedOut"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decline_invitation_api_v1_invitations__invitation_id__decline_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     leaderboard_api_v1_leaderboard_get: {
         parameters: {
             query?: {
@@ -8356,6 +10059,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    my_invitations_api_v1_me_invitations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationOut"][];
                 };
             };
         };
@@ -8703,6 +10426,108 @@ export interface operations {
             };
             /** @description احراز هویت نشده */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_queue_api_v1_metrics_review_queue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricOut"][];
+                };
+            };
+        };
+    };
+    delete_metric_api_v1_metrics__metric_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                metric_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_metric_api_v1_metrics__metric_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                metric_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetricReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -10187,6 +12012,41 @@ export interface operations {
             };
         };
     };
+    invite_to_project_api_v1_projects__project_id__invitations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     leave_team_api_v1_projects__project_id__leave_post: {
         parameters: {
             query?: never;
@@ -10225,6 +12085,74 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    project_metrics_api_v1_projects__project_id__metrics_get: {
+        parameters: {
+            query?: {
+                status?: ("PENDING" | "VERIFIED" | "REJECTED") | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_project_metric_api_v1_projects__project_id__metrics_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetricIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricOut"];
                 };
             };
             /** @description Validation Error */
@@ -13260,6 +15188,439 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_ventures_api_v1_ventures_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                page_size?: number;
+                q?: string | null;
+                stage?: ("IDEA" | "VALIDATION" | "MVP" | "FIRST_REVENUE" | "GROWTH" | "PAUSED" | "CLOSED") | null;
+                looking_for_cofounder?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_VentureSummaryOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_venture_api_v1_ventures_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VentureIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VentureDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_ventures_api_v1_ventures_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VentureSummaryOut"][];
+                };
+            };
+        };
+    };
+    get_venture_api_v1_ventures__venture_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VentureDetailOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_venture_api_v1_ventures__venture_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_venture_api_v1_ventures__venture_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VentureIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VentureDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    venture_invitations_api_v1_ventures__venture_id__invitations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    invite_to_venture_api_v1_ventures__venture_id__invitations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    leave_venture_api_v1_ventures__venture_id__leave_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_member_api_v1_ventures__venture_id__members__user_id__remove_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemoveMemberIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    venture_metrics_api_v1_ventures__venture_id__metrics_get: {
+        parameters: {
+            query?: {
+                status?: ("PENDING" | "VERIFIED" | "REJECTED") | null;
+            };
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_venture_metric_api_v1_ventures__venture_id__metrics_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetricIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_stage_api_v1_ventures__venture_id__stage_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                venture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StageChangeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VentureDetailOut"];
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -126,6 +126,8 @@ class Settings(BaseSettings):
     default_term_code: str = "1404-2"
     quiet_hours_start: Annotated[int, Field(ge=0, le=23)] = 23
     quiet_hours_end: Annotated[int, Field(ge=0, le=23)] = 8
+    # §7.7 «آستانهٔ تنظیمات» برای گذار FIRST_REVENUE → GROWTH، به ریال.
+    venture_growth_threshold_rial: Annotated[int, Field(ge=1)] = 500_000_000
 
     # ── مشتق‌ها ────────────────────────────────────────────────────────
     @property

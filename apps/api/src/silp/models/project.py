@@ -43,6 +43,9 @@ HEALTH_STATES = ("HEALTHY", "AT_RISK", "STALLED")
 MEMBER_STATUSES = ("ACTIVE", "LEFT", "REMOVED")
 APPLICATION_STATUSES = ("PENDING", "ACCEPTED", "REJECTED", "WAITLISTED", "WITHDRAWN")
 FEEDBACK_VERDICTS = ("NOT_RELEVANT", "INTERESTED", "DISMISSED")
+INVITATION_STATUSES = ("PENDING", "ACCEPTED", "DECLINED", "CANCELLED")
+#: از کجا آمده — دعوت مستقیم از نیمرخ، ارتقای ایده، یا پاسخ به آگهی (FR-TEAM-03).
+INVITATION_SOURCES = ("DIRECT", "IDEA_PROMOTION", "OPENING")
 
 # §11 سند v1 — چهار نوع پروژه با عنوان فارسی برای نمایش و متن دلیل.
 KIND_TITLE_FA: dict[str, str] = {
@@ -81,10 +84,17 @@ class Project(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     lead_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=False
     )
-    # ارجاع‌های رو به جلو — قید در مهاجرت ۰۰۶، ۰۰۹ و ۰۰۸ افزوده می‌شود.
-    offering_id: Mapped[uuid.UUID | None] = mapped_column(PGUUID(as_uuid=True))
-    venture_id: Mapped[uuid.UUID | None] = mapped_column(PGUUID(as_uuid=True))
-    origin_idea_id: Mapped[uuid.UUID | None] = mapped_column(PGUUID(as_uuid=True))
+    # ارجاع‌های رو به جلو — ستون در ۰۰۱۰ ساخته شد و قیدش در مهاجرت جدول
+    # مقصد (۰۰۶، ۰۰۹ و ۰۰۸) افزوده می‌شود (ADR-0004).
+    offering_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("course_offerings.id")
+    )
+    venture_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("ventures.id")
+    )
+    origin_idea_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("ideas.id")
+    )
 
     # ── مشخصات تطابق (§08) ─────────────────────────────────────────────
     time_commitment_hpw: Mapped[int | None] = mapped_column(Integer)
@@ -158,6 +168,14 @@ class Project(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
             postgresql_where=text("status = 'OPEN' AND deleted_at IS NULL"),
         ),
         Index("idx_projects_health", "health", postgresql_where=text("health <> 'HEALTHY'")),
+        Index(
+            "idx_projects_offering",
+            "offering_id",
+            postgresql_where=text("offering_id IS NOT NULL"),
+        ),
+        Index(
+            "idx_projects_venture", "venture_id", postgresql_where=text("venture_id IS NOT NULL")
+        ),
     )
 
     @property
@@ -264,8 +282,10 @@ class Team(UUIDPrimaryKeyMixin, Base):
     project_id: Mapped[uuid.UUID | None] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE")
     )
-    # ارجاع رو به جلو — قید در مهاجرت ۰۰۹ افزوده می‌شود.
-    venture_id: Mapped[uuid.UUID | None] = mapped_column(PGUUID(as_uuid=True))
+    # ارجاع رو به جلو — قید در مهاجرت ۰۰۹ افزوده شد.
+    venture_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("ventures.id", ondelete="CASCADE")
+    )
     name: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=text("now()")
@@ -280,6 +300,12 @@ class Team(UUIDPrimaryKeyMixin, Base):
             "(project_id IS NOT NULL)::int + (venture_id IS NOT NULL)::int = 1", name="owner"
         ),
         Index("idx_teams_project", "project_id"),
+        Index(
+            "idx_teams_venture",
+            "venture_id",
+            unique=True,
+            postgresql_where=text("venture_id IS NOT NULL"),
+        ),
     )
 
 
@@ -365,6 +391,62 @@ class ProjectApplication(UUIDPrimaryKeyMixin, Base):
     )
 
 
+class TeamInvitation(UUIDPrimaryKeyMixin, Base):
+    """دعوت به تیم پروژه یا کسب‌وکار — FR-TEAM-03، §7.8.
+
+    دعوت به **تیم** است، نه به پروژه: تیم کسب‌وکار و تیم پروژه یک جدول‌اند
+    و پذیرش در هر دو یعنی یک ردیف `team_members`.
+
+    «منقضی» وضعیت ذخیره‌شده نیست: دعوتی که `expires_at` آن گذشته، هنوز
+    `PENDING` است ولی پذیرفته نمی‌شود و در فهرست نمی‌آید. کاری که هر
+    شب وضعیت را عوض کند، فقط یک جای دیگر برای ناهمخوانی می‌ساخت.
+    """
+
+    __tablename__ = "team_invitations"
+
+    team_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("teams.id", ondelete="CASCADE"), nullable=False
+    )
+    inviter_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    invitee_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    role_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("project_roles.id", ondelete="SET NULL")
+    )
+    message: Mapped[str | None] = mapped_column(Text)
+    source: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'DIRECT'"))
+    status: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'PENDING'"))
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now() + interval '14 days'")
+    )
+    responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+    __table_args__ = (
+        CheckConstraint(_in_list("status", INVITATION_STATUSES), name="status_valid"),
+        CheckConstraint(_in_list("source", INVITATION_SOURCES), name="source_valid"),
+        CheckConstraint("inviter_id <> invitee_id", name="not_self"),
+        CheckConstraint("message IS NULL OR length(message) <= 500", name="message_length"),
+        CheckConstraint(
+            "(status = 'PENDING') = (responded_at IS NULL)", name="responded_matches_status"
+        ),
+        # یک دعوت باز به‌ازای هر (تیم، کاربر) — دعوت دوباره همان را برمی‌گرداند.
+        Index(
+            "idx_team_invitations_open",
+            "team_id",
+            "invitee_id",
+            unique=True,
+            postgresql_where=text("status = 'PENDING'"),
+        ),
+        Index("idx_team_invitations_invitee", "invitee_id", "status"),
+    )
+
+
 class RecommendationFeedback(Base):
     """§4.9 و §8.9 — «این به من نمی‌خورد» / «دیگر نشانم نده» / «فعلاً نه».
 
@@ -394,6 +476,8 @@ __all__ = [
     "APPLICATION_STATUSES",
     "DIFFICULTY_TITLE_FA",
     "FEEDBACK_VERDICTS",
+    "INVITATION_SOURCES",
+    "INVITATION_STATUSES",
     "KIND_TITLE_FA",
     "PROJECT_KINDS",
     "PROJECT_STATUSES",
@@ -405,5 +489,6 @@ __all__ = [
     "ProjectRole",
     "RecommendationFeedback",
     "Team",
+    "TeamInvitation",
     "TeamMember",
 ]

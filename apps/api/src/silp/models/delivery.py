@@ -421,9 +421,13 @@ class TeamOpening(UUIDPrimaryKeyMixin, Base):
     project_id: Mapped[uuid.UUID | None] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE")
     )
-    # ارجاع‌های رو به جلو — قید در ۰۰۹ و ۰۰۸ افزوده می‌شود.
-    venture_id: Mapped[uuid.UUID | None] = mapped_column(PGUUID(as_uuid=True))
-    idea_id: Mapped[uuid.UUID | None] = mapped_column(PGUUID(as_uuid=True))
+    # ارجاع‌های رو به جلو — قیدشان در ۰۰۹ و ۰۰۸ افزوده شد.
+    venture_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("ventures.id", ondelete="CASCADE")
+    )
+    idea_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("ideas.id", ondelete="CASCADE")
+    )
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     needed_skills: Mapped[list[uuid.UUID]] = mapped_column(

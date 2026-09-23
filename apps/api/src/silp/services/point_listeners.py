@@ -9,9 +9,9 @@
   دیتابیس حساب و با `reconcile` هم‌تراز می‌شود. همین تابع‌ها را کار
   پس‌زمینهٔ `release_quiz_points` هم صدا می‌زند.
 
-قواعدی که ماژول منبعشان هنوز ساخته نشده (پژوهش، کارآفرینی، ایده،
-پرسش‌وپاسخ، ارزیابی همتا، بازتاب) در `point_rules` هستند ولی شنونده ندارند؛
-با همان ماژول‌ها در M7 وصل می‌شوند (§13.6).
+ایده و کارآفرینی از M7 وصل‌اند. قواعدی که ماژول منبعشان هنوز ساخته نشده
+(پژوهش، پرسش‌وپاسخ، ارزیابی همتا، بازتاب) در `point_rules` هستند ولی
+شنونده ندارند.
 """
 
 from __future__ import annotations
@@ -25,6 +25,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.logging import get_logger
 from silp.core.permissions import Role
+from silp.domain import ideas as idea_rules
+from silp.domain import ventures as venture_rules
 from silp.domain.gamification import formulas
 from silp.models.delivery import Deliverable, Milestone
 from silp.models.education import (
@@ -35,9 +37,11 @@ from silp.models.education import (
     Resource,
     ResourceProgress,
 )
+from silp.models.idea import Idea
 from silp.models.profile import TOTAL_SURVEY_STEPS
 from silp.models.project import Project, ProjectApplication, Team, TeamMember
 from silp.models.quiz import Quiz, QuizAttempt
+from silp.models.venture import Venture, VentureMetric, VentureStageChange
 from silp.services import authz, events
 from silp.services.grading_service import results_visible
 from silp.services.points_service import Award, PointsService, SourceKey
@@ -482,4 +486,137 @@ async def on_survey_step_completed(
     )
 
 
-__all__ = ["LearningPoints", "active_member_ids"]
+# ── ایده — §9.2 `COMMUNITY` ────────────────────────────────────────────
+@events.subscribe(events.IdeaSubmitted)
+async def on_idea_submitted(session: AsyncSession, event: events.IdeaSubmitted) -> None:
+    idea = await session.get(Idea, event.idea_id)
+    if idea is None:
+        return
+    await PointsService(session).award(idea.author_id, Award("IDEA_SUBMITTED", "IDEA", idea.id))
+
+
+@events.subscribe(events.IdeaWithdrawn)
+async def on_idea_withdrawn(session: AsyncSession, event: events.IdeaWithdrawn) -> None:
+    """ایدهٔ حذف یا بایگانی‌شده ارزشی نساخته؛ امتیاز ثبتش برمی‌گردد.
+
+    بدون این، ثبت و حذف پیاپی زیر سقف روزانه، امتیاز بی‌کار بود (§09).
+    امتیازهای آستانهٔ رأی می‌مانند: آن رأی‌ها را دیگران داده‌اند.
+    """
+    idea = await session.get(Idea, event.idea_id)
+    if idea is None:
+        return
+    await PointsService(session).reconcile(
+        idea.author_id,
+        desired=[],
+        universe=[("IDEA_SUBMITTED", "IDEA", idea.id)],
+        reason="ایده حذف یا بایگانی شد",
+    )
+
+
+@events.subscribe(events.IdeaVoted)
+async def on_idea_voted(session: AsyncSession, event: events.IdeaVoted) -> None:
+    """آستانهٔ ۱۰ و ۵۰ رأی — «یک‌بار»؛ پس گرفتن رأی آن را برنمی‌گرداند."""
+    idea = await session.get(Idea, event.idea_id)
+    if idea is None:
+        return
+    points = PointsService(session)
+    for rule in idea_rules.reached_milestones(idea.vote_count):
+        await points.award(idea.author_id, Award(rule, "IDEA", idea.id))
+
+
+@events.subscribe(events.IdeaPromoted)
+async def on_idea_promoted(session: AsyncSession, event: events.IdeaPromoted) -> None:
+    idea = await session.get(Idea, event.idea_id)
+    if idea is None or idea.status != "PROMOTED":
+        return
+    await PointsService(session).award(idea.author_id, Award("IDEA_PROMOTED", "IDEA", idea.id))
+
+
+# ── کارآفرینی — §9.2 `STARTUP` ─────────────────────────────────────────
+@events.subscribe(events.VentureCreated)
+async def on_venture_created(session: AsyncSession, event: events.VentureCreated) -> None:
+    venture = await session.get(Venture, event.venture_id)
+    if venture is None:
+        return
+    await PointsService(session).award(
+        venture.founder_id, Award("VENTURE_CREATED", "VENTURE", venture.id)
+    )
+
+
+@events.subscribe(events.VentureDeleted)
+async def on_venture_deleted(session: AsyncSession, event: events.VentureDeleted) -> None:
+    venture = await session.get(Venture, event.venture_id)
+    if venture is None:
+        return
+    await PointsService(session).reconcile(
+        venture.founder_id,
+        desired=[],
+        universe=[("VENTURE_CREATED", "VENTURE", venture.id)],
+        reason="کسب‌وکار حذف شد",
+    )
+
+
+async def venture_member_ids(session: AsyncSession, venture_id: uuid.UUID) -> list[uuid.UUID]:
+    rows = await session.scalars(
+        select(TeamMember.user_id)
+        .join(Team, Team.id == TeamMember.team_id)
+        .where(Team.venture_id == venture_id, TeamMember.status == "ACTIVE")
+    )
+    return list(dict.fromkeys(rows))
+
+
+@events.subscribe(events.VentureStageChanged)
+async def on_venture_stage_changed(
+    session: AsyncSession, event: events.VentureStageChanged
+) -> None:
+    """`50 × مرحله` برای **همهٔ اعضای فعال** — ارتقا کار تیم است (ADR-0014).
+
+    فقط گذار رو به جلو در مسیر رشد امتیاز دارد؛ بازگشت از توقف به همان
+    مرحله، ارتقا نیست.
+    """
+    change = await session.get(VentureStageChange, event.change_id)
+    if change is None:
+        return
+    target = change.to_stage
+    if venture_rules.next_growth_stage(change.from_stage) != target:
+        return
+    award = Award(
+        "VENTURE_STAGE_UP",
+        "VENTURE_STAGE",
+        change.id,
+        multiplier=Decimal(venture_rules.stage_number(target)),
+        note=venture_rules.stage_title(target),
+    )
+    points = PointsService(session)
+    for member_id in await venture_member_ids(session, change.venture_id):
+        await points.award(member_id, award)
+
+
+@events.subscribe(events.MetricReviewed)
+async def on_metric_reviewed(session: AsyncSession, event: events.MetricReviewed) -> None:
+    """شاخص تأییدشده ⇒ امتیاز ثبت‌کننده. ضریب از `venture_rules.metric_multiplier`."""
+    row = await session.get(VentureMetric, event.metric_id)
+    if row is None or row.status != "VERIFIED":
+        return
+    rule_code = venture_rules.METRIC_RULES[row.metric]
+    points = PointsService(session)
+    rule = await points.rule(rule_code)
+    offering_id = None
+    if row.project_id is not None:
+        project = await session.get(Project, row.project_id)
+        offering_id = project.offering_id if project is not None else None
+    await points.award(
+        row.user_id,
+        Award(
+            rule_code,
+            "METRIC",
+            row.id,
+            multiplier=venture_rules.metric_multiplier(
+                row.metric, row.value, per_row_cap=rule.daily_cap if rule else None
+            ),
+            offering_id=offering_id,
+        ),
+    )
+
+
+__all__ = ["LearningPoints", "active_member_ids", "venture_member_ids"]

@@ -333,3 +333,79 @@ async def test_notification_preferences_survive_the_request(  # type: ignore[no-
         stored = await verifier.get(NotificationPreference, (account["user_id"], "COURSE"))
     assert stored is not None, "ترجیح commit نشده است"
     assert stored.channels == ["IN_APP", "SMS"]
+
+
+async def test_idea_and_its_points_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """M7 — ایده، امتیاز ثبتش (شنونده) و نظر با شمارندهٔ تریگری."""
+    from silp.models.gamification import PointEntry
+    from silp.models.idea import Idea
+
+    created = await committing_client.post(
+        "/api/v1/ideas",
+        headers=auth(account),
+        json={"title": "ایدهٔ پایدار", "body": "شرح کافی برای یک ایدهٔ آزمایشی."},
+    )
+    assert created.status_code == 201, created.text
+    idea_id = uuid.UUID(created.json()["id"])
+    try:
+        comment = await committing_client.post(
+            f"/api/v1/ideas/{idea_id}/comments", headers=auth(account), json={"body": "نظر"}
+        )
+        assert comment.status_code == 201, comment.text
+        async with other_connection() as verifier:
+            stored = await verifier.get(Idea, idea_id)
+            assert stored is not None, "ایده commit نشده است"
+            assert stored.comment_count == 1, "شمارندهٔ نظر commit نشده است"
+            rules = list(
+                await verifier.scalars(
+                    select(PointEntry.rule_code).where(PointEntry.user_id == account["user_id"])
+                )
+            )
+        assert "IDEA_SUBMITTED" in rules
+    finally:
+        await committing_session.execute(delete(Idea).where(Idea.id == idea_id))
+        await committing_session.commit()
+
+
+async def test_username_and_venture_with_team_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """نام کاربری با نام نیمرخ ساخته می‌شود؛ کسب‌وکار و تیمش در یک تراکنش."""
+    from tests.integration.helpers import complete_profile
+
+    from silp.models.identity import User
+    from silp.models.project import Team, TeamMember
+    from silp.models.venture import Venture, VentureMetric
+
+    await complete_profile(committing_client, account["token"], first_name="مریم")
+    async with other_connection() as verifier:
+        username = await verifier.scalar(select(User.username).where(User.id == account["user_id"]))
+    assert username == "marim-rastami", username
+
+    created = await committing_client.post(
+        "/api/v1/ventures",
+        headers=auth(account),
+        json={"name": "کسب‌وکار پایدار", "pitch": "معرفی یک‌خطی کسب‌وکار آزمایشی."},
+    )
+    assert created.status_code == 201, created.text
+    venture_id = uuid.UUID(created.json()["id"])
+    try:
+        metric = await committing_client.post(
+            f"/api/v1/ventures/{venture_id}/metrics",
+            headers=auth(account),
+            json={"metric": "CALLS", "value": 2, "occurred_on": "2026-09-01"},
+        )
+        assert metric.status_code == 201, metric.text
+        async with other_connection() as verifier:
+            team_id = await verifier.scalar(select(Team.id).where(Team.venture_id == venture_id))
+            assert team_id is not None, "تیم کسب‌وکار commit نشده است"
+            founder = await verifier.scalar(
+                select(TeamMember.is_lead).where(TeamMember.team_id == team_id)
+            )
+            assert founder is True
+            assert await verifier.get(VentureMetric, uuid.UUID(metric.json()["id"])) is not None
+    finally:
+        await committing_session.execute(delete(Venture).where(Venture.id == venture_id))
+        await committing_session.commit()

@@ -28,17 +28,19 @@ from silp.integrations.messaging.bots import (
 from silp.integrations.sms.kavenegar import KavenegarSMSSender
 from silp.services.template_service import SAMPLE_VALUES
 
-MIGRATION = (
-    Path(__file__).resolve().parents[2] / "src/silp/db/migrations/versions/0013_messaging.py"
-)
+MIGRATIONS = Path(__file__).resolve().parents[2] / "src/silp/db/migrations/versions"
 
 
 def _seeded_templates() -> tuple[tuple[str, str, str | None, str, tuple[str, ...]], ...]:
-    spec = importlib.util.spec_from_file_location("migration_0013", MIGRATION)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module.TEMPLATES  # type: ignore[no-any-return]
+    """الگوهای همهٔ مهاجرت‌ها — ۰۰۱۳ پایه را کاشت و مهاجرت‌های بعدی افزودند."""
+    seeded: list[tuple[str, str, str | None, str, tuple[str, ...]]] = []
+    for path in sorted(MIGRATIONS.glob("*.py")):
+        spec = importlib.util.spec_from_file_location(f"migration_{path.stem}", path)
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        seeded.extend(getattr(module, "TEMPLATES", ()))
+    return tuple(seeded)
 
 
 # ── فهرست انواع و دادهٔ اولیهٔ الگو ────────────────────────────────────

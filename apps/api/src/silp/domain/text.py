@@ -20,6 +20,11 @@ def to_persian_digits(value: str | int | float) -> str:
     return str(value).translate(_TO_PERSIAN).replace(".", "٫")
 
 
+def format_number_fa(value: int) -> str:
+    """عدد صحیح با جداکنندهٔ هزارگان فارسی: ۵۰۰٬۰۰۰."""
+    return to_persian_digits(f"{value:,}".replace(",", "٬"))
+
+
 def join_fa(parts: list[str]) -> str:
     """پیوند فهرست با «و» فارسی: «الف، ب و ج»."""
     if not parts:
@@ -29,4 +34,4 @@ def join_fa(parts: list[str]) -> str:
     return f"{'، '.join(parts[:-1])} و {parts[-1]}"
 
 
-__all__ = ["join_fa", "to_persian_digits"]
+__all__ = ["format_number_fa", "join_fa", "to_persian_digits"]

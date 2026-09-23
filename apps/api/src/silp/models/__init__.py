@@ -30,6 +30,7 @@ from silp.models.education import (
 )
 from silp.models.file import File
 from silp.models.gamification import Badge, PointEntry, PointRule, UserBadge
+from silp.models.idea import Idea, IdeaComment, IdeaVote
 from silp.models.identity import (
     NULL_SCOPE,
     OTPChallenge,
@@ -61,6 +62,7 @@ from silp.models.project import (
     ProjectRole,
     RecommendationFeedback,
     Team,
+    TeamInvitation,
     TeamMember,
 )
 from silp.models.quiz import (
@@ -72,6 +74,7 @@ from silp.models.quiz import (
     QuizQuestion,
 )
 from silp.models.taxonomy import Asset, Interest, Skill, University
+from silp.models.venture import Venture, VentureMetric, VentureStageChange
 
 __all__ = [
     "NULL_SCOPE",
@@ -91,6 +94,9 @@ __all__ = [
     "Enrollment",
     "File",
     "GradeAppeal",
+    "Idea",
+    "IdeaComment",
+    "IdeaVote",
     "Interest",
     "MaterialAccessEvent",
     "MessageTemplate",
@@ -131,6 +137,7 @@ __all__ = [
     "Subscription",
     "SubscriptionPlan",
     "Team",
+    "TeamInvitation",
     "TeamMember",
     "TeamOpening",
     "Term",
@@ -139,5 +146,8 @@ __all__ = [
     "UserBadge",
     "UserChannel",
     "UserRole",
+    "Venture",
+    "VentureMetric",
+    "VentureStageChange",
     "WeekMaterial",
 ]

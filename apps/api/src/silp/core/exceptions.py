@@ -142,6 +142,35 @@ class ConcurrentModification(Conflict):
     log_level = "warning"
 
 
+# ── ایده، کارآفرینی، تیم — §5.13، M7 ───────────────────────────────────
+class DuplicateVote(Conflict):
+    code = "DUPLICATE_VOTE"
+    message = "شما قبلاً به این ایده رأی داده‌اید."
+
+
+class StageCriteriaNotMet(Conflict):
+    """§7.7 — «۴۰۹ با فهرست موارد کمبود تا کاربر بداند دقیقاً چه لازم است»."""
+
+    code = "STAGE_CRITERIA_NOT_MET"
+    message = "شرایط ارتقا به مرحلهٔ بعد فراهم نیست."
+
+    def __init__(self, *, missing: list[str], **kwargs: Any) -> None:
+        details = kwargs.pop("details", {}) or {}
+        details["missing"] = missing
+        super().__init__(
+            "شرایط ارتقا به مرحلهٔ بعد فراهم نیست: " + "؛ ".join(missing) + ".",
+            details=details,
+            **kwargs,
+        )
+
+
+class InvitationClosed(Conflict):
+    """دعوت پاسخ گرفته، لغو شده یا از مهلت ۱۴ روزه گذشته — FR-TEAM-03."""
+
+    code = "INVITATION_CLOSED"
+    message = "این دعوت دیگر معتبر نیست."
+
+
 # ── آموزش — §5.5 ───────────────────────────────────────────────────────
 class AlreadyEnrolled(Conflict):
     code = "ALREADY_ENROLLED"

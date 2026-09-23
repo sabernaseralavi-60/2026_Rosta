@@ -28,7 +28,7 @@ class DisplayName:
 
 
 async def display_names(
-    session: AsyncSession, user_ids: Iterable[uuid.UUID]
+    session: AsyncSession, user_ids: Iterable[uuid.UUID | None]
 ) -> dict[uuid.UUID, DisplayName]:
     unique = {uid for uid in user_ids if uid is not None}
     if not unique:

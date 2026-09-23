@@ -179,6 +179,64 @@ class ProjectStalled:
     days_inactive: int
 
 
+# ── از M7 — ایده، کارآفرینی، دعوت ──────────────────────────────────────
+@dataclass(frozen=True, slots=True)
+class IdeaSubmitted:
+    idea_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class IdeaWithdrawn:
+    """ایده حذف یا بایگانی شد — امتیاز ثبتش برمی‌گردد (§09 «بدون خلق ارزش»)."""
+
+    idea_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class IdeaVoted:
+    idea_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class IdeaCommented:
+    comment_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class IdeaPromoted:
+    idea_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class VentureCreated:
+    venture_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class VentureDeleted:
+    venture_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class VentureStageChanged:
+    change_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class MetricReviewed:
+    metric_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class InvitationSent:
+    invitation_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class InvitationAccepted:
+    invitation_id: uuid.UUID
+
+
 # ── ناظر ───────────────────────────────────────────────────────────────
 E = TypeVar("E")
 Handler = Callable[[AsyncSession, Any], Awaitable[None]]
@@ -233,6 +291,14 @@ __all__ = [
     "EnrollmentCompleted",
     "EnrollmentDecided",
     "EnrollmentRequested",
+    "IdeaCommented",
+    "IdeaPromoted",
+    "IdeaSubmitted",
+    "IdeaVoted",
+    "IdeaWithdrawn",
+    "InvitationAccepted",
+    "InvitationSent",
+    "MetricReviewed",
     "ProjectCompleted",
     "ProjectStalled",
     "QuizGraded",
@@ -242,6 +308,9 @@ __all__ = [
     "SessionsRevoked",
     "SurveyStepCompleted",
     "UserRegistered",
+    "VentureCreated",
+    "VentureDeleted",
+    "VentureStageChanged",
     "WeekPublished",
     "publish",
     "subscribe",
