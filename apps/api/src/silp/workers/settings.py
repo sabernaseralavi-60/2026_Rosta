@@ -3,7 +3,7 @@
 کارهای نگهداری از M0 هستند. `close_expired_attempts` در M4 افزوده شد
 (§7.11، FR-QUIZ-02). چهار کار گیمیفیکیشن و سلامت پروژه از M5 هستند؛
 ارسال صف، یادآوری مهلت، خلاصهٔ هفتگی، انتشار زمان‌بندی‌شدهٔ هفته و
-پاک‌سازی اعلان از M6.
+پاک‌سازی اعلان از M6. آزادسازی رزرو موضوع و اعلان آگهی منقضی از M7 بخش ب.
 
 همهٔ زمان‌بندی‌ها به وقت UTC است. «ساعت ۲ بامداد» سند به وقت تهران است،
 یعنی ۲۲:۳۰ UTC شب قبل.
@@ -24,6 +24,7 @@ from silp.integrations.sms import MemorySMSSender
 from silp.services.attempt_service import AttemptService
 from silp.services.badge_service import BadgeService
 from silp.services.notification_service import NotificationService
+from silp.services.opening_service import OpeningService
 from silp.services.otp_service import OTPService
 from silp.services.outbox_service import OutboxService
 from silp.services.point_listeners import LearningPoints
@@ -32,6 +33,7 @@ from silp.services.project_health_service import ProjectHealthService
 from silp.services.reminder_service import ReminderService
 from silp.services.teaching_service import TeachingService
 from silp.services.token_service import TokenService
+from silp.services.topic_service import TopicService
 
 log = get_logger("silp.worker")
 
@@ -155,6 +157,22 @@ async def cleanup_notifications(ctx: dict[str, Any]) -> None:
     log.info("notifications_cleaned", archived=archived, outbox_purged=purged)
 
 
+async def release_stale_topics(ctx: dict[str, Any]) -> int:
+    """§7.11، FR-RES-03 — هشدار روز ۲۵ و آزادسازی رزرو ۳۰ روز بی‌تحرک."""
+    async with session_scope() as session:
+        stats = await TopicService(session).release_stale()
+    return stats.released
+
+
+async def expire_team_openings(ctx: dict[str, Any]) -> int:
+    """§7.11 — آگهی‌دهندهٔ آگهی تازه‌منقضی خبردار می‌شود تا تمدیدش کند.
+
+    وضعیت عوض نمی‌شود: «منقضی» از `expires_at` خوانده می‌شود (ADR-0015).
+    """
+    async with session_scope() as session:
+        return await OpeningService(session).notify_expired()
+
+
 async def startup(ctx: dict[str, Any]) -> None:
     settings = get_settings()
     configure_logging(
@@ -185,6 +203,8 @@ class WorkerSettings:
         weekly_digest,
         publish_scheduled_weeks,
         cleanup_notifications,
+        release_stale_topics,
+        expire_team_openings,
     ]
     cron_jobs: ClassVar[list[Any]] = [
         # هر ساعت، دقیقهٔ ۷ — عمداً سر ساعت نیست تا با بقیهٔ کارها تصادم نکند.
@@ -214,6 +234,9 @@ class WorkerSettings:
         cron(publish_scheduled_weeks, minute=set(range(3, 60, 5))),
         # §7.11 «cleanup_expired_data» — یکشنبه ۴ بامداد تهران = ۰:۳۰ UTC.
         cron(cleanup_notifications, weekday=6, hour=0, minute=30),
+        # §7.11 — ۳ بامداد تهران = ۲۳:۳۰ UTC شب قبل.
+        cron(release_stale_topics, hour=23, minute=30),
+        cron(expire_team_openings, hour=23, minute=35),
     ]
     on_startup = startup
     on_shutdown = shutdown

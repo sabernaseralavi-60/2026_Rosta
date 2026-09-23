@@ -46,7 +46,13 @@ DELIVERABLE_STATUSES = (
 FEEDBACK_REQUIRED_STATUSES = ("CHANGES_REQUESTED", "REJECTED")
 TASK_STATUSES = ("TODO", "DOING", "DONE")
 CERTIFICATE_KINDS = ("PROJECT", "COURSE", "RESEARCH_LEVEL")
-OPENING_STATUSES = ("OPEN", "FILLED", "EXPIRED")
+#: «منقضی» ذخیره نمی‌شود — آگهی باز با `expires_at` گذشته (ADR-0015، مثل دعوت).
+OPENING_STATUSES = ("OPEN", "FILLED", "CLOSED")
+OPENING_APPLICATION_STATUSES = ("PENDING", "ACCEPTED", "DECLINED", "WITHDRAWN")
+OPENING_TITLE_MAX = 120
+OPENING_DESCRIPTION_MAX = 2000
+OPENING_MESSAGE_MAX = 500
+MAX_OPENING_SKILLS = 10
 
 MILESTONE_STATUS_TITLE_FA: dict[str, str] = {
     "PENDING": "شروع نشده",
@@ -411,7 +417,14 @@ class Certificate(UUIDPrimaryKeyMixin, Base):
 
 
 class TeamOpening(UUIDPrimaryKeyMixin, Base):
-    """آگهی نیاز به هم‌تیمی — FR-TEAM-02. مسیرهایش در M7-08 می‌آیند."""
+    """آگهی نیاز به هم‌تیمی — FR-TEAM-02، M7-08.
+
+    آگهی مال **تیم** است — پروژه یا کسب‌وکار، دقیقاً یکی — چون پذیرش
+    درخواست یعنی عضویت، و ایده تیمی ندارد که کسی به آن بپیوندد (ADR-0015).
+    `idea_id` از §4.7 مانده ولی در فاز ۱ نوشته نمی‌شود.
+
+    یک آگهی یک جای خالی است: پذیرش یک درخواست آن را `FILLED` می‌کند.
+    """
 
     __tablename__ = "team_openings"
 
@@ -428,6 +441,10 @@ class TeamOpening(UUIDPrimaryKeyMixin, Base):
     idea_id: Mapped[uuid.UUID | None] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("ideas.id", ondelete="CASCADE")
     )
+    #: نقش پروژه — پذیرش، همان نقش را به عضو تازه می‌دهد (از ۰۰۱۴).
+    role_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("project_roles.id", ondelete="SET NULL")
+    )
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     needed_skills: Mapped[list[uuid.UUID]] = mapped_column(
@@ -438,7 +455,11 @@ class TeamOpening(UUIDPrimaryKeyMixin, Base):
     expires_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=text("now() + interval '30 days'")
     )
+    filled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=text("now()")
     )
 
@@ -448,7 +469,79 @@ class TeamOpening(UUIDPrimaryKeyMixin, Base):
             "commitment_hpw IS NULL OR commitment_hpw BETWEEN 1 AND 60",
             name="commitment_range",
         ),
+        CheckConstraint(
+            "(project_id IS NOT NULL)::int + (venture_id IS NOT NULL)::int = 1", name="owner"
+        ),
+        CheckConstraint(
+            "(status = 'FILLED') = (filled_at IS NOT NULL)", name="filled_matches_status"
+        ),
+        CheckConstraint(f"length(title) BETWEEN 3 AND {OPENING_TITLE_MAX}", name="title_length"),
+        CheckConstraint(
+            f"length(description) BETWEEN 10 AND {OPENING_DESCRIPTION_MAX}",
+            name="description_length",
+        ),
+        CheckConstraint(
+            f"cardinality(needed_skills) <= {MAX_OPENING_SKILLS}", name="needed_skills_count"
+        ),
         Index("idx_team_openings_open", "expires_at", postgresql_where=text("status = 'OPEN'")),
+        Index(
+            "idx_team_openings_project",
+            "project_id",
+            postgresql_where=text("project_id IS NOT NULL"),
+        ),
+        Index(
+            "idx_team_openings_venture",
+            "venture_id",
+            postgresql_where=text("venture_id IS NOT NULL"),
+        ),
+    )
+
+    def is_open_at(self, now: datetime) -> bool:
+        return self.status == "OPEN" and self.expires_at > now
+
+
+class OpeningApplication(UUIDPrimaryKeyMixin, Base):
+    """درخواست پیوستن از روی آگهی — FR-TEAM-03 «درخواست پیوستن از آگهی».
+
+    جدا از `project_applications`: آن جدول مال پروژه است و کسب‌وکار
+    درخواست پیوستن ندارد؛ آگهی هم می‌تواند پس از شروع کار پروژه باز شود،
+    وقتی پروژه دیگر `OPEN` نیست.
+    """
+
+    __tablename__ = "opening_applications"
+
+    opening_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("team_openings.id", ondelete="CASCADE"), nullable=False
+    )
+    applicant_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'PENDING'"))
+    decided_by: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id")
+    )
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    decision_note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+    __table_args__ = (
+        UniqueConstraint("opening_id", "applicant_id", name="uq_opening_applications_applicant"),
+        CheckConstraint(_in_list("status", OPENING_APPLICATION_STATUSES), name="status_valid"),
+        CheckConstraint(
+            f"length(btrim(message)) BETWEEN 1 AND {OPENING_MESSAGE_MAX}", name="message_length"
+        ),
+        CheckConstraint(
+            "(status = 'PENDING') = (decided_at IS NULL)", name="decided_matches_status"
+        ),
+        Index(
+            "idx_opening_applications_pending",
+            "opening_id",
+            postgresql_where=text("status = 'PENDING'"),
+        ),
+        Index("idx_opening_applications_user", "applicant_id", "status"),
     )
 
 
@@ -459,7 +552,12 @@ __all__ = [
     "FEEDBACK_REQUIRED_STATUSES",
     "MILESTONE_STATUSES",
     "MILESTONE_STATUS_TITLE_FA",
+    "MAX_OPENING_SKILLS",
+    "OPENING_APPLICATION_STATUSES",
+    "OPENING_DESCRIPTION_MAX",
+    "OPENING_MESSAGE_MAX",
     "OPENING_STATUSES",
+    "OPENING_TITLE_MAX",
     "OUTPUT_KINDS",
     "OUTPUT_KIND_TITLE_FA",
     "TASK_STATUSES",
@@ -468,6 +566,7 @@ __all__ = [
     "Deliverable",
     "DeliverableFile",
     "Milestone",
+    "OpeningApplication",
     "PeerEvaluation",
     "ProjectActivity",
     "ProjectMessage",

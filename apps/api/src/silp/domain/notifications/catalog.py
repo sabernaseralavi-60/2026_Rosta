@@ -41,7 +41,7 @@ GROUP_TITLE_FA: dict[Group, str] = {
 
 GROUP_DESCRIPTION_FA: dict[Group, str] = {
     "COURSE": "هفتهٔ تازه، آزمون، نتیجه و اعلان‌های استاد",
-    "PROJECT": "درخواست پیوستن، دعوت به تیم، تحویل‌دادنی، مهلت مرحله و کسب‌وکار",
+    "PROJECT": "درخواست پیوستن، دعوت و آگهی تیم، تحویل‌دادنی، مهلت مرحله، کسب‌وکار و پژوهش",
     "SOCIAL": "نشان‌های تازه و ایده‌های تو",
     "SYSTEM": "امنیت حساب، خوش‌آمد و خلاصهٔ هفتگی",
 }
@@ -239,6 +239,67 @@ _KINDS: tuple[Kind, ...] = (
         "تغییر مرحلهٔ کسب‌وکار",
         ("venture", "stage", "from_stage"),
     ),
+    # ── پژوهش و آگهی هم‌تیمی (M7 بخش ب) ───────────────────────────────
+    Kind(
+        "RESEARCH_SUBMITTED",
+        "PROJECT",
+        "NORMAL",
+        "تحویل تازهٔ مسیر پژوهش (منتور)",
+        ("student", "level"),
+    ),
+    Kind(
+        "RESEARCH_REVIEWED",
+        "PROJECT",
+        "IMPORTANT",
+        "نتیجهٔ بررسی سطح پژوهش",
+        ("level", "decision", "detail"),
+        allow_sms=True,
+    ),
+    Kind(
+        "TOPIC_REVIEWED",
+        "PROJECT",
+        "NORMAL",
+        "نتیجهٔ پیشنهاد موضوع پژوهشی",
+        ("topic", "decision", "detail"),
+    ),
+    Kind(
+        "TOPIC_RELEASE_WARNING",
+        "PROJECT",
+        "IMPORTANT",
+        "هشدار آزاد شدن رزرو موضوع",
+        ("topic", "days"),
+    ),
+    Kind("TOPIC_RELEASED", "PROJECT", "NORMAL", "آزاد شدن رزرو موضوع", ("topic", "days")),
+    Kind(
+        "OUTPUT_REVIEWED",
+        "PROJECT",
+        "NORMAL",
+        "نتیجهٔ راستی‌آزمایی خروجی پژوهشی",
+        ("title", "decision", "detail"),
+    ),
+    Kind(
+        "OPENING_MATCH",
+        "PROJECT",
+        "LOW",
+        "آگهی هم‌تیمی هم‌خوان با نیمرخ من",
+        ("opening", "team", "skills"),
+    ),
+    Kind(
+        "OPENING_APPLIED",
+        "PROJECT",
+        "NORMAL",
+        "درخواست تازه برای آگهی (آگهی‌دهنده)",
+        ("applicant", "opening"),
+    ),
+    Kind(
+        "OPENING_DECIDED",
+        "PROJECT",
+        "IMPORTANT",
+        "نتیجهٔ درخواست پیوستن از آگهی",
+        ("opening", "team", "decision", "detail"),
+        allow_sms=True,
+    ),
+    Kind("OPENING_EXPIRED", "PROJECT", "LOW", "پایان مهلت آگهی (آگهی‌دهنده)", ("opening",)),
     # ── نشان و جامعه ───────────────────────────────────────────────────
     Kind("BADGE_AWARDED", "SOCIAL", "LOW", "نشان تازه", ("badge",)),
     Kind(

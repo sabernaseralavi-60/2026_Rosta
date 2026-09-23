@@ -606,6 +606,22 @@
         "title": "ApplicationOut",
         "type": "object"
       },
+      "ApplyIn": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ApplyIn",
+        "type": "object"
+      },
       "ArchiveIn": {
         "additionalProperties": false,
         "properties": {
@@ -2258,6 +2274,36 @@
         "title": "CriterionOut",
         "type": "object"
       },
+      "DecideIn": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "ACCEPTED",
+              "DECLINED"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "DecideIn",
+        "type": "object"
+      },
       "DecisionIn": {
         "additionalProperties": false,
         "properties": {
@@ -2684,6 +2730,68 @@
         "title": "ErrorResponse",
         "type": "object"
       },
+      "EvidenceFieldOut": {
+        "properties": {
+          "hint_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint Fa"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "int",
+              "text",
+              "url",
+              "date"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label_fa": {
+            "title": "Label Fa",
+            "type": "string"
+          },
+          "min_length": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Length"
+          },
+          "min_value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Value"
+          }
+        },
+        "required": [
+          "key",
+          "label_fa",
+          "kind"
+        ],
+        "title": "EvidenceFieldOut",
+        "type": "object"
+      },
       "FileOut": {
         "properties": {
           "content_type": {
@@ -2748,6 +2856,25 @@
         "title": "FileOut",
         "type": "object"
       },
+      "FileRefOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "original_name": {
+            "title": "Original Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "original_name"
+        ],
+        "title": "FileRefOut",
+        "type": "object"
+      },
       "FinalGradeIn": {
         "additionalProperties": false,
         "properties": {
@@ -2762,6 +2889,24 @@
           "grade"
         ],
         "title": "FinalGradeIn",
+        "type": "object"
+      },
+      "GapOut": {
+        "properties": {
+          "min_level": {
+            "title": "Min Level",
+            "type": "integer"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title_fa",
+          "min_level"
+        ],
+        "title": "GapOut",
         "type": "object"
       },
       "GradeAnswerIn": {
@@ -4010,52 +4155,6 @@
         "title": "LevelLabel",
         "type": "object"
       },
-      "LevelOut": {
-        "properties": {
-          "current_at": {
-            "title": "Current At",
-            "type": "integer"
-          },
-          "level": {
-            "title": "Level",
-            "type": "integer"
-          },
-          "next_at": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Next At"
-          },
-          "ratio": {
-            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-            "title": "Ratio",
-            "type": "string"
-          },
-          "title_fa": {
-            "title": "Title Fa",
-            "type": "string"
-          },
-          "to_next": {
-            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-            "title": "To Next",
-            "type": "string"
-          }
-        },
-        "required": [
-          "level",
-          "title_fa",
-          "current_at",
-          "to_next",
-          "ratio"
-        ],
-        "title": "LevelOut",
-        "type": "object"
-      },
       "LinkMaterialIn": {
         "additionalProperties": false,
         "properties": {
@@ -4167,6 +4266,42 @@
           "refresh_token"
         ],
         "title": "LogoutIn",
+        "type": "object"
+      },
+      "ManagedTeamOut": {
+        "description": "تیمی که کاربر می‌تواند برایش آگهی بدهد یا دعوت بفرستد.",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "PROJECT",
+              "VENTURE"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectBriefOut"
+            },
+            "title": "Roles",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "title"
+        ],
+        "title": "ManagedTeamOut",
         "type": "object"
       },
       "MatchOut": {
@@ -5250,6 +5385,89 @@
         "title": "MilestoneOut",
         "type": "object"
       },
+      "MyApplicationOut": {
+        "properties": {
+          "applicant": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Note"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "opening_id": {
+            "format": "uuid",
+            "title": "Opening Id",
+            "type": "string"
+          },
+          "opening_title": {
+            "title": "Opening Title",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "DECLINED",
+              "WITHDRAWN"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "target": {
+            "$ref": "#/components/schemas/TargetOut"
+          }
+        },
+        "required": [
+          "id",
+          "opening_id",
+          "applicant",
+          "message",
+          "status",
+          "status_fa",
+          "created_at",
+          "opening_title",
+          "target"
+        ],
+        "title": "MyApplicationOut",
+        "type": "object"
+      },
       "MyStandingOut": {
         "properties": {
           "excluded_reason": {
@@ -6102,6 +6320,475 @@
         "title": "OnboardingOut",
         "type": "object"
       },
+      "OpeningApplicationOut": {
+        "properties": {
+          "applicant": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Note"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "opening_id": {
+            "format": "uuid",
+            "title": "Opening Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "DECLINED",
+              "WITHDRAWN"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "opening_id",
+          "applicant",
+          "message",
+          "status",
+          "status_fa",
+          "created_at"
+        ],
+        "title": "OpeningApplicationOut",
+        "type": "object"
+      },
+      "OpeningDetailOut": {
+        "properties": {
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/OpeningApplicationOut"
+            },
+            "title": "Applications",
+            "type": "array"
+          },
+          "can_manage": {
+            "default": false,
+            "title": "Can Manage",
+            "type": "boolean"
+          },
+          "commitment_hpw": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Hpw"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "effective_status": {
+            "enum": [
+              "OPEN",
+              "FILLED",
+              "CLOSED",
+              "EXPIRED"
+            ],
+            "title": "Effective Status",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "has_applied": {
+            "default": false,
+            "title": "Has Applied",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "my_application": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpeningApplicationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "needed_skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillRefOut"
+            },
+            "title": "Needed Skills",
+            "type": "array"
+          },
+          "pending_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pending Count"
+          },
+          "poster": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectBriefOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "FILLED",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "target": {
+            "$ref": "#/components/schemas/TargetOut"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "needed_skills",
+          "status",
+          "effective_status",
+          "status_fa",
+          "expires_at",
+          "created_at",
+          "target",
+          "poster"
+        ],
+        "title": "OpeningDetailOut",
+        "type": "object"
+      },
+      "OpeningIn": {
+        "additionalProperties": false,
+        "properties": {
+          "commitment_hpw": {
+            "anyOf": [
+              {
+                "maximum": 60.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Hpw"
+          },
+          "description": {
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "needed_skill_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Needed Skill Ids",
+            "type": "array"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "role_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Id"
+          },
+          "title": {
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          },
+          "venture_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venture Id"
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ],
+        "title": "OpeningIn",
+        "type": "object"
+      },
+      "OpeningOut": {
+        "properties": {
+          "can_manage": {
+            "default": false,
+            "title": "Can Manage",
+            "type": "boolean"
+          },
+          "commitment_hpw": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Hpw"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "effective_status": {
+            "enum": [
+              "OPEN",
+              "FILLED",
+              "CLOSED",
+              "EXPIRED"
+            ],
+            "title": "Effective Status",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "has_applied": {
+            "default": false,
+            "title": "Has Applied",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "needed_skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillRefOut"
+            },
+            "title": "Needed Skills",
+            "type": "array"
+          },
+          "pending_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pending Count"
+          },
+          "poster": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectBriefOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "OPEN",
+              "FILLED",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "target": {
+            "$ref": "#/components/schemas/TargetOut"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "needed_skills",
+          "status",
+          "effective_status",
+          "status_fa",
+          "expires_at",
+          "created_at",
+          "target",
+          "poster"
+        ],
+        "title": "OpeningOut",
+        "type": "object"
+      },
+      "OpeningUpdateIn": {
+        "additionalProperties": false,
+        "properties": {
+          "commitment_hpw": {
+            "anyOf": [
+              {
+                "maximum": 60.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Commitment Hpw"
+          },
+          "description": {
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Description",
+            "type": "string"
+          },
+          "needed_skill_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Needed Skill Ids",
+            "type": "array"
+          },
+          "role_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Id"
+          },
+          "title": {
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ],
+        "title": "OpeningUpdateIn",
+        "type": "object"
+      },
       "OutboxMessageOut": {
         "properties": {
           "attempts": {
@@ -6284,6 +6971,691 @@
         "title": "OutboxPageOut",
         "type": "object"
       },
+      "OutputIn": {
+        "additionalProperties": false,
+        "properties": {
+          "authors": {
+            "maxLength": 500,
+            "minLength": 2,
+            "title": "Authors",
+            "type": "string"
+          },
+          "doi": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doi"
+          },
+          "file_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Id"
+          },
+          "kind": {
+            "enum": [
+              "JOURNAL",
+              "CONFERENCE",
+              "THESIS",
+              "REPORT",
+              "PREPRINT"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "published_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published On"
+          },
+          "quartile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Q1",
+                  "Q2",
+                  "Q3",
+                  "Q4",
+                  "NA"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quartile"
+          },
+          "status": {
+            "default": "DRAFT",
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "UNDER_REVIEW",
+              "REVISION",
+              "ACCEPTED",
+              "PUBLISHED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "submitted_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted On"
+          },
+          "title": {
+            "maxLength": 300,
+            "minLength": 3,
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          }
+        },
+        "required": [
+          "kind",
+          "title",
+          "authors"
+        ],
+        "title": "OutputIn",
+        "type": "object"
+      },
+      "OutputOut": {
+        "properties": {
+          "authors": {
+            "title": "Authors",
+            "type": "string"
+          },
+          "can_delete": {
+            "default": false,
+            "title": "Can Delete",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "doi": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doi"
+          },
+          "file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FileRefOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_scored": {
+            "title": "Is Scored",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "JOURNAL",
+              "CONFERENCE",
+              "THESIS",
+              "REPORT",
+              "PREPRINT"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "points": {
+            "default": "0",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          },
+          "project": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectRefOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "published_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published On"
+          },
+          "quartile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Q1",
+                  "Q2",
+                  "Q3",
+                  "Q4",
+                  "NA"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quartile"
+          },
+          "review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Note"
+          },
+          "review_status": {
+            "enum": [
+              "NONE",
+              "PENDING",
+              "VERIFIED",
+              "REJECTED"
+            ],
+            "title": "Review Status",
+            "type": "string"
+          },
+          "review_status_fa": {
+            "title": "Review Status Fa",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "UNDER_REVIEW",
+              "REVISION",
+              "ACCEPTED",
+              "PUBLISHED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "submitted_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted On"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "verified_quartile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Q1",
+                  "Q2",
+                  "Q3",
+                  "Q4",
+                  "NA"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Quartile"
+          },
+          "verified_stage": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SUBMITTED",
+                  "ACCEPTED",
+                  "PUBLISHED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Stage"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "kind_fa",
+          "title",
+          "authors",
+          "status",
+          "status_fa",
+          "review_status",
+          "review_status_fa",
+          "is_scored",
+          "created_at"
+        ],
+        "title": "OutputOut",
+        "type": "object"
+      },
+      "OutputReviewIn": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "VERIFIED",
+              "REJECTED"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "OutputReviewIn",
+        "type": "object"
+      },
+      "OutputReviewItemOut": {
+        "properties": {
+          "authors": {
+            "title": "Authors",
+            "type": "string"
+          },
+          "can_delete": {
+            "default": false,
+            "title": "Can Delete",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "doi": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doi"
+          },
+          "file": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FileRefOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_scored": {
+            "title": "Is Scored",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "JOURNAL",
+              "CONFERENCE",
+              "THESIS",
+              "REPORT",
+              "PREPRINT"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "points": {
+            "default": "0",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          },
+          "project": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectRefOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "published_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published On"
+          },
+          "quartile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Q1",
+                  "Q2",
+                  "Q3",
+                  "Q4",
+                  "NA"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quartile"
+          },
+          "review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Note"
+          },
+          "review_status": {
+            "enum": [
+              "NONE",
+              "PENDING",
+              "VERIFIED",
+              "REJECTED"
+            ],
+            "title": "Review Status",
+            "type": "string"
+          },
+          "review_status_fa": {
+            "title": "Review Status Fa",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "UNDER_REVIEW",
+              "REVISION",
+              "ACCEPTED",
+              "PUBLISHED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "submitted_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted On"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "venue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Venue"
+          },
+          "verified_quartile": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Q1",
+                  "Q2",
+                  "Q3",
+                  "Q4",
+                  "NA"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Quartile"
+          },
+          "verified_stage": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SUBMITTED",
+                  "ACCEPTED",
+                  "PUBLISHED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Stage"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "kind_fa",
+          "title",
+          "authors",
+          "status",
+          "status_fa",
+          "review_status",
+          "review_status_fa",
+          "is_scored",
+          "created_at",
+          "owner"
+        ],
+        "title": "OutputReviewItemOut",
+        "type": "object"
+      },
       "Page_CourseSummaryOut_": {
         "properties": {
           "has_next": {
@@ -6356,6 +7728,42 @@
         "title": "Page[IdeaSummaryOut]",
         "type": "object"
       },
+      "Page_OpeningOut_": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OpeningOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "has_next"
+        ],
+        "title": "Page[OpeningOut]",
+        "type": "object"
+      },
       "Page_ProjectSummaryOut_": {
         "properties": {
           "has_next": {
@@ -6390,6 +7798,42 @@
           "has_next"
         ],
         "title": "Page[ProjectSummaryOut]",
+        "type": "object"
+      },
+      "Page_TopicOut_": {
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TopicOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "has_next"
+        ],
+        "title": "Page[TopicOut]",
         "type": "object"
       },
       "Page_VentureSummaryOut_": {
@@ -6497,6 +7941,44 @@
           "points"
         ],
         "title": "PendingAnswerOut",
+        "type": "object"
+      },
+      "PersonOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "username"
+        ],
+        "title": "PersonOut",
         "type": "object"
       },
       "PickRandomIn": {
@@ -7002,7 +8484,7 @@
             "title": "Latest Entry Id"
           },
           "level": {
-            "$ref": "#/components/schemas/LevelOut"
+            "$ref": "#/components/schemas/silp__schemas__gamification__LevelOut"
           },
           "recent": {
             "items": {
@@ -7157,6 +8639,52 @@
           }
         },
         "title": "PreferencesStepIn",
+        "type": "object"
+      },
+      "PreviousVersionOut": {
+        "properties": {
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "status": {
+            "enum": [
+              "SUBMITTED",
+              "APPROVED",
+              "CHANGES_REQUESTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "status"
+        ],
+        "title": "PreviousVersionOut",
         "type": "object"
       },
       "ProfileOut": {
@@ -7436,6 +8964,17 @@
             ],
             "title": "Gender"
           },
+          "is_public": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Public"
+          },
           "last_name": {
             "anyOf": [
               {
@@ -7557,6 +9096,25 @@
           "days_inactive"
         ],
         "title": "ProjectAtRiskOut",
+        "type": "object"
+      },
+      "ProjectBriefOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "ProjectBriefOut",
         "type": "object"
       },
       "ProjectCardOut": {
@@ -8030,6 +9588,25 @@
           "expected_output"
         ],
         "title": "ProjectIn",
+        "type": "object"
+      },
+      "ProjectRefOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "ProjectRefOut",
         "type": "object"
       },
       "ProjectRoleIn": {
@@ -9765,6 +11342,153 @@
         "title": "ReviewIn",
         "type": "object"
       },
+      "ReviewItemOut": {
+        "properties": {
+          "checklist": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "evidence": {
+            "additionalProperties": true,
+            "title": "Evidence",
+            "type": "object"
+          },
+          "evidence_fields": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceFieldOut"
+            },
+            "title": "Evidence Fields",
+            "type": "array"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/FileRefOut"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "level_title_fa": {
+            "title": "Level Title Fa",
+            "type": "string"
+          },
+          "links": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "previous": {
+            "items": {
+              "$ref": "#/components/schemas/PreviousVersionOut"
+            },
+            "title": "Previous",
+            "type": "array"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "SUBMITTED",
+              "APPROVED",
+              "CHANGES_REQUESTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "student": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "submitted_at": {
+            "format": "date-time",
+            "title": "Submitted At",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "topic_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Title"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "level",
+          "version",
+          "status",
+          "status_fa",
+          "summary",
+          "links",
+          "evidence",
+          "submitted_at",
+          "student",
+          "level_title_fa",
+          "evidence_fields",
+          "checklist"
+        ],
+        "title": "ReviewItemOut",
+        "type": "object"
+      },
       "ReviewOut": {
         "properties": {
           "deliverable": {
@@ -9935,6 +11659,39 @@
         "title": "SaveAnswerOut",
         "type": "object"
       },
+      "SearchContextOut": {
+        "properties": {
+          "can_invite": {
+            "default": false,
+            "title": "Can Invite",
+            "type": "boolean"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/GapOut"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "my_profile_is_public": {
+            "default": false,
+            "title": "My Profile Is Public",
+            "type": "boolean"
+          },
+          "project": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectBriefOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "SearchContextOut",
+        "type": "object"
+      },
       "SessionOut": {
         "description": "یک نشست فعال — §5.2 `GET /auth/sessions`.",
         "properties": {
@@ -10010,6 +11767,35 @@
           "level"
         ],
         "title": "SkillAnswerIn",
+        "type": "object"
+      },
+      "SkillLevelOut": {
+        "properties": {
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "skill_id": {
+            "format": "uuid",
+            "title": "Skill Id",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "skill_id",
+          "title_fa",
+          "level",
+          "verified"
+        ],
+        "title": "SkillLevelOut",
         "type": "object"
       },
       "SkillListOut": {
@@ -10089,6 +11875,25 @@
           "is_core"
         ],
         "title": "SkillOut",
+        "type": "object"
+      },
+      "SkillRefOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa"
+        ],
+        "title": "SkillRefOut",
         "type": "object"
       },
       "SkillRequirementIn": {
@@ -10392,15 +12197,149 @@
         "title": "StudentDashboardOut",
         "type": "object"
       },
-      "SubmitIn": {
+      "SubmissionOut": {
         "properties": {
-          "confirm_unanswered": {
-            "default": 0,
-            "title": "Confirm Unanswered",
+          "evidence": {
+            "additionalProperties": true,
+            "title": "Evidence",
+            "type": "object"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/FileRefOut"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "links": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "SUBMITTED",
+              "APPROVED",
+              "CHANGES_REQUESTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "submitted_at": {
+            "format": "date-time",
+            "title": "Submitted At",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "topic_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Title"
+          },
+          "version": {
+            "title": "Version",
             "type": "integer"
           }
         },
-        "title": "SubmitIn",
+        "required": [
+          "id",
+          "level",
+          "version",
+          "status",
+          "status_fa",
+          "summary",
+          "links",
+          "evidence",
+          "submitted_at"
+        ],
+        "title": "SubmissionOut",
+        "type": "object"
+      },
+      "SubmissionReviewIn": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "APPROVED",
+              "CHANGES_REQUESTED"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "SubmissionReviewIn",
         "type": "object"
       },
       "SubmitOut": {
@@ -10958,6 +12897,39 @@
         "title": "SyncOut",
         "type": "object"
       },
+      "TargetOut": {
+        "properties": {
+          "href": {
+            "title": "Href",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "PROJECT",
+              "VENTURE"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "title",
+          "href"
+        ],
+        "title": "TargetOut",
+        "type": "object"
+      },
       "TaskIn": {
         "additionalProperties": false,
         "properties": {
@@ -11296,6 +13268,190 @@
         "title": "TeamOut",
         "type": "object"
       },
+      "TeamSearchOut": {
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/SearchContextOut"
+          },
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TeammateOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "has_next",
+          "context"
+        ],
+        "title": "TeamSearchOut",
+        "type": "object"
+      },
+      "TeammateOut": {
+        "properties": {
+          "assets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assets",
+            "type": "array"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "complement_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complement Reason"
+          },
+          "complement_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complement Score"
+          },
+          "complement_skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Complement Skills",
+            "type": "array"
+          },
+          "shares_course": {
+            "title": "Shares Course",
+            "type": "boolean"
+          },
+          "stronger_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stronger Reason"
+          },
+          "stronger_skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Stronger Skills",
+            "type": "array"
+          },
+          "top_skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillLevelOut"
+            },
+            "title": "Top Skills",
+            "type": "array"
+          },
+          "user": {
+            "$ref": "#/components/schemas/TeammateUserOut"
+          },
+          "weekly_hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Hours"
+          }
+        },
+        "required": [
+          "user",
+          "top_skills",
+          "assets",
+          "shares_course"
+        ],
+        "title": "TeammateOut",
+        "type": "object"
+      },
+      "TeammateUserOut": {
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "university": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "University"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "display_name"
+        ],
+        "title": "TeammateUserOut",
+        "type": "object"
+      },
       "TemplateOut": {
         "properties": {
           "body": {
@@ -11518,6 +13674,347 @@
           "expires_in"
         ],
         "title": "TokenPairOut",
+        "type": "object"
+      },
+      "TopicBriefOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "idle_days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idle Days Left"
+          },
+          "status": {
+            "enum": [
+              "PROPOSED",
+              "OPEN",
+              "RESERVED",
+              "TAKEN",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status",
+          "status_fa"
+        ],
+        "title": "TopicBriefOut",
+        "type": "object"
+      },
+      "TopicCloseIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "TopicCloseIn",
+        "type": "object"
+      },
+      "TopicIn": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "maxLength": 4000,
+            "minLength": 20,
+            "title": "Description",
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "maximum": 4.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "prerequisites": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prerequisites"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 5,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ],
+        "title": "TopicIn",
+        "type": "object"
+      },
+      "TopicOut": {
+        "properties": {
+          "can_edit": {
+            "default": false,
+            "title": "Can Edit",
+            "type": "boolean"
+          },
+          "can_manage": {
+            "default": false,
+            "title": "Can Manage",
+            "type": "boolean"
+          },
+          "can_release": {
+            "default": false,
+            "title": "Can Release",
+            "type": "boolean"
+          },
+          "can_reserve": {
+            "default": false,
+            "title": "Can Reserve",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "idle_days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idle Days Left"
+          },
+          "is_mine": {
+            "default": false,
+            "title": "Is Mine",
+            "type": "boolean"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "prerequisites": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prerequisites"
+          },
+          "proposer": {
+            "$ref": "#/components/schemas/PersonOut"
+          },
+          "reserved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reserved At"
+          },
+          "reserved_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reserved_by_me": {
+            "default": false,
+            "title": "Reserved By Me",
+            "type": "boolean"
+          },
+          "review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Note"
+          },
+          "status": {
+            "enum": [
+              "PROPOSED",
+              "OPEN",
+              "RESERVED",
+              "TAKEN",
+              "CLOSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "status",
+          "status_fa",
+          "proposer",
+          "created_at"
+        ],
+        "title": "TopicOut",
+        "type": "object"
+      },
+      "TopicReviewIn": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "APPROVE",
+              "REJECT"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "TopicReviewIn",
+        "type": "object"
+      },
+      "TrackOut": {
+        "properties": {
+          "can_participate": {
+            "default": false,
+            "title": "Can Participate",
+            "type": "boolean"
+          },
+          "can_review": {
+            "default": false,
+            "title": "Can Review",
+            "type": "boolean"
+          },
+          "completed": {
+            "default": false,
+            "title": "Completed",
+            "type": "boolean"
+          },
+          "current_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Level"
+          },
+          "levels": {
+            "items": {
+              "$ref": "#/components/schemas/silp__schemas__research__LevelOut"
+            },
+            "title": "Levels",
+            "type": "array"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TopicBriefOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "levels",
+          "current_level"
+        ],
+        "title": "TrackOut",
         "type": "object"
       },
       "TrendPointOut": {
@@ -12500,6 +14997,248 @@
           "status"
         ],
         "title": "WeekSummaryOut",
+        "type": "object"
+      },
+      "silp__schemas__gamification__LevelOut": {
+        "properties": {
+          "current_at": {
+            "title": "Current At",
+            "type": "integer"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "next_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next At"
+          },
+          "ratio": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Ratio",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "to_next": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "To Next",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "title_fa",
+          "current_at",
+          "to_next",
+          "ratio"
+        ],
+        "title": "LevelOut",
+        "type": "object"
+      },
+      "silp__schemas__quiz__SubmitIn": {
+        "properties": {
+          "confirm_unanswered": {
+            "default": 0,
+            "title": "Confirm Unanswered",
+            "type": "integer"
+          }
+        },
+        "title": "SubmitIn",
+        "type": "object"
+      },
+      "silp__schemas__research__LevelOut": {
+        "properties": {
+          "approved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "attachments_hint_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attachments Hint Fa"
+          },
+          "checklist": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "deliverable_fa": {
+            "title": "Deliverable Fa",
+            "type": "string"
+          },
+          "evidence_fields": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceFieldOut"
+            },
+            "title": "Evidence Fields",
+            "type": "array"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "mentor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "min_attachments": {
+            "title": "Min Attachments",
+            "type": "integer"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state": {
+            "enum": [
+              "LOCKED",
+              "AVAILABLE",
+              "IN_PROGRESS",
+              "SUBMITTED",
+              "APPROVED"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "state_fa": {
+            "title": "State Fa",
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "submissions": {
+            "items": {
+              "$ref": "#/components/schemas/SubmissionOut"
+            },
+            "title": "Submissions",
+            "type": "array"
+          },
+          "template_columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Template Columns",
+            "type": "array"
+          },
+          "template_title_fa": {
+            "title": "Template Title Fa",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "title_fa",
+          "deliverable_fa",
+          "state",
+          "state_fa",
+          "steps",
+          "checklist",
+          "template_title_fa",
+          "template_columns",
+          "evidence_fields",
+          "min_attachments"
+        ],
+        "title": "LevelOut",
+        "type": "object"
+      },
+      "silp__schemas__research__SubmitIn": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "additionalProperties": true,
+            "title": "Evidence",
+            "type": "object"
+          },
+          "file_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "File Ids",
+            "type": "array"
+          },
+          "links": {
+            "items": {
+              "maxLength": 500,
+              "type": "string"
+            },
+            "maxItems": 10,
+            "title": "Links",
+            "type": "array"
+          },
+          "summary": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary"
+        ],
+        "title": "SubmitIn",
         "type": "object"
       }
     },
@@ -13800,7 +16539,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubmitIn"
+                "$ref": "#/components/schemas/silp__schemas__quiz__SubmitIn"
               }
             }
           },
@@ -20543,6 +23282,1191 @@
         ]
       }
     },
+    "/api/v1/research/outputs": {
+      "get": {
+        "operationId": "my_outputs_api_v1_research_outputs_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OutputOut"
+                  },
+                  "title": "Response My Outputs Api V1 Research Outputs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "خروجی‌های پژوهشی من",
+        "tags": [
+          "research"
+        ]
+      },
+      "post": {
+        "operationId": "create_output_api_v1_research_outputs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutputIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت خروجی پژوهشی",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/outputs/review-queue": {
+      "get": {
+        "operationId": "output_review_queue_api_v1_research_outputs_review_queue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OutputReviewItemOut"
+                  },
+                  "title": "Response Output Review Queue Api V1 Research Outputs Review Queue Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "صف راستی‌آزمایی خروجی‌ها",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/outputs/{output_id}": {
+      "delete": {
+        "operationId": "delete_output_api_v1_research_outputs__output_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف خروجی راستی‌آزمایی‌نشده",
+        "tags": [
+          "research"
+        ]
+      },
+      "patch": {
+        "operationId": "update_output_api_v1_research_outputs__output_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutputIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش خروجی",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/outputs/{output_id}/download-url": {
+      "get": {
+        "operationId": "output_file_api_v1_research_outputs__output_id__download_url_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دانلود فایل خروجی — نویسنده یا بازبین",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/outputs/{output_id}/review": {
+      "post": {
+        "operationId": "review_output_api_v1_research_outputs__output_id__review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OutputReviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "راستی‌آزمایی یا رد ادعای خروجی",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/review-queue": {
+      "get": {
+        "operationId": "review_queue_api_v1_research_review_queue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReviewItemOut"
+                  },
+                  "title": "Response Review Queue Api V1 Research Review Queue Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "صف بررسی مسیر پژوهش",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/submissions/{submission_id}/files/{file_id}/download-url": {
+      "get": {
+        "operationId": "submission_file_api_v1_research_submissions__submission_id__files__file_id__download_url_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "submission_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Submission Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "file_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "File Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دانلود پیوست تحویل — دانشجو یا بازبین",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/submissions/{submission_id}/review": {
+      "post": {
+        "operationId": "review_submission_api_v1_research_submissions__submission_id__review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "submission_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Submission Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmissionReviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تأیید یا درخواست اصلاح تحویل سطح",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/topics": {
+      "get": {
+        "operationId": "list_topics_api_v1_research_topics_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PROPOSED",
+                    "OPEN",
+                    "RESERVED",
+                    "TAKEN",
+                    "CLOSED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "level",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 4,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Level"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Mine",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_TopicOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بانک موضوع پژوهشی",
+        "tags": [
+          "research"
+        ]
+      },
+      "post": {
+        "description": "کادر آموزشی موضوع **باز** ثبت می‌کند؛ دانشجو **پیشنهاد** می‌دهد که تا تأیید پنهان است.",
+        "operationId": "create_topic_api_v1_research_topics_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت یا پیشنهاد موضوع",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/topics/{topic_id}": {
+      "get": {
+        "operationId": "get_topic_api_v1_research_topics__topic_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Topic Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جزئیات موضوع",
+        "tags": [
+          "research"
+        ]
+      },
+      "patch": {
+        "operationId": "update_topic_api_v1_research_topics__topic_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Topic Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش موضوع",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/topics/{topic_id}/close": {
+      "post": {
+        "operationId": "close_topic_api_v1_research_topics__topic_id__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Topic Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicCloseIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بستن موضوع",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/topics/{topic_id}/release": {
+      "post": {
+        "operationId": "release_topic_api_v1_research_topics__topic_id__release_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Topic Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "آزاد کردن رزرو",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/topics/{topic_id}/reopen": {
+      "post": {
+        "operationId": "reopen_topic_api_v1_research_topics__topic_id__reopen_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Topic Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بازگشایی موضوع",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/topics/{topic_id}/reserve": {
+      "post": {
+        "operationId": "reserve_topic_api_v1_research_topics__topic_id__reserve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Topic Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "TOPIC_ALREADY_RESERVED"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "رزرو موضوع",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/topics/{topic_id}/review": {
+      "post": {
+        "operationId": "review_topic_api_v1_research_topics__topic_id__review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "topic_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Topic Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicReviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تأیید یا رد پیشنهاد",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/tracks": {
+      "get": {
+        "description": "چهار سطح با راهنما، الگو و شاهدهای لازم؛ برای کاربر واردشده، وضعیت و تحویل‌ها.",
+        "operationId": "my_track_api_v1_research_tracks_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "مسیر پژوهشی من",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/research/tracks/{level}/submit": {
+      "post": {
+        "operationId": "submit_level_api_v1_research_tracks__level__submit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "level",
+            "required": true,
+            "schema": {
+              "title": "Level",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/silp__schemas__research__SubmitIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "سطح قفل، تأییدشده یا در انتظار بررسی"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "`details.missing` — شاهدهای کم"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ارسال تحویل‌دادنی سطح",
+        "tags": [
+          "research"
+        ]
+      }
+    },
     "/api/v1/resources/{resource_id}/download": {
       "get": {
         "operationId": "download_resource_api_v1_resources__resource_id__download_get",
@@ -24064,6 +27988,901 @@
         "summary": "انتشار هفته (فوری یا زمان‌بندی‌شده)",
         "tags": [
           "teaching"
+        ]
+      }
+    },
+    "/api/v1/teams/applications/mine": {
+      "get": {
+        "operationId": "my_applications_api_v1_teams_applications_mine_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MyApplicationOut"
+                  },
+                  "title": "Response My Applications Api V1 Teams Applications Mine Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "درخواست‌های من برای آگهی‌ها",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/applications/{application_id}/decide": {
+      "post": {
+        "operationId": "decide_application_api_v1_teams_applications__application_id__decide_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "application_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Application Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecideIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpeningApplicationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پذیرش یا رد درخواست",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/applications/{application_id}/withdraw": {
+      "post": {
+        "operationId": "withdraw_application_api_v1_teams_applications__application_id__withdraw_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "application_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Application Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پس گرفتن درخواست",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/managed": {
+      "get": {
+        "description": "پروژه‌های فعالی که `project.application.decide` دارم و کسب‌وکارهایی که بنیان‌گذارشانم.",
+        "operationId": "managed_teams_api_v1_teams_managed_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ManagedTeamOut"
+                  },
+                  "title": "Response Managed Teams Api V1 Teams Managed Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تیم‌هایی که می‌توانم برایشان آگهی بدهم یا دعوت بفرستم",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/openings": {
+      "get": {
+        "description": "آگهی‌های باز. `mine=true` آگهی‌هایی که خودم داده‌ام، با هر وضعیتی.",
+        "operationId": "list_openings_api_v1_teams_openings_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "skill_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Skill Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PROJECT",
+                    "VENTURE"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "project_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "venture_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Venture Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Mine",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_OpeningOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "آگهی‌های نیاز به هم‌تیمی",
+        "tags": [
+          "teams"
+        ]
+      },
+      "post": {
+        "operationId": "create_opening_api_v1_teams_openings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpeningDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت آگهی نیاز به هم‌تیمی",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/openings/{opening_id}": {
+      "get": {
+        "operationId": "get_opening_api_v1_teams_openings__opening_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "opening_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Opening Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpeningDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جزئیات آگهی",
+        "tags": [
+          "teams"
+        ]
+      },
+      "patch": {
+        "operationId": "update_opening_api_v1_teams_openings__opening_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "opening_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Opening Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpeningUpdateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpeningDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش آگهی",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/openings/{opening_id}/apply": {
+      "post": {
+        "operationId": "apply_to_opening_api_v1_teams_openings__opening_id__apply_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "opening_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Opening Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpeningApplicationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "OPENING_CLOSED، PROFILE_INCOMPLETE، DUPLICATE_APPLICATION"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "درخواست پیوستن از آگهی",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/openings/{opening_id}/close": {
+      "post": {
+        "operationId": "close_opening_api_v1_teams_openings__opening_id__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "opening_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Opening Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpeningDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "بستن آگهی",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/openings/{opening_id}/renew": {
+      "post": {
+        "operationId": "renew_opening_api_v1_teams_openings__opening_id__renew_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "opening_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Opening Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpeningDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تمدید ۳۰ روزه",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/search": {
+      "get": {
+        "description": "`complement_project_id` ⇒ مرتب بر پایهٔ مکملیت با تیم آن پروژه (§8.14).",
+        "operationId": "search_teammates_api_v1_teams_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "skill_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Skill Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_level",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 5,
+              "minimum": 1,
+              "title": "Min Level",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "asset_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Asset Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "interest_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Interest Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offering_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Offering Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "university_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "University Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "complement_project_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Complement Project Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamSearchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جستجوی هم‌تیمی",
+        "tags": [
+          "teams"
         ]
       }
     },

@@ -7,6 +7,7 @@ from silp.models.delivery import (
     Deliverable,
     DeliverableFile,
     Milestone,
+    OpeningApplication,
     PeerEvaluation,
     ProjectActivity,
     ProjectMessage,
@@ -73,6 +74,13 @@ from silp.models.quiz import (
     QuizAttempt,
     QuizQuestion,
 )
+from silp.models.research import (
+    ResearchOutput,
+    ResearchSubmission,
+    ResearchSubmissionFile,
+    ResearchTopic,
+    ResearchTrack,
+)
 from silp.models.taxonomy import Asset, Interest, Skill, University
 from silp.models.venture import Venture, VentureMetric, VentureStageChange
 
@@ -104,6 +112,7 @@ __all__ = [
     "Notification",
     "NotificationPreference",
     "OTPChallenge",
+    "OpeningApplication",
     "OutboxMessage",
     "PeerEvaluation",
     "PointEntry",
@@ -130,6 +139,11 @@ __all__ = [
     "QuizQuestion",
     "RecommendationFeedback",
     "RefreshToken",
+    "ResearchOutput",
+    "ResearchSubmission",
+    "ResearchSubmissionFile",
+    "ResearchTopic",
+    "ResearchTrack",
     "Resource",
     "ResourceProgress",
     "Role",

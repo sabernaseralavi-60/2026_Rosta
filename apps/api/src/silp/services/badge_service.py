@@ -25,8 +25,10 @@
 
 | `SALES_AMOUNT` (جمع و بیشینه) | `venture_metrics` **تأییدشده** ثبت‌کننده (M7) |
 
-واقعیت‌های پژوهش (مقالهٔ Q1) و شهر هوشمند هنوز منبعی ندارند و صفرند؛
-نشانشان قفل می‌ماند و بقیه ارزیابی می‌شوند.
+| `OUTPUT_ACCEPTED` به تفکیک چارک | ردیف فعال دفتر کل ⨝ `research_outputs.verified_quartile` |
+
+واقعیت شهر هوشمند هنوز منبعی ندارد و صفر است؛ نشانش قفل می‌ماند و بقیه
+ارزیابی می‌شوند.
 """
 
 from __future__ import annotations
@@ -57,6 +59,7 @@ from silp.models.delivery import Deliverable
 from silp.models.gamification import POINT_CATEGORIES, Badge, PointEntry, UserBadge
 from silp.models.identity import User
 from silp.models.project import Project, ProjectApplication, TeamMember
+from silp.models.research import ResearchOutput
 from silp.models.venture import VentureMetric
 from silp.services import events
 
@@ -124,6 +127,19 @@ class BadgeService:
                 .group_by(Project.kind)
             ):
                 counts[count_key("PROJECT_COMPLETED", kind)] = n
+
+        accepted_outputs = [sid for rule, sid, _ in originals if rule == "OUTPUT_ACCEPTED"]
+        if accepted_outputs:
+            # «مقالهٔ Q1» چارکی است که بازبین دیده، نه چارکی که نویسنده ادعا کرده.
+            for quartile, n in await self.session.execute(
+                select(ResearchOutput.verified_quartile, func.count())
+                .where(
+                    ResearchOutput.id.in_(accepted_outputs),
+                    ResearchOutput.verified_quartile.is_not(None),
+                )
+                .group_by(ResearchOutput.verified_quartile)
+            ):
+                counts[count_key("OUTPUT_ACCEPTED", quartile)] = n
 
         counts["NIGHT_ACTIVITY"] = sum(1 for _, _, at in originals if formulas.is_night(at))
         counts["DELIVERABLE_APPROVED"] = (

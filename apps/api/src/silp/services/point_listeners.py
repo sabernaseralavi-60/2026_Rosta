@@ -9,9 +9,9 @@
   دیتابیس حساب و با `reconcile` هم‌تراز می‌شود. همین تابع‌ها را کار
   پس‌زمینهٔ `release_quiz_points` هم صدا می‌زند.
 
-ایده و کارآفرینی از M7 وصل‌اند. قواعدی که ماژول منبعشان هنوز ساخته نشده
-(پژوهش، پرسش‌وپاسخ، ارزیابی همتا، بازتاب) در `point_rules` هستند ولی
-شنونده ندارند.
+ایده و کارآفرینی از M7 وصل‌اند؛ پژوهش و `TEAM_FORMED` از M7 بخش ب.
+قواعدی که ماژول منبعشان هنوز ساخته نشده (پرسش‌وپاسخ، ارزیابی همتا، بازتاب)
+در `point_rules` هستند ولی شنونده ندارند.
 """
 
 from __future__ import annotations
@@ -20,15 +20,16 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
-from sqlalchemy import func, select
+from sqlalchemy import exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.logging import get_logger
 from silp.core.permissions import Role
 from silp.domain import ideas as idea_rules
+from silp.domain import research as research_rules
 from silp.domain import ventures as venture_rules
 from silp.domain.gamification import formulas
-from silp.models.delivery import Deliverable, Milestone
+from silp.models.delivery import Deliverable, Milestone, OpeningApplication, TeamOpening
 from silp.models.education import (
     AttendanceRecord,
     ClassSession,
@@ -41,6 +42,7 @@ from silp.models.idea import Idea
 from silp.models.profile import TOTAL_SURVEY_STEPS
 from silp.models.project import Project, ProjectApplication, Team, TeamMember
 from silp.models.quiz import Quiz, QuizAttempt
+from silp.models.research import ResearchOutput, ResearchSubmission, ResearchTopic
 from silp.models.venture import Venture, VentureMetric, VentureStageChange
 from silp.services import authz, events
 from silp.services.grading_service import results_visible
@@ -619,4 +621,148 @@ async def on_metric_reviewed(session: AsyncSession, event: events.MetricReviewed
     )
 
 
-__all__ = ["LearningPoints", "active_member_ids", "venture_member_ids"]
+# ── پژوهش — §9.2 `RESEARCH`، ADR-0015 ──────────────────────────────────
+@events.subscribe(events.ResearchReviewed)
+async def on_research_reviewed(session: AsyncSession, event: events.ResearchReviewed) -> None:
+    """`RESEARCH_Ln_APPROVED` — منبع، تحویلِ تأییدشده است؛ هر سطح یک‌بار تأیید می‌شود."""
+    row = await session.get(ResearchSubmission, event.submission_id)
+    if row is None or row.status != "APPROVED":
+        return
+    spec = research_rules.level_spec(row.level)
+    await PointsService(session).award(
+        row.user_id,
+        Award(spec.rule_code, "RESEARCH_SUBMISSION", row.id, note=spec.title_fa),
+    )
+
+
+@events.subscribe(events.OutputReviewed)
+async def on_output_reviewed(session: AsyncSession, event: events.OutputReviewed) -> None:
+    """امتیاز خروجی = تابع آنچه راستی‌آزمایی شده. `reconcile` هم افزودن را
+    می‌پوشاند (پذیرش پس از ارسال)، هم اصلاح را (چارک اشتباه، ادعای پس‌گرفته)."""
+    output = await session.get(ResearchOutput, event.output_id)
+    if output is None or output.review_status != "VERIFIED":
+        return
+    desired = [
+        Award(rule, "RESEARCH_OUTPUT", output.id, multiplier=multiplier)
+        for rule, multiplier in research_rules.output_awards(
+            output.kind, output.verified_stage, output.verified_quartile
+        )
+    ]
+    await PointsService(session).reconcile(
+        output.owner_id,
+        desired=desired,
+        universe=[(rule, "RESEARCH_OUTPUT", output.id) for rule in research_rules.OUTPUT_RULES],
+        reason="راستی‌آزمایی تازهٔ خروجی پژوهشی",
+    )
+
+
+@events.subscribe(events.TopicReviewed)
+async def on_topic_reviewed(session: AsyncSession, event: events.TopicReviewed) -> None:
+    """`TOPIC_PROPOSED` — «پیشنهاد موضوع پژوهشی **پذیرفته‌شده**» (§9.2)."""
+    if not event.approved:
+        return
+    topic = await session.get(ResearchTopic, event.topic_id)
+    if topic is None or topic.reviewed_by == topic.proposer_id:
+        return
+    await PointsService(session).award(
+        topic.proposer_id, Award("TOPIC_PROPOSED", "RESEARCH_TOPIC", topic.id)
+    )
+
+
+# ── آگهی هم‌تیمی — `TEAM_FORMED`، §9.8 ─────────────────────────────────
+async def award_team_formed(
+    session: AsyncSession,
+    *,
+    happened_at: datetime,
+    reviewer_id: uuid.UUID | None,
+    project_id: uuid.UUID | None = None,
+    venture_id: uuid.UUID | None = None,
+    contributor_id: uuid.UUID | None = None,
+) -> None:
+    """«تشکیل تیم صوری ⇒ `TEAM_FORMED` فقط پس از اولین تحویل‌دادنی تأییدشدهٔ تیم».
+
+    امتیاز به آگهی‌دهنده می‌رسد، یک‌بار برای هر آگهی، وقتی تیمی که از آگهی
+    شکل گرفت **پس از پیوستن** کار تأییدشده‌ای داشته باشد و عضو تازه هنوز
+    در تیم باشد. تأیید به دست خود آگهی‌دهنده حساب نیست — همان قاعدهٔ
+    `MILESTONE_APPROVED` (ADR-0012): تأیید کار تیم خودت، امتیاز خودت نیست.
+    """
+    member_active = exists().where(
+        TeamMember.user_id == OpeningApplication.applicant_id,
+        TeamMember.status == "ACTIVE",
+        TeamMember.team_id == Team.id,
+    )
+    stmt = (
+        select(TeamOpening.id, TeamOpening.poster_id)
+        .join(OpeningApplication, OpeningApplication.opening_id == TeamOpening.id)
+        .join(
+            Team,
+            (Team.project_id == TeamOpening.project_id)
+            | (Team.venture_id == TeamOpening.venture_id),
+        )
+        .where(
+            TeamOpening.status == "FILLED",
+            OpeningApplication.status == "ACCEPTED",
+            OpeningApplication.decided_at < happened_at,
+            member_active,
+        )
+    )
+    if project_id is not None:
+        stmt = stmt.where(TeamOpening.project_id == project_id)
+    elif venture_id is not None:
+        stmt = stmt.where(TeamOpening.venture_id == venture_id)
+    else:
+        return
+    if contributor_id is not None:
+        stmt = stmt.where(OpeningApplication.applicant_id == contributor_id)
+    points = PointsService(session)
+    for opening_id, poster_id in (await session.execute(stmt)).all():
+        if poster_id == reviewer_id:
+            continue
+        await points.award(poster_id, Award("TEAM_FORMED", "OPENING", opening_id))
+
+
+@events.subscribe(events.DeliverableReviewed)
+async def on_deliverable_approved_team_formed(
+    session: AsyncSession, event: events.DeliverableReviewed
+) -> None:
+    if event.decision != "APPROVED":
+        return
+    deliverable = await session.get(Deliverable, event.deliverable_id)
+    if deliverable is None or deliverable.reviewed_at is None:
+        return
+    milestone = await session.get(Milestone, deliverable.milestone_id)
+    if milestone is None:
+        return
+    await award_team_formed(
+        session,
+        happened_at=deliverable.reviewed_at,
+        reviewer_id=event.reviewer_id,
+        project_id=milestone.project_id,
+    )
+
+
+@events.subscribe(events.MetricReviewed)
+async def on_metric_verified_team_formed(
+    session: AsyncSession, event: events.MetricReviewed
+) -> None:
+    """کسب‌وکار تحویل‌دادنی ندارد؛ کار تأییدشدهٔ عضو تازه، شاخص تأییدشدهٔ اوست."""
+    row = await session.get(VentureMetric, event.metric_id)
+    if row is None or row.status != "VERIFIED":
+        return
+    assert row.reviewed_at is not None
+    await award_team_formed(
+        session,
+        happened_at=row.reviewed_at,
+        reviewer_id=row.reviewed_by,
+        project_id=row.project_id,
+        venture_id=row.venture_id,
+        contributor_id=row.user_id,
+    )
+
+
+__all__ = [
+    "LearningPoints",
+    "active_member_ids",
+    "award_team_formed",
+    "venture_member_ids",
+]

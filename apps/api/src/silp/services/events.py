@@ -237,6 +237,51 @@ class InvitationAccepted:
     invitation_id: uuid.UUID
 
 
+# ── از M7 بخش ب — پژوهش و آگهی هم‌تیمی ─────────────────────────────────
+@dataclass(frozen=True, slots=True)
+class ResearchSubmitted:
+    submission_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class ResearchReviewed:
+    """تأیید یا درخواست اصلاح تحویل یک سطح — §7.13 `ResearchLevelApproved`."""
+
+    submission_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class TopicReviewed:
+    """پیشنهاد موضوع دانشجو پذیرفته یا رد شد."""
+
+    topic_id: uuid.UUID
+    approved: bool
+
+
+@dataclass(frozen=True, slots=True)
+class OutputReviewed:
+    """راستی‌آزمایی یا رد ادعای وضعیت یک خروجی پژوهشی."""
+
+    output_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class OpeningCreated:
+    opening_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class OpeningApplied:
+    application_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class OpeningDecided:
+    """پذیرش، رد، یا بسته شدن خودکار با پر شدن آگهی."""
+
+    application_id: uuid.UUID
+
+
 # ── ناظر ───────────────────────────────────────────────────────────────
 E = TypeVar("E")
 Handler = Callable[[AsyncSession, Any], Awaitable[None]]
@@ -299,14 +344,21 @@ __all__ = [
     "InvitationAccepted",
     "InvitationSent",
     "MetricReviewed",
+    "OpeningApplied",
+    "OpeningCreated",
+    "OpeningDecided",
+    "OutputReviewed",
     "ProjectCompleted",
     "ProjectStalled",
     "QuizGraded",
     "QuizPublished",
     "QuizResultsPublished",
+    "ResearchReviewed",
+    "ResearchSubmitted",
     "ResourceCompleted",
     "SessionsRevoked",
     "SurveyStepCompleted",
+    "TopicReviewed",
     "UserRegistered",
     "VentureCreated",
     "VentureDeleted",

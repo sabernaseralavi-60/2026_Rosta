@@ -157,6 +157,12 @@ class Permission(StrEnum):
     VENTURE_METRIC_VERIFY = "venture.metric.verify"
     PROJECT_METRIC_VERIFY = "project.metric.verify"
 
+    # ── پژوهش و تیم (M7 بخش ب) ────────────────────────────────────────
+    RESEARCH_PARTICIPATE = "research.participate"
+    RESEARCH_REVIEW = "research.review"
+    RESEARCH_TOPIC_MANAGE = "research.topic.manage"
+    TEAM_SEARCH = "team.search"
+
 
 _SELF_SERVICE_ROLES: frozenset[Role] = frozenset(
     {
@@ -272,6 +278,21 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     # منتور یا استاد.
     Permission.PROJECT_METRIC_VERIFY: frozenset(
         {Role.PROJECT_LEAD, Role.MENTOR, Role.INSTRUCTOR, Role.ADMIN}
+    ),
+    # پژوهش — ADR-0015. مسیر چهارسطحی مال دانشجوست (FR-RES-01)؛ منتور و
+    # دستیار آموزشی هم معمولاً دانشجوی ارشدند و مسیر خودشان را دارند.
+    Permission.RESEARCH_PARTICIPATE: frozenset({Role.STUDENT, Role.MENTOR, Role.TA}),
+    # تأیید سطح و راستی‌آزمایی مقاله: همان کسانی که تحویل‌دادنی را بازبینی
+    # می‌کنند، بی‌قلمرو — مسیر پژوهش به هیچ پروژه یا ارائه‌ای تعلق ندارد.
+    Permission.RESEARCH_REVIEW: frozenset(
+        {Role.MENTOR, Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}
+    ),
+    # FR-RES-03 «استاد موضوعات پژوهشی باز را ثبت می‌کند». پیشنهاد دانشجو
+    # هم پذیرفته است، ولی تا تأیید همین نقش‌ها باز نمی‌شود.
+    Permission.RESEARCH_TOPIC_MANAGE: frozenset({Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}),
+    # FR-TEAM-01 — جستجوی هم‌تیمی. کادر آموزشی هم برای تیم‌سازی پروژه‌هایش.
+    Permission.TEAM_SEARCH: frozenset(
+        {Role.STUDENT, Role.MENTOR, Role.TA, Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}
     ),
 }
 

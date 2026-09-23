@@ -32,10 +32,12 @@ from silp.routers.v1 import (
     notifications,
     projects,
     quizzes,
+    research,
     subscriptions,
     taxonomy,
     teach,
     teach_quiz,
+    teams,
     ventures,
     workspace,
 )
@@ -151,6 +153,9 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(ventures.metrics_router)
     v1.include_router(ventures.project_metrics_router)
     v1.include_router(ventures.invitations_router)
+    # ── پژوهش و تیم (M7 بخش ب) ────────────────────────────────────────
+    v1.include_router(research.router)
+    v1.include_router(teams.router)
     app.include_router(v1)
 
 

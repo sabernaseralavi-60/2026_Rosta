@@ -171,6 +171,28 @@ class InvitationClosed(Conflict):
     message = "این دعوت دیگر معتبر نیست."
 
 
+# ── پژوهش و تیم — §5.13، M7 بخش ب ──────────────────────────────────────
+class TopicAlreadyReserved(Conflict):
+    """FR-RES-03 — موضوع را کس دیگری زودتر رزرو کرد، یا دیگر باز نیست."""
+
+    code = "TOPIC_ALREADY_RESERVED"
+    message = "این موضوع رزرو شده است."
+
+
+class ReservationLimit(Conflict):
+    """یک رزرو باز برای هر نفر — موضوع نگه‌داشته، موضوع گرفته‌شده از دیگری است."""
+
+    code = "RESERVATION_LIMIT"
+    message = "هم‌اکنون یک موضوع رزروشده داری؛ اول آن را آزاد کن یا کار رویش را شروع کن."
+
+
+class OpeningClosed(Conflict):
+    """FR-TEAM-02 — آگهی پر شده، بسته شده یا از مهلتش گذشته."""
+
+    code = "OPENING_CLOSED"
+    message = "این آگهی دیگر درخواست نمی‌پذیرد."
+
+
 # ── آموزش — §5.5 ───────────────────────────────────────────────────────
 class AlreadyEnrolled(Conflict):
     code = "ALREADY_ENROLLED"

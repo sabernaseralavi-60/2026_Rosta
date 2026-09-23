@@ -68,6 +68,9 @@ class ProfileUpdateIn(BaseModel):
     degree_level: DegreeLevel | None = None
     student_number: Annotated[str, Field(max_length=30)] | None = None
     entry_year: Annotated[int, Field(ge=1300, le=1420)] | None = None
+    #: FR-PROF-03، FR-TEAM-01 — «فقط کسانی که نیمرخشان را عمومی کرده‌اند قابل
+    #: جستجواند». پیش‌فرض خصوصی است؛ روشن کردنش انتخاب خود دانشجوست.
+    is_public: bool | None = None
 
     @field_validator("first_name", "last_name", "display_name", "field_of_study")
     @classmethod

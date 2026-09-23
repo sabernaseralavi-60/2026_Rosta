@@ -409,3 +409,111 @@ async def test_username_and_venture_with_team_survive_the_request(  # type: igno
     finally:
         await committing_session.execute(delete(Venture).where(Venture.id == venture_id))
         await committing_session.commit()
+
+
+async def test_research_writes_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """M7 بخش ب — تحویل سطح (با ردیف مسیر)، پیشنهاد موضوع، خروجی و نیمرخ عمومی."""
+    from tests.integration.helpers import complete_profile
+
+    from silp.models.profile import Profile
+    from silp.models.research import (
+        ResearchOutput,
+        ResearchSubmission,
+        ResearchTopic,
+        ResearchTrack,
+    )
+
+    await complete_profile(committing_client, account["token"])
+    response = await committing_client.patch(
+        "/api/v1/me/profile", headers=auth(account), json={"is_public": True}
+    )
+    assert response.status_code == 200, response.text
+    submission = await committing_client.post(
+        "/api/v1/research/tracks/1/submit",
+        headers=auth(account),
+        json={
+            "summary": "ماتریس مرور ۲۴ منبع دربارهٔ ایمنی عابر پیاده در تقاطع‌ها.",
+            "links": ["https://example.org/matrix.xlsx"],
+            "evidence": {
+                "source_count": 24,
+                "gap_summary": "هیچ پژوهشی ایمنی عابر پیاده را در تقاطع‌های بی‌چراغ"
+                " شهرهای متوسط ایران با دادهٔ تصادف و حجم تردد نسنجیده است.",
+            },
+        },
+    )
+    assert submission.status_code == 201, submission.text
+    topic = await committing_client.post(
+        "/api/v1/research/topics",
+        headers=auth(account),
+        json={"title": "موضوع پایدار آزمایشی", "description": "شرح کافی برای یک موضوع آزمایشی."},
+    )
+    assert topic.status_code == 201, topic.text
+    output = await committing_client.post(
+        "/api/v1/research/outputs",
+        headers=auth(account),
+        json={
+            "kind": "JOURNAL",
+            "title": "Durable paper",
+            "authors": "A. B.",
+            "status": "SUBMITTED",
+        },
+    )
+    assert output.status_code == 201, output.text
+    try:
+        async with other_connection() as verifier:
+            assert (await verifier.get(Profile, account["user_id"])).is_public is True  # type: ignore[union-attr]
+            track = await verifier.get(ResearchTrack, (account["user_id"], 1))
+            assert track is not None and track.status == "SUBMITTED", "مسیر commit نشده است"
+            stored = await verifier.get(ResearchSubmission, uuid.UUID(submission.json()["id"]))
+            assert stored is not None, "تحویل commit نشده است"
+            proposal = await verifier.get(ResearchTopic, uuid.UUID(topic.json()["id"]))
+            assert proposal is not None and proposal.status == "PROPOSED"
+            paper = await verifier.get(ResearchOutput, uuid.UUID(output.json()["id"]))
+            assert paper is not None and paper.review_status == "PENDING"
+    finally:
+        await committing_session.execute(
+            delete(ResearchTopic).where(ResearchTopic.proposer_id == account["user_id"])
+        )
+        await committing_session.execute(
+            delete(ResearchOutput).where(ResearchOutput.owner_id == account["user_id"])
+        )
+        await committing_session.commit()
+
+
+async def test_venture_opening_survives_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """آگهی کسب‌وکار باید با پایان درخواست بماند — ثبتش شنوندهٔ اعلان هدفمند هم دارد."""
+    from tests.integration.helpers import complete_profile
+
+    from silp.models.delivery import TeamOpening
+    from silp.models.venture import Venture
+
+    await complete_profile(committing_client, account["token"])
+    venture = await committing_client.post(
+        "/api/v1/ventures",
+        headers=auth(account),
+        json={"name": "آگهی پایدار", "pitch": "معرفی یک‌خطی کسب‌وکار آزمایشی."},
+    )
+    assert venture.status_code == 201, venture.text
+    venture_id = uuid.UUID(venture.json()["id"])
+    try:
+        opening = await committing_client.post(
+            "/api/v1/teams/openings",
+            headers=auth(account),
+            json={
+                "venture_id": str(venture_id),
+                "title": "بازاریاب",
+                "description": "یک هم‌تیمی برای بازاریابی آنلاین.",
+            },
+        )
+        assert opening.status_code == 201, opening.text
+        async with other_connection() as verifier:
+            stored = await verifier.get(TeamOpening, uuid.UUID(opening.json()["id"]))
+            assert stored is not None, "آگهی commit نشده است"
+            assert stored.venture_id == venture_id
+    finally:
+        await committing_session.execute(delete(Venture).where(Venture.id == venture_id))
+        await committing_session.commit()

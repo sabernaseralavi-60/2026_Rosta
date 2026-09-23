@@ -2067,6 +2067,305 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/research/outputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** خروجی‌های پژوهشی من */
+        get: operations["my_outputs_api_v1_research_outputs_get"];
+        put?: never;
+        /** ثبت خروجی پژوهشی */
+        post: operations["create_output_api_v1_research_outputs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/outputs/review-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** صف راستی‌آزمایی خروجی‌ها */
+        get: operations["output_review_queue_api_v1_research_outputs_review_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/outputs/{output_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** حذف خروجی راستی‌آزمایی‌نشده */
+        delete: operations["delete_output_api_v1_research_outputs__output_id__delete"];
+        options?: never;
+        head?: never;
+        /** ویرایش خروجی */
+        patch: operations["update_output_api_v1_research_outputs__output_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/research/outputs/{output_id}/download-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** دانلود فایل خروجی — نویسنده یا بازبین */
+        get: operations["output_file_api_v1_research_outputs__output_id__download_url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/outputs/{output_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** راستی‌آزمایی یا رد ادعای خروجی */
+        post: operations["review_output_api_v1_research_outputs__output_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/review-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** صف بررسی مسیر پژوهش */
+        get: operations["review_queue_api_v1_research_review_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/submissions/{submission_id}/files/{file_id}/download-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** دانلود پیوست تحویل — دانشجو یا بازبین */
+        get: operations["submission_file_api_v1_research_submissions__submission_id__files__file_id__download_url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/submissions/{submission_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تأیید یا درخواست اصلاح تحویل سطح */
+        post: operations["review_submission_api_v1_research_submissions__submission_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/topics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** بانک موضوع پژوهشی */
+        get: operations["list_topics_api_v1_research_topics_get"];
+        put?: never;
+        /**
+         * ثبت یا پیشنهاد موضوع
+         * @description کادر آموزشی موضوع **باز** ثبت می‌کند؛ دانشجو **پیشنهاد** می‌دهد که تا تأیید پنهان است.
+         */
+        post: operations["create_topic_api_v1_research_topics_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/topics/{topic_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** جزئیات موضوع */
+        get: operations["get_topic_api_v1_research_topics__topic_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** ویرایش موضوع */
+        patch: operations["update_topic_api_v1_research_topics__topic_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/research/topics/{topic_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** بستن موضوع */
+        post: operations["close_topic_api_v1_research_topics__topic_id__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/topics/{topic_id}/release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** آزاد کردن رزرو */
+        post: operations["release_topic_api_v1_research_topics__topic_id__release_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/topics/{topic_id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** بازگشایی موضوع */
+        post: operations["reopen_topic_api_v1_research_topics__topic_id__reopen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/topics/{topic_id}/reserve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** رزرو موضوع */
+        post: operations["reserve_topic_api_v1_research_topics__topic_id__reserve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/topics/{topic_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تأیید یا رد پیشنهاد */
+        post: operations["review_topic_api_v1_research_topics__topic_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/tracks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * مسیر پژوهشی من
+         * @description چهار سطح با راهنما، الگو و شاهدهای لازم؛ برای کاربر واردشده، وضعیت و تحویل‌ها.
+         */
+        get: operations["my_track_api_v1_research_tracks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/tracks/{level}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ارسال تحویل‌دادنی سطح */
+        post: operations["submit_level_api_v1_research_tracks__level__submit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/resources/{resource_id}/download": {
         parameters: {
             query?: never;
@@ -2947,6 +3246,187 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teams/applications/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** درخواست‌های من برای آگهی‌ها */
+        get: operations["my_applications_api_v1_teams_applications_mine_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/applications/{application_id}/decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** پذیرش یا رد درخواست */
+        post: operations["decide_application_api_v1_teams_applications__application_id__decide_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/applications/{application_id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** پس گرفتن درخواست */
+        post: operations["withdraw_application_api_v1_teams_applications__application_id__withdraw_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/managed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * تیم‌هایی که می‌توانم برایشان آگهی بدهم یا دعوت بفرستم
+         * @description پروژه‌های فعالی که `project.application.decide` دارم و کسب‌وکارهایی که بنیان‌گذارشانم.
+         */
+        get: operations["managed_teams_api_v1_teams_managed_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/openings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * آگهی‌های نیاز به هم‌تیمی
+         * @description آگهی‌های باز. `mine=true` آگهی‌هایی که خودم داده‌ام، با هر وضعیتی.
+         */
+        get: operations["list_openings_api_v1_teams_openings_get"];
+        put?: never;
+        /** ثبت آگهی نیاز به هم‌تیمی */
+        post: operations["create_opening_api_v1_teams_openings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/openings/{opening_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** جزئیات آگهی */
+        get: operations["get_opening_api_v1_teams_openings__opening_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** ویرایش آگهی */
+        patch: operations["update_opening_api_v1_teams_openings__opening_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/teams/openings/{opening_id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** درخواست پیوستن از آگهی */
+        post: operations["apply_to_opening_api_v1_teams_openings__opening_id__apply_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/openings/{opening_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** بستن آگهی */
+        post: operations["close_opening_api_v1_teams_openings__opening_id__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/openings/{opening_id}/renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تمدید ۳۰ روزه */
+        post: operations["renew_opening_api_v1_teams_openings__opening_id__renew_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teams/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * جستجوی هم‌تیمی
+         * @description `complement_project_id` ⇒ مرتب بر پایهٔ مکملیت با تیم آن پروژه (§8.14).
+         */
+        get: operations["search_teammates_api_v1_teams_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ventures": {
         parameters: {
             query?: never;
@@ -3312,6 +3792,11 @@ export interface components {
             status: "PENDING" | "ACCEPTED" | "REJECTED" | "WAITLISTED" | "WITHDRAWN";
             /** Status Fa */
             status_fa: string;
+        };
+        /** ApplyIn */
+        ApplyIn: {
+            /** Message */
+            message: string;
         };
         /** ArchiveIn */
         ArchiveIn: {
@@ -3954,6 +4439,16 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** DecideIn */
+        DecideIn: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "ACCEPTED" | "DECLINED";
+            /** Note */
+            note?: string | null;
+        };
         /** DecisionIn */
         DecisionIn: {
             /**
@@ -4116,6 +4611,24 @@ export interface components {
         ErrorResponse: {
             error: components["schemas"]["ErrorDetail"];
         };
+        /** EvidenceFieldOut */
+        EvidenceFieldOut: {
+            /** Hint Fa */
+            hint_fa?: string | null;
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "int" | "text" | "url" | "date";
+            /** Label Fa */
+            label_fa: string;
+            /** Min Length */
+            min_length?: number | null;
+            /** Min Value */
+            min_value?: number | null;
+        };
         /** FileOut */
         FileOut: {
             /** Content Type */
@@ -4142,10 +4655,27 @@ export interface components {
             /** Uploaded At */
             uploaded_at?: string | null;
         };
+        /** FileRefOut */
+        FileRefOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Original Name */
+            original_name: string;
+        };
         /** FinalGradeIn */
         FinalGradeIn: {
             /** Grade */
             grade: number;
+        };
+        /** GapOut */
+        GapOut: {
+            /** Min Level */
+            min_level: number;
+            /** Title Fa */
+            title_fa: string;
         };
         /** GradeAnswerIn */
         GradeAnswerIn: {
@@ -4598,21 +5128,6 @@ export interface components {
             /** Level */
             level: number;
         };
-        /** LevelOut */
-        LevelOut: {
-            /** Current At */
-            current_at: number;
-            /** Level */
-            level: number;
-            /** Next At */
-            next_at?: number | null;
-            /** Ratio */
-            ratio: string;
-            /** Title Fa */
-            title_fa: string;
-            /** To Next */
-            to_next: string;
-        };
         /** LinkMaterialIn */
         LinkMaterialIn: {
             /**
@@ -4666,6 +5181,26 @@ export interface components {
         LogoutIn: {
             /** Refresh Token */
             refresh_token: string;
+        };
+        /**
+         * ManagedTeamOut
+         * @description تیمی که کاربر می‌تواند برایش آگهی بدهد یا دعوت بفرستد.
+         */
+        ManagedTeamOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PROJECT" | "VENTURE";
+            /** Roles */
+            roles?: components["schemas"]["ProjectBriefOut"][];
+            /** Title */
+            title: string;
         };
         /**
          * MatchOut
@@ -5069,6 +5604,41 @@ export interface components {
             /** Title Fa */
             title_fa: string;
         };
+        /** MyApplicationOut */
+        MyApplicationOut: {
+            applicant: components["schemas"]["PersonOut"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Decided At */
+            decided_at?: string | null;
+            /** Decision Note */
+            decision_note?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Message */
+            message: string;
+            /**
+             * Opening Id
+             * Format: uuid
+             */
+            opening_id: string;
+            /** Opening Title */
+            opening_title: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACCEPTED" | "DECLINED" | "WITHDRAWN";
+            /** Status Fa */
+            status_fa: string;
+            target: components["schemas"]["TargetOut"];
+        };
         /** MyStandingOut */
         MyStandingOut: {
             /** Excluded Reason */
@@ -5390,6 +5960,177 @@ export interface components {
             /** Total Steps */
             total_steps: number;
         };
+        /** OpeningApplicationOut */
+        OpeningApplicationOut: {
+            applicant: components["schemas"]["PersonOut"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Decided At */
+            decided_at?: string | null;
+            /** Decision Note */
+            decision_note?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Message */
+            message: string;
+            /**
+             * Opening Id
+             * Format: uuid
+             */
+            opening_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACCEPTED" | "DECLINED" | "WITHDRAWN";
+            /** Status Fa */
+            status_fa: string;
+        };
+        /** OpeningDetailOut */
+        OpeningDetailOut: {
+            /** Applications */
+            applications?: components["schemas"]["OpeningApplicationOut"][];
+            /**
+             * Can Manage
+             * @default false
+             */
+            can_manage: boolean;
+            /** Commitment Hpw */
+            commitment_hpw?: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Description */
+            description: string;
+            /**
+             * Effective Status
+             * @enum {string}
+             */
+            effective_status: "OPEN" | "FILLED" | "CLOSED" | "EXPIRED";
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Has Applied
+             * @default false
+             */
+            has_applied: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            my_application?: components["schemas"]["OpeningApplicationOut"] | null;
+            /** Needed Skills */
+            needed_skills: components["schemas"]["SkillRefOut"][];
+            /** Pending Count */
+            pending_count?: number | null;
+            poster: components["schemas"]["PersonOut"];
+            role?: components["schemas"]["ProjectBriefOut"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "OPEN" | "FILLED" | "CLOSED";
+            /** Status Fa */
+            status_fa: string;
+            target: components["schemas"]["TargetOut"];
+            /** Title */
+            title: string;
+        };
+        /** OpeningIn */
+        OpeningIn: {
+            /** Commitment Hpw */
+            commitment_hpw?: number | null;
+            /** Description */
+            description: string;
+            /** Needed Skill Ids */
+            needed_skill_ids?: string[];
+            /** Project Id */
+            project_id?: string | null;
+            /** Role Id */
+            role_id?: string | null;
+            /** Title */
+            title: string;
+            /** Venture Id */
+            venture_id?: string | null;
+        };
+        /** OpeningOut */
+        OpeningOut: {
+            /**
+             * Can Manage
+             * @default false
+             */
+            can_manage: boolean;
+            /** Commitment Hpw */
+            commitment_hpw?: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Description */
+            description: string;
+            /**
+             * Effective Status
+             * @enum {string}
+             */
+            effective_status: "OPEN" | "FILLED" | "CLOSED" | "EXPIRED";
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Has Applied
+             * @default false
+             */
+            has_applied: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Needed Skills */
+            needed_skills: components["schemas"]["SkillRefOut"][];
+            /** Pending Count */
+            pending_count?: number | null;
+            poster: components["schemas"]["PersonOut"];
+            role?: components["schemas"]["ProjectBriefOut"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "OPEN" | "FILLED" | "CLOSED";
+            /** Status Fa */
+            status_fa: string;
+            target: components["schemas"]["TargetOut"];
+            /** Title */
+            title: string;
+        };
+        /** OpeningUpdateIn */
+        OpeningUpdateIn: {
+            /** Commitment Hpw */
+            commitment_hpw?: number | null;
+            /** Description */
+            description: string;
+            /** Needed Skill Ids */
+            needed_skill_ids?: string[];
+            /** Role Id */
+            role_id?: string | null;
+            /** Title */
+            title: string;
+        };
         /** OutboxMessageOut */
         OutboxMessageOut: {
             /** Attempts */
@@ -5456,6 +6197,195 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** OutputIn */
+        OutputIn: {
+            /** Authors */
+            authors: string;
+            /** Doi */
+            doi?: string | null;
+            /** File Id */
+            file_id?: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "JOURNAL" | "CONFERENCE" | "THESIS" | "REPORT" | "PREPRINT";
+            /** Project Id */
+            project_id?: string | null;
+            /** Published On */
+            published_on?: string | null;
+            /** Quartile */
+            quartile?: ("Q1" | "Q2" | "Q3" | "Q4" | "NA") | null;
+            /**
+             * Status
+             * @default DRAFT
+             * @enum {string}
+             */
+            status: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVISION" | "ACCEPTED" | "PUBLISHED" | "REJECTED";
+            /** Submitted On */
+            submitted_on?: string | null;
+            /** Title */
+            title: string;
+            /** Url */
+            url?: string | null;
+            /** Venue */
+            venue?: string | null;
+        };
+        /** OutputOut */
+        OutputOut: {
+            /** Authors */
+            authors: string;
+            /**
+             * Can Delete
+             * @default false
+             */
+            can_delete: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Doi */
+            doi?: string | null;
+            file?: components["schemas"]["FileRefOut"] | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Scored */
+            is_scored: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "JOURNAL" | "CONFERENCE" | "THESIS" | "REPORT" | "PREPRINT";
+            /** Kind Fa */
+            kind_fa: string;
+            /**
+             * Points
+             * @default 0
+             */
+            points: string;
+            project?: components["schemas"]["ProjectRefOut"] | null;
+            /** Published On */
+            published_on?: string | null;
+            /** Quartile */
+            quartile?: ("Q1" | "Q2" | "Q3" | "Q4" | "NA") | null;
+            /** Review Note */
+            review_note?: string | null;
+            /**
+             * Review Status
+             * @enum {string}
+             */
+            review_status: "NONE" | "PENDING" | "VERIFIED" | "REJECTED";
+            /** Review Status Fa */
+            review_status_fa: string;
+            /** Reviewed At */
+            reviewed_at?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVISION" | "ACCEPTED" | "PUBLISHED" | "REJECTED";
+            /** Status Fa */
+            status_fa: string;
+            /** Submitted On */
+            submitted_on?: string | null;
+            /** Title */
+            title: string;
+            /** Url */
+            url?: string | null;
+            /** Venue */
+            venue?: string | null;
+            /** Verified Quartile */
+            verified_quartile?: ("Q1" | "Q2" | "Q3" | "Q4" | "NA") | null;
+            /** Verified Stage */
+            verified_stage?: ("SUBMITTED" | "ACCEPTED" | "PUBLISHED") | null;
+        };
+        /** OutputReviewIn */
+        OutputReviewIn: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "VERIFIED" | "REJECTED";
+            /** Note */
+            note?: string | null;
+        };
+        /** OutputReviewItemOut */
+        OutputReviewItemOut: {
+            /** Authors */
+            authors: string;
+            /**
+             * Can Delete
+             * @default false
+             */
+            can_delete: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Doi */
+            doi?: string | null;
+            file?: components["schemas"]["FileRefOut"] | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Scored */
+            is_scored: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "JOURNAL" | "CONFERENCE" | "THESIS" | "REPORT" | "PREPRINT";
+            /** Kind Fa */
+            kind_fa: string;
+            owner: components["schemas"]["PersonOut"];
+            /**
+             * Points
+             * @default 0
+             */
+            points: string;
+            project?: components["schemas"]["ProjectRefOut"] | null;
+            /** Published On */
+            published_on?: string | null;
+            /** Quartile */
+            quartile?: ("Q1" | "Q2" | "Q3" | "Q4" | "NA") | null;
+            /** Review Note */
+            review_note?: string | null;
+            /**
+             * Review Status
+             * @enum {string}
+             */
+            review_status: "NONE" | "PENDING" | "VERIFIED" | "REJECTED";
+            /** Review Status Fa */
+            review_status_fa: string;
+            /** Reviewed At */
+            reviewed_at?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "REVISION" | "ACCEPTED" | "PUBLISHED" | "REJECTED";
+            /** Status Fa */
+            status_fa: string;
+            /** Submitted On */
+            submitted_on?: string | null;
+            /** Title */
+            title: string;
+            /** Url */
+            url?: string | null;
+            /** Venue */
+            venue?: string | null;
+            /** Verified Quartile */
+            verified_quartile?: ("Q1" | "Q2" | "Q3" | "Q4" | "NA") | null;
+            /** Verified Stage */
+            verified_stage?: ("SUBMITTED" | "ACCEPTED" | "PUBLISHED") | null;
+        };
         /** Page[CourseSummaryOut] */
         Page_CourseSummaryOut_: {
             /** Has Next */
@@ -5482,12 +6412,38 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[OpeningOut] */
+        Page_OpeningOut_: {
+            /** Has Next */
+            has_next: boolean;
+            /** Items */
+            items: components["schemas"]["OpeningOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
         /** Page[ProjectSummaryOut] */
         Page_ProjectSummaryOut_: {
             /** Has Next */
             has_next: boolean;
             /** Items */
             items: components["schemas"]["ProjectSummaryOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[TopicOut] */
+        Page_TopicOut_: {
+            /** Has Next */
+            has_next: boolean;
+            /** Items */
+            items: components["schemas"]["TopicOut"][];
             /** Page */
             page: number;
             /** Page Size */
@@ -5540,6 +6496,18 @@ export interface components {
             } | null;
             /** Student Name */
             student_name: string;
+        };
+        /** PersonOut */
+        PersonOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string | null;
+            /** Username */
+            username: string | null;
         };
         /** PickRandomIn */
         PickRandomIn: {
@@ -5695,7 +6663,7 @@ export interface components {
             };
             /** Latest Entry Id */
             latest_entry_id?: string | null;
-            level: components["schemas"]["LevelOut"];
+            level: components["schemas"]["silp__schemas__gamification__LevelOut"];
             /** Recent */
             recent?: components["schemas"]["PointEntryOut"][];
             /** Term By Category */
@@ -5733,6 +6701,20 @@ export interface components {
             weekly_hours?: number | null;
             /** Work Style */
             work_style?: ("SOLO" | "TEAM" | "EITHER") | null;
+        };
+        /** PreviousVersionOut */
+        PreviousVersionOut: {
+            /** Feedback */
+            feedback?: string | null;
+            /** Reviewed At */
+            reviewed_at?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "SUBMITTED" | "APPROVED" | "CHANGES_REQUESTED";
+            /** Version */
+            version: number;
         };
         /**
          * ProfileOut
@@ -5797,6 +6779,8 @@ export interface components {
             first_name?: string | null;
             /** Gender */
             gender?: ("M" | "F" | "UNDISCLOSED") | null;
+            /** Is Public */
+            is_public?: boolean | null;
             /** Last Name */
             last_name?: string | null;
             /** Student Number */
@@ -5831,6 +6815,16 @@ export interface components {
             id: string;
             /** Title Fa */
             title_fa: string;
+        };
+        /** ProjectBriefOut */
+        ProjectBriefOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
         };
         /** ProjectCardOut */
         ProjectCardOut: {
@@ -6004,6 +6998,16 @@ export interface components {
              * @enum {string}
              */
             work_style: "SOLO" | "TEAM" | "EITHER";
+        };
+        /** ProjectRefOut */
+        ProjectRefOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
         };
         /** ProjectRoleIn */
         ProjectRoleIn: {
@@ -6654,6 +7658,56 @@ export interface components {
             /** Score */
             score?: number | null;
         };
+        /** ReviewItemOut */
+        ReviewItemOut: {
+            /** Checklist */
+            checklist: string[];
+            /** Evidence */
+            evidence: {
+                [key: string]: unknown;
+            };
+            /** Evidence Fields */
+            evidence_fields: components["schemas"]["EvidenceFieldOut"][];
+            /** Feedback */
+            feedback?: string | null;
+            /** Files */
+            files?: components["schemas"]["FileRefOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Level */
+            level: number;
+            /** Level Title Fa */
+            level_title_fa: string;
+            /** Links */
+            links: string[];
+            /** Previous */
+            previous?: components["schemas"]["PreviousVersionOut"][];
+            /** Reviewed At */
+            reviewed_at?: string | null;
+            reviewer?: components["schemas"]["PersonOut"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "SUBMITTED" | "APPROVED" | "CHANGES_REQUESTED";
+            /** Status Fa */
+            status_fa: string;
+            student: components["schemas"]["PersonOut"];
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            /** Summary */
+            summary: string;
+            /** Topic Title */
+            topic_title?: string | null;
+            /** Version */
+            version: number;
+        };
         /** ReviewOut */
         ReviewOut: {
             deliverable: components["schemas"]["DeliverableOut"];
@@ -6729,6 +7783,22 @@ export interface components {
             /** Seconds Remaining */
             seconds_remaining: number;
         };
+        /** SearchContextOut */
+        SearchContextOut: {
+            /**
+             * Can Invite
+             * @default false
+             */
+            can_invite: boolean;
+            /** Gaps */
+            gaps?: components["schemas"]["GapOut"][];
+            /**
+             * My Profile Is Public
+             * @default false
+             */
+            my_profile_is_public: boolean;
+            project?: components["schemas"]["ProjectBriefOut"] | null;
+        };
         /**
          * SessionOut
          * @description یک نشست فعال — §5.2 `GET /auth/sessions`.
@@ -6766,6 +7836,20 @@ export interface components {
              */
             skill_id: string;
         };
+        /** SkillLevelOut */
+        SkillLevelOut: {
+            /** Level */
+            level: number;
+            /**
+             * Skill Id
+             * Format: uuid
+             */
+            skill_id: string;
+            /** Title Fa */
+            title_fa: string;
+            /** Verified */
+            verified: boolean;
+        };
         /** SkillListOut */
         SkillListOut: {
             /** Items */
@@ -6792,6 +7876,16 @@ export interface components {
             sort_order: number;
             /** Title En */
             title_en: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** SkillRefOut */
+        SkillRefOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
             /** Title Fa */
             title_fa: string;
         };
@@ -6911,13 +8005,56 @@ export interface components {
             /** Upcoming */
             upcoming: components["schemas"]["UpcomingEventOut"][];
         };
-        /** SubmitIn */
-        SubmitIn: {
+        /** SubmissionOut */
+        SubmissionOut: {
+            /** Evidence */
+            evidence: {
+                [key: string]: unknown;
+            };
+            /** Feedback */
+            feedback?: string | null;
+            /** Files */
+            files?: components["schemas"]["FileRefOut"][];
             /**
-             * Confirm Unanswered
-             * @default 0
+             * Id
+             * Format: uuid
              */
-            confirm_unanswered: number;
+            id: string;
+            /** Level */
+            level: number;
+            /** Links */
+            links: string[];
+            /** Reviewed At */
+            reviewed_at?: string | null;
+            reviewer?: components["schemas"]["PersonOut"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "SUBMITTED" | "APPROVED" | "CHANGES_REQUESTED";
+            /** Status Fa */
+            status_fa: string;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            /** Summary */
+            summary: string;
+            /** Topic Title */
+            topic_title?: string | null;
+            /** Version */
+            version: number;
+        };
+        /** SubmissionReviewIn */
+        SubmissionReviewIn: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "APPROVED" | "CHANGES_REQUESTED";
+            /** Feedback */
+            feedback?: string | null;
         };
         /** SubmitOut */
         SubmitOut: {
@@ -7123,6 +8260,23 @@ export interface components {
             /** Seconds Remaining */
             seconds_remaining: number;
         };
+        /** TargetOut */
+        TargetOut: {
+            /** Href */
+            href: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PROJECT" | "VENTURE";
+            /** Title */
+            title: string;
+        };
         /** TaskIn */
         TaskIn: {
             /** Assignee Id */
@@ -7247,6 +8401,58 @@ export interface components {
              */
             project_id: string;
         };
+        /** TeamSearchOut */
+        TeamSearchOut: {
+            context: components["schemas"]["SearchContextOut"];
+            /** Has Next */
+            has_next: boolean;
+            /** Items */
+            items: components["schemas"]["TeammateOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
+        /** TeammateOut */
+        TeammateOut: {
+            /** Assets */
+            assets: string[];
+            /** Bio */
+            bio?: string | null;
+            /** Complement Reason */
+            complement_reason?: string | null;
+            /** Complement Score */
+            complement_score?: number | null;
+            /** Complement Skills */
+            complement_skills?: string[];
+            /** Shares Course */
+            shares_course: boolean;
+            /** Stronger Reason */
+            stronger_reason?: string | null;
+            /** Stronger Skills */
+            stronger_skills?: string[];
+            /** Top Skills */
+            top_skills: components["schemas"]["SkillLevelOut"][];
+            user: components["schemas"]["TeammateUserOut"];
+            /** Weekly Hours */
+            weekly_hours?: number | null;
+        };
+        /** TeammateUserOut */
+        TeammateUserOut: {
+            /** Display Name */
+            display_name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** University */
+            university?: string | null;
+            /** Username */
+            username: string | null;
+        };
         /** TemplateOut */
         TemplateOut: {
             /** Body */
@@ -7326,6 +8532,140 @@ export interface components {
              * @default Bearer
              */
             token_type: string;
+        };
+        /** TopicBriefOut */
+        TopicBriefOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Idle Days Left */
+            idle_days_left?: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PROPOSED" | "OPEN" | "RESERVED" | "TAKEN" | "CLOSED";
+            /** Status Fa */
+            status_fa: string;
+            /** Title */
+            title: string;
+        };
+        /** TopicCloseIn */
+        TopicCloseIn: {
+            /** Reason */
+            reason: string;
+        };
+        /** TopicIn */
+        TopicIn: {
+            /** Description */
+            description: string;
+            /** Level */
+            level?: number | null;
+            /** Prerequisites */
+            prerequisites?: string | null;
+            /** Title */
+            title: string;
+        };
+        /** TopicOut */
+        TopicOut: {
+            /**
+             * Can Edit
+             * @default false
+             */
+            can_edit: boolean;
+            /**
+             * Can Manage
+             * @default false
+             */
+            can_manage: boolean;
+            /**
+             * Can Release
+             * @default false
+             */
+            can_release: boolean;
+            /**
+             * Can Reserve
+             * @default false
+             */
+            can_reserve: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Description */
+            description: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Idle Days Left */
+            idle_days_left?: number | null;
+            /**
+             * Is Mine
+             * @default false
+             */
+            is_mine: boolean;
+            /** Level */
+            level?: number | null;
+            /** Prerequisites */
+            prerequisites?: string | null;
+            proposer: components["schemas"]["PersonOut"];
+            /** Reserved At */
+            reserved_at?: string | null;
+            reserved_by?: components["schemas"]["PersonOut"] | null;
+            /**
+             * Reserved By Me
+             * @default false
+             */
+            reserved_by_me: boolean;
+            /** Review Note */
+            review_note?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PROPOSED" | "OPEN" | "RESERVED" | "TAKEN" | "CLOSED";
+            /** Status Fa */
+            status_fa: string;
+            /** Title */
+            title: string;
+        };
+        /** TopicReviewIn */
+        TopicReviewIn: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "APPROVE" | "REJECT";
+            /** Note */
+            note?: string | null;
+        };
+        /** TrackOut */
+        TrackOut: {
+            /**
+             * Can Participate
+             * @default false
+             */
+            can_participate: boolean;
+            /**
+             * Can Review
+             * @default false
+             */
+            can_review: boolean;
+            /**
+             * Completed
+             * @default false
+             */
+            completed: boolean;
+            /** Current Level */
+            current_level: number | null;
+            /** Levels */
+            levels: components["schemas"]["silp__schemas__research__LevelOut"][];
+            topic?: components["schemas"]["TopicBriefOut"] | null;
         };
         /** TrendPointOut */
         TrendPointOut: {
@@ -7687,6 +9027,81 @@ export interface components {
             title_fa: string;
             /** Week Number */
             week_number: number;
+        };
+        /** LevelOut */
+        silp__schemas__gamification__LevelOut: {
+            /** Current At */
+            current_at: number;
+            /** Level */
+            level: number;
+            /** Next At */
+            next_at?: number | null;
+            /** Ratio */
+            ratio: string;
+            /** Title Fa */
+            title_fa: string;
+            /** To Next */
+            to_next: string;
+        };
+        /** SubmitIn */
+        silp__schemas__quiz__SubmitIn: {
+            /**
+             * Confirm Unanswered
+             * @default 0
+             */
+            confirm_unanswered: number;
+        };
+        /** LevelOut */
+        silp__schemas__research__LevelOut: {
+            /** Approved At */
+            approved_at?: string | null;
+            /** Attachments Hint Fa */
+            attachments_hint_fa?: string | null;
+            /** Checklist */
+            checklist: string[];
+            /** Deliverable Fa */
+            deliverable_fa: string;
+            /** Evidence Fields */
+            evidence_fields: components["schemas"]["EvidenceFieldOut"][];
+            /** Level */
+            level: number;
+            mentor?: components["schemas"]["PersonOut"] | null;
+            /** Min Attachments */
+            min_attachments: number;
+            /** Points */
+            points?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "LOCKED" | "AVAILABLE" | "IN_PROGRESS" | "SUBMITTED" | "APPROVED";
+            /** State Fa */
+            state_fa: string;
+            /** Steps */
+            steps: string[];
+            /** Submissions */
+            submissions?: components["schemas"]["SubmissionOut"][];
+            /** Template Columns */
+            template_columns: string[];
+            /** Template Title Fa */
+            template_title_fa: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** SubmitIn */
+        silp__schemas__research__SubmitIn: {
+            /** Evidence */
+            evidence?: {
+                [key: string]: unknown;
+            };
+            /** File Ids */
+            file_ids?: string[];
+            /** Links */
+            links?: string[];
+            /** Summary */
+            summary: string;
         };
     };
     responses: never;
@@ -8539,7 +9954,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SubmitIn"];
+                "application/json": components["schemas"]["silp__schemas__quiz__SubmitIn"];
             };
         };
         responses: {
@@ -12910,6 +14325,748 @@ export interface operations {
             };
         };
     };
+    my_outputs_api_v1_research_outputs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutputOut"][];
+                };
+            };
+        };
+    };
+    create_output_api_v1_research_outputs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutputIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutputOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    output_review_queue_api_v1_research_outputs_review_queue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutputReviewItemOut"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_output_api_v1_research_outputs__output_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                output_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_output_api_v1_research_outputs__output_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                output_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutputIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutputOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    output_file_api_v1_research_outputs__output_id__download_url_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                output_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_output_api_v1_research_outputs__output_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                output_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutputReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutputOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_queue_api_v1_research_review_queue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewItemOut"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    submission_file_api_v1_research_submissions__submission_id__files__file_id__download_url_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submission_id: string;
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_submission_api_v1_research_submissions__submission_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                submission_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmissionReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmissionOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_topics_api_v1_research_topics_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                page_size?: number;
+                status?: ("PROPOSED" | "OPEN" | "RESERVED" | "TAKEN" | "CLOSED") | null;
+                level?: number | null;
+                q?: string | null;
+                mine?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_TopicOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_topic_api_v1_research_topics_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TopicIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_topic_api_v1_research_topics__topic_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_topic_api_v1_research_topics__topic_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TopicIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_topic_api_v1_research_topics__topic_id__close_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TopicCloseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    release_topic_api_v1_research_topics__topic_id__release_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_topic_api_v1_research_topics__topic_id__reopen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reserve_topic_api_v1_research_topics__topic_id__reserve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicOut"];
+                };
+            };
+            /** @description TOPIC_ALREADY_RESERVED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_topic_api_v1_research_topics__topic_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                topic_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TopicReviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopicOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_track_api_v1_research_tracks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackOut"];
+                };
+            };
+        };
+    };
+    submit_level_api_v1_research_tracks__level__submit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                level: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["silp__schemas__research__SubmitIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmissionOut"];
+                };
+            };
+            /** @description سطح قفل، تأییدشده یا در انتظار بررسی */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description `details.missing` — شاهدهای کم */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     download_resource_api_v1_resources__resource_id__download_get: {
         parameters: {
             query?: never;
@@ -15175,6 +17332,456 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WeekSummaryOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_applications_api_v1_teams_applications_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyApplicationOut"][];
+                };
+            };
+        };
+    };
+    decide_application_api_v1_teams_applications__application_id__decide_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecideIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningApplicationOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    withdraw_application_api_v1_teams_applications__application_id__withdraw_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    managed_teams_api_v1_teams_managed_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedTeamOut"][];
+                };
+            };
+        };
+    };
+    list_openings_api_v1_teams_openings_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                page_size?: number;
+                q?: string | null;
+                skill_id?: string | null;
+                kind?: ("PROJECT" | "VENTURE") | null;
+                project_id?: string | null;
+                venture_id?: string | null;
+                mine?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_OpeningOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_opening_api_v1_teams_openings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpeningIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningDetailOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_opening_api_v1_teams_openings__opening_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                opening_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningDetailOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_opening_api_v1_teams_openings__opening_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                opening_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpeningUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_to_opening_api_v1_teams_openings__opening_id__apply_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                opening_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningApplicationOut"];
+                };
+            };
+            /** @description OPENING_CLOSED، PROFILE_INCOMPLETE، DUPLICATE_APPLICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_opening_api_v1_teams_openings__opening_id__close_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                opening_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    renew_opening_api_v1_teams_openings__opening_id__renew_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                opening_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_teammates_api_v1_teams_search_get: {
+        parameters: {
+            query?: {
+                skill_id?: string | null;
+                min_level?: number;
+                asset_id?: string | null;
+                interest_id?: string | null;
+                offering_id?: string | null;
+                university_id?: string | null;
+                q?: string | null;
+                complement_project_id?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeamSearchOut"];
                 };
             };
             /** @description Forbidden */

@@ -27,21 +27,29 @@ from decimal import Decimal
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from silp.domain import research as research_rules
 from silp.domain import ventures as venture_rules
 from silp.domain.calendar import format_datetime_fa
 from silp.domain.notifications.templating import excerpt
-from silp.domain.text import format_number_fa, to_persian_digits
-from silp.models.delivery import Deliverable, Milestone
+from silp.domain.text import format_number_fa, join_fa, to_persian_digits
+from silp.models.delivery import Deliverable, Milestone, OpeningApplication, TeamOpening
 from silp.models.education import Announcement, Course, CourseOffering, CourseWeek, Enrollment
 from silp.models.gamification import Badge, PointEntry
 from silp.models.idea import Idea, IdeaComment
 from silp.models.project import Project, ProjectApplication, Team, TeamInvitation
 from silp.models.quiz import GradeAppeal, Quiz, QuizAttempt
+from silp.models.research import (
+    ResearchOutput,
+    ResearchSubmission,
+    ResearchTopic,
+    ResearchTrack,
+)
 from silp.models.venture import METRIC_TITLE_FA, Venture, VentureMetric, VentureStageChange
 from silp.services import events
 from silp.services.directory import display_names, name_of
 from silp.services.grading_service import results_visible
 from silp.services.notification_service import NotificationService
+from silp.services.opening_service import OpeningService
 from silp.services.point_listeners import active_member_ids, venture_member_ids
 
 #: وقتی نام کاربر هنوز ثبت نشده (پیش از ورود اولیه).
@@ -614,4 +622,177 @@ async def on_venture_stage_changed(
     )
 
 
-__all__ = ["course_title", "fa_number"]
+# ── پژوهش و آگهی هم‌تیمی — M7 بخش ب ───────────────────────────────────
+def level_label(level: int) -> str:
+    """«۲ (تحلیل داده)» — شمارهٔ سطح با عنوانش."""
+    return f"{to_persian_digits(level)} ({research_rules.level_spec(level).title_fa})"
+
+
+async def _earned(
+    session: AsyncSession, user_id: uuid.UUID, source_type: str, source_id: uuid.UUID
+) -> Decimal | None:
+    """امتیاز فعال این منبع — امتیاز پیش از اعلان ثبت شده (ترتیب `LISTENER_MODULES`)."""
+    total: Decimal | None = await session.scalar(
+        select(func.sum(PointEntry.amount)).where(
+            PointEntry.user_id == user_id,
+            PointEntry.source_type == source_type,
+            PointEntry.source_id == source_id,
+        )
+    )
+    return total
+
+
+@events.subscribe(events.ResearchSubmitted)
+async def on_research_submitted(session: AsyncSession, event: events.ResearchSubmitted) -> None:
+    """به منتور سطح — کسی که پیش‌تر همین سطح را بررسی کرده. تحویل اول منتور ندارد و در صف می‌نشیند."""
+    row = await session.get(ResearchSubmission, event.submission_id)
+    if row is None:
+        return
+    track = await session.get(ResearchTrack, (row.user_id, row.level))
+    if track is None or track.mentor_id is None or track.mentor_id == row.user_id:
+        return
+    await NotificationService(session).notify(
+        "RESEARCH_SUBMITTED",
+        [track.mentor_id],
+        {"student": await _name(session, row.user_id), "level": level_label(row.level)},
+        action_url="/research/review",
+        dedup_key=f"RESEARCH_SUBMITTED:{row.id}",
+    )
+
+
+@events.subscribe(events.ResearchReviewed)
+async def on_research_reviewed(session: AsyncSession, event: events.ResearchReviewed) -> None:
+    row = await session.get(ResearchSubmission, event.submission_id)
+    if row is None or row.status == "SUBMITTED":
+        return
+    if row.status == "APPROVED":
+        earned = await _earned(session, row.user_id, "RESEARCH_SUBMISSION", row.id)
+        decision = "تأیید شد"
+        detail = f"{fa_number(earned)} امتیاز پژوهش گرفتی." if earned else ""
+        if row.level < research_rules.MAX_LEVEL:
+            detail = (detail + " سطح بعدی برایت باز شد.").strip()
+    else:
+        decision = "نیاز به اصلاح دارد"
+        detail = excerpt(row.feedback or "", 200)
+    await NotificationService(session).notify(
+        "RESEARCH_REVIEWED",
+        [row.user_id],
+        {"level": level_label(row.level), "decision": decision, "detail": detail},
+        action_url=f"/research/level/{row.level}",
+        dedup_key=f"RESEARCH_REVIEWED:{row.id}",
+    )
+
+
+@events.subscribe(events.TopicReviewed)
+async def on_topic_reviewed(session: AsyncSession, event: events.TopicReviewed) -> None:
+    topic = await session.get(ResearchTopic, event.topic_id)
+    if topic is None or topic.reviewed_by == topic.proposer_id:
+        return
+    if event.approved:
+        earned = await _earned(session, topic.proposer_id, "RESEARCH_TOPIC", topic.id)
+        decision = "پذیرفته شد"
+        detail = "حالا در بانک موضوع است و دیگران می‌توانند رزروش کنند."
+        if earned:
+            detail += f" {fa_number(earned)} امتیاز پژوهش گرفتی."
+    else:
+        decision = "پذیرفته نشد"
+        detail = excerpt(topic.review_note or "", 200)
+    await NotificationService(session).notify(
+        "TOPIC_REVIEWED",
+        [topic.proposer_id],
+        {"topic": topic.title, "decision": decision, "detail": detail},
+        action_url=f"/research/topics/{topic.id}",
+        dedup_key=f"TOPIC_REVIEWED:{topic.id}",
+    )
+
+
+@events.subscribe(events.OutputReviewed)
+async def on_output_reviewed(session: AsyncSession, event: events.OutputReviewed) -> None:
+    output = await session.get(ResearchOutput, event.output_id)
+    if output is None or output.review_status not in ("VERIFIED", "REJECTED"):
+        return
+    if output.review_status == "VERIFIED":
+        earned = await _earned(session, output.owner_id, "RESEARCH_OUTPUT", output.id)
+        decision = "راستی‌آزمایی شد"
+        detail = f"امتیاز پژوهش این خروجی اکنون {fa_number(earned)} است." if earned else ""
+    else:
+        decision = "راستی‌آزمایی نشد"
+        detail = excerpt(output.review_note or "", 200)
+    assert output.reviewed_at is not None
+    await NotificationService(session).notify(
+        "OUTPUT_REVIEWED",
+        [output.owner_id],
+        {"title": output.title, "decision": decision, "detail": detail},
+        action_url="/research/outputs",
+        # هر بررسی یک اعلان — خروجی می‌تواند چند بار (ارسال، پذیرش، انتشار) بررسی شود.
+        dedup_key=f"OUTPUT_REVIEWED:{output.id}:{output.reviewed_at.isoformat()}",
+    )
+
+
+@events.subscribe(events.OpeningCreated)
+async def on_opening_created(session: AsyncSession, event: events.OpeningCreated) -> None:
+    """FR-TEAM-02 «دانشجویان واجد شرایط، اعلان هدفمند دریافت می‌کنند»."""
+    opening = await session.get(TeamOpening, event.opening_id)
+    if opening is None:
+        return
+    service = OpeningService(session)
+    target = await service.target_of(opening)
+    notifications = NotificationService(session)
+    for user_id, skills in await service.matching_users(opening):
+        await notifications.notify(
+            "OPENING_MATCH",
+            [user_id],
+            {"opening": opening.title, "team": target.title, "skills": join_fa(skills[:3])},
+            action_url=f"/teams/openings/{opening.id}",
+            dedup_key=f"OPENING_MATCH:{opening.id}",
+        )
+
+
+@events.subscribe(events.OpeningApplied)
+async def on_opening_applied(session: AsyncSession, event: events.OpeningApplied) -> None:
+    application = await session.get(OpeningApplication, event.application_id)
+    if application is None:
+        return
+    opening = await session.get(TeamOpening, application.opening_id)
+    if opening is None:
+        return
+    await NotificationService(session).notify(
+        "OPENING_APPLIED",
+        [opening.poster_id],
+        {"applicant": await _name(session, application.applicant_id), "opening": opening.title},
+        action_url=f"/teams/openings/{opening.id}",
+        dedup_key=f"OPENING_APPLIED:{application.id}",
+    )
+
+
+@events.subscribe(events.OpeningDecided)
+async def on_opening_decided(session: AsyncSession, event: events.OpeningDecided) -> None:
+    application = await session.get(OpeningApplication, event.application_id)
+    if application is None or application.status not in ("ACCEPTED", "DECLINED"):
+        return
+    opening = await session.get(TeamOpening, application.opening_id)
+    if opening is None:
+        return
+    target = await OpeningService(session).target_of(opening)
+    if application.status == "ACCEPTED":
+        decision = "پذیرفته شد"
+        detail = "حالا عضو تیمی؛ از صفحهٔ تیم شروع کن."
+        url = (
+            f"/projects/{target.project.id}/workspace"
+            if target.project is not None
+            else target.href
+        )
+    else:
+        decision = "پذیرفته نشد"
+        detail = excerpt(application.decision_note or "", 200)
+        url = "/teams/openings"
+    await NotificationService(session).notify(
+        "OPENING_DECIDED",
+        [application.applicant_id],
+        {"opening": opening.title, "team": target.title, "decision": decision, "detail": detail},
+        action_url=url,
+        dedup_key=f"OPENING_DECIDED:{application.id}",
+    )
+
+
+__all__ = ["course_title", "fa_number", "level_label"]

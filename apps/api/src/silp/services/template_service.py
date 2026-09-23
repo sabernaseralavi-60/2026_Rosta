@@ -78,6 +78,10 @@ SAMPLE_VALUES: dict[str, str] = {
     "venture": "خرمای صابر",
     "stage": "محصول کمینه",
     "from_stage": "اعتبارسنجی",
+    "level": "۲ (تحلیل داده)",
+    "topic": "ایمنی عابر پیاده در تقاطع‌های کرمان",
+    "opening": "تحلیلگر GIS",
+    "skills": "GIS و Python",
 }
 
 
