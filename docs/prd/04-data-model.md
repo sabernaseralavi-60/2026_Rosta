@@ -1175,8 +1175,15 @@ CREATE TABLE certificates (
   issued_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   issued_by   UUID REFERENCES users(id),
   metadata    JSONB NOT NULL DEFAULT '{}'::jsonb,
-  revoked_at  TIMESTAMPTZ
+  revoked_at  TIMESTAMPTZ,
+  revoked_by  UUID REFERENCES users(id),          -- ۰۰۱۶، ADR-0017
+  revoke_reason TEXT,
+  CHECK (revoked_at IS NULL OR revoke_reason IS NOT NULL),
+  CHECK (public_code ~ '^[0-9A-Z]{4}-[0-9A-Z]{4}$')   -- Crockford Base32، ۴۰ بیت
 );
+-- یک گواهی معتبر برای هر موضوع — صدور از شنونده بی‌اثر است (ADR-0017)
+CREATE UNIQUE INDEX uq_certificates_subject ON certificates(user_id, kind, subject_id)
+  WHERE revoked_at IS NULL;
 ```
 
 ---
@@ -1641,8 +1648,8 @@ CREATE TABLE message_templates (
 
 CREATE TABLE audit_logs (              -- فقط افزودنی (FR-ADM-02)
   id          UUID PRIMARY KEY DEFAULT uuidv7(),
-  actor_id    UUID REFERENCES users(id),
-  impersonated_by UUID REFERENCES users(id),
+  actor_id    UUID,                    -- بی کلید خارجی: لاگ از کاربر بیشتر می‌ماند (ADR-0017)
+  impersonated_by UUID,
   action      TEXT NOT NULL,           -- 'ROLE_GRANTED','GRADE_OVERRIDDEN',...
   entity_type TEXT NOT NULL,
   entity_id   UUID,
@@ -1655,6 +1662,11 @@ CREATE TABLE audit_logs (              -- فقط افزودنی (FR-ADM-02)
 CREATE INDEX idx_audit_entity ON audit_logs(entity_type, entity_id, created_at DESC);
 CREATE INDEX idx_audit_actor ON audit_logs(actor_id, created_at DESC);
 REVOKE UPDATE, DELETE ON audit_logs FROM PUBLIC;
+-- REVOKE مالک جدول را محدود نمی‌کند؛ تریگر برای همه (ADR-0017):
+CREATE TRIGGER audit_logs_append_only BEFORE UPDATE OR DELETE ON audit_logs
+  FOR EACH ROW EXECUTE FUNCTION audit_logs_append_only();   -- RAISE EXCEPTION
+CREATE INDEX idx_audit_created ON audit_logs(created_at DESC);
+CREATE INDEX idx_audit_action ON audit_logs(action, created_at DESC);
 
 CREATE TABLE app_settings (
   key        TEXT PRIMARY KEY,
@@ -1751,7 +1763,9 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
 0015_city_lab         ◄────── پس از ۰۰۱۴ (M7 بخش ج، ADR-0016)
                                project_artifact_versions + projects.workflow،
                                milestones.workflow_stage/owner_id، deliverables.evidence
-0016_admin                     audit_logs, app_settings, qa_threads, qa_replies
+0016_admin            ◄────── پس از ۰۰۱۵ (M7 بخش د، ADR-0017)
+                               audit_logs + تریگر فقط‌افزودنی، ابطال و یکتایی certificates
+                               (app_settings و qa_threads/qa_replies با ماژول‌هایشان)
 0017_seed_reference_data       دادهٔ مرجع وابسته به مهاجرت‌های بالا (§14)
 ```
 

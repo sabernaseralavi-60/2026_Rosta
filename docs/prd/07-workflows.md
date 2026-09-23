@@ -108,7 +108,7 @@ def generate_username(first: str, last: str) -> str:
 | `→ PENDING` | ارائه `OPEN` و ظرفیت آزاد و `requires_approval` | اعلان به استاد |
 | `→ ACTIVE` | تأیید استاد یا عدم نیاز به تأیید | اعلان به دانشجو، دسترسی به محتوا |
 | `→ DROPPED` | پیش از پایان مهلت حذف | حفظ همهٔ داده‌ها (نمرات، تلاش‌ها) |
-| `→ COMPLETED` | استاد نمرهٔ نهایی ثبت کند | صدور گواهی درس، امتیاز `LEARNING` |
+| `→ COMPLETED` | استاد نمرهٔ نهایی ثبت کند | صدور گواهی درس (نمرهٔ ≥ ۱۰؛ اصلاح به زیر ۱۰ باطلش می‌کند)، امتیاز `LEARNING` |
 
 > **حذف پس از مهلت:** `DROPPED` می‌شود ولی نمرهٔ نهایی صفر ثبت می‌گردد.
 > این تصمیم توسط `app_settings.late_drop_policy` قابل تغییر است.
@@ -644,12 +644,14 @@ WHERE due_on < CURRENT_DATE
 | `DeliverableSubmitted` | PRJ | اعلان به بازبین، به‌روزرسانی `last_activity_at` |
 | `DeliverableReviewed` | PRJ | امتیاز، اعلان، بررسی تکمیل مرحله |
 | `MilestoneApproved` | PRJ | امتیاز، بررسی تکمیل پروژه |
-| `ProjectCompleted` | PRJ | گواهی، امتیاز نهایی، درخواست بازتاب |
+| `ProjectCompleted` | PRJ | گواهی برای هر عضو فعال (صادرکننده: `completed_by`)، امتیاز نهایی، درخواست بازتاب (فاز ۲) |
 | `IdeaVoted` | IDEA | به‌روزرسانی شمارنده، امتیاز به نویسنده |
 | `IdeaPromoted` | IDEA | امتیاز، اعلان، دعوت به تیم |
 | `VentureStageAdvanced` | VEN | امتیاز `STARTUP`، اعلان |
 | `MetricVerified` | VEN | امتیاز `STARTUP` بر اساس مقدار |
-| `ResearchLevelApproved` | RES | امتیاز `RESEARCH`، گواهی سطح |
+| `ResearchLevelApproved` | RES | امتیاز `RESEARCH`، گواهی سطح (M7 بخش د) |
+| `CertificateIssued` · `CertificateRevoked` | ADM | اعلان به دارنده (ADR-0017) |
+| `RoleGranted` · `ImpersonationStarted` | ADM | اعلان «نقش تازه» و «پشتیبانی حساب شما را بررسی کرد» (§6.5) |
 | `PointsAwarded` | GAM | بررسی نشان، بررسی ارتقای سطح |
 | `BadgeAwarded` | GAM | اعلان با انیمیشن جشن |
 

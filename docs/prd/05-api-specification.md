@@ -157,10 +157,10 @@ Authorization: Bearer <access_token>
 | `POST` | `/me/badges/seen` | جشن نشان دیده شد (§9.10) |
 | `GET` | `/me/dashboard` | داشبورد دانشجو در یک درخواست (FR-DASH-01) |
 | `GET` | `/me/learning-score/{offering_id}` | نمرهٔ یادگیری من با چهار مؤلفه (§9.6) |
-| `GET` | `/me/certificates` | گواهی‌ها |
-| `PATCH` | `/me/settings` | حریم خصوصی و اعلان |
+| `GET` | `/me/certificates` | گواهی‌ها، باطل‌شده‌ها هم با دلیل (ADR-0017) |
+| `PATCH` | `/me/settings` | حریم خصوصی و اعلان — در M7 حریم خصوصی از `PATCH /me/profile` است: `is_public` و `privacy: {بخش: bool}` (ادغام، نه جایگزین؛ کلید ناشناخته ⇒ ۴۲۲) |
 | `POST` | `/me/avatar` | دریافت URL آپلود آواتار |
-| `GET` | `/profiles/{username}` | نیمرخ عمومی (بدون احراز هویت) |
+| `GET` | `/profiles/{username}` | نیمرخ عمومی (بدون احراز هویت)؛ خصوصی ⇒ ۴۰۴ جز برای صاحبش؛ بخش خاموش از سرور نمی‌آید (FR-PROF-03) |
 
 **`GET /me` — پاسخ**
 ```jsonc
@@ -206,10 +206,11 @@ Authorization: Bearer <access_token>
 
 | متد | مسیر | توضیح |
 |-----|------|-------|
-| `GET` | `/public/stats` | آمار زندهٔ سامانه برای صفحهٔ اصلی |
-| `GET` | `/public/courses` | ویترین دروس عمومی |
-| `GET` | `/public/projects` | ویترین پروژه‌های باز (بدون امتیاز تطابق) |
-| `GET` | `/public/certificates/{code}` | راستی‌آزمایی گواهی |
+| `GET` | `/public/stats` | آمار زندهٔ سامانه برای صفحهٔ اصلی — فقط تأییدشده‌ها شمرده می‌شوند |
+| `GET` | `/public/stories` | «سه داستان واقعی»: آخرین پروژه‌های تکمیل‌شده، فقط با نام اعضای دارای نیمرخ عمومی (M7 بخش د) |
+| `GET` | `/public/courses` | ویترین دروس عمومی — ساخته نشد؛ `GET /courses` بی‌ورود همین کار را می‌کند |
+| `GET` | `/public/projects` | ویترین پروژه‌های باز — ساخته نشد؛ `GET /projects` بی‌ورود همین کار را می‌کند |
+| `GET` | `/public/certificates/{code}` | راستی‌آزمایی گواهی؛ کد با حروف کوچک، رقم فارسی و بی‌خط‌تیره هم پذیرفته است |
 
 **`GET /public/stats`** — با `Cache-Control: public, max-age=300`
 ```jsonc
@@ -219,7 +220,9 @@ Authorization: Bearer <access_token>
   "completed_milestones": 461,
   "research_outputs": 12,
   "verified_revenue_rial": 460000000,
-  "active_courses": 4
+  "active_courses": 4,
+  "completed_projects": 9,      // M7 بخش د
+  "certificates": 30
 }
 ```
 
@@ -228,9 +231,12 @@ Authorization: Bearer <access_token>
 
 **`GET /public/certificates/{code}`**
 ```jsonc
-// 200 → { "valid": true, "holder_name": "مریم کریمی",
-//         "title_fa": "تکمیل پروژهٔ …", "issued_at": "…", "issuer": "…" }
-// 404 → گواهی یافت نشد یا باطل شده است
+// 200 → { "valid": true, "public_code": "7KQ2-MX9P", "kind": "PROJECT",
+//         "holder_name": "مریم کریمی", "holder_username": "marim-karimi" | null,
+//         "title_fa": "تکمیل پروژهٔ …", "issued_at": "…", "issuer": "…",
+//         "details": { "role": "MEMBER", "team_size": 3, … } }
+// 200 → { "valid": false, "revoked_at": "…", "revoke_reason": "…", … }  — باطل‌شده
+// 404 → کدی که هرگز صادر نشده (ADR-0017: باطل‌شده «یافت نشد» نیست)
 ```
 
 ---
@@ -753,17 +759,24 @@ Authorization: Bearer <access_token>
 | متد | مسیر | توضیح |
 |-----|------|-------|
 | `GET` | `/admin/metrics` | شاخص‌های کلان |
-| `GET/PATCH` | `/admin/users` | مدیریت کاربران |
-| `POST` | `/admin/users/{id}/roles` | اعطای نقش |
-| `DELETE` | `/admin/users/{id}/roles/{code}` | سلب نقش |
-| `POST` | `/admin/users/{id}/impersonate` | جعل هویت (با لاگ) |
+| `GET` | `/admin/users` | جستجو با نام، نام کاربری، بخشی از موبایل یا ایمیل؛ فیلتر نقش و وضعیت — `user.view_all` (پشتیبانی موبایل را پوشانده می‌بیند) |
+| `GET` | `/admin/users/{id}` | جزئیات: اعطاها با قلمرو و اعطاکننده، نقش‌های مشتق، شمارش‌ها، ۱۰ رویداد حسابرسی اخیر، مجاز بودن جعل هویت |
+| `PATCH` | `/admin/users/{id}` | تعلیق یا فعال‌سازی با دلیل — `user.deactivate`؛ خود یا آخرین مدیر ⇒ ۴۰۹؛ همهٔ نشست‌ها بسته می‌شوند |
+| `GET` | `/admin/roles` | نقش‌های قابل اعطا و قلمروهای مجازشان |
+| `POST` | `/admin/users/{id}/roles` | اعطای نقش `{role, scope_type: GLOBAL\|OFFERING, scope_id, expires_at}`؛ نقش مشتق ⇒ ۴۲۲؛ تکراری ⇒ ۴۰۹ |
+| `DELETE` | `/admin/users/{id}/roles/{code}` | سلب نقش (`?scope_type=&scope_id=`)؛ نقش مدیرِ خود یا آخرین مدیر ⇒ ۴۰۹ |
+| `POST` | `/admin/users/{id}/impersonate` | جعل هویت (با لاگ) — توکن ۳۰ دقیقه‌ای فقط‌خواندنی بی refresh؛ روی مدیر ⇒ `403 IMPERSONATION_FORBIDDEN` |
+| `POST` | `/admin/impersonation/end` | ثبت پایان جعل هویت با توکن خود پشتیبان |
+| `GET` | `/admin/certificates` | جستجوی گواهی با کد یا کاربر — `certificate.revoke` |
+| `POST` | `/admin/certificates/{id}/revoke` | ابطال با دلیل؛ در لاگ حسابرسی و با اعلان به دارنده |
 | `GET/POST/PATCH` | `/admin/taxonomy/*` | مدیریت طبقه‌بندی |
 | `GET/PATCH` | `/admin/point-rules` | قواعد امتیاز |
 | `POST` | `/admin/point-rules/recalculate` | بازمحاسبهٔ گذشته‌نگر |
 | `POST` | `/admin/point-entries/{id}/reverse` | اصلاح یک ردیف با رکورد معکوس (با دلیل) |
 | `GET/POST/PATCH` | `/admin/badges` | مدیریت نشان |
 | `GET/PATCH` | `/admin/settings` | تنظیمات |
-| `GET` | `/admin/audit` | لاگ حسابرسی |
+| `GET` | `/admin/audit` | لاگ حسابرسی — فیلتر `user_id` (کنشگر یا موضوع)، `actor_id`، `action`، `entity_type`، بازهٔ زمانی؛ مکان‌نمای `cursor` |
+| `GET` | `/admin/audit/export` | همان فیلترها به CSV با BOM (حداکثر ۱۰٬۰۰۰ ردیف) |
 | `GET` | `/admin/outbox` | وضعیت صف ارسال با شمارش هر وضعیت — `message.outbox.view` |
 | `POST` | `/admin/outbox/{id}/retry` | تلاش مجدد ارسال — `message.outbox.retry` |
 | `POST` | `/admin/outbox/retry-dead` | همهٔ `DEAD`ها (یا یک کانال) به صف، پس از رفع قطعی |
@@ -771,6 +784,21 @@ Authorization: Bearer <access_token>
 | `PUT` | `/admin/message-templates/{code}/{channel}` | ساخت یا ویرایش الگو؛ متغیر ناشناخته ⇒ `TEMPLATE_INVALID` |
 | `POST` | `/admin/message-templates/preview` | پیش‌نمایش با مقدارهای نمونه و تعداد بخش پیامک (FR-MSG-03) |
 | `GET` | `/admin/health` | سلامت فنی |
+
+---
+
+### جستجوی سراسری — `/search` (M7 بخش د، §3.7)
+
+| متد | مسیر | توضیح |
+|-----|------|-------|
+| `GET` | `/search?q=…&per_group=5` | نیازمند ورود؛ هفت گروه `COURSE`، `PROJECT`، `IDEA`، `VENTURE`، `TOPIC`، `PERSON`، `MATERIAL`، هرکدام با قاعدهٔ دیده‌شدن فهرست خودش؛ کمتر از دو نویسه ⇒ فهرست خالی |
+
+```jsonc
+{ "q": "خرماي",
+  "groups": [ { "kind": "PROJECT", "title_fa": "پروژه‌ها",
+                "items": [ { "id": "…", "title": "فروش خرمای صابر", "subtitle": "کارآفرینی",
+                             "href": "/projects/…" } ] } ] }
+```
 
 ---
 
@@ -784,6 +812,8 @@ Authorization: Bearer <access_token>
 | `TOKEN_REUSE_DETECTED` | 401 | نشست شما به‌دلایل امنیتی بسته شد. دوباره وارد شوید. |
 | `ACCOUNT_LOCKED` | 423 | حساب شما موقتاً قفل شده است. |
 | `PERMISSION_DENIED` | 403 | شما به این بخش دسترسی ندارید. |
+| `IMPERSONATION_READ_ONLY` | 403 | در حالت مشاهده به‌عنوان کاربر دیگر، تغییر داده ممکن نیست. |
+| `IMPERSONATION_FORBIDDEN` | 403 | مشاهده به‌عنوان این کاربر مجاز نیست (مدیر، خود، یا حساب غیرفعال). |
 | `PROFILE_INCOMPLETE` | 409 | برای این کار باید نیمرخ خود را تکمیل کنید. |
 | `ALREADY_ENROLLED` | 409 | شما قبلاً در این درس ثبت‌نام کرده‌اید. |
 | `OFFERING_FULL` | 409 | ظرفیت این درس تکمیل شده است. |
