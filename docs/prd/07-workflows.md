@@ -346,9 +346,13 @@ IDEA ──► VALIDATION ──► MVP ──► FIRST_REVENUE ──► GROWTH
 | از | به | معیار |
 |----|-----|-------|
 | `IDEA` | `VALIDATION` | شرح، مسئله، بازار هدف، و مدل درآمد پر شده باشد |
-| `VALIDATION` | `MVP` | ≥ ۱۰ رکورد `venture_metrics` با `metric='MEETINGS'` یا `LEADS` |
-| `MVP` | `FIRST_REVENUE` | ≥ ۱ `Deliverable` تأییدشده از نوع `CODE` یا `MEDIA` |
-| `FIRST_REVENUE` | `GROWTH` | مجموع `SALES_AMOUNT` تأییدشده > آستانهٔ تنظیمات |
+| `VALIDATION` | `MVP` | جمع مقدار `MEETINGS` و `LEADS` **تأییدشده** ≥ ۱۰ |
+| `MVP` | `FIRST_REVENUE` | ≥ ۱ `Deliverable` تأییدشده از نوع `CODE` یا `MEDIA` در پروژه‌های کسب‌وکار (`projects.venture_id`) |
+| `FIRST_REVENUE` | `GROWTH` | مجموع `SALES_AMOUNT` تأییدشده > آستانهٔ تنظیمات (`VENTURE_GROWTH_THRESHOLD_RIAL`، پیش‌فرض ۵۰۰ میلیون ریال) |
+
+شاخص‌های پروژه‌های یک کسب‌وکار در معیارهای خود آن حساب می‌شوند. هر گذار یک
+ردیف `venture_stage_changes` است؛ ارتقا به **همهٔ اعضای فعال** `50 × مرحله`
+امتیاز می‌دهد و بازگشت از توقف امتیاز ندارد ([ADR-0014](../adr/0014-ideas-ventures-and-invitations.md)).
 
 اگر معیار برقرار نباشد، `409 STAGE_CRITERIA_NOT_MET` با فهرست موارد کمبود
 برگردانده می‌شود تا کاربر بداند دقیقاً چه چیزی لازم است.
@@ -369,10 +373,16 @@ IDEA ──► VALIDATION ──► MVP ──► FIRST_REVENUE ──► GROWTH
             └───────────┬───────────┘
                         ▼
           ideas.status = PROMOTED
-          ideas.promoted_to_{type,id} پر می‌شود
-          نویسنده: اعلان + امتیاز COMMUNITY (۵۰)
-                    + دعوت خودکار به تیم
+          ideas.promoted_to_{type,id,by,at} پر می‌شود
+          نویسنده: اعلان + امتیاز IDEA_PROMOTED (۱۰۰، جدول §9.2)
 ```
+
+* **پروژه:** ارتقادهنده مدیر پروژهٔ `DRAFT` می‌شود؛ تیم همان لحظه ساخته
+  می‌شود و نویسنده دعوت (`team_invitations`، منبع `IDEA_PROMOTION`) می‌گیرد.
+* **کسب‌وکار:** نویسنده بنیان‌گذار می‌شود. ایدهٔ ناشناس به کسب‌وکار ارتقا
+  نمی‌یابد (۴۰۹)، چون صفحهٔ کسب‌وکار بنیان‌گذار را نشان می‌دهد.
+
+همه در یک تراکنش و با قفل ردیف ایده: دو ارتقای هم‌زمان، دو مقصد نمی‌سازند.
 
 ---
 

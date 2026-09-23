@@ -536,21 +536,34 @@ Authorization: Bearer <access_token>
 
 | متد | مسیر | توضیح |
 |-----|------|-------|
-| `GET/POST` | `/ventures` | فهرست و ثبت کسب‌وکار |
-| `GET/PATCH` | `/ventures/{id}` | جزئیات و ویرایش |
-| `POST` | `/ventures/{id}/stage` | ارتقای مرحلهٔ بلوغ (با بررسی معیار خروج) |
-| `GET/POST` | `/ventures/{id}/metrics` | ثبت و گزارش فعالیت و فروش |
-| `POST` | `/metrics/{id}/verify` | تأیید شاخص توسط مدیر |
+| `GET/POST` | `/ventures` | فهرست (`q`، `stage`، `looking_for_cofounder`) و ثبت کسب‌وکار — ثبت نیمرخ کامل می‌خواهد |
+| `GET` | `/ventures/mine` | کسب‌وکارهایی که عضو فعال تیمشانم |
+| `GET/PATCH/DELETE` | `/ventures/{id}` | جزئیات، ویرایش، حذف (فقط مرحلهٔ `IDEA`) — `readiness` و `totals` فقط برای اعضا و مدیران |
+| `POST` | `/ventures/{id}/stage` | `ADVANCE`، `PAUSE`، `RESUME`، `CLOSE`؛ کمبود معیار ⇒ `409 STAGE_CRITERIA_NOT_MET` با `details.missing` |
+| `GET/POST` | `/ventures/{id}/metrics` | فهرست با جمع کل و جمع هر عضو، و ثبت فعالیت یا فروش (عضو) |
+| `GET/POST` | `/projects/{id}/metrics` | همان، برای پروژهٔ عملیاتی نوع A (FR-VEN-02) |
+| `GET` | `/metrics/review-queue` | شاخص‌های در انتظاری که کاربر حق تأییدشان را دارد |
+| `POST` | `/metrics/{id}/review` | `VERIFIED` یا `REJECTED` (رد با یادداشت) — نه برای ثبت خودِ کاربر |
+| `DELETE` | `/metrics/{id}` | حذف ثبت در انتظار (ثبت‌کننده) |
+| `POST` | `/ventures/{id}/leave` · `/members/{uid}/remove` | ترک تیم، حذف عضو با دلیل |
+| `GET/POST` | `/ventures/{id}/invitations` | دعوت‌های باز و دعوت با نام کاربری (بنیان‌گذار) |
+| `POST` | `/projects/{id}/invitations` | دعوت مستقیم به تیم پروژه (`project.application.decide`) |
+| `GET` | `/me/invitations` | دعوت‌های باز من |
+| `POST` | `/invitations/{id}/accept` · `/decline` | پاسخ؛ دعوت بسته یا منقضی ⇒ `409 INVITATION_CLOSED` |
+| `DELETE` | `/invitations/{id}` | لغو دعوت (دعوت‌کننده) |
 | `GET` | `/research/tracks` | وضعیت مسیر پژوهشی من |
 | `POST` | `/research/tracks/{level}/submit` | ارسال تحویل‌دادنی سطح |
 | `GET/POST` | `/research/topics` | بانک موضوع |
 | `POST` | `/research/topics/{id}/reserve` | رزرو موضوع |
 | `GET/POST` | `/research/outputs` | خروجی‌های پژوهشی |
-| `GET/POST` | `/ideas` | بانک ایده |
-| `GET` | `/ideas/{id}` | جزئیات ایده |
-| `POST/DELETE` | `/ideas/{id}/vote` | رأی و پس‌گرفتن رأی |
-| `POST` | `/ideas/{id}/comments` | نظر |
-| `POST` | `/ideas/{id}/promote` | ارتقا به پروژه یا کسب‌وکار |
+| `GET/POST` | `/ideas` | بانک ایده — `sort=hot\|new\|top`، `status`، `category`، `tag`، `q`، `mine` |
+| `GET` | `/ideas/categories` | هشت دستهٔ ثابت با عنوان فارسی |
+| `GET/PATCH/DELETE` | `/ideas/{id}` | جزئیات با نظرها؛ ویرایش و حذف (نویسنده، ایدهٔ باز) |
+| `POST/DELETE` | `/ideas/{id}/vote` | رأی و پس‌گرفتن؛ رأی دوباره ⇒ `409 DUPLICATE_VOTE`، رأی به ایدهٔ خود ⇒ ۴۰۹ |
+| `POST` | `/ideas/{id}/comments` | نظر، یا پاسخ با `parent_id` (نخ یک‌سطحی) |
+| `DELETE` | `/ideas/comments/{id}` | حذف نظر (نویسنده یا `idea.moderate`) |
+| `POST` | `/ideas/{id}/archive` | بایگانی با دلیل (`idea.moderate`) |
+| `POST` | `/ideas/{id}/promote` | ارتقا (`idea.promote`) — `PROJECT` با `project_kind`، یا `VENTURE` (نه برای ایدهٔ ناشناس) |
 | `GET` | `/teams/search` | جستجوی هم‌تیمی |
 | `GET/POST` | `/teams/openings` | آگهی نیاز به هم‌تیمی |
 | `POST` | `/teams/openings/{id}/apply` | درخواست برای آگهی |

@@ -1153,44 +1153,69 @@ CREATE TABLE certificates (
 ## ۴.۷ کارآفرینی، پژوهش، ایده
 
 ```sql
-CREATE TABLE ventures (
+CREATE TABLE ventures (                -- مهاجرت 0009 (ADR-0014)
   id            UUID PRIMARY KEY DEFAULT uuidv7(),
   slug          TEXT NOT NULL UNIQUE,
-  name          TEXT NOT NULL,
-  pitch         TEXT NOT NULL CHECK (length(pitch) <= 280),
+  name          TEXT NOT NULL CHECK (length(name) BETWEEN 2 AND 120),
+  pitch         TEXT NOT NULL CHECK (length(pitch) BETWEEN 10 AND 280),
   description   TEXT,
   problem       TEXT,
   target_market TEXT,
   revenue_model TEXT,
+  current_status TEXT,                 -- FR-VEN-01 «وضعیت فعلی»
   stage         TEXT NOT NULL DEFAULT 'IDEA'
                 CHECK (stage IN ('IDEA','VALIDATION','MVP','FIRST_REVENUE','GROWTH','PAUSED','CLOSED')),
+  paused_from_stage TEXT,              -- بازگشت از توقف به همان مرحله
+  stage_changed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   founder_id    UUID NOT NULL REFERENCES users(id),
   looking_for_cofounder BOOLEAN NOT NULL DEFAULT false,
-  needed_roles  TEXT[],
+  needed_roles  TEXT[] NOT NULL DEFAULT '{}' CHECK (cardinality(needed_roles) <= 10),
   logo_key      TEXT,
   origin_idea_id UUID REFERENCES ideas(id),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  deleted_at    TIMESTAMPTZ
+  deleted_at    TIMESTAMPTZ,
+  search_norm   TEXT GENERATED ALWAYS AS (fa_normalize(name || ' ' || pitch)) STORED,
+  CONSTRAINT paused_from_matches CHECK ((stage = 'PAUSED') = (paused_from_stage IS NOT NULL))
+);
+CREATE INDEX idx_ventures_search ON ventures USING GIN (search_norm gin_trgm_ops);
+
+-- هر گذار مرحله یک ردیف: تاریخچه، و منبع یکتای امتیاز VENTURE_STAGE_UP (ADR-0014)
+CREATE TABLE venture_stage_changes (
+  id         UUID PRIMARY KEY DEFAULT uuidv7(),
+  venture_id UUID NOT NULL REFERENCES ventures(id) ON DELETE CASCADE,
+  from_stage TEXT NOT NULL,
+  to_stage   TEXT NOT NULL CHECK (to_stage <> from_stage),
+  changed_by UUID REFERENCES users(id),
+  reason     TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE venture_metrics (          -- FR-VEN-02/03
   id         UUID PRIMARY KEY DEFAULT uuidv7(),
   venture_id UUID REFERENCES ventures(id) ON DELETE CASCADE,
-  project_id UUID,   -- کلید خارجی در مهاجرت ۰۱۰ افزوده می‌شود (ترتیب وابستگی)
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
   user_id    UUID NOT NULL REFERENCES users(id),
   metric     TEXT NOT NULL CHECK (metric IN
              ('CALLS','MEETINGS','LEADS','SALES_COUNT','SALES_AMOUNT','CONTENT_PIECES','CUSTOMERS')),
-  value      BIGINT NOT NULL,          -- مبلغ به ریال برای SALES_AMOUNT
+  value      BIGINT NOT NULL CHECK (value > 0),   -- مبلغ به ریال برای SALES_AMOUNT
   occurred_on DATE NOT NULL,
-  note       TEXT,
+  note       TEXT CHECK (note IS NULL OR length(note) <= 500),
   evidence_file_id UUID REFERENCES files(id),
-  verified_by UUID REFERENCES users(id),
-  verified_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  status     TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING','VERIFIED','REJECTED')),
+  reviewed_by UUID REFERENCES users(id),
+  reviewed_at TIMESTAMPTZ,
+  review_note TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  -- دقیقاً یکی: شاخص پروژهٔ یک کسب‌وکار از راه projects.venture_id به آن می‌رسد.
+  CONSTRAINT owner CHECK ((venture_id IS NOT NULL)::int + (project_id IS NOT NULL)::int = 1),
+  CONSTRAINT reviewed_matches_status CHECK ((status = 'PENDING') = (reviewed_at IS NULL)),
+  CONSTRAINT not_self_reviewed CHECK (reviewed_by IS NULL OR reviewed_by <> user_id)
 );
 CREATE INDEX idx_venture_metrics_lookup ON venture_metrics(venture_id, metric, occurred_on);
+CREATE INDEX idx_venture_metrics_project ON venture_metrics(project_id, metric, occurred_on);
 CREATE INDEX idx_venture_metrics_user ON venture_metrics(user_id, occurred_on DESC);
+CREATE INDEX idx_venture_metrics_pending ON venture_metrics(created_at) WHERE status = 'PENDING';
 
 CREATE TABLE research_tracks (
   user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -1240,28 +1265,37 @@ CREATE TABLE research_topics (
 CREATE INDEX idx_topics_reservation_expiry ON research_topics(reserved_at)
   WHERE status = 'RESERVED';
 
-CREATE TABLE ideas (
+CREATE TABLE ideas (                   -- مهاجرت 0008 (ADR-0014)
   id          UUID PRIMARY KEY DEFAULT uuidv7(),
   author_id   UUID NOT NULL REFERENCES users(id),
-  title       TEXT NOT NULL,
-  body        TEXT NOT NULL,
-  problem     TEXT,
-  category    TEXT,
-  tags        TEXT[] NOT NULL DEFAULT '{}',
+  title       TEXT NOT NULL CHECK (length(title) BETWEEN 3 AND 120),
+  body        TEXT NOT NULL CHECK (length(body) BETWEEN 10 AND 4000),
+  problem     TEXT CHECK (problem IS NULL OR length(problem) <= 1000),
+  category    TEXT CHECK (category IN ('TRANSPORT','AGRICULTURE','COMMERCE','EDUCATION',
+                                       'TECHNOLOGY','ENVIRONMENT','SOCIAL','OTHER')),
+  tags        TEXT[] NOT NULL DEFAULT '{}' CHECK (cardinality(tags) <= 8),
   is_anonymous BOOLEAN NOT NULL DEFAULT false,
   status      TEXT NOT NULL DEFAULT 'OPEN'
               CHECK (status IN ('OPEN','PROMOTED','ARCHIVED')),
-  vote_count  INT NOT NULL DEFAULT 0,       -- غیرنرمال، با تریگر نگهداری می‌شود
+  vote_count  INT NOT NULL DEFAULT 0,       -- غیرنرمال، با تریگر افزایشی (§7.12)
   comment_count INT NOT NULL DEFAULT 0,
   promoted_to_type TEXT CHECK (promoted_to_type IN ('PROJECT','VENTURE')),
   promoted_to_id UUID,
+  promoted_by UUID REFERENCES users(id),
+  promoted_at TIMESTAMPTZ,
+  archived_reason TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at  TIMESTAMPTZ,
-  search_norm TEXT GENERATED ALWAYS AS (fa_normalize(title || ' ' || body)) STORED
+  search_norm TEXT GENERATED ALWAYS AS (fa_normalize(title || ' ' || body)) STORED,
+  CONSTRAINT promotion_consistent CHECK (
+    (status = 'PROMOTED') = (promoted_to_id IS NOT NULL)
+    AND (promoted_to_id IS NULL) = (promoted_to_type IS NULL))
 );
 CREATE INDEX idx_ideas_search ON ideas USING GIN (search_norm gin_trgm_ops);
-CREATE INDEX idx_ideas_ranking ON ideas(vote_count DESC, created_at DESC) WHERE status = 'OPEN';
+CREATE INDEX idx_ideas_ranking ON ideas(vote_count DESC, created_at DESC)
+  WHERE status = 'OPEN' AND deleted_at IS NULL;
+CREATE INDEX idx_ideas_tags ON ideas USING GIN (tags);
 
 CREATE TABLE idea_votes (
   idea_id    UUID NOT NULL REFERENCES ideas(id) ON DELETE CASCADE,
@@ -1274,10 +1308,30 @@ CREATE TABLE idea_comments (
   id         UUID PRIMARY KEY DEFAULT uuidv7(),
   idea_id    UUID NOT NULL REFERENCES ideas(id) ON DELETE CASCADE,
   author_id  UUID NOT NULL REFERENCES users(id),
-  body       TEXT NOT NULL,
+  parent_id  UUID REFERENCES idea_comments(id) ON DELETE CASCADE,  -- نخ یک‌سطحی
+  body       TEXT NOT NULL CHECK (length(body) BETWEEN 1 AND 1000),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ
 );
+
+-- FR-TEAM-03، §7.8 — دعوت به تیم پروژه یا کسب‌وکار (ADR-0014). «منقضی»
+-- ذخیره نمی‌شود: دعوتی که expires_at آن گذشته پذیرفته نمی‌شود.
+CREATE TABLE team_invitations (
+  id           UUID PRIMARY KEY DEFAULT uuidv7(),
+  team_id      UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  inviter_id   UUID NOT NULL REFERENCES users(id),
+  invitee_id   UUID NOT NULL REFERENCES users(id) CHECK (invitee_id <> inviter_id),
+  role_id      UUID REFERENCES project_roles(id) ON DELETE SET NULL,
+  message      TEXT CHECK (message IS NULL OR length(message) <= 500),
+  source       TEXT NOT NULL DEFAULT 'DIRECT' CHECK (source IN ('DIRECT','IDEA_PROMOTION','OPENING')),
+  status       TEXT NOT NULL DEFAULT 'PENDING'
+               CHECK (status IN ('PENDING','ACCEPTED','DECLINED','CANCELLED')),
+  expires_at   TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '14 days'),
+  responded_at TIMESTAMPTZ,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX idx_team_invitations_open ON team_invitations(team_id, invitee_id)
+  WHERE status = 'PENDING';
 
 CREATE TABLE team_openings (           -- FR-TEAM-02
   id          UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -1581,17 +1635,20 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
                                + قید announcements.project_id
 0007_quiz                      quizzes, question_bank, quiz_questions,
                                quiz_attempts, quiz_answers, grade_appeals
-0008_ideas                     ideas, idea_votes, idea_comments
-                               + قید projects.origin_idea_id
-0009_ventures                  ventures, venture_metrics
-                               + قید projects.venture_id و teams.venture_id
-                               + قید venture_metrics.project_id
-0012_research                  research_tracks, research_outputs, research_topics
-0012_gamification     ◄────── ساخته‌شده در M5 (پیش از پژوهش)
+0012_gamification     ◄────── ساخته‌شده در M5
                                point_rules, point_entries, user_point_totals, badges, user_badges
 0013_messaging        ◄────── ساخته‌شده در M6
                                notifications, notification_preferences, user_channels,
                                outbox_messages, message_templates
+0008_ideas            ◄────── پس از ۰۰۱۳ اجرا می‌شود (M7، ADR-0014)
+                               ideas, idea_votes, idea_comments + تریگر شمارنده‌ها
+                               + قید projects.origin_idea_id و team_openings.idea_id
+0009_ventures         ◄────── پس از ۰۰۰۸ (M7)
+                               ventures, venture_stage_changes, venture_metrics,
+                               team_invitations
+                               + قید projects.venture_id، teams.venture_id،
+                                 team_openings.venture_id
+0014_research                  research_tracks, research_outputs, research_topics
 0015_admin                     audit_logs, app_settings, qa_threads, qa_replies
 0016_seed_reference_data       دادهٔ مرجع وابسته به مهاجرت‌های بالا (§14)
 ```
