@@ -4,17 +4,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { NotificationBell } from '@/components/domain/NotificationBell';
 import { PointsBadge } from '@/components/domain/PointsBadge';
 import { Button } from '@/components/ui/Button';
 import { logout } from '@/lib/api/auth';
 import { clearSession, readSession } from '@/lib/auth/session';
 
 /**
- * هدر اپلیکیشن — نسخهٔ M5.
+ * هدر اپلیکیشن — نسخهٔ M6.
  *
  * ناوبری عمدی کوتاه است: مقصدهایی که دانشجو هر روز می‌خواهد، به‌علاوهٔ
- * `PointsBadge` (§9.10 «نوار سطح همیشه در هدر»). سایدبار کامل، مرکز
- * اعلان و جستجوی سراسری در M6 و M7 می‌آیند.
+ * `PointsBadge` (§9.10 «نوار سطح همیشه در هدر») و زنگولهٔ اعلان
+ * (FR-MSG-01). سایدبار کامل و جستجوی سراسری در M7 می‌آیند.
  */
 
 const NAV: { href: string; label: string }[] = [
@@ -69,6 +70,7 @@ export function AppHeader() {
 
         <div className="flex items-center gap-3">
           <PointsBadge />
+          <NotificationBell />
           {displayName && (
             <span className="text-[13.5px] text-[var(--fg-secondary)]">{displayName}</span>
           )}
