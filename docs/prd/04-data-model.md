@@ -1217,17 +1217,43 @@ CREATE INDEX idx_venture_metrics_project ON venture_metrics(project_id, metric, 
 CREATE INDEX idx_venture_metrics_user ON venture_metrics(user_id, occurred_on DESC);
 CREATE INDEX idx_venture_metrics_pending ON venture_metrics(created_at) WHERE status = 'PENDING';
 
+-- مهاجرت 0014 (ADR-0015). ردیف سطح ۱ با اولین تحویل، سطح بعد با تأیید سطح قبل.
 CREATE TABLE research_tracks (
   user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   level       INT NOT NULL CHECK (level BETWEEN 1 AND 4),
   status      TEXT NOT NULL DEFAULT 'IN_PROGRESS'
               CHECK (status IN ('IN_PROGRESS','SUBMITTED','APPROVED')),
-  mentor_id   UUID REFERENCES users(id),
-  deliverable_id UUID REFERENCES deliverables(id),
+  mentor_id   UUID REFERENCES users(id),     -- نخستین بازبین سطح
   started_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   approved_at TIMESTAMPTZ,
-  PRIMARY KEY (user_id, level)
+  approved_by UUID REFERENCES users(id),
+  PRIMARY KEY (user_id, level),
+  CHECK ((status = 'APPROVED') = (approved_at IS NOT NULL))
 );
+
+-- به‌جای deliverable_id: تحویل‌دادنی به مرحلهٔ پروژه بسته است (ADR-0015).
+CREATE TABLE research_submissions (
+  id          UUID PRIMARY KEY DEFAULT uuidv7(),
+  user_id     UUID NOT NULL,
+  level       INT NOT NULL,
+  version     INT NOT NULL DEFAULT 1 CHECK (version >= 1),
+  topic_id    UUID REFERENCES research_topics(id) ON DELETE SET NULL,
+  summary     TEXT NOT NULL CHECK (length(summary) BETWEEN 30 AND 4000),
+  links       TEXT[] NOT NULL DEFAULT '{}' CHECK (cardinality(links) <= 10),
+  evidence    JSONB NOT NULL DEFAULT '{}',    -- شاهدهای ساختاریافتهٔ سطح
+  status      TEXT NOT NULL DEFAULT 'SUBMITTED'
+              CHECK (status IN ('SUBMITTED','APPROVED','CHANGES_REQUESTED')),
+  feedback    TEXT,                           -- برای CHANGES_REQUESTED الزامی
+  reviewed_by UUID REFERENCES users(id),
+  reviewed_at TIMESTAMPTZ,
+  submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  FOREIGN KEY (user_id, level) REFERENCES research_tracks ON DELETE CASCADE,
+  UNIQUE (user_id, level, version),
+  CONSTRAINT not_self_reviewed CHECK (reviewed_by IS NULL OR reviewed_by <> user_id)
+);
+CREATE UNIQUE INDEX idx_research_submissions_open ON research_submissions(user_id, level)
+  WHERE status = 'SUBMITTED';
+CREATE TABLE research_submission_files (submission_id UUID, file_id UUID, PRIMARY KEY (…));
 
 CREATE TABLE research_outputs (
   id         UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -1239,12 +1265,20 @@ CREATE TABLE research_outputs (
   quartile   TEXT CHECK (quartile IN ('Q1','Q2','Q3','Q4','NA')),
   status     TEXT NOT NULL DEFAULT 'DRAFT'
              CHECK (status IN ('DRAFT','SUBMITTED','UNDER_REVIEW','REVISION','ACCEPTED','PUBLISHED','REJECTED')),
-  doi        TEXT,
+  doi        TEXT CHECK (doi ~ '^10\.\d{4,9}/\S+$'),
   url        TEXT,
   file_id    UUID REFERENCES files(id),
-  project_id UUID REFERENCES projects(id),
+  project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
   submitted_on DATE,
   published_on DATE,
+  -- راستی‌آزمایی (ADR-0015): امتیاز OUTPUT_* فقط از این دو می‌آید.
+  verified_stage    TEXT CHECK (verified_stage IN ('SUBMITTED','ACCEPTED','PUBLISHED')),
+  verified_quartile TEXT,
+  review_status TEXT NOT NULL DEFAULT 'NONE'
+                CHECK (review_status IN ('NONE','PENDING','VERIFIED','REJECTED')),
+  reviewed_by UUID REFERENCES users(id),     -- هرگز owner_id
+  reviewed_at TIMESTAMPTZ,
+  review_note TEXT,                          -- برای REJECTED الزامی
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -1252,17 +1286,27 @@ CREATE TABLE research_outputs (
 CREATE TABLE research_topics (
   id          UUID PRIMARY KEY DEFAULT uuidv7(),
   proposer_id UUID NOT NULL REFERENCES users(id),
-  title       TEXT NOT NULL,
-  description TEXT NOT NULL,
+  title       TEXT NOT NULL CHECK (length(title) BETWEEN 5 AND 200),
+  description TEXT NOT NULL CHECK (length(description) BETWEEN 20 AND 4000),
   prerequisites TEXT,
   level       INT CHECK (level BETWEEN 1 AND 4),
   status      TEXT NOT NULL DEFAULT 'OPEN'
-              CHECK (status IN ('OPEN','RESERVED','TAKEN','CLOSED')),
+              CHECK (status IN ('PROPOSED','OPEN','RESERVED','TAKEN','CLOSED')),
   reserved_by UUID REFERENCES users(id),
   reserved_at TIMESTAMPTZ,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+  last_activity_at TIMESTAMPTZ,              -- ساعت بی‌تحرکی رزرو (۳۰ روز)
+  reviewed_by UUID REFERENCES users(id),
+  reviewed_at TIMESTAMPTZ,
+  review_note TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  search_norm TEXT GENERATED ALWAYS AS (fa_normalize(title || ' ' || description)) STORED,
+  CHECK ((status IN ('RESERVED','TAKEN')) = (reserved_by IS NOT NULL))
 );
-CREATE INDEX idx_topics_reservation_expiry ON research_topics(reserved_at)
+CREATE INDEX idx_topics_reservation_expiry ON research_topics(last_activity_at)
+  WHERE status = 'RESERVED';
+-- یک رزرو باز برای هر نفر — ADR-0015
+CREATE UNIQUE INDEX idx_topics_one_reservation ON research_topics(reserved_by)
   WHERE status = 'RESERVED';
 
 CREATE TABLE ideas (                   -- مهاجرت 0008 (ADR-0014)
@@ -1333,19 +1377,40 @@ CREATE TABLE team_invitations (
 CREATE UNIQUE INDEX idx_team_invitations_open ON team_invitations(team_id, invitee_id)
   WHERE status = 'PENDING';
 
-CREATE TABLE team_openings (           -- FR-TEAM-02
+CREATE TABLE team_openings (           -- FR-TEAM-02 (بازشکل‌داده در 0014، ADR-0015)
   id          UUID PRIMARY KEY DEFAULT uuidv7(),
   poster_id   UUID NOT NULL REFERENCES users(id),
   project_id  UUID REFERENCES projects(id) ON DELETE CASCADE,
   venture_id  UUID REFERENCES ventures(id) ON DELETE CASCADE,
-  idea_id     UUID REFERENCES ideas(id) ON DELETE CASCADE,
-  title       TEXT NOT NULL,
-  description TEXT NOT NULL,
-  needed_skills UUID[] NOT NULL DEFAULT '{}',
-  commitment_hpw INT,
-  status      TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN','FILLED','EXPIRED')),
+  idea_id     UUID REFERENCES ideas(id) ON DELETE CASCADE,   -- در فاز ۱ نوشته نمی‌شود
+  role_id     UUID REFERENCES project_roles(id) ON DELETE SET NULL,
+  title       TEXT NOT NULL CHECK (length(title) BETWEEN 3 AND 120),
+  description TEXT NOT NULL CHECK (length(description) BETWEEN 10 AND 2000),
+  needed_skills UUID[] NOT NULL DEFAULT '{}' CHECK (cardinality(needed_skills) <= 10),
+  commitment_hpw INT CHECK (commitment_hpw BETWEEN 1 AND 60),
+  -- «منقضی» ذخیره نمی‌شود: OPEN با expires_at گذشته (مثل دعوت، ADR-0014)
+  status      TEXT NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN','FILLED','CLOSED')),
   expires_at  TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '30 days'),
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+  filled_at   TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT owner CHECK ((project_id IS NOT NULL)::int + (venture_id IS NOT NULL)::int = 1),
+  CHECK ((status = 'FILLED') = (filled_at IS NOT NULL))
+);
+
+CREATE TABLE opening_applications (    -- FR-TEAM-03 «درخواست پیوستن از آگهی» (ADR-0015)
+  id           UUID PRIMARY KEY DEFAULT uuidv7(),
+  opening_id   UUID NOT NULL REFERENCES team_openings(id) ON DELETE CASCADE,
+  applicant_id UUID NOT NULL REFERENCES users(id),
+  message      TEXT NOT NULL CHECK (length(btrim(message)) BETWEEN 1 AND 500),
+  status       TEXT NOT NULL DEFAULT 'PENDING'
+               CHECK (status IN ('PENDING','ACCEPTED','DECLINED','WITHDRAWN')),
+  decided_by   UUID REFERENCES users(id),
+  decided_at   TIMESTAMPTZ,
+  decision_note TEXT,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (opening_id, applicant_id),
+  CHECK ((status = 'PENDING') = (decided_at IS NULL))
 );
 ```
 
@@ -1648,7 +1713,10 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
                                team_invitations
                                + قید projects.venture_id، teams.venture_id،
                                  team_openings.venture_id
-0014_research                  research_tracks, research_outputs, research_topics
+0014_research         ◄────── پس از ۰۰۰۹ (M7 بخش ب، ADR-0015)
+                               research_topics, research_tracks, research_submissions,
+                               research_submission_files, research_outputs,
+                               opening_applications + بازشکل team_openings
 0015_admin                     audit_logs, app_settings, qa_threads, qa_replies
 0016_seed_reference_data       دادهٔ مرجع وابسته به مهاجرت‌های بالا (§14)
 ```

@@ -551,11 +551,20 @@ Authorization: Bearer <access_token>
 | `GET` | `/me/invitations` | دعوت‌های باز من |
 | `POST` | `/invitations/{id}/accept` · `/decline` | پاسخ؛ دعوت بسته یا منقضی ⇒ `409 INVITATION_CLOSED` |
 | `DELETE` | `/invitations/{id}` | لغو دعوت (دعوت‌کننده) |
-| `GET` | `/research/tracks` | وضعیت مسیر پژوهشی من |
-| `POST` | `/research/tracks/{level}/submit` | ارسال تحویل‌دادنی سطح |
-| `GET/POST` | `/research/topics` | بانک موضوع |
-| `POST` | `/research/topics/{id}/reserve` | رزرو موضوع |
-| `GET/POST` | `/research/outputs` | خروجی‌های پژوهشی |
+| `GET` | `/research/tracks` | چهار سطح با راهنما، الگو و شاهدهای لازم؛ برای کاربر واردشده وضعیت، تحویل‌ها و موضوع جاری (ADR-0015) |
+| `POST` | `/research/tracks/{level}/submit` | تحویل سطح جاری (`summary`، `links`، `file_ids`، `evidence`)؛ سطح قفل یا در انتظار ⇒ ۴۰۹؛ شاهد کم ⇒ ۴۲۲ با `details.missing` |
+| `GET` | `/research/review-queue` | تحویل‌های در انتظار، با نسخه‌های قبلی (`research.review`، نه تحویل خود) |
+| `POST` | `/research/submissions/{id}/review` | `APPROVED` یا `CHANGES_REQUESTED` (با بازخورد) |
+| `GET` | `/research/submissions/{id}/files/{fid}/download-url` | پیوست تحویل — دانشجو یا بازبین |
+| `GET/POST` | `/research/topics` | بانک موضوع (`status`، `level`، `q`، `mine`)؛ ثبت کادر ⇒ `OPEN`، پیشنهاد دانشجو ⇒ `PROPOSED` |
+| `GET/PATCH` | `/research/topics/{id}` | جزئیات؛ ویرایش (کادر، یا پیشنهاددهنده تا پیش از تأیید) |
+| `POST` | `/research/topics/{id}/review` | `APPROVE` یا `REJECT` (با دلیل) پیشنهاد — `research.topic.manage` |
+| `POST` | `/research/topics/{id}/reserve` · `/release` | رزرو اتمی (یک رزرو باز برای هر نفر) و آزاد کردن |
+| `POST` | `/research/topics/{id}/close` · `/reopen` | بستن با دلیل و بازگرداندن به بانک — کادر |
+| `GET/POST` | `/research/outputs` | خروجی‌های من و ثبت؛ ادعای تغییردهندهٔ امتیاز ⇒ `review_status = PENDING` |
+| `PATCH/DELETE` | `/research/outputs/{id}` | به‌روزرسانی؛ حذف فقط پیش از راستی‌آزمایی |
+| `GET` | `/research/outputs/review-queue` | ادعاهای در انتظار راستی‌آزمایی |
+| `POST` | `/research/outputs/{id}/review` | `VERIFIED` یا `REJECTED` (با یادداشت) — امتیاز `OUTPUT_*` از همین |
 | `GET/POST` | `/ideas` | بانک ایده — `sort=hot\|new\|top`، `status`، `category`، `tag`، `q`، `mine` |
 | `GET` | `/ideas/categories` | هشت دستهٔ ثابت با عنوان فارسی |
 | `GET/PATCH/DELETE` | `/ideas/{id}` | جزئیات با نظرها؛ ویرایش و حذف (نویسنده، ایدهٔ باز) |
@@ -564,16 +573,26 @@ Authorization: Bearer <access_token>
 | `DELETE` | `/ideas/comments/{id}` | حذف نظر (نویسنده یا `idea.moderate`) |
 | `POST` | `/ideas/{id}/archive` | بایگانی با دلیل (`idea.moderate`) |
 | `POST` | `/ideas/{id}/promote` | ارتقا (`idea.promote`) — `PROJECT` با `project_kind`، یا `VENTURE` (نه برای ایدهٔ ناشناس) |
-| `GET` | `/teams/search` | جستجوی هم‌تیمی |
-| `GET/POST` | `/teams/openings` | آگهی نیاز به هم‌تیمی |
-| `POST` | `/teams/openings/{id}/apply` | درخواست برای آگهی |
+| `GET` | `/teams/search` | جستجوی هم‌تیمی — فقط نیمرخ عمومی (`team.search`) |
+| `GET` | `/teams/managed` | پروژه‌ها و کسب‌وکارهایی که می‌توانم برایشان آگهی بدهم یا دعوت بفرستم |
+| `GET/POST` | `/teams/openings` | آگهی‌های باز (`q`، `skill_id`، `kind`، `mine`) و ثبت برای پروژه یا کسب‌وکار (دقیقاً یکی) |
+| `GET/PATCH` | `/teams/openings/{id}` | جزئیات (درخواست‌ها فقط برای مدیران)؛ ویرایش آگهی باز |
+| `POST` | `/teams/openings/{id}/close` · `/renew` | بستن (درخواست‌های باز رد می‌شوند) و تمدید ۳۰ روزه |
+| `POST` | `/teams/openings/{id}/apply` | درخواست (نیمرخ کامل)؛ آگهی پر، بسته یا منقضی ⇒ `409 OPENING_CLOSED` |
+| `GET` | `/teams/applications/mine` | درخواست‌های من |
+| `POST` | `/teams/applications/{id}/decide` · `/withdraw` | پذیرش (عضویت، آگهی `FILLED`، رد خودکار بقیه) یا رد؛ پس گرفتن |
 | `GET` | `/leaderboard` | رتبه‌بندی |
 
 **`GET /teams/search` — پارامترها و پاسخ**
 ```
 ?skill_id=…&min_level=3&asset_id=…&interest_id=…&offering_id=…&university_id=…
-&complement_project_id=…   ← مکمل تیم فعلی این پروژه
+&q=…&complement_project_id=…   ← مکمل تیم فعلی این پروژه
 ```
+
+بدون `complement_project_id`، `complement_score` تهی است و هر نتیجه
+`stronger_skills` و `stronger_reason` («در GIS از تو قوی‌تر است») دارد؛
+`context` کمبودهای تیم، `can_invite` و `my_profile_is_public` را می‌دهد
+([ADR-0015](../adr/0015-research-track-topics-and-openings.md)).
 ```jsonc
 { "items": [
     { "user": { "username": "ali-m", "display_name": "علی م.",
@@ -770,6 +789,8 @@ Authorization: Bearer <access_token>
 | `MILESTONE_NOT_OPEN` | 409 | این مرحله پذیرای تحویل نیست. |
 | `STAGE_CRITERIA_NOT_MET` | 409 | شرایط ارتقا به مرحلهٔ بعد فراهم نیست. |
 | `TOPIC_ALREADY_RESERVED` | 409 | این موضوع رزرو شده است. |
+| `RESERVATION_LIMIT` | 409 | هم‌اکنون یک موضوع رزروشده داری؛ اول آن را آزاد کن یا کار رویش را شروع کن. |
+| `OPENING_CLOSED` | 409 | این آگهی دیگر درخواست نمی‌پذیرد. |
 | `FILE_TOO_LARGE` | 413 | حجم فایل بیش از حد مجاز است. |
 | `CONTENT_TYPE_NOT_ALLOWED` | 415 | این نوع فایل مجاز نیست. |
 | `FILE_SCAN_PENDING` | 409 | فایل در حال بررسی است. کمی صبر کنید. |
