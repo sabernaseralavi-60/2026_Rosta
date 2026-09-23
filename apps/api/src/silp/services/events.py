@@ -43,6 +43,7 @@ log = get_logger("silp.events")
 #: اجرا می‌شود تا «… و ۵۰ امتیاز گرفتی» امتیاز همین رویداد را ببیند.
 LISTENER_MODULES: tuple[str, ...] = (
     "silp.services.point_listeners",
+    "silp.services.certificate_listeners",
     "silp.services.notification_listeners",
 )
 
@@ -111,6 +112,9 @@ class DeliverableReviewed:
 @dataclass(frozen=True, slots=True)
 class ProjectCompleted:
     project_id: uuid.UUID
+    #: کسی که پروژه را بست — صادرکنندهٔ گواهی تکمیل (ADR-0017). بازپخش
+    #: `backfill_points` آن را نمی‌داند.
+    completed_by: uuid.UUID | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -296,6 +300,31 @@ class CityWorkflowCompleted:
     project_id: uuid.UUID
 
 
+# ── از M7 بخش د — گواهی و مدیریت ───────────────────────────────────────
+@dataclass(frozen=True, slots=True)
+class CertificateIssued:
+    certificate_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class CertificateRevoked:
+    certificate_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class RoleGranted:
+    user_id: uuid.UUID
+    role: str
+
+
+@dataclass(frozen=True, slots=True)
+class ImpersonationStarted:
+    """§6.5 — «کاربر هدف اعلان دریافت می‌کند»."""
+
+    target_id: uuid.UUID
+    agent_id: uuid.UUID
+
+
 # ── ناظر ───────────────────────────────────────────────────────────────
 E = TypeVar("E")
 Handler = Callable[[AsyncSession, Any], Awaitable[None]]
@@ -345,6 +374,8 @@ __all__ = [
     "ApplicationSubmitted",
     "AttendanceRecorded",
     "BadgeAwarded",
+    "CertificateIssued",
+    "CertificateRevoked",
     "CityWorkflowCompleted",
     "DeliverableReviewed",
     "DeliverableSubmitted",
@@ -356,6 +387,7 @@ __all__ = [
     "IdeaSubmitted",
     "IdeaVoted",
     "IdeaWithdrawn",
+    "ImpersonationStarted",
     "InvitationAccepted",
     "InvitationSent",
     "MetricReviewed",
@@ -372,6 +404,7 @@ __all__ = [
     "ResearchReviewed",
     "ResearchSubmitted",
     "ResourceCompleted",
+    "RoleGranted",
     "SessionsRevoked",
     "SurveyStepCompleted",
     "TopicReviewed",

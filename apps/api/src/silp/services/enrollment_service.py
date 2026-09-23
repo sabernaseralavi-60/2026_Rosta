@@ -31,8 +31,10 @@ from silp.core.exceptions import (
     ValidationFailed,
 )
 from silp.core.logging import get_logger
+from silp.domain import audit
 from silp.models.education import CourseOffering, Enrollment
 from silp.services import events
+from silp.services.audit_service import AuditService
 
 log = get_logger("silp.enrollment")
 
@@ -214,6 +216,14 @@ class EnrollmentService:
         if not 0 <= grade <= 20:
             raise ValidationFailed("نمره باید بین ۰ تا ۲۰ باشد.")
 
+        AuditService(self.session).stage(
+            audit.FINAL_GRADE_SET,
+            actor=decided_by,
+            entity_type="ENROLLMENT",
+            entity_id=enrollment.id,
+            before={"final_grade": enrollment.final_grade, "status": enrollment.status},
+            after={"final_grade": grade, "status": "COMPLETED"},
+        )
         enrollment.final_grade = grade  # type: ignore[assignment]
         enrollment.status = "COMPLETED"
         enrollment.decided_at = _now()

@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.exceptions import NotFound, ValidationFailed
 from silp.core.logging import get_logger
+from silp.domain import public_profile
 from silp.domain.identity.onboarding import ProfileSnapshot
 from silp.domain.identity.username import pick_username, slugify_fa
 from silp.domain.recommendation import service as recommendation
@@ -87,7 +88,18 @@ class ProfileService:
         فقط کلیدهای فرستاده‌شده تغییر می‌کنند؛ `None` یعنی «دست نزن»، نه
         «خالی کن». پاک کردن یک فیلد در §5.3 مسیر جداگانه دارد.
         """
+        privacy = fields.pop("privacy", None)
         known = {k: v for k, v in fields.items() if v is not None}
+        if privacy:
+            # بخش‌های نیمرخ عمومی در ستون JSON ادغام می‌شوند، نه جایگزین —
+            # FR-PROF-03 «هر بخش جداگانه».
+            update = {k: v for k, v in privacy.items() if v is not None}
+            try:
+                known["privacy_settings"] = public_profile.merge(
+                    (await self.get(user_id) or Profile()).privacy_settings, update
+                )
+            except ValueError as exc:
+                raise ValidationFailed(str(exc)) from exc
         profile = await self.get(user_id)
 
         if profile is None:

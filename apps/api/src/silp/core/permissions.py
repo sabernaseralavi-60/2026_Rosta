@@ -99,6 +99,9 @@ class Permission(StrEnum):
     USER_DEACTIVATE = "user.deactivate"
     AUDIT_LOG_VIEW = "audit.log.view"
     IMPERSONATE = "user.impersonate"
+    # M7-12 — پنل مدیریت (ADR-0017)
+    USER_VIEW_ALL = "user.view_all"
+    ADMIN_METRICS_VIEW = "admin.metrics.view"
 
     # ── آموزش (M3) ─────────────────────────────────────────────────────
     COURSE_CREATE = "course.create"
@@ -138,6 +141,7 @@ class Permission(StrEnum):
     DELIVERABLE_SUBMIT = "deliverable.submit"
     DELIVERABLE_REVIEW = "deliverable.review"
     CERTIFICATE_ISSUE = "certificate.issue"
+    CERTIFICATE_REVOKE = "certificate.revoke"
 
     # ── گیمیفیکیشن (M5) ────────────────────────────────────────────────
     POINTS_VIEW_OTHERS = "points.view_others"
@@ -194,6 +198,10 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     Permission.USER_DEACTIVATE: frozenset({Role.ADMIN}),
     Permission.AUDIT_LOG_VIEW: frozenset({Role.SUPPORT, Role.ADMIN}),
     Permission.IMPERSONATE: frozenset({Role.SUPPORT, Role.ADMIN}),
+    # فهرست کاربران و شاخص‌های کلان: پشتیبانی باید کاربر را پیدا کند تا
+    # بتواند «مشاهده به‌عنوان» بزند؛ تغییر نقش و وضعیت فقط با مدیر است.
+    Permission.USER_VIEW_ALL: frozenset({Role.SUPPORT, Role.ADMIN}),
+    Permission.ADMIN_METRICS_VIEW: frozenset({Role.SUPPORT, Role.ADMIN}),
     # آموزش
     Permission.COURSE_CREATE: frozenset({Role.COORDINATOR, Role.ADMIN}),
     Permission.OFFERING_CREATE: frozenset({Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}),
@@ -251,6 +259,8 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
         {Role.PROJECT_LEAD, Role.MENTOR, Role.INSTRUCTOR, Role.ADMIN}
     ),
     Permission.CERTIFICATE_ISSUE: frozenset({Role.INSTRUCTOR, Role.ADMIN}),
+    # ابطال، اعتبار یک سند عمومی را برمی‌دارد؛ فقط مدیر، با دلیل و لاگ.
+    Permission.CERTIFICATE_REVOKE: frozenset({Role.ADMIN}),
     # گیمیفیکیشن
     Permission.POINTS_VIEW_OTHERS: frozenset({Role.INSTRUCTOR, Role.SUPPORT, Role.ADMIN}),
     Permission.POINTS_AWARD_MANUAL: frozenset({Role.INSTRUCTOR, Role.ADMIN}),

@@ -215,6 +215,7 @@ async def grant_role(
     scope_type: ScopeType = ScopeType.GLOBAL,
     scope_id: uuid.UUID | None = None,
     granted_by: uuid.UUID | None = None,
+    expires_at: datetime | None = None,
 ) -> UserRole | None:
     """اعطای نقش. اگر همین اعطا وجود داشته باشد، None برمی‌گردد.
 
@@ -230,6 +231,7 @@ async def grant_role(
             scope_type=scope_type.value,
             scope_id=scope_id,
             granted_by=granted_by,
+            expires_at=expires_at,
         )
         .on_conflict_do_nothing()
         .returning(UserRole)

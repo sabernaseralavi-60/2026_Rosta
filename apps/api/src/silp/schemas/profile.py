@@ -46,6 +46,22 @@ class ProfileOut(BaseModel):
     primary_goal: PrimaryGoal | None = None
     weekly_hours: int | None = None
     is_public: bool = False
+    #: FR-PROF-03 — روشن یا خاموش بودن هر بخش نیمرخ عمومی (ADR-0017).
+    privacy: dict[str, bool] = Field(default_factory=dict)
+
+
+class PrivacyIn(BaseModel):
+    """بخش‌های نیمرخ عمومی — `None` یعنی «تغییر نده»."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    university: bool | None = None
+    skills: bool | None = None
+    projects: bool | None = None
+    certificates: bool | None = None
+    research: bool | None = None
+    badges: bool | None = None
+    points: bool | None = None
 
 
 class ProfileUpdateIn(BaseModel):
@@ -71,6 +87,7 @@ class ProfileUpdateIn(BaseModel):
     #: FR-PROF-03، FR-TEAM-01 — «فقط کسانی که نیمرخشان را عمومی کرده‌اند قابل
     #: جستجواند». پیش‌فرض خصوصی است؛ روشن کردنش انتخاب خود دانشجوست.
     is_public: bool | None = None
+    privacy: PrivacyIn | None = None
 
     @field_validator("first_name", "last_name", "display_name", "field_of_study")
     @classmethod

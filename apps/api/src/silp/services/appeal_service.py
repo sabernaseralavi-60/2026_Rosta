@@ -34,9 +34,11 @@ from silp.core.exceptions import (
     ValidationFailed,
 )
 from silp.core.logging import get_logger
+from silp.domain import audit
 from silp.domain.quiz import appeal_window_open
 from silp.models.quiz import GradeAppeal, Quiz, QuizAttempt, QuizQuestion
 from silp.services import events
+from silp.services.audit_service import AuditService
 from silp.services.grading_service import GradingService
 
 log = get_logger("silp.appeal")
@@ -169,6 +171,18 @@ class AppealService:
                 feedback=cleaned,
             )
 
+        AuditService(self.session).stage(
+            audit.APPEAL_RESOLVED,
+            actor=resolver_id,
+            entity_type="GRADE_APPEAL",
+            entity_id=appeal.id,
+            before={"status": appeal.status},
+            after={
+                "status": "ACCEPTED" if accept else "REJECTED",
+                "new_score": new_score,
+                "attempt_id": appeal.attempt_id,
+            },
+        )
         appeal.status = "ACCEPTED" if accept else "REJECTED"
         appeal.response = cleaned
         appeal.resolved_by = resolver_id

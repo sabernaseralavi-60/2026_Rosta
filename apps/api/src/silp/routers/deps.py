@@ -26,6 +26,7 @@ from silp.core.middleware import UNSAFE_METHODS, bind_user, client_ip
 from silp.core.permissions import CurrentUser, Permission, Role, RoleGrant
 from silp.core.security import decode_access_token
 from silp.db.session import get_session
+from silp.domain import audit
 from silp.integrations.sms import SMSSender, get_sms_sender
 from silp.integrations.storage import StorageBackend
 from silp.integrations.storage import get_storage as storage_for
@@ -34,6 +35,7 @@ from silp.services import authz
 from silp.services.appeal_service import AppealService
 from silp.services.application_service import ApplicationService
 from silp.services.attempt_service import AttemptService
+from silp.services.audit_service import AuditService
 from silp.services.auth_service import AuthService
 from silp.services.course_service import CourseService
 from silp.services.delivery_service import DeliveryService
@@ -226,7 +228,11 @@ async def get_current_user(
                 "در حالت مشاهده به‌عنوان کاربر دیگر، تغییر داده ممکن نیست.",
                 code="IMPERSONATION_READ_ONLY",
             )
-        impersonated_by = uuid.UUID(str(act_as))
+        try:
+            impersonated_by = uuid.UUID(str(act_as))
+        except ValueError as exc:
+            raise InvalidToken from exc
+        await _audit_impersonated_request(request, session, user_id, impersonated_by)
 
     grants = await authz.get_grants(session, user_id)
     bind_user(user_id)
@@ -238,6 +244,37 @@ async def get_current_user(
         grants=grants,
         impersonated_by=impersonated_by,
     )
+
+
+async def _audit_impersonated_request(
+    request: Request, session: AsyncSession, user_id: uuid.UUID, agent_id: uuid.UUID
+) -> None:
+    """§6.5 — «**هر درخواست** در `audit_logs` با `impersonated_by`».
+
+    پشتیبانی که از توکن جعل هویت استفاده می‌کند باید هنوز فعال باشد و
+    مجوزش را داشته باشد: توکن ۳۰ دقیقه زنده است و نقشِ گرفته‌شده نباید تا
+    پایانش کار کند.
+
+    ردیف همین‌جا commit می‌شود: درخواست جعل هویت همیشه خواندنی است و
+    مسیرهای `GET` هرگز commit نمی‌زنند، پس بدون این، لاگ با بسته شدن نشست
+    بی‌صدا برمی‌گشت.
+    """
+    agent = await session.get(User, agent_id)
+    if agent is None or not agent.is_active:
+        raise InvalidToken
+    agent_grants = await authz.get_grants(session, agent_id)
+    if not CurrentUser(id=agent_id, session_id=agent_id, grants=agent_grants).has_permission(
+        Permission.IMPERSONATE
+    ):
+        raise InvalidToken
+    route = getattr(request.scope.get("route"), "path", None)
+    AuditService(session).stage(
+        audit.IMPERSONATED_REQUEST,
+        actor=CurrentUser(id=user_id, session_id=agent_id, impersonated_by=agent_id),
+        entity_type="REQUEST",
+        after={"method": request.method, "path": request.url.path, "route": route},
+    )
+    await session.commit()
 
 
 async def get_optional_user(

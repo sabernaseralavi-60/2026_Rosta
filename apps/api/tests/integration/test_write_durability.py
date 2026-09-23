@@ -610,3 +610,92 @@ async def test_city_workflow_writes_survive_the_request(  # type: ignore[no-unty
     finally:
         await committing_session.execute(delete(Project).where(Project.id == project_id))
         await committing_session.commit()
+
+
+async def test_admin_writes_and_impersonated_reads_leave_an_audit_trail(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """M7 بخش د — نقش، لاگ حسابرسی و لاگ درخواست جعل هویت.
+
+    لاگ درخواستِ جعل هویت روی مسیر `GET` نوشته می‌شود که خودش هرگز
+    commit نمی‌زند؛ بدون commit صریح در `get_current_user` این ردیف با
+    بسته شدن نشست بی‌صدا برمی‌گشت و فقط همین تست آن را می‌بیند.
+    """
+    from silp.core.permissions import Role
+    from silp.models.admin import AuditLog
+    from silp.models.identity import User, UserRole
+    from silp.services import authz
+
+    await authz.grant_role(committing_session, user_id=account["user_id"], role=Role.ADMIN)
+    await committing_session.commit()
+    await authz.invalidate_roles(account["user_id"])
+
+    mobile = f"0913{uuid.uuid4().int % 10_000_000:07d}"
+    response = await committing_client.post(
+        "/api/v1/auth/otp/request", json={"destination": mobile, "channel": "SMS"}
+    )
+    response = await committing_client.post(
+        "/api/v1/auth/otp/verify",
+        json={"challenge_id": response.json()["challenge_id"], "code": "111111"},
+    )
+    assert response.status_code == 200, response.text
+    target_id = uuid.UUID(response.json()["user"]["id"])
+    try:
+        granted = await committing_client.post(
+            f"/api/v1/admin/users/{target_id}/roles", headers=auth(account), json={"role": "MENTOR"}
+        )
+        assert granted.status_code == 201, granted.text
+        token = await committing_client.post(
+            f"/api/v1/admin/users/{target_id}/impersonate", headers=auth(account)
+        )
+        assert token.status_code == 200, token.text
+        seen = await committing_client.get(
+            "/api/v1/me", headers={"Authorization": f"Bearer {token.json()['access_token']}"}
+        )
+        assert seen.status_code == 200, seen.text
+
+        async with other_connection() as verifier:
+            role = await verifier.scalar(
+                select(UserRole.role_code).where(
+                    UserRole.user_id == target_id, UserRole.role_code == "MENTOR"
+                )
+            )
+            assert role == "MENTOR", "اعطای نقش commit نشده است"
+            actions = set(
+                await verifier.scalars(
+                    select(AuditLog.action).where(
+                        (AuditLog.entity_id == target_id) | (AuditLog.actor_id == target_id)
+                    )
+                )
+            )
+            assert {
+                "ROLE_GRANTED",
+                "IMPERSONATION_STARTED",
+                "IMPERSONATED_REQUEST",
+            } <= actions, f"لاگ حسابرسی commit نشده است: {actions}"
+    finally:
+        await committing_session.execute(delete(User).where(User.id == target_id))
+        await committing_session.commit()
+
+
+async def test_public_profile_privacy_survives_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    from silp.models.profile import Profile
+
+    response = await committing_client.patch(
+        "/api/v1/me/profile",
+        headers=auth(account),
+        json={
+            "first_name": "سارا",
+            "last_name": "محمدی",
+            "is_public": True,
+            "privacy": {"points": False},
+        },
+    )
+    assert response.status_code == 200, response.text
+
+    async with other_connection() as verifier:
+        stored = await verifier.get(Profile, account["user_id"])
+        assert stored is not None and stored.is_public, "نیمرخ عمومی commit نشده است"
+        assert stored.privacy_settings == {"points": False}

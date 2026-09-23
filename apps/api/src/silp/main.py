@@ -22,8 +22,10 @@ from silp.core.redis import close_redis
 from silp.db.session import dispose_engine
 from silp.routers import health
 from silp.routers.v1 import (
+    admin,
     applications,
     auth,
+    certificates,
     city,
     courses,
     files,
@@ -32,8 +34,10 @@ from silp.routers.v1 import (
     me,
     notifications,
     projects,
+    public,
     quizzes,
     research,
+    search,
     subscriptions,
     taxonomy,
     teach,
@@ -160,6 +164,14 @@ def _register_routers(app: FastAPI) -> None:
 
     v1.include_router(city.router)
     v1.include_router(city.project_router)
+    # ── عمومی، گواهی، مدیریت و جستجو (M7 بخش د) ────────────────────────
+    v1.include_router(public.router)
+    v1.include_router(public.profiles_router)
+    v1.include_router(certificates.public_router)
+    v1.include_router(certificates.me_router)
+    v1.include_router(certificates.admin_router)
+    v1.include_router(admin.router)
+    v1.include_router(search.router)
     app.include_router(v1)
 
 

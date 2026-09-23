@@ -26,6 +26,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.permissions import CurrentUser, Permission, Role, ScopeType
+from silp.domain import audit
 from silp.domain.gamification.learning_score import COMPONENT_TITLE_FA
 from silp.domain.gamification.levels import LevelProgress
 from silp.domain.project_health import HEALTH_TITLE_FA
@@ -73,6 +74,7 @@ from silp.schemas.gamification import (
     UpcomingEventOut,
 )
 from silp.services import authz
+from silp.services.audit_service import AuditService
 from silp.services.badge_service import BadgeService, BadgeStatus
 from silp.services.dashboard_service import DashboardService
 from silp.services.directory import display_names, name_of
@@ -521,7 +523,7 @@ async def update_point_rule(
     code: str,
     payload: PointRuleUpdateIn,
     session: SessionDep,
-    _: Annotated[CurrentUser, Depends(require(Permission.POINTS_RULE_EDIT))],
+    actor: Annotated[CurrentUser, Depends(require(Permission.POINTS_RULE_EDIT))],
 ) -> PointRuleOut:
     """FR-GAM-02 — **گذشته‌نگر نیست.** برای اعمال به گذشته، بازمحاسبه."""
     rule = await PointsService(session).update_rule(
@@ -533,6 +535,7 @@ async def update_point_rule(
         term_cap=payload.term_cap,
         is_active=payload.is_active,
         clear_caps=payload.clear_caps,
+        actor=actor,
     )
     return PointRuleOut.model_validate(rule, from_attributes=True)
 
@@ -546,11 +549,24 @@ async def update_point_rule(
 async def recalculate_points(
     payload: RecalculateIn,
     session: SessionDep,
-    _: Annotated[CurrentUser, Depends(require(Permission.POINTS_RECALCULATE))],
+    actor: Annotated[CurrentUser, Depends(require(Permission.POINTS_RECALCULATE))],
 ) -> RecalculateOut:
     """§9.9 — معکوس و ثبت دوباره در یک تراکنش. **هیچ ردیفی پاک نمی‌شود.**"""
     points = PointsService(session)
     result = await points.recalculate(payload.rule_code, since=payload.since, until=payload.until)
+    # «همه در یک تراکنش، با ثبت در audit_logs» — §9.9 گام ۴.
+    AuditService(session).stage(
+        audit.POINTS_RECALCULATED,
+        actor=actor,
+        entity_type="POINT_RULE",
+        before={"code": payload.rule_code, "since": payload.since, "until": payload.until},
+        after={
+            "code": result.rule_code,
+            "reversed": result.reversed,
+            "reawarded": result.reawarded,
+            "users": result.users,
+        },
+    )
     await session.commit()
     await points.refresh_totals()
     await session.commit()
@@ -575,9 +591,9 @@ async def reverse_point_entry(
     session: SessionDep,
     # «اصلاح دفتر کل» مدیریتی است: `POINTS_AWARD_MANUAL` را استاد هم دارد،
     # و آن سراسری است — پس با آن، هر استادی امتیاز هر دانشجویی را صفر می‌کرد.
-    _: Annotated[CurrentUser, Depends(require(Permission.POINTS_RECALCULATE))],
+    actor: Annotated[CurrentUser, Depends(require(Permission.POINTS_RECALCULATE))],
 ) -> PointEntryOut:
-    reversal = await PointsService(session).reverse_by_id(entry_id, payload.reason)
+    reversal = await PointsService(session).reverse_by_id(entry_id, payload.reason, actor=actor)
     await session.commit()
     return (await entries_out(session, [reversal]))[0]
 

@@ -15,7 +15,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
-from silp.core.logging import get_logger, trace_id_var, user_id_var
+from silp.core.logging import (
+    client_ip_var,
+    get_logger,
+    trace_id_var,
+    user_agent_var,
+    user_id_var,
+)
 
 log = get_logger("silp.request")
 
@@ -39,12 +45,16 @@ class TraceMiddleware(BaseHTTPMiddleware):
             trace_id = str(uuid.uuid4())
 
         token = trace_id_var.set(trace_id)
+        ip_token = client_ip_var.set(client_ip(request))
+        agent_token = user_agent_var.set((request.headers.get("User-Agent") or "")[:500] or None)
         structlog.contextvars.bind_contextvars(trace_id=trace_id)
         request.state.trace_id = trace_id
         try:
             response = await call_next(request)
         finally:
             trace_id_var.reset(token)
+            client_ip_var.reset(ip_token)
+            user_agent_var.reset(agent_token)
             structlog.contextvars.unbind_contextvars("trace_id")
 
         response.headers[TRACE_HEADER] = trace_id

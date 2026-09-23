@@ -46,6 +46,11 @@ DELIVERABLE_STATUSES = (
 FEEDBACK_REQUIRED_STATUSES = ("CHANGES_REQUESTED", "REJECTED")
 TASK_STATUSES = ("TODO", "DOING", "DONE")
 CERTIFICATE_KINDS = ("PROJECT", "COURSE", "RESEARCH_LEVEL")
+CERTIFICATE_KIND_TITLE_FA: dict[str, str] = {
+    "PROJECT": "تکمیل پروژه",
+    "COURSE": "گذراندن درس",
+    "RESEARCH_LEVEL": "سطح مسیر پژوهش",
+}
 #: «منقضی» ذخیره نمی‌شود — آگهی باز با `expires_at` گذشته (ADR-0015، مثل دعوت).
 OPENING_STATUSES = ("OPEN", "FILLED", "CLOSED")
 OPENING_APPLICATION_STATUSES = ("PENDING", "ACCEPTED", "DECLINED", "WITHDRAWN")
@@ -475,12 +480,35 @@ class Certificate(UUIDPrimaryKeyMixin, Base):
         "metadata", JSONB, nullable=False, server_default=text("'{}'::jsonb")
     )
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # ابطال با کنشگر و دلیل — ADR-0017. گواهی باطل‌شده پاک نمی‌شود: پیوندی
+    # که در رزومه‌ای مانده، باید بگوید «باطل»، نه «هرگز نبوده».
+    revoked_by: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id")
+    )
+    revoke_reason: Mapped[str | None] = mapped_column(Text)
 
     __table_args__ = (
         CheckConstraint(_in_list("kind", CERTIFICATE_KINDS), name="kind_valid"),
         CheckConstraint("jsonb_typeof(metadata) = 'object'", name="metadata_is_object"),
+        CheckConstraint(
+            "revoked_at IS NULL OR revoke_reason IS NOT NULL", name="revoke_has_reason"
+        ),
+        CheckConstraint("public_code ~ '^[0-9A-Z]{4}-[0-9A-Z]{4}$'", name="public_code_format"),
         Index("idx_certificates_user", "user_id", "kind"),
+        # یک گواهی معتبر برای هر موضوع — صدور از شنونده بی‌اثر است.
+        Index(
+            "uq_certificates_subject",
+            "user_id",
+            "kind",
+            "subject_id",
+            unique=True,
+            postgresql_where=text("revoked_at IS NULL"),
+        ),
     )
+
+    @property
+    def is_valid(self) -> bool:
+        return self.revoked_at is None
 
 
 class TeamOpening(UUIDPrimaryKeyMixin, Base):
@@ -615,6 +643,7 @@ class OpeningApplication(UUIDPrimaryKeyMixin, Base):
 __all__ = [
     "ARTIFACT_KINDS",
     "CERTIFICATE_KINDS",
+    "CERTIFICATE_KIND_TITLE_FA",
     "DELIVERABLE_STATUSES",
     "DELIVERABLE_STATUS_TITLE_FA",
     "FEEDBACK_REQUIRED_STATUSES",

@@ -16,6 +16,11 @@ import structlog
 # trace_id و user_id از میان‌افزار تا کوئری و کار پس‌زمینه منتشر می‌شوند (NFR-16).
 trace_id_var: ContextVar[str | None] = ContextVar("trace_id", default=None)
 user_id_var: ContextVar[str | None] = ContextVar("user_id", default=None)
+# مبدأ درخواست برای لاگ حسابرسی (FR-ADM-02 «از کدام IP»). همان جایی گذاشته
+# می‌شود که trace_id، تا سرویسی که ردیف حسابرسی می‌نویسد به `Request` نیاز
+# نداشته باشد.
+client_ip_var: ContextVar[str | None] = ContextVar("client_ip", default=None)
+user_agent_var: ContextVar[str | None] = ContextVar("user_agent", default=None)
 
 # کلیدهایی که هرگز نباید در لاگ ظاهر شوند (NFR-13). تطبیق روی زیررشته است،
 # پس `otp_code`، `new_password` و `national_id_enc` هم گرفته می‌شوند.

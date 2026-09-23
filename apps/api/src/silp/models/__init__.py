@@ -2,6 +2,7 @@
 
 from silp.db.base import Base
 from silp.models.access import MaterialAccessEvent, Subscription, SubscriptionPlan
+from silp.models.admin import AuditLog
 from silp.models.delivery import (
     Certificate,
     Deliverable,
@@ -86,6 +87,7 @@ from silp.models.taxonomy import Asset, Interest, Skill, University
 from silp.models.venture import Venture, VentureMetric, VentureStageChange
 
 __all__ = [
+    "AuditLog",
     "NULL_SCOPE",
     "Announcement",
     "Asset",

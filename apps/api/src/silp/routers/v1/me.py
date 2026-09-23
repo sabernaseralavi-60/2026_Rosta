@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.exceptions import NotFound
 from silp.core.security import mask_email, mask_mobile
+from silp.domain import public_profile
 from silp.domain.recommendation import service as recommendation
 from silp.models.identity import User
 from silp.models.profile import DEGREE_TITLE_FA, TOTAL_SURVEY_STEPS, Profile
@@ -70,6 +71,7 @@ def _profile_out(profile: Profile | None) -> ProfileOut | None:
         primary_goal=profile.primary_goal,
         weekly_hours=profile.weekly_hours,
         is_public=profile.is_public,
+        privacy=public_profile.sections(profile.privacy_settings),
     )
 
 

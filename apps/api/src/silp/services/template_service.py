@@ -19,6 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from silp.core.config import Settings, get_settings
 from silp.core.exceptions import NotFound, ValidationFailed
 from silp.core.logging import get_logger
+from silp.domain import audit
 from silp.domain.notifications import catalog
 from silp.domain.notifications.templating import (
     Rendered,
@@ -28,6 +29,7 @@ from silp.domain.notifications.templating import (
     validate,
 )
 from silp.models.messaging import MessageTemplate
+from silp.services.audit_service import AuditService
 
 log = get_logger("silp.templates")
 
@@ -84,6 +86,8 @@ SAMPLE_VALUES: dict[str, str] = {
     "skills": "GIS و Python",
     "assigner": "مریم کریمی",
     "number": "۴",
+    "role": "منتور",
+    "agent": "پشتیبانی سیلپ (علی احمدی)",
 }
 
 
@@ -120,6 +124,39 @@ class TemplateService:
             validate(cleaned_subject, body, allowed)
         except TemplateError as exc:
             raise ValidationFailed(str(exc), code="TEMPLATE_INVALID") from exc
+
+        # ستون‌ها، نه موجودیت: درج `RETURNING` پایین همان کلید را برمی‌گرداند
+        # و موجودیتِ از قبل بارشده در نقشهٔ هویت، مقدار کهنه را نگه می‌داشت.
+        previous = (
+            await self.session.execute(
+                select(
+                    MessageTemplate.subject, MessageTemplate.body, MessageTemplate.is_active
+                ).where(MessageTemplate.code == code, MessageTemplate.channel == channel)
+            )
+        ).first()
+        AuditService(self.session).stage(
+            audit.MESSAGE_TEMPLATE_UPDATED,
+            actor=actor_id,
+            entity_type="MESSAGE_TEMPLATE",
+            before=(
+                {
+                    "code": code,
+                    "channel": channel,
+                    "subject": previous.subject,
+                    "body": previous.body,
+                    "is_active": previous.is_active,
+                }
+                if previous is not None
+                else None
+            ),
+            after={
+                "code": code,
+                "channel": channel,
+                "subject": cleaned_subject,
+                "body": body.strip(),
+                "is_active": is_active,
+            },
+        )
 
         statement = insert(MessageTemplate).values(
             code=code,

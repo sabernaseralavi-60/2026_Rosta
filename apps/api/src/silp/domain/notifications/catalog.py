@@ -324,6 +324,7 @@ _KINDS: tuple[Kind, ...] = (
     ),
     # ── نشان و جامعه ───────────────────────────────────────────────────
     Kind("BADGE_AWARDED", "SOCIAL", "LOW", "نشان تازه", ("badge",)),
+    Kind("CERTIFICATE_ISSUED", "SOCIAL", "NORMAL", "صدور گواهی تازه", ("title",)),
     Kind(
         "IDEA_COMMENTED",
         "SOCIAL",
@@ -363,6 +364,21 @@ _KINDS: tuple[Kind, ...] = (
         ("reviews", "enrollments", "at_risk"),
     ),
     Kind("OUTBOX_DEAD", "SYSTEM", "IMPORTANT", "پیام‌های ارسال‌نشده (مدیر)", ("count",)),
+    Kind(
+        "CERTIFICATE_REVOKED",
+        "SYSTEM",
+        "IMPORTANT",
+        "ابطال گواهی",
+        ("title", "reason"),
+    ),
+    Kind("ROLE_GRANTED", "SYSTEM", "NORMAL", "نقش تازه در سامانه", ("role",)),
+    Kind(
+        "ACCOUNT_VIEWED_BY_SUPPORT",
+        "SYSTEM",
+        "IMPORTANT",
+        "بررسی حساب به دست پشتیبانی",
+        ("agent",),
+    ),
 )
 
 KINDS: dict[str, Kind] = {kind.code: kind for kind in _KINDS}

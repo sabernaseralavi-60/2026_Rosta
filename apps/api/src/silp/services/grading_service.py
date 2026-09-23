@@ -33,6 +33,7 @@ from silp.core.exceptions import (
     ValidationFailed,
 )
 from silp.core.logging import get_logger
+from silp.domain import audit
 from silp.domain.quiz import (
     QuestionKind,
     parse_question,
@@ -41,6 +42,7 @@ from silp.domain.quiz import (
 )
 from silp.models.quiz import Quiz, QuizAnswer, QuizAttempt, QuizQuestion
 from silp.services import events
+from silp.services.audit_service import AuditService
 
 log = get_logger("silp.grading")
 
@@ -196,6 +198,22 @@ class GradingService:
         answer.manual_score = quantize(score)
         answer.grader_id = grader_id
         answer.feedback = feedback
+        # FR-ADM-02 «تغییر نمره»: فقط وقتی نمره‌ای از قبل بوده — تصحیح
+        # نخستینِ یک پاسخ تشریحی، تغییر نمره نیست.
+        existing = previous if previous is not None else answer.auto_score
+        if existing is not None:
+            AuditService(self.session).stage(
+                audit.GRADE_OVERRIDDEN,
+                actor=grader_id,
+                entity_type="QUIZ_ATTEMPT",
+                entity_id=attempt.id,
+                before={"question_id": question_id, "score": existing},
+                after={
+                    "question_id": question_id,
+                    "score": answer.manual_score,
+                    "feedback": feedback,
+                },
+            )
 
         await self._recalculate(attempt)
         await events.publish(self.session, events.QuizGraded(attempt_id=attempt.id, manual=True))
@@ -271,6 +289,14 @@ class GradingService:
         تا ابطالِ یک تلاشِ خراب، دفعهٔ دانشجو را نسوزاند.
         """
         attempt = await self._attempt_of(attempt_id, quiz_id, must_be_finished=False)
+        AuditService(self.session).stage(
+            audit.ATTEMPT_VOIDED,
+            actor=grader_id,
+            entity_type="QUIZ_ATTEMPT",
+            entity_id=attempt.id,
+            before={"status": attempt.status, "total_score": attempt.total_score},
+            after={"status": "VOIDED"},
+        )
         attempt.status = "VOIDED"
         attempt.is_provisional = False
         attempt.graded_by = grader_id

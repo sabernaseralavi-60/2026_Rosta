@@ -4,6 +4,94 @@
  */
 
 export interface paths {
+    "/api/v1/admin/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** لاگ حسابرسی */
+        get: operations["audit_log_api_v1_admin_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * خروجی CSV لاگ حسابرسی
+         * @description «قابل جستجو و خروجی‌گیری» — BOM دارد تا Excel فارسی را درست باز کند.
+         */
+        get: operations["export_audit_api_v1_admin_audit_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** جستجوی گواهی */
+        get: operations["search_certificates_api_v1_admin_certificates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/certificates/{certificate_id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ابطال گواهی */
+        post: operations["revoke_certificate_api_v1_admin_certificates__certificate_id__revoke_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/impersonation/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** پایان مشاهده به‌عنوان کاربر */
+        post: operations["end_impersonation_api_v1_admin_impersonation_end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/message-templates": {
         parameters: {
             query?: never;
@@ -48,6 +136,23 @@ export interface paths {
         get?: never;
         /** ساخت یا ویرایش الگو */
         put: operations["put_template_api_v1_admin_message_templates__code___channel__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** شاخص‌های کلان سامانه */
+        get: operations["metrics_api_v1_admin_metrics_get"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -178,6 +283,116 @@ export interface paths {
          * @description FR-GAM-02 — **گذشته‌نگر نیست.** برای اعمال به گذشته، بازمحاسبه.
          */
         patch: operations["update_point_rule_api_v1_admin_point_rules__code__patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** نقش‌های قابل اعطا */
+        get: operations["role_options_api_v1_admin_roles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** جستجوی کاربران */
+        get: operations["list_users_api_v1_admin_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** جزئیات یک کاربر */
+        get: operations["get_user_api_v1_admin_users__user_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * تعلیق یا فعال‌سازی حساب
+         * @description «غیرفعال‌سازی حساب (نه حذف)» — حذف فیزیکی از هیچ مسیری ممکن نیست (§6.3).
+         */
+        patch: operations["set_user_status_api_v1_admin_users__user_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}/impersonate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * مشاهده به‌عنوان کاربر (فقط خواندنی)
+         * @description توکن ۳۰ دقیقه‌ای، بی refresh؛ هر درخواست با آن در لاگ حسابرسی می‌نشیند
+         *     و هر `POST`/`PATCH`/`DELETE` با `IMPERSONATION_READ_ONLY` رد می‌شود.
+         */
+        post: operations["impersonate_api_v1_admin_users__user_id__impersonate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** اعطای نقش */
+        post: operations["grant_role_api_v1_admin_users__user_id__roles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}/roles/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** سلب نقش */
+        delete: operations["revoke_role_api_v1_admin_users__user_id__roles__code__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/applications/mine": {
@@ -1003,6 +1218,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** گواهی‌های من */
+        get: operations["my_certificates_api_v1_me_certificates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/dashboard": {
         parameters: {
             query?: never;
@@ -1589,6 +1821,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/profiles/{username}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** نیمرخ عمومی */
+        get: operations["public_profile_api_v1_profiles__username__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects": {
         parameters: {
             query?: never;
@@ -2099,6 +2348,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/certificates/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** راستی‌آزمایی گواهی */
+        get: operations["verify_certificate_api_v1_public_certificates__code__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** آمار زندهٔ سامانه */
+        get: operations["public_stats_api_v1_public_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/stories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * داستان‌های واقعی صفحهٔ اصلی
+         * @description آخرین پروژه‌های تکمیل‌شده. فهرست خالی یعنی بخش در صفحه دیده نشود.
+         */
+        get: operations["public_stories_api_v1_public_stories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quizzes/offering/{offering_id}": {
         parameters: {
             query?: never;
@@ -2502,6 +2805,23 @@ export interface paths {
          * @description FR-EDU-04 — ویدئو خودش تمام می‌شود، PDF با دکمهٔ صریح.
          */
         post: operations["record_progress_api_v1_resources__resource_id__progress_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** جستجوی سراسری */
+        get: operations["search_api_v1_search_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3742,6 +4062,111 @@ export interface components {
             /** Summary */
             summary: string;
         };
+        /** AdminUserDetailOut */
+        AdminUserDetailOut: {
+            /** Can Impersonate */
+            can_impersonate: boolean;
+            /** Certificates */
+            certificates: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Derived Roles */
+            derived_roles: string[];
+            /** Email */
+            email: string | null;
+            /** Enrollments */
+            enrollments: number;
+            /** Grants */
+            grants: components["schemas"]["RoleGrantAdminOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Impersonation Blocked Reason */
+            impersonation_blocked_reason?: string | null;
+            /** Is Public */
+            is_public: boolean;
+            /** Last Login At */
+            last_login_at: string | null;
+            /** Level */
+            level: number;
+            /** Mobile */
+            mobile: string | null;
+            /** Name */
+            name: string | null;
+            /** Points Total */
+            points_total: number;
+            /** Projects Active */
+            projects_active: number;
+            /** Projects Completed */
+            projects_completed: number;
+            /** Recent Audit */
+            recent_audit: components["schemas"]["AuditEntryOut"][];
+            /** Roles */
+            roles: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
+            /** Username */
+            username: string | null;
+        };
+        /**
+         * AdminUserOut
+         * @description یک ردیف فهرست کاربران.
+         *
+         *     موبایل و ایمیل پوشانده‌اند مگر کنشگر `profile.view.contact` داشته باشد
+         *     (NFR-01): پشتیبانی کاربر را پیدا می‌کند بی‌آنکه شمارهٔ کامل ببیند.
+         */
+        AdminUserOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Email */
+            email: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Public */
+            is_public: boolean;
+            /** Last Login At */
+            last_login_at: string | null;
+            /** Mobile */
+            mobile: string | null;
+            /** Name */
+            name: string | null;
+            /** Roles */
+            roles: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
+            /** Username */
+            username: string | null;
+        };
+        /** AdminUserPage */
+        AdminUserPage: {
+            /** Has Next */
+            has_next: boolean;
+            /** Items */
+            items: components["schemas"]["AdminUserOut"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
         /**
          * AlternativeOut
          * @description یک پروژهٔ جایگزین همراه پاسخ رد — §7.5.
@@ -4197,6 +4622,56 @@ export interface components {
             /** Week Number */
             week_number?: number | null;
         };
+        /** AuditEntryOut */
+        AuditEntryOut: {
+            /** Action */
+            action: string;
+            /** Action Fa */
+            action_fa: string;
+            /** Actor Id */
+            actor_id: string | null;
+            /** Actor Name */
+            actor_name: string | null;
+            /** After */
+            after: {
+                [key: string]: unknown;
+            } | null;
+            /** Before */
+            before: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Entity Id */
+            entity_id: string | null;
+            /** Entity Type */
+            entity_type: string;
+            /** Entity Type Fa */
+            entity_type_fa: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Impersonated By */
+            impersonated_by: string | null;
+            /** Impersonator Name */
+            impersonator_name: string | null;
+            /** Ip Address */
+            ip_address: string | null;
+            /** User Agent */
+            user_agent: string | null;
+        };
+        /** AuditPageOut */
+        AuditPageOut: {
+            /** Items */
+            items: components["schemas"]["AuditEntryOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
         /**
          * AuthUserOut
          * @description کاربر در پاسخ ورود — §5.2. اطلاعات تماس پوشانده می‌شود (NFR-01).
@@ -4356,6 +4831,91 @@ export interface components {
             code: "TRANSPORT" | "AGRICULTURE" | "COMMERCE" | "EDUCATION" | "TECHNOLOGY" | "ENVIRONMENT" | "SOCIAL" | "OTHER";
             /** Title Fa */
             title_fa: string;
+        };
+        /**
+         * CertificateOut
+         * @description گواهی من — `GET /me/certificates`.
+         */
+        CertificateOut: {
+            /** Details */
+            details?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Issuer Name */
+            issuer_name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PROJECT" | "COURSE" | "RESEARCH_LEVEL";
+            /** Kind Fa */
+            kind_fa: string;
+            /** Public Code */
+            public_code: string;
+            /** Revoke Reason */
+            revoke_reason?: string | null;
+            /** Revoked At */
+            revoked_at?: string | null;
+            /** Title Fa */
+            title_fa: string;
+            /** Verify Path */
+            verify_path: string;
+        };
+        /** CertificateRevokeIn */
+        CertificateRevokeIn: {
+            /** Reason */
+            reason: string;
+        };
+        /**
+         * CertificateVerifyOut
+         * @description `GET /public/certificates/{code}`.
+         *
+         *     `valid = false` با `revoked_at` یعنی گواهی صادر شده بود و باطل شد؛
+         *     کدی که هرگز صادر نشده ۴۰۴ می‌گیرد (ADR-0017).
+         */
+        CertificateVerifyOut: {
+            /** Details */
+            details?: {
+                [key: string]: unknown;
+            };
+            /** Holder Name */
+            holder_name: string;
+            /** Holder Username */
+            holder_username: string | null;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Issuer */
+            issuer: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PROJECT" | "COURSE" | "RESEARCH_LEVEL";
+            /** Kind Fa */
+            kind_fa: string;
+            /** Public Code */
+            public_code: string;
+            /** Revoke Reason */
+            revoke_reason?: string | null;
+            /** Revoked At */
+            revoked_at?: string | null;
+            /** Title Fa */
+            title_fa: string;
+            /** Valid */
+            valid: boolean;
         };
         /** ChannelConfirmIn */
         ChannelConfirmIn: {
@@ -5299,6 +5859,38 @@ export interface components {
              */
             voted_by_me: boolean;
         };
+        /** ImpersonationEndIn */
+        ImpersonationEndIn: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /**
+         * ImpersonationOut
+         * @description توکن فقط‌خواندنی ۳۰ دقیقه‌ای، بی refresh — §6.5.
+         */
+        ImpersonationOut: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Roles */
+            roles: string[];
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string | null;
+            /** Username */
+            username: string | null;
+        };
         /** IntegrityEventIn */
         IntegrityEventIn: {
             /** Detail */
@@ -5937,18 +6529,6 @@ export interface components {
             verified?: {
                 [key: string]: number;
             };
-        };
-        /** MetricsOut */
-        MetricsOut: {
-            /** By Member */
-            by_member?: components["schemas"]["MemberTotalsOut"][];
-            /** Items */
-            items: components["schemas"]["MetricOut"][];
-            /** Metric Titles */
-            metric_titles?: {
-                [key: string]: string;
-            };
-            totals: components["schemas"]["MetricTotalsOut"];
         };
         /** MilestoneIn */
         MilestoneIn: {
@@ -7148,6 +7728,26 @@ export interface components {
             version: number;
         };
         /**
+         * PrivacyIn
+         * @description بخش‌های نیمرخ عمومی — `None` یعنی «تغییر نده».
+         */
+        PrivacyIn: {
+            /** Badges */
+            badges?: boolean | null;
+            /** Certificates */
+            certificates?: boolean | null;
+            /** Points */
+            points?: boolean | null;
+            /** Projects */
+            projects?: boolean | null;
+            /** Research */
+            research?: boolean | null;
+            /** Skills */
+            skills?: boolean | null;
+            /** University */
+            university?: boolean | null;
+        };
+        /**
          * ProfileOut
          * @description نیمرخ در پاسخ `GET /me` — §5.3.
          *
@@ -7180,6 +7780,10 @@ export interface components {
             last_name: string;
             /** Primary Goal */
             primary_goal?: ("GRADE" | "LEARNING" | "PUBLICATION" | "INCOME" | "STARTUP" | "EMPLOYMENT") | null;
+            /** Privacy */
+            privacy?: {
+                [key: string]: boolean;
+            };
             university?: components["schemas"]["UniversityRef"] | null;
             /** Weekly Hours */
             weekly_hours?: number | null;
@@ -7214,6 +7818,7 @@ export interface components {
             is_public?: boolean | null;
             /** Last Name */
             last_name?: string | null;
+            privacy?: components["schemas"]["PrivacyIn"] | null;
             /** Student Number */
             student_number?: string | null;
             /** University Id */
@@ -7562,6 +8167,160 @@ export interface components {
              * @enum {string}
              */
             target_type: "PROJECT" | "VENTURE";
+        };
+        /** PublicBadgeOut */
+        PublicBadgeOut: {
+            /**
+             * Awarded At
+             * Format: date-time
+             */
+            awarded_at: string;
+            /** Code */
+            code: string;
+            /** Description */
+            description: string;
+            /** Icon */
+            icon: string;
+            /** Tier */
+            tier: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** PublicCertificateOut */
+        PublicCertificateOut: {
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "PROJECT" | "COURSE" | "RESEARCH_LEVEL";
+            /** Public Code */
+            public_code: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** PublicLevelOut */
+        PublicLevelOut: {
+            /** Level */
+            level: number;
+            /** Title Fa */
+            title_fa: string;
+            /** Total */
+            total: number;
+        };
+        /** PublicOutputOut */
+        PublicOutputOut: {
+            /** Doi */
+            doi: string | null;
+            /** Kind Fa */
+            kind_fa: string;
+            /** Title */
+            title: string;
+            /** Url */
+            url: string | null;
+            /** Venue */
+            venue: string | null;
+        };
+        /**
+         * PublicProfileOut
+         * @description FR-PROF-03 — بخش خاموش `null` یا خالی است، نه پنهان در رابط.
+         *
+         *     هیچ فیلدی برای موبایل، ایمیل، کد ملی، نمره یا رتبهٔ کلاس وجود ندارد.
+         */
+        PublicProfileOut: {
+            /** Badges */
+            badges?: components["schemas"]["PublicBadgeOut"][];
+            /** Bio */
+            bio: string | null;
+            /** Certificates */
+            certificates?: components["schemas"]["PublicCertificateOut"][];
+            /** Degree Level Fa */
+            degree_level_fa?: string | null;
+            /** Field Of Study */
+            field_of_study?: string | null;
+            /** Is Owner */
+            is_owner: boolean;
+            /** Is Public */
+            is_public: boolean;
+            /**
+             * Member Since
+             * Format: date-time
+             */
+            member_since: string;
+            /** Name */
+            name: string;
+            points?: components["schemas"]["PublicLevelOut"] | null;
+            /** Projects */
+            projects?: components["schemas"]["PublicProjectOut"][];
+            /** Research Level */
+            research_level?: number | null;
+            /** Research Level Fa */
+            research_level_fa?: string | null;
+            /** Research Outputs */
+            research_outputs?: components["schemas"]["PublicOutputOut"][];
+            /** Sections */
+            sections: {
+                [key: string]: boolean;
+            };
+            /** Skills */
+            skills?: components["schemas"]["PublicSkillOut"][];
+            /** University */
+            university?: string | null;
+            /** Username */
+            username: string;
+        };
+        /** PublicProjectOut */
+        PublicProjectOut: {
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Kind Fa */
+            kind_fa: string;
+            /** Role Fa */
+            role_fa: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** PublicSkillOut */
+        PublicSkillOut: {
+            /** Level */
+            level: number;
+            /** Title Fa */
+            title_fa: string;
+            /** Verified */
+            verified: boolean;
+        };
+        /**
+         * PublicStatsOut
+         * @description §5.3.1 — «سرور عدد واقعی برمی‌گرداند و تصمیم نمایش با رابط است».
+         */
+        PublicStatsOut: {
+            /** Active Courses */
+            active_courses: number;
+            /** Active Projects */
+            active_projects: number;
+            /** Certificates */
+            certificates: number;
+            /** Completed Milestones */
+            completed_milestones: number;
+            /** Completed Projects */
+            completed_projects: number;
+            /** Research Outputs */
+            research_outputs: number;
+            /** Students */
+            students: number;
+            /** Verified Revenue Rial */
+            verified_revenue_rial: number;
         };
         /** PublishWeekIn */
         PublishWeekIn: {
@@ -8172,6 +8931,43 @@ export interface components {
              */
             workflow_completed: boolean;
         };
+        /** RoleGrantAdminOut */
+        RoleGrantAdminOut: {
+            /** Code */
+            code: string;
+            /** Expires At */
+            expires_at?: string | null;
+            /**
+             * Granted At
+             * Format: date-time
+             */
+            granted_at: string;
+            /** Granted By Name */
+            granted_by_name?: string | null;
+            /** Scope Id */
+            scope_id: string | null;
+            /** Scope Label */
+            scope_label?: string | null;
+            /** Scope Type */
+            scope_type: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** RoleGrantIn */
+        RoleGrantIn: {
+            /** Expires At */
+            expires_at?: string | null;
+            /** Role */
+            role: string;
+            /** Scope Id */
+            scope_id?: string | null;
+            /**
+             * Scope Type
+             * @default GLOBAL
+             * @enum {string}
+             */
+            scope_type: "GLOBAL" | "OFFERING";
+        };
         /** RoleGrantOut */
         RoleGrantOut: {
             /** Code */
@@ -8180,6 +8976,15 @@ export interface components {
             scope_id?: string | null;
             /** Scope Type */
             scope_type: string;
+        };
+        /** RoleOptionOut */
+        RoleOptionOut: {
+            /** Code */
+            code: string;
+            /** Scopes */
+            scopes: ("GLOBAL" | "OFFERING")[];
+            /** Title Fa */
+            title_fa: string;
         };
         /** RosterEntryOut */
         RosterEntryOut: {
@@ -8252,6 +9057,36 @@ export interface components {
              */
             my_profile_is_public: boolean;
             project?: components["schemas"]["ProjectBriefOut"] | null;
+        };
+        /** SearchGroupOut */
+        SearchGroupOut: {
+            /** Items */
+            items: components["schemas"]["SearchHitOut"][];
+            /** Kind */
+            kind: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** SearchHitOut */
+        SearchHitOut: {
+            /** Href */
+            href: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Subtitle */
+            subtitle: string | null;
+            /** Title */
+            title: string;
+        };
+        /** SearchOut */
+        SearchOut: {
+            /** Groups */
+            groups: components["schemas"]["SearchGroupOut"][];
+            /** Q */
+            q: string;
         };
         /**
          * SessionOut
@@ -8424,6 +9259,41 @@ export interface components {
             to_stage: "IDEA" | "VALIDATION" | "MVP" | "FIRST_REVENUE" | "GROWTH" | "PAUSED" | "CLOSED";
             /** To Stage Fa */
             to_stage_fa: string;
+        };
+        /** StoryMemberOut */
+        StoryMemberOut: {
+            /** Is Lead */
+            is_lead: boolean;
+            /** Name */
+            name: string;
+            /** Username */
+            username: string;
+        };
+        /** StoryOut */
+        StoryOut: {
+            /** Approved Milestones */
+            approved_milestones: number;
+            /** Completed At */
+            completed_at: string | null;
+            /** Course Title */
+            course_title: string | null;
+            /** Kind */
+            kind: string;
+            /** Kind Fa */
+            kind_fa: string;
+            /** Members */
+            members: components["schemas"]["StoryMemberOut"][];
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Summary */
+            summary: string;
+            /** Team Size */
+            team_size: number;
+            /** Title Fa */
+            title_fa: string;
         };
         /** StudentAtRiskOut */
         StudentAtRiskOut: {
@@ -9215,6 +10085,16 @@ export interface components {
             /** Upload Url */
             upload_url: string;
         };
+        /** UserStatusIn */
+        UserStatusIn: {
+            /** Reason */
+            reason: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ACTIVE" | "SUSPENDED" | "DEACTIVATED";
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -9482,6 +10362,48 @@ export interface components {
             /** Week Number */
             week_number: number;
         };
+        /**
+         * MetricsOut
+         * @description `GET /admin/metrics` — شاخص‌های کلان (§3.6 `/admin`).
+         */
+        silp__schemas__admin__MetricsOut: {
+            /** Audit 24H */
+            audit_24h: number;
+            /** Certificates */
+            certificates: number;
+            /** Impersonations 7D */
+            impersonations_7d: number;
+            /** Outbox */
+            outbox: {
+                [key: string]: number;
+            };
+            /** Pending Deliverables */
+            pending_deliverables: number;
+            /** Pending Metrics */
+            pending_metrics: number;
+            /** Pending Outputs */
+            pending_outputs: number;
+            /** Pending Research */
+            pending_research: number;
+            /** Projects */
+            projects: {
+                [key: string]: number;
+            };
+            /** Public Profiles */
+            public_profiles: number;
+            /** Roles */
+            roles: {
+                [key: string]: number;
+            };
+            /** Users Active 7D */
+            users_active_7d: number;
+            /** Users New 7D */
+            users_new_7d: number;
+            /** Users Suspended */
+            users_suspended: number;
+            /** Users Total */
+            users_total: number;
+        };
         /** LevelOut */
         silp__schemas__gamification__LevelOut: {
             /** Current At */
@@ -9557,6 +10479,18 @@ export interface components {
             /** Summary */
             summary: string;
         };
+        /** MetricsOut */
+        silp__schemas__venture__MetricsOut: {
+            /** By Member */
+            by_member?: components["schemas"]["MemberTotalsOut"][];
+            /** Items */
+            items: components["schemas"]["MetricOut"][];
+            /** Metric Titles */
+            metric_titles?: {
+                [key: string]: string;
+            };
+            totals: components["schemas"]["MetricTotalsOut"];
+        };
     };
     responses: never;
     parameters: never;
@@ -9566,6 +10500,262 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    audit_log_api_v1_admin_audit_get: {
+        parameters: {
+            query?: {
+                actor_id?: string | null;
+                /** @description هرچه این کاربر کرد یا بر او شد */
+                user_id?: string | null;
+                entity_type?: string | null;
+                entity_id?: string | null;
+                action?: string | null;
+                since?: string | null;
+                until?: string | null;
+                cursor?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditPageOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_audit_api_v1_admin_audit_export_get: {
+        parameters: {
+            query?: {
+                actor_id?: string | null;
+                user_id?: string | null;
+                entity_type?: string | null;
+                entity_id?: string | null;
+                action?: string | null;
+                since?: string | null;
+                until?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": unknown;
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_certificates_api_v1_admin_certificates_get: {
+        parameters: {
+            query?: {
+                code?: string | null;
+                user_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateOut"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_certificate_api_v1_admin_certificates__certificate_id__revoke_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                certificate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CertificateRevokeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_impersonation_api_v1_admin_impersonation_end_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImpersonationEndIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     templates_api_v1_admin_message_templates_get: {
         parameters: {
             query?: never;
@@ -9678,6 +10868,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_api_v1_admin_metrics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["silp__schemas__admin__MetricsOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -10010,6 +11238,427 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    role_options_api_v1_admin_roles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleOptionOut"][];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_users_api_v1_admin_users_get: {
+        parameters: {
+            query?: {
+                /** @description نام، نام کاربری، موبایل یا ایمیل */
+                q?: string | null;
+                role?: string | null;
+                status?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserPage"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_user_api_v1_admin_users__user_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDetailOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_user_status_api_v1_admin_users__user_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserStatusIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDetailOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    impersonate_api_v1_admin_users__user_id__impersonate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpersonationOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    grant_role_api_v1_admin_users__user_id__roles_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleGrantIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDetailOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_role_api_v1_admin_users__user_id__roles__code__delete: {
+        parameters: {
+            query?: {
+                scope_type?: string;
+                scope_id?: string | null;
+            };
+            header?: never;
+            path: {
+                user_id: string;
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserDetailOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -11943,6 +13592,26 @@ export interface operations {
             };
         };
     };
+    my_certificates_api_v1_me_certificates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateOut"][];
+                };
+            };
+        };
+    };
     my_dashboard_api_v1_me_dashboard_get: {
         parameters: {
             query?: never;
@@ -13380,6 +15049,46 @@ export interface operations {
             };
         };
     };
+    public_profile_api_v1_profiles__username__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicProfileOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_projects_api_v1_projects_get: {
         parameters: {
             query?: {
@@ -14218,7 +15927,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MetricsOut"];
+                    "application/json": components["schemas"]["silp__schemas__venture__MetricsOut"];
                 };
             };
             /** @description Validation Error */
@@ -14845,6 +16554,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_certificate_api_v1_public_certificates__code__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateVerifyOut"];
+                };
+            };
+            /** @description کدی که هرگز صادر نشده */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    public_stats_api_v1_public_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicStatsOut"];
+                };
+            };
+        };
+    };
+    public_stories_api_v1_public_stories_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryOut"][];
                 };
             };
         };
@@ -15828,6 +17617,47 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_api_v1_search_get: {
+        parameters: {
+            query?: {
+                q?: string;
+                per_group?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -18839,7 +20669,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MetricsOut"];
+                    "application/json": components["schemas"]["silp__schemas__venture__MetricsOut"];
                 };
             };
             /** @description Validation Error */

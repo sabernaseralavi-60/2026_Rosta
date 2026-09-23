@@ -46,10 +46,13 @@ from sqlalchemy.sql.selectable import Exists
 
 from silp.core.exceptions import Conflict, NotFound, ValidationFailed
 from silp.core.logging import get_logger
+from silp.core.permissions import CurrentUser
+from silp.domain import audit
 from silp.domain.gamification import formulas
 from silp.domain.gamification.levels import LevelProgress, progress
 from silp.models.education import CourseOffering, Term
 from silp.models.gamification import POINT_CATEGORIES, PointEntry, PointRule
+from silp.services.audit_service import AuditService
 
 log = get_logger("silp.points")
 
@@ -115,6 +118,18 @@ def _is_idempotency_clash(exc: IntegrityError) -> bool:
     return "idx_point_idempotency" in message or "idx_point_single_reversal" in message
 
 
+def _rule_snapshot(rule: PointRule) -> dict[str, object]:
+    """فیلدهای قابل ویرایش قاعده — برای «قبل و بعد» لاگ حسابرسی."""
+    return {
+        "title_fa": rule.title_fa,
+        "base_points": rule.base_points,
+        "daily_cap": rule.daily_cap,
+        "weekly_cap": rule.weekly_cap,
+        "term_cap": rule.term_cap,
+        "is_active": rule.is_active,
+    }
+
+
 class PointsService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -145,11 +160,13 @@ class PointsService:
         term_cap: int | None = None,
         is_active: bool | None = None,
         clear_caps: Sequence[str] = (),
+        actor: CurrentUser | uuid.UUID | None = None,
     ) -> PointRule:
         """FR-GAM-02 — تغییر قاعده **گذشته‌نگر نیست**؛ بازمحاسبه عمل جداست."""
         rule = await self.session.get(PointRule, code)
         if rule is None:
             raise NotFound("این قاعدهٔ امتیاز پیدا نشد.")
+        before = _rule_snapshot(rule)
         if base_points is not None:
             if base_points < 0:
                 raise ValidationFailed("امتیاز پایه نمی‌تواند منفی باشد.")
@@ -173,6 +190,15 @@ class PointsService:
             setattr(rule, name, None)
         if is_active is not None:
             rule.is_active = is_active
+        after = _rule_snapshot(rule)
+        if after != before:
+            AuditService(self.session).stage(
+                audit.POINT_RULE_UPDATED,
+                actor=actor,
+                entity_type="POINT_RULE",
+                before={"code": code, **before},
+                after={"code": code, **after},
+            )
         await self.session.commit()
         self._rules.pop(code, None)
         log.info("point_rule_updated", rule_code=code)
@@ -418,7 +444,13 @@ class PointsService:
             rule_code=rule_code, reversed=reversed_count, reawarded=reawarded, users=len(users)
         )
 
-    async def reverse_by_id(self, entry_id: uuid.UUID, reason: str) -> PointEntry:
+    async def reverse_by_id(
+        self,
+        entry_id: uuid.UUID,
+        reason: str,
+        *,
+        actor: CurrentUser | uuid.UUID | None = None,
+    ) -> PointEntry:
         """اصلاح دستی مدیر — یک ردیف مشخص."""
         cleaned = reason.strip()
         if not cleaned:
@@ -429,6 +461,14 @@ class PointsService:
         reversal = await self.reverse(entry, cleaned)
         if reversal is None:
             raise Conflict("این ردیف قبلاً اصلاح شده است.")
+        AuditService(self.session).stage(
+            audit.POINT_ENTRY_REVERSED,
+            actor=actor,
+            entity_type="POINT_ENTRY",
+            entity_id=entry.id,
+            before={"user_id": entry.user_id, "rule_code": entry.rule_code, "amount": entry.amount},
+            after={"reversal_id": reversal.id, "amount": reversal.amount, "reason": cleaned},
+        )
         return reversal
 
     # ── خواندن ─────────────────────────────────────────────────────────

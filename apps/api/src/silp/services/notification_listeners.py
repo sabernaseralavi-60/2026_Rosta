@@ -27,13 +27,20 @@ from decimal import Decimal
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from silp.core.permissions import ROLE_TITLE_FA, Role
 from silp.domain import city as city_rules
 from silp.domain import research as research_rules
 from silp.domain import ventures as venture_rules
 from silp.domain.calendar import format_datetime_fa
 from silp.domain.notifications.templating import excerpt
 from silp.domain.text import format_number_fa, join_fa, to_persian_digits
-from silp.models.delivery import Deliverable, Milestone, OpeningApplication, TeamOpening
+from silp.models.delivery import (
+    Certificate,
+    Deliverable,
+    Milestone,
+    OpeningApplication,
+    TeamOpening,
+)
 from silp.models.education import Announcement, Course, CourseOffering, CourseWeek, Enrollment
 from silp.models.gamification import Badge, PointEntry
 from silp.models.idea import Idea, IdeaComment
@@ -868,6 +875,60 @@ async def on_city_workflow_completed(
         {"project": project.title_fa},
         action_url=f"/projects/{project.id}/city",
         dedup_key=f"CITY_WORKFLOW_COMPLETED:{project.id}",
+    )
+
+
+# ── گواهی و مدیریت — M7 بخش د ─────────────────────────────────────────
+@events.subscribe(events.CertificateIssued)
+async def on_certificate_issued(session: AsyncSession, event: events.CertificateIssued) -> None:
+    certificate = await session.get(Certificate, event.certificate_id)
+    if certificate is None or certificate.revoked_at is not None:
+        return
+    await NotificationService(session).notify(
+        "CERTIFICATE_ISSUED",
+        [certificate.user_id],
+        {"title": certificate.title_fa},
+        action_url="/me/certificates",
+        dedup_key=f"CERTIFICATE_ISSUED:{certificate.id}",
+        data={"public_code": certificate.public_code},
+    )
+
+
+@events.subscribe(events.CertificateRevoked)
+async def on_certificate_revoked(session: AsyncSession, event: events.CertificateRevoked) -> None:
+    certificate = await session.get(Certificate, event.certificate_id)
+    if certificate is None or certificate.revoked_at is None:
+        return
+    await NotificationService(session).notify(
+        "CERTIFICATE_REVOKED",
+        [certificate.user_id],
+        {"title": certificate.title_fa, "reason": certificate.revoke_reason or ""},
+        action_url="/me/certificates",
+        dedup_key=f"CERTIFICATE_REVOKED:{certificate.id}",
+    )
+
+
+@events.subscribe(events.RoleGranted)
+async def on_role_granted(session: AsyncSession, event: events.RoleGranted) -> None:
+    await NotificationService(session).notify(
+        "ROLE_GRANTED",
+        [event.user_id],
+        {"role": ROLE_TITLE_FA.get(Role(event.role), event.role)},
+        action_url="/dashboard",
+    )
+
+
+@events.subscribe(events.ImpersonationStarted)
+async def on_impersonation_started(
+    session: AsyncSession, event: events.ImpersonationStarted
+) -> None:
+    """§6.5 — «کاربر هدف اعلان دریافت می‌کند». نام پشتیبان را می‌بیند."""
+    names = await display_names(session, [event.agent_id])
+    agent = name_of(names, event.agent_id) or "پشتیبانی"
+    await NotificationService(session).notify(
+        "ACCOUNT_VIEWED_BY_SUPPORT",
+        [event.target_id],
+        {"agent": f"پشتیبانی سیلپ ({agent})"},
     )
 
 

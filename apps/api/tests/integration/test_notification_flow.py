@@ -706,9 +706,15 @@ async def test_deadline_reminders_are_idempotent(client, db_session) -> None:  #
 
 
 async def test_quiz_closing_reminder_skips_those_who_took_it(client, db_session) -> None:  # type: ignore[no-untyped-def]
+    from silp.domain.gamification.formulas import LOCAL_TZ
     from silp.services.reminder_service import ReminderService
 
-    scene = await _scene(client, db_session, closes_delta=timedelta(days=1, hours=1))
+    # یادآور بر اساس «روز» تهران است، نه ۲۴ ساعت: «اکنون + ۲۵ ساعت» پس از
+    # ساعت ۲۳ تهران دو روز تقویمی جلوتر می‌افتد و یادآور «یک روز مانده» نمی‌گیرد.
+    # ظهر فردای تهران در هر ساعتی از شبانه‌روز «یک روز مانده» است.
+    local_now = datetime.now(LOCAL_TZ)
+    tomorrow_noon = (local_now + timedelta(days=1)).replace(hour=12, minute=0, second=0)
+    scene = await _scene(client, db_session, closes_delta=tomorrow_noon - local_now)
     await _add_question(client, scene, kind="SINGLE_CHOICE", payload=SINGLE_PAYLOAD)
     await _publish(client, scene)
 
