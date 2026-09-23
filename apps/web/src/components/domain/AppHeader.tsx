@@ -24,6 +24,7 @@ const NAV: { href: string; label: string }[] = [
   { href: '/library', label: 'کتابخانه' },
   { href: '/projects', label: 'پروژه‌ها' },
   { href: '/research', label: 'پژوهش' },
+  { href: '/city', label: 'شهر هوشمند' },
   { href: '/teams/openings', label: 'تیم' },
   { href: '/ideas', label: 'ایده‌ها' },
   { href: '/ventures', label: 'کسب‌وکار' },

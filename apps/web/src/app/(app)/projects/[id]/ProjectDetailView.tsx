@@ -82,6 +82,11 @@ export function ProjectDetailView({ id }: { id: string }) {
       <header className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-1.5">
           <Badge tone="brand">{project.kind_fa}</Badge>
+          {project.workflow === 'CITY' && (
+            <Link href="/city">
+              <Badge tone="accent">آزمایشگاه شهر هوشمند — گردش‌کار ۸ مرحله‌ای</Badge>
+            </Link>
+          )}
           <Badge tone="neutral">دشواری: {project.difficulty_fa}</Badge>
           {project.tags.map((tag) => (
             <Badge key={tag} tone="neutral">

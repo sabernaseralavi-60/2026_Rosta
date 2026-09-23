@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 import { MilestoneTracker } from '@/components/domain/MilestoneTracker';
@@ -94,7 +95,10 @@ function MilestonePanel({
   const [historyError, setHistoryError] = useState<string | null>(null);
 
   const mine = milestone.my_deliverable;
+  // مرحلهٔ گردش‌کار شهری شاهد ساختاریافته دارد؛ فرمش در صفحهٔ گردش‌کار است.
+  const isCityStage = milestone.workflow_stage !== null;
   const canSubmit =
+    !isCityStage &&
     isMember &&
     milestone.status !== 'APPROVED' &&
     (mine === null || mine.status === 'CHANGES_REQUESTED');
@@ -109,9 +113,19 @@ function MilestonePanel({
 
   return (
     <div className="mt-2 flex flex-col gap-3">
+      {milestone.owner_name && (
+        <p className="text-[12.5px] text-[var(--fg-tertiary)]">مسئول: {milestone.owner_name}</p>
+      )}
+      {isCityStage && (
+        <Button asChild variant="secondary" size="sm" className="self-start">
+          <Link href={`/projects/${milestone.project_id}/city`}>
+            تحویل و بررسی در صفحهٔ گردش‌کار شهری
+          </Link>
+        </Button>
+      )}
       {mine && <DeliverableCard deliverable={mine} label="آخرین تحویل تو" />}
 
-      {mine && canReview && mine.status !== 'APPROVED' && (
+      {!isCityStage && mine && canReview && mine.status !== 'APPROVED' && (
         <ReviewForm deliverable={mine} accessToken={accessToken} onReviewed={onChanged} />
       )}
 

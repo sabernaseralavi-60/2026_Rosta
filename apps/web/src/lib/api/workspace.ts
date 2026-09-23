@@ -65,6 +65,8 @@ export interface ProjectInput {
   required_assets: { asset_id: string; is_mandatory: boolean }[];
   interests: string[];
   roles: { title_fa: string; description: string | null; slots: number }[];
+  /** فقط هنگام ساخت — الگوی هشت‌مرحله‌ای شهر هوشمند برای نوع C (ADR-0016). */
+  workflow?: 'CITY' | null;
 }
 
 export function createProject(input: ProjectInput, accessToken: string) {
@@ -236,6 +238,8 @@ export interface Deliverable {
   score: number | null;
   feedback: string | null;
   rubric_scores: Record<string, number> | null;
+  /** شاهد ساختاریافتهٔ مرحلهٔ گردش‌کار شهری. */
+  evidence: Record<string, unknown> | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
   submitted_at: string;
@@ -257,6 +261,10 @@ export interface Milestone {
   status: MilestoneStatus;
   status_fa: string;
   approved_at: string | null;
+  /** شمارهٔ مرحله در الگوی گردش‌کار شهری؛ `null` یعنی مرحلهٔ آزاد. */
+  workflow_stage: number | null;
+  owner_id: string | null;
+  owner_name: string | null;
   my_deliverable: Deliverable | null;
   deliverable_count: number;
 }
@@ -306,7 +314,13 @@ export function fetchDeliverables(milestoneId: string, accessToken: string) {
 
 export function submitDeliverable(
   milestoneId: string,
-  body: { body?: string | null; file_ids?: string[]; links?: string[] },
+  body: {
+    body?: string | null;
+    file_ids?: string[];
+    links?: string[];
+    evidence?: Record<string, unknown> | null;
+    checklist_confirmed?: number[];
+  },
   accessToken: string,
 ) {
   return apiFetch<Deliverable>(`/milestones/${milestoneId}/deliverables`, {
@@ -321,6 +335,21 @@ export interface ReviewResult {
   milestone: Milestone;
   /** §7.6 — همهٔ مراحل الزامی تأیید شد؟ پس پیشنهاد بستن پروژه. */
   project_ready_to_close: boolean;
+  /** گردش‌کار شهری با همین تأیید کامل شد (ADR-0016). */
+  workflow_completed?: boolean;
+}
+
+/** FR-CITY-01 — مسئول مرحله؛ `null` برای مرحلهٔ آزاد یعنی بی‌مسئول. */
+export function assignMilestoneOwner(
+  milestoneId: string,
+  ownerId: string | null,
+  accessToken: string,
+) {
+  return apiFetch<Milestone>(`/milestones/${milestoneId}/owner`, {
+    method: 'PUT',
+    accessToken,
+    body: { owner_id: ownerId },
+  });
 }
 
 export function reviewDeliverable(

@@ -87,6 +87,26 @@ export class UploadFailed extends Error {
  * نداده باشد خالی می‌ماند — سرور در آن حالت ردش می‌کند، که درست است:
  * نوعِ ناشناخته نباید حدس زده شود.
  */
+/**
+ * مرورگر برای بعضی پسوندها نوعی نمی‌دهد — مهم‌ترینشان فایل‌های مدل شهری
+ * (`.osm`، `.net.xml`) و GeoJSON. فقط وقتی نوع خالی است از پسوند خوانده
+ * می‌شود؛ سرور همچنان Magic Number را می‌سنجد (ADR-0016).
+ */
+const TYPE_BY_EXTENSION: [string, string][] = [
+  ['.osm', 'application/xml'],
+  ['.xml', 'application/xml'],
+  ['.geojson', 'application/geo+json'],
+  ['.csv', 'text/csv'],
+  ['.json', 'application/json'],
+];
+
+export function contentTypeOf(file: File): string {
+  if (file.type) return file.type;
+  const name = file.name.toLowerCase();
+  const match = TYPE_BY_EXTENSION.find(([extension]) => name.endsWith(extension));
+  return match ? match[1] : 'application/octet-stream';
+}
+
 export async function uploadFile(
   file: File,
   purpose: FilePurpose,
@@ -95,7 +115,7 @@ export async function uploadFile(
   const ticket = await requestUploadUrl(
     {
       original_name: file.name,
-      content_type: file.type || 'application/octet-stream',
+      content_type: contentTypeOf(file),
       size_bytes: file.size,
       purpose,
     },

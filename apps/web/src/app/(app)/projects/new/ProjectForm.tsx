@@ -76,6 +76,8 @@ export function ProjectForm() {
   const [tags, setTags] = useState('');
   const [selectedSkills, setSelectedSkills] = useState<Record<string, number>>({});
   const [milestones, setMilestones] = useState<MilestoneDraft[]>([{ ...EMPTY_MILESTONE }]);
+  const [cityWorkflow, setCityWorkflow] = useState(false);
+  const [startsOn, setStartsOn] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -89,6 +91,8 @@ export function ProjectForm() {
   }, []);
 
   const filledMilestones = milestones.filter((milestone) => milestone.title_fa.trim());
+  // الگوی شهر هوشمند هشت مرحلهٔ ثابتش را خودش می‌سازد (ADR-0016).
+  const useCity = kind === 'C_PROBLEM' && cityWorkflow;
   const skillCount = Object.keys(selectedSkills).length;
   const ready =
     title.trim().length >= 3 &&
@@ -96,7 +100,7 @@ export function ProjectForm() {
     description.trim().length >= 10 &&
     expectedOutput.trim().length >= 3 &&
     skillCount > 0 &&
-    filledMilestones.length > 0;
+    (useCity || filledMilestones.length > 0);
 
   function toggleSkill(id: string) {
     setSelectedSkills((current) => {
@@ -132,7 +136,7 @@ export function ProjectForm() {
             .filter(Boolean)
             .slice(0, 10),
           rewards: {},
-          starts_on: null,
+          starts_on: useCity && startsOn ? startsOn : null,
           deadline_on: null,
           applications_close_at: null,
           required_skills: Object.entries(selectedSkills).map(([skill_id, min_level]) => ({
@@ -144,13 +148,14 @@ export function ProjectForm() {
           required_assets: [],
           interests: [],
           roles: [],
+          workflow: useCity ? 'CITY' : null,
         },
         accessToken,
       );
 
       // مرحله‌ها پس از ساخت پروژه ثبت می‌شوند: قرارداد §5.7 برای هر
       // مرحله یک درخواست جدا دارد و ترتیبشان مهم است.
-      for (const [index, milestone] of filledMilestones.entries()) {
+      for (const [index, milestone] of (useCity ? [] : filledMilestones).entries()) {
         await createMilestone(
           project.id,
           {
@@ -251,6 +256,36 @@ export function ProjectForm() {
             })}
           </div>
         </fieldset>
+
+        {kind === 'C_PROBLEM' && (
+          <div className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] p-3">
+            <label className="flex items-start gap-2 text-[14px]">
+              <input
+                type="checkbox"
+                className="mt-1.5"
+                checked={cityWorkflow}
+                onChange={(event) => setCityWorkflow(event.target.checked)}
+              />
+              <span>
+                <span className="font-medium">با الگوی گردش‌کار شهر هوشمند</span>
+                <span className="block text-[12.5px] text-[var(--fg-tertiary)]">
+                  هشت مرحلهٔ ثابت از انتخاب محدوده تا داشبورد شهرداری، هرکدام با چک‌لیست کیفیت و
+                  مسئول — مراحل را خودت تعریف نمی‌کنی.
+                </span>
+              </span>
+            </label>
+            {cityWorkflow && (
+              <Input
+                label="تاریخ شروع"
+                hint="مهلت هر هشت مرحله از همین تاریخ حساب می‌شود (۱۶ هفته)."
+                type="date"
+                value={startsOn}
+                onChange={(event) => setStartsOn(event.target.value)}
+                forceLtr
+              />
+            )}
+          </div>
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
@@ -376,6 +411,7 @@ export function ProjectForm() {
         })}
       </Card>
 
+      {!useCity && (
       <Card className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <CardTitle>مراحل</CardTitle>
@@ -466,6 +502,7 @@ export function ProjectForm() {
           افزودن مرحله
         </Button>
       </Card>
+      )}
 
       {error && (
         <p role="alert" className="text-[14px] text-[var(--danger-600)]">

@@ -187,6 +187,14 @@ export function WorkspaceView({ id }: { id: string }) {
           <Button asChild variant="ghost" size="sm">
             <Link href={`/projects/${id}`}>صفحهٔ عمومی پروژه</Link>
           </Button>
+          {project.workflow === 'CITY' && (
+            <Button asChild variant="secondary" size="sm">
+              <Link href={`/projects/${id}/city`}>گردش‌کار شهر هوشمند</Link>
+            </Button>
+          )}
+          <Button asChild variant="ghost" size="sm">
+            <Link href={`/projects/${id}/files`}>کتابخانهٔ فایل</Link>
+          </Button>
           {isLead && (
             <Button asChild variant="ghost" size="sm">
               <Link href={`/projects/${id}/applications`}>درخواست‌های پیوستن</Link>

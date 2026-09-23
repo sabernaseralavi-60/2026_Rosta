@@ -31,6 +31,8 @@ export interface ProjectSummary {
   tags: string[];
   deadline_on: string | null;
   applications_close_at: string | null;
+  /** الگوی گردش‌کار — `CITY` یعنی آزمایشگاه شهر هوشمند (ADR-0016). */
+  workflow?: 'CITY' | null;
 }
 
 /**
@@ -89,6 +91,7 @@ export interface RecommendationsResult {
 
 export interface ProjectDetail extends ProjectSummary {
   description: string;
+  workflow_completed_at?: string | null;
   expected_output: string;
   rewards: Record<string, unknown>;
   required_skills: {
