@@ -1,21 +1,33 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { CommandPalette } from '@/components/domain/CommandPalette';
+import { ImpersonationBanner } from '@/components/domain/ImpersonationBanner';
 import { NotificationBell } from '@/components/domain/NotificationBell';
 import { PointsBadge } from '@/components/domain/PointsBadge';
 import { Button } from '@/components/ui/Button';
+import { canSeeAdmin } from '@/lib/api/admin';
 import { logout } from '@/lib/api/auth';
-import { clearSession, readSession } from '@/lib/auth/session';
+import {
+  clearSession,
+  IMPERSONATION_REFRESH,
+  readSession,
+  stopImpersonation,
+} from '@/lib/auth/session';
 
 /**
- * هدر اپلیکیشن — نسخهٔ M7.
+ * هدر اپلیکیشن — §3.7.
  *
- * ناوبری عمدی کوتاه است: مقصدهایی که دانشجو هر روز می‌خواهد، به‌علاوهٔ
- * `PointsBadge` (§9.10 «نوار سطح همیشه در هدر») و زنگولهٔ اعلان
- * (FR-MSG-01). سایدبار کامل و جستجوی سراسری در M7 می‌آیند.
+ * `[لوگو] [جستجوی سراسری ⌘K] … [امتیاز و سطح] [زنگوله] [آواتار]`. ناوبری
+ * عمدی کوتاه است: مقصدهایی که دانشجو هر روز می‌خواهد. پیوند «مدیریت» فقط
+ * برای مدیر و پشتیبانی دیده می‌شود؛ سرور هر مسیر را جداگانه می‌سنجد.
+ *
+ * مهمان در صفحه‌های ویترین (پروژه‌ها، ایده‌ها، شهر هوشمند، پژوهش) به
+ * ورود فرستاده نمی‌شود — دکمهٔ «پروژه‌ها را ببین» صفحهٔ اصلی باید به خود
+ * پروژه‌ها برسد، نه به فرم ورود (§3.10).
  */
 
 const NAV: { href: string; label: string }[] = [
@@ -30,21 +42,49 @@ const NAV: { href: string; label: string }[] = [
   { href: '/ventures', label: 'کسب‌وکار' },
   { href: '/leaderboard', label: 'رتبه‌بندی' },
 ];
+
+/** مسیرهایی که مهمان هم می‌بیند — API فهرستشان احراز هویت نمی‌خواهد. */
+const GUEST_BROWSABLE = ['/projects', '/ideas', '/city', '/research'];
+
+export function isGuestBrowsable(pathname: string): boolean {
+  return GUEST_BROWSABLE.some(
+    (prefix) =>
+      (pathname === prefix || pathname.startsWith(`${prefix}/`)) &&
+      !pathname.endsWith('/new') &&
+      !pathname.includes('/workspace'),
+  );
+}
+
 export function AppHeader() {
   const router = useRouter();
+  const pathname = usePathname();
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const [roles, setRoles] = useState<string[]>([]);
+  const [guest, setGuest] = useState(false);
 
   useEffect(() => {
     const session = readSession();
     if (!session) {
+      if (isGuestBrowsable(pathname)) {
+        setGuest(true);
+        return;
+      }
       router.replace('/login');
       return;
     }
+    setGuest(false);
     setDisplayName(session.user.display_name ?? session.user.username);
-  }, [router]);
+    setRoles(session.user.roles ?? []);
+  }, [router, pathname]);
 
   async function handleLogout() {
     const session = readSession();
+    if (session?.refreshToken === IMPERSONATION_REFRESH) {
+      // خروج در حالت جعل هویت یعنی بازگشت به نشست پشتیبان، نه بستن آن.
+      stopImpersonation();
+      window.location.assign('/admin/users');
+      return;
+    }
     if (session) {
       // خروج سمت سرور ممکن است شکست بخورد؛ نشست محلی در هر حال پاک می‌شود.
       await logout(session.refreshToken).catch(() => undefined);
@@ -54,36 +94,66 @@ export function AppHeader() {
   }
 
   return (
-    <header className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-      <div className="page flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="text-[17px] font-bold text-[var(--brand-700)]">
-            سیلپ
-          </Link>
-          <nav aria-label="ناوبری اصلی" className="hidden items-center gap-4 sm:flex">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-[14px] text-[var(--fg-secondary)] transition-colors hover:text-[var(--brand-700)]"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+    <>
+      <ImpersonationBanner />
+      <header className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+        <div className="page flex h-16 items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-4">
+            <Link
+              href={guest ? '/' : '/dashboard'}
+              className="text-[17px] font-bold text-[var(--brand-700)]"
+            >
+              سیلپ
+            </Link>
+            {!guest && <CommandPalette />}
+            <nav aria-label="ناوبری اصلی" className="hidden items-center gap-3 xl:flex">
+              {NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
+                  className="whitespace-nowrap text-[13.5px] text-[var(--fg-secondary)] transition-colors hover:text-[var(--brand-700)] aria-[current=page]:font-semibold aria-[current=page]:text-[var(--brand-700)]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              {canSeeAdmin(roles) && (
+                <Link
+                  href="/admin"
+                  aria-current={pathname.startsWith('/admin') ? 'page' : undefined}
+                  className="whitespace-nowrap text-[13.5px] font-medium text-[var(--accent-700)] hover:text-[var(--accent-600)]"
+                >
+                  مدیریت
+                </Link>
+              )}
+            </nav>
+          </div>
 
-        <div className="flex items-center gap-3">
-          <PointsBadge />
-          <NotificationBell />
-          {displayName && (
-            <span className="text-[13.5px] text-[var(--fg-secondary)]">{displayName}</span>
-          )}
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            خروج
-          </Button>
+          <div className="flex shrink-0 items-center gap-3">
+            {guest ? (
+              <Button asChild size="sm">
+                <Link href="/login">ورود یا ثبت‌نام</Link>
+              </Button>
+            ) : (
+              <>
+                <PointsBadge />
+                <NotificationBell />
+                {displayName && (
+                  <Link
+                    href="/me/public-profile"
+                    className="hidden text-[13.5px] text-[var(--fg-secondary)] hover:text-[var(--brand-700)] 2xl:inline"
+                  >
+                    {displayName}
+                  </Link>
+                )}
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  خروج
+                </Button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

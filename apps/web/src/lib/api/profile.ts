@@ -7,12 +7,7 @@ import type { Recommendation } from './projects';
 export type DegreeLevel = 'ASSOCIATE' | 'BACHELOR' | 'MASTER' | 'PHD' | 'OTHER';
 export type WorkStyle = 'SOLO' | 'TEAM' | 'EITHER';
 export type PrimaryGoal =
-  | 'GRADE'
-  | 'LEARNING'
-  | 'PUBLICATION'
-  | 'INCOME'
-  | 'STARTUP'
-  | 'EMPLOYMENT';
+  'GRADE' | 'LEARNING' | 'PUBLICATION' | 'INCOME' | 'STARTUP' | 'EMPLOYMENT';
 
 export interface Profile {
   first_name: string;
@@ -29,6 +24,8 @@ export interface Profile {
   primary_goal: PrimaryGoal | null;
   weekly_hours: number | null;
   is_public: boolean;
+  /** FR-PROF-03 — روشن یا خاموش بودن هر بخش نیمرخ عمومی (ADR-0017). */
+  privacy: Record<string, boolean>;
 }
 
 export interface Me {
@@ -62,6 +59,8 @@ export interface ProfileUpdate {
   entry_year?: number;
   /** FR-TEAM-01 — فقط نیمرخ عمومی در جستجوی هم‌تیمی دیده می‌شود. */
   is_public?: boolean;
+  /** فقط بخش‌های فرستاده‌شده تغییر می‌کنند. */
+  privacy?: Partial<Record<string, boolean>>;
 }
 
 /**
@@ -99,10 +98,7 @@ export function fetchSurvey(accessToken: string) {
   return apiFetch<SurveyState>('/me/survey', { accessToken });
 }
 
-export function saveSkills(
-  skills: { skill_id: string; level: number }[],
-  accessToken: string,
-) {
+export function saveSkills(skills: { skill_id: string; level: number }[], accessToken: string) {
   return apiFetch<SurveyStepResult>('/me/survey/skills', {
     method: 'PATCH',
     accessToken,

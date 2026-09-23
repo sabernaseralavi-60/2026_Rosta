@@ -31,3 +31,23 @@ export function formatNumber(value: number): string {
 export function formatRial(amountRial: number): string {
   return `${formatNumber(amountRial)} ریال`;
 }
+
+/**
+ * عدد بزرگ به شکل کوتاه — برای کاشی آمار صفحهٔ اصلی (§10.10 «۴۶۰م»):
+ * `460000000` → `۴۶۰ میلیون`، `1250000000` → `۱٫۳ میلیارد`.
+ */
+export function formatCompact(value: number): string {
+  const units: [number, string][] = [
+    [1_000_000_000, 'میلیارد'],
+    [1_000_000, 'میلیون'],
+    [1_000, 'هزار'],
+  ];
+  for (const [size, label] of units) {
+    if (Math.abs(value) >= size) {
+      const scaled = value / size;
+      const rounded = scaled >= 100 ? Math.round(scaled) : Math.round(scaled * 10) / 10;
+      return `${new Intl.NumberFormat('fa-IR').format(rounded)} ${label}`;
+    }
+  }
+  return formatNumber(value);
+}
