@@ -1406,55 +1406,85 @@ CREATE TABLE files (
 );
 CREATE INDEX idx_files_uploader ON files(uploaded_by, created_at DESC);
 
+-- اعلان: همان اسکیمای مهاجرت 0013_messaging (ADR-0013)
 CREATE TABLE notifications (
   id         UUID PRIMARY KEY DEFAULT uuidv7(),
   user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  kind       TEXT NOT NULL,            -- 'DELIVERABLE_REVIEWED','QUIZ_OPENED',...
+  kind       TEXT NOT NULL,            -- 'DELIVERABLE_APPROVED','QUIZ_OPENED',... (catalog.py)
+  kind_group TEXT NOT NULL             -- فیلتر مرکز اعلان
+             CHECK (kind_group IN ('COURSE','PROJECT','SOCIAL','SYSTEM')),
   title      TEXT NOT NULL,
   body       TEXT NOT NULL,
-  action_url TEXT,
+  action_url TEXT                      -- فقط مسیر داخلی
+             CHECK (action_url IS NULL OR (action_url LIKE '/%' AND action_url NOT LIKE '//%')),
   priority   TEXT NOT NULL DEFAULT 'NORMAL'
              CHECK (priority IN ('LOW','NORMAL','IMPORTANT','URGENT')),
   data       JSONB NOT NULL DEFAULT '{}'::jsonb,
+  dedup_key  TEXT,                     -- بی‌اثری کارهای زمان‌بندی‌شده (§7.11)
   read_at    TIMESTAMPTZ,
+  archived_at TIMESTAMPTZ,             -- §4.12 «۹۰ روز، سپس آرشیو»
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_notifications_unread ON notifications(user_id, created_at DESC)
-  WHERE read_at IS NULL;
+  WHERE read_at IS NULL AND archived_at IS NULL;
+CREATE INDEX idx_notifications_feed ON notifications(user_id, id DESC)
+  WHERE archived_at IS NULL;
+CREATE UNIQUE INDEX idx_notifications_dedup ON notifications(user_id, dedup_key)
+  WHERE dedup_key IS NOT NULL;
 
 CREATE TABLE notification_preferences (
   user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   kind_group TEXT NOT NULL,            -- 'COURSE','PROJECT','SOCIAL','SYSTEM'
-  channels   TEXT[] NOT NULL DEFAULT '{IN_APP}',
+  channels   TEXT[] NOT NULL DEFAULT '{IN_APP}'
+             CHECK ('IN_APP' = ANY(channels)),   -- مرکز اعلان خاموش‌شدنی نیست
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, kind_group)
 );
 
-CREATE TABLE outbox_messages (         -- D-08
+CREATE TABLE user_channels (           -- پیوند تلگرام و ایتا (ADR-0013)
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  channel    TEXT NOT NULL CHECK (channel IN ('TELEGRAM','EITAA','WHATSAPP')),
+  address    TEXT,                     -- شناسهٔ گفت‌وگو
+  verified_at TIMESTAMPTZ,
+  link_code_hash TEXT,                 -- sha256 توکن تلگرام یا bcrypt کد ایتا
+  link_expires_at TIMESTAMPTZ,
+  link_attempts SMALLINT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, channel)
+);
+CREATE UNIQUE INDEX idx_user_channels_address ON user_channels(channel, address)
+  WHERE verified_at IS NOT NULL;      -- یک گفت‌وگو، یک حساب
+
+CREATE TABLE outbox_messages (         -- D-08، D-23
   id          UUID PRIMARY KEY DEFAULT uuidv7(),
-  channel     TEXT NOT NULL CHECK (channel IN ('EMAIL','SMS','TELEGRAM','EITAA','WHATSAPP','PUSH')),
+  channel     TEXT NOT NULL CHECK (channel IN ('EMAIL','SMS','TELEGRAM','EITAA','WHATSAPP')),
   recipient   TEXT NOT NULL,
-  template    TEXT NOT NULL,
-  payload     JSONB NOT NULL,
-  notification_id UUID REFERENCES notifications(id),
+  template    TEXT NOT NULL,           -- کد نوع اعلان؛ متن هنگام ارسال ساخته می‌شود
+  payload     JSONB NOT NULL,          -- {"values": {...}} متغیرهای الگو
+  notification_id UUID REFERENCES notifications(id) ON DELETE SET NULL,
+  user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+  priority    TEXT NOT NULL DEFAULT 'NORMAL',     -- ساعت آرام در تلاش مجدد هم
   status      TEXT NOT NULL DEFAULT 'QUEUED'
               CHECK (status IN ('QUEUED','SENDING','SENT','FAILED','DEAD')),
   attempts    INT NOT NULL DEFAULT 0,
-  next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT now(),  -- در SENDING: پایان اجاره
   last_error  TEXT,
   provider_message_id TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   sent_at     TIMESTAMPTZ
 );
 CREATE INDEX idx_outbox_dispatch ON outbox_messages(next_attempt_at)
-  WHERE status IN ('QUEUED','FAILED');
+  WHERE status IN ('QUEUED','FAILED','SENDING');
 
 CREATE TABLE message_templates (
   code       TEXT NOT NULL,
-  channel    TEXT NOT NULL,
+  channel    TEXT NOT NULL,            -- 'IN_APP' هم؛ عنوان و متن مرکز اعلان
   subject    TEXT,
   body       TEXT NOT NULL,
   variables  TEXT[] NOT NULL DEFAULT '{}',
   is_active  BOOLEAN NOT NULL DEFAULT true,
+  updated_by UUID REFERENCES users(id),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (code, channel)
 );
@@ -1557,8 +1587,10 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
                                + قید projects.venture_id و teams.venture_id
                                + قید venture_metrics.project_id
 0012_research                  research_tracks, research_outputs, research_topics
-0013_gamification              point_rules, point_entries, user_point_totals, badges, user_badges
-0014_messaging                 notifications, notification_preferences,
+0012_gamification     ◄────── ساخته‌شده در M5 (پیش از پژوهش)
+                               point_rules, point_entries, user_point_totals, badges, user_badges
+0013_messaging        ◄────── ساخته‌شده در M6
+                               notifications, notification_preferences, user_channels,
                                outbox_messages, message_templates
 0015_admin                     audit_logs, app_settings, qa_threads, qa_replies
 0016_seed_reference_data       دادهٔ مرجع وابسته به مهاجرت‌های بالا (§14)

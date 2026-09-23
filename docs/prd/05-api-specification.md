@@ -624,11 +624,20 @@ Authorization: Bearer <access_token>
 | `GET` | `/notifications/unread-count` | شمارندهٔ خوانده‌نشده |
 | `POST` | `/notifications/{id}/read` | علامت خوانده‌شده |
 | `POST` | `/notifications/read-all` | همه را خوانده‌شده کن |
-| `GET/PUT` | `/notifications/preferences` | تنظیمات کانال |
+| `GET/PUT` | `/notifications/preferences` | تنظیمات کانال — دسته ⇒ کانال‌ها؛ وضعیت هر کانال و ساعت آرام |
+| `POST` | `/notifications/channels/{telegram\|eitaa}/link` | شروع پیوند: پیوند عمیق تلگرام، یا فرستادن کد به ایتا |
+| `POST` | `/notifications/channels/eitaa/confirm` | تأیید کد ایتا |
+| `DELETE` | `/notifications/channels/{channel}` | قطع پیوند |
 | `GET` | `/notifications/stream` | **SSE** برای اعلان بی‌درنگ |
+| `POST` | `/integrations/telegram/webhook` | وب‌هوک ربات؛ هدر `X-Telegram-Bot-Api-Secret-Token` |
 
 `GET /notifications/stream` از Server-Sent Events استفاده می‌کند، نه WebSocket —
 ساده‌تر، سازگارتر با پروکسی‌های ایرانی، و برای این کاربرد کافی است.
+
+جریان دو رویداد دارد: `unread` با `{"count": n}` و `notification` با یک
+اعلان کامل. هر ۱۰ دقیقه بسته می‌شود و کلاینت با توکن تازه دوباره وصل
+می‌شود. کلاینت با `fetch` و هدر `Authorization` می‌خواند، نه `EventSource`
+— توکن هرگز در نشانی نمی‌آید (ADR-0013).
 
 ---
 
@@ -706,8 +715,12 @@ Authorization: Bearer <access_token>
 | `GET/POST/PATCH` | `/admin/badges` | مدیریت نشان |
 | `GET/PATCH` | `/admin/settings` | تنظیمات |
 | `GET` | `/admin/audit` | لاگ حسابرسی |
-| `GET` | `/admin/outbox` | وضعیت صف ارسال |
-| `POST` | `/admin/outbox/{id}/retry` | تلاش مجدد ارسال |
+| `GET` | `/admin/outbox` | وضعیت صف ارسال با شمارش هر وضعیت — `message.outbox.view` |
+| `POST` | `/admin/outbox/{id}/retry` | تلاش مجدد ارسال — `message.outbox.retry` |
+| `POST` | `/admin/outbox/retry-dead` | همهٔ `DEAD`ها (یا یک کانال) به صف، پس از رفع قطعی |
+| `GET` | `/admin/message-templates` | الگوهای پیام — `message.template.edit` |
+| `PUT` | `/admin/message-templates/{code}/{channel}` | ساخت یا ویرایش الگو؛ متغیر ناشناخته ⇒ `TEMPLATE_INVALID` |
+| `POST` | `/admin/message-templates/preview` | پیش‌نمایش با مقدارهای نمونه و تعداد بخش پیامک (FR-MSG-03) |
 | `GET` | `/admin/health` | سلامت فنی |
 
 ---
