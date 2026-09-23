@@ -60,6 +60,8 @@ export interface ProfileUpdate {
   degree_level?: DegreeLevel;
   student_number?: string;
   entry_year?: number;
+  /** FR-TEAM-01 — فقط نیمرخ عمومی در جستجوی هم‌تیمی دیده می‌شود. */
+  is_public?: boolean;
 }
 
 /**

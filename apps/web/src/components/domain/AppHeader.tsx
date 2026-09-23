@@ -23,6 +23,8 @@ const NAV: { href: string; label: string }[] = [
   { href: '/courses', label: 'دروس من' },
   { href: '/library', label: 'کتابخانه' },
   { href: '/projects', label: 'پروژه‌ها' },
+  { href: '/research', label: 'پژوهش' },
+  { href: '/teams/openings', label: 'تیم' },
   { href: '/ideas', label: 'ایده‌ها' },
   { href: '/ventures', label: 'کسب‌وکار' },
   { href: '/leaderboard', label: 'رتبه‌بندی' },
