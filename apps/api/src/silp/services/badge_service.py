@@ -27,8 +27,12 @@
 
 | `OUTPUT_ACCEPTED` به تفکیک چارک | ردیف فعال دفتر کل ⨝ `research_outputs.verified_quartile` |
 
-واقعیت شهر هوشمند هنوز منبعی ندارد و صفر است؛ نشانش قفل می‌ماند و بقیه
-ارزیابی می‌شوند.
+| `CITY_WORKFLOW_COMPLETED` | گردش‌کار شهری کامل با تحویل تأییدشدهٔ کاربر (ADR-0016) |
+
+«سهم» در گردش‌کار شهری تحویل تأییدشده است، نه عضویت لحظهٔ آخر: عضوی که
+روز تأیید مرحلهٔ هشتم پیوست، شهرساز نیست؛ مدیری که فقط بررسی کرد هم نیست.
+تحویل تأییدشده و زمان کامل شدن هیچ‌کدام عوض نمی‌شوند، پس این واقعیت با
+ترک تیم پس نمی‌رود.
 """
 
 from __future__ import annotations
@@ -55,7 +59,7 @@ from silp.domain.gamification.badges import (
     evaluate,
     longest_weekly_streak,
 )
-from silp.models.delivery import Deliverable
+from silp.models.delivery import Deliverable, Milestone
 from silp.models.gamification import POINT_CATEGORIES, Badge, PointEntry, UserBadge
 from silp.models.identity import User
 from silp.models.project import Project, ProjectApplication, TeamMember
@@ -147,6 +151,21 @@ class BadgeService:
                 select(func.count())
                 .select_from(Deliverable)
                 .where(Deliverable.submitter_id == user_id, Deliverable.status == "APPROVED")
+            )
+            or 0
+        )
+        counts["CITY_WORKFLOW_COMPLETED"] = (
+            await self.session.scalar(
+                select(func.count(func.distinct(Milestone.project_id)))
+                .select_from(Deliverable)
+                .join(Milestone, Milestone.id == Deliverable.milestone_id)
+                .join(Project, Project.id == Milestone.project_id)
+                .where(
+                    Deliverable.submitter_id == user_id,
+                    Deliverable.status == "APPROVED",
+                    Milestone.workflow_stage.is_not(None),
+                    Project.workflow_completed_at.is_not(None),
+                )
             )
             or 0
         )
@@ -262,6 +281,21 @@ class BadgeService:
                 await self.session.scalars(
                     select(ProjectApplication.applicant_id)
                     .where(ProjectApplication.created_at >= since)
+                    .distinct()
+                )
+            )
+            # «شهرساز» — سهیمی که پیش از تأیید مرحلهٔ آخر تیم را ترک کرد،
+            # امتیاز تازه‌ای نگرفته ولی نشانش همین حالا کسب شده است.
+            users |= set(
+                await self.session.scalars(
+                    select(Deliverable.submitter_id)
+                    .join(Milestone, Milestone.id == Deliverable.milestone_id)
+                    .join(Project, Project.id == Milestone.project_id)
+                    .where(
+                        Project.workflow_completed_at >= since,
+                        Milestone.workflow_stage.is_not(None),
+                        Deliverable.status == "APPROVED",
+                    )
                     .distinct()
                 )
             )

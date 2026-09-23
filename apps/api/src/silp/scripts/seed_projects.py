@@ -16,12 +16,12 @@ import uuid
 from dataclasses import dataclass, field
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import delete, func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.logging import get_logger
-from silp.models.delivery import Milestone
+from silp.models.delivery import Deliverable, Milestone
 from silp.models.identity import User
 from silp.models.project import (
     Project,
@@ -33,6 +33,7 @@ from silp.models.project import (
     TeamMember,
 )
 from silp.models.taxonomy import Asset, Interest, Skill
+from silp.services.city_service import CityService
 
 log = get_logger("silp.seed.projects")
 
@@ -85,6 +86,8 @@ class ProjectSeed:
     interests: tuple[str, ...] = ()
     roles: tuple[RoleSpec, ...] = ()
     tags: tuple[str, ...] = field(default_factory=tuple)
+    #: الگوی گردش‌کار (ADR-0016) — مراحل از الگو می‌آیند، نه از `MILESTONE_TEMPLATE`.
+    workflow: str | None = None
 
 
 # §14.5 — شش پروژهٔ مرجع
@@ -159,6 +162,7 @@ PROJECTS: tuple[ProjectSeed, ...] = (
             RoleSpec("تحلیلگر سناریو", 2),
         ),
         tags=("SUMO", "ترافیک", "شهر هوشمند", "کرمان"),
+        workflow="CITY",
     ),
     ProjectSeed(
         slug="p-03-crash-severity-review",
@@ -307,6 +311,8 @@ async def seed_projects(session: AsyncSession, lead_id: uuid.UUID) -> tuple[int,
         found = await session.scalar(select(Project).where(Project.slug == seed.slug))
         if found is not None:
             existing += 1
+            if seed.workflow and found.workflow is None:
+                await _adopt_workflow(session, found)
             continue
 
         project = Project(
@@ -375,6 +381,12 @@ async def seed_projects(session: AsyncSession, lead_id: uuid.UUID) -> tuple[int,
         await session.flush()
         session.add(TeamMember(team_id=team.id, user_id=lead_id, is_lead=True, status="ACTIVE"))
 
+        if seed.workflow:
+            await CityService(session).apply_workflow(project)
+            created += 1
+            log.info("seed_project_created", slug=seed.slug, kind=seed.kind)
+            continue
+
         for order, (title, description, points, output_kind) in enumerate(
             MILESTONE_TEMPLATE, start=1
         ):
@@ -394,6 +406,26 @@ async def seed_projects(session: AsyncSession, lead_id: uuid.UUID) -> tuple[int,
         log.info("seed_project_created", slug=seed.slug, kind=seed.kind)
 
     return created, existing
+
+
+async def _adopt_workflow(session: AsyncSession, project: Project) -> None:
+    """پروژهٔ نمونه‌ای که پیش از ADR-0016 با سه مرحلهٔ عمومی ساخته شد.
+
+    فقط اگر هنوز هیچ تحویلی نگرفته باشد، مراحلش با الگو جایگزین می‌شوند؛
+    تحویل‌دادنی واقعی هرگز برای یک دادهٔ نمونه دور ریخته نمی‌شود.
+    """
+    delivered = await session.scalar(
+        select(func.count())
+        .select_from(Deliverable)
+        .join(Milestone, Milestone.id == Deliverable.milestone_id)
+        .where(Milestone.project_id == project.id)
+    )
+    if delivered:
+        log.warning("seed_workflow_skipped", slug=project.slug, reason="has_deliverables")
+        return
+    await session.execute(delete(Milestone).where(Milestone.project_id == project.id))
+    await CityService(session).apply_workflow(project)
+    log.info("seed_workflow_adopted", slug=project.slug)
 
 
 async def ensure_lead(session: AsyncSession, mobile: str) -> uuid.UUID:

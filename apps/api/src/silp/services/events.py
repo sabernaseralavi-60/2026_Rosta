@@ -282,6 +282,20 @@ class OpeningDecided:
     application_id: uuid.UUID
 
 
+# ── از M7 بخش ج — آزمایشگاه شهر هوشمند ─────────────────────────────────
+@dataclass(frozen=True, slots=True)
+class MilestoneOwnerAssigned:
+    milestone_id: uuid.UUID
+    assigned_by: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class CityWorkflowCompleted:
+    """هر هشت مرحلهٔ الگوی شهری تأیید شد — منبع نشان «شهرساز» (ADR-0016)."""
+
+    project_id: uuid.UUID
+
+
 # ── ناظر ───────────────────────────────────────────────────────────────
 E = TypeVar("E")
 Handler = Callable[[AsyncSession, Any], Awaitable[None]]
@@ -331,6 +345,7 @@ __all__ = [
     "ApplicationSubmitted",
     "AttendanceRecorded",
     "BadgeAwarded",
+    "CityWorkflowCompleted",
     "DeliverableReviewed",
     "DeliverableSubmitted",
     "EnrollmentCompleted",
@@ -344,6 +359,7 @@ __all__ = [
     "InvitationAccepted",
     "InvitationSent",
     "MetricReviewed",
+    "MilestoneOwnerAssigned",
     "OpeningApplied",
     "OpeningCreated",
     "OpeningDecided",

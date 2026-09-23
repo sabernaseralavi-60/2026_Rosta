@@ -84,6 +84,15 @@ class ContentSpec:
 
 
 _ZIP_SIGNATURES = (((0, b"PK\x03\x04"),), ((0, b"PK\x05\x06"),), ((0, b"PK\x07\x08"),))
+# XML — فایل‌های مدل شهری (`.osm`، `.net.xml`، `.rou.xml`، ADR-0016). بیشترشان
+# با اعلان `<?xml` شروع می‌شوند؛ خروجی بعضی ابزارها مستقیم با ریشهٔ سند.
+_XML_SIGNATURES = (
+    ((0, b"<?xml"),),
+    ((0, b"\xef\xbb\xbf<?xml"),),
+    ((0, b"<osm"),),
+    ((0, b"<net"),),
+    ((0, b"<routes"),),
+)
 _OOXML = "application/vnd.openxmlformats-officedocument"
 
 CONTENT_SPECS: tuple[ContentSpec, ...] = (
@@ -107,6 +116,9 @@ CONTENT_SPECS: tuple[ContentSpec, ...] = (
     ContentSpec("text/plain", Category.DOCUMENT, (".txt", ".md")),
     ContentSpec("application/json", Category.DATASET, (".json", ".geojson")),
     ContentSpec("application/geo+json", Category.DATASET, (".geojson",)),
+    ContentSpec("application/xml", Category.DATASET, (".xml", ".osm"), _XML_SIGNATURES),
+    # مرورگرها `.xml` را اغلب با این نوع می‌فرستند؛ همان قاعده، نام دیگر.
+    ContentSpec("text/xml", Category.DATASET, (".xml", ".osm"), _XML_SIGNATURES),
 )
 
 _BY_TYPE: dict[str, ContentSpec] = {spec.content_type: spec for spec in CONTENT_SPECS}

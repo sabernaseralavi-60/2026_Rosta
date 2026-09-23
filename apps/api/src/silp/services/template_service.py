@@ -82,6 +82,8 @@ SAMPLE_VALUES: dict[str, str] = {
     "topic": "ایمنی عابر پیاده در تقاطع‌های کرمان",
     "opening": "تحلیلگر GIS",
     "skills": "GIS و Python",
+    "assigner": "مریم کریمی",
+    "number": "۴",
 }
 
 

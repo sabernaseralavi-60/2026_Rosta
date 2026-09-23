@@ -44,6 +44,7 @@ from silp.models.delivery import (
 )
 from silp.models.project import Project
 from silp.services import events
+from silp.services.city_service import CityService
 from silp.services.project_service import MAX_MILESTONES_PER_PROJECT, ProjectService
 
 log = get_logger("silp.delivery")
@@ -75,6 +76,8 @@ class ReviewOutcome:
     milestone: Milestone
     # آیا با این تأیید، همهٔ مراحل الزامی تمام شد؟ — §7.6 «پیشنهاد بستن پروژه»
     project_ready_to_close: bool = False
+    # گردش‌کار شهری با همین تأیید کامل شد؟ — ADR-0016
+    workflow_completed: bool = False
 
 
 def _now() -> datetime:
@@ -85,6 +88,7 @@ class DeliveryService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
         self.projects = ProjectService(session)
+        self.city = CityService(session)
 
     # ── مرحله ──────────────────────────────────────────────────────────
     async def milestones(self, project_id: uuid.UUID) -> list[Milestone]:
@@ -147,6 +151,8 @@ class DeliveryService:
         _validate_milestone(draft)
         if milestone.status == "APPROVED":
             raise Conflict("مرحلهٔ تأییدشده ویرایش نمی‌شود.")
+        if milestone.workflow_stage is not None:
+            _require_template_unchanged(milestone, draft)
         milestone.title_fa = draft.title_fa.strip()
         milestone.description = (draft.description or "").strip() or None
         milestone.sort_order = draft.sort_order
@@ -169,6 +175,8 @@ class DeliveryService:
 
     async def delete_milestone(self, *, milestone: Milestone, project: Project) -> None:
         """حذف مرحله فقط تا وقتی هیچ تحویلی برایش نیامده باشد."""
+        if milestone.workflow_stage is not None:
+            raise Conflict("مراحل گردش‌کار شهری ثابت‌اند و حذف نمی‌شوند.")
         submitted = await self.session.scalar(
             select(func.count())
             .select_from(Deliverable)
@@ -204,8 +212,14 @@ class DeliveryService:
         body: str | None,
         links: list[str] | None = None,
         file_ids: list[uuid.UUID] | None = None,
+        evidence: dict[str, Any] | None = None,
+        checklist_confirmed: list[int] | None = None,
     ) -> Deliverable:
-        """§7.6 — ارسال یک نسخهٔ تازه برای یک مرحله."""
+        """§7.6 — ارسال یک نسخهٔ تازه برای یک مرحله.
+
+        مرحلهٔ گردش‌کار شهری قفل ترتیبی و شاهد ساختاریافته دارد (ADR-0016)؛
+        مرحلهٔ آزاد شاهد نمی‌پذیرد — شاهدی که بی‌صدا دور ریخته شود، بدتر از خطاست.
+        """
         if await self.projects.membership(project.id, actor.id) is None:
             raise NotTeamMember
         if project.status not in ("IN_PROGRESS", "OPEN"):
@@ -232,6 +246,20 @@ class DeliveryService:
         if previous is not None and previous.status == "APPROVED":
             raise Conflict("تحویل شما برای این مرحله تأیید شده است.")
 
+        cleaned_evidence: dict[str, Any] | None = None
+        if milestone.workflow_stage is not None:
+            cleaned_evidence = await self.city.check_submission(
+                milestone=milestone,
+                project=project,
+                body=text,
+                links=cleaned_links,
+                file_ids=list(file_ids or []),
+                evidence=evidence,
+                checklist_confirmed=checklist_confirmed,
+            )
+        elif evidence or checklist_confirmed:
+            raise ValidationFailed("این مرحله شاهد ساختاریافته ندارد.")
+
         now = _now()
         is_late = milestone.due_on is not None and now.date() > milestone.due_on
         next_version = (previous.version + 1) if previous else 1
@@ -244,9 +272,17 @@ class DeliveryService:
             links=cleaned_links,
             is_late=is_late,
         )
+        if cleaned_evidence is not None:
+            # انتساب None به ستون JSONB مقدار JSON `null` می‌نویسد، نه NULL.
+            deliverable.evidence = cleaned_evidence
 
         for file_id in file_ids or []:
             self.session.add(DeliverableFile(deliverable_id=deliverable.id, file_id=file_id))
+        if milestone.workflow_stage is not None:
+            await self.session.flush()
+            await self.city.record_artifacts(
+                project=project, deliverable=deliverable, file_ids=list(file_ids or [])
+            )
 
         if milestone.status in ("PENDING", "IN_PROGRESS", "OVERDUE"):
             milestone.status = "SUBMITTED"
@@ -305,6 +341,8 @@ class DeliveryService:
 
         milestone = await self.require_milestone(deliverable.milestone_id)
         project = await self.projects.require(milestone.project_id)
+        if decision == "APPROVED":
+            await self.city.guard_approval(milestone=milestone, deliverable=deliverable)
 
         deliverable.status = decision
         deliverable.feedback = text
@@ -314,10 +352,12 @@ class DeliveryService:
         deliverable.reviewed_at = _now()
 
         ready = False
+        completed = False
         if decision == "APPROVED":
             milestone.status = "APPROVED"
             milestone.approved_at = _now()
             ready = await self._all_required_approved(project.id)
+            completed = await self.city.after_approval(project=project)
         else:
             # مرحله به حالت کاری برمی‌گردد تا نسخهٔ بعدی جا داشته باشد.
             milestone.status = "IN_PROGRESS"
@@ -341,7 +381,10 @@ class DeliveryService:
         await self.session.commit()
         log.info("deliverable_reviewed", deliverable_id=str(deliverable.id), decision=decision)
         return ReviewOutcome(
-            deliverable=deliverable, milestone=milestone, project_ready_to_close=ready
+            deliverable=deliverable,
+            milestone=milestone,
+            project_ready_to_close=ready,
+            workflow_completed=completed,
         )
 
     async def review_queue(self, project_id: uuid.UUID) -> list[Deliverable]:
@@ -432,6 +475,23 @@ def _review_summary(decision: str, milestone_title: str) -> str:
             return f"برای مرحلهٔ «{milestone_title}» اصلاح خواسته شد."
         case _:
             return f"تحویل مرحلهٔ «{milestone_title}» رد شد."
+
+
+def _require_template_unchanged(milestone: Milestone, draft: MilestoneDraft) -> None:
+    """مرحلهٔ الگو: عنوان، ترتیب، چک‌لیست، نوع خروجی و الزامی بودن ثابت‌اند.
+
+    شرح، مهلت و بارم قابل تنظیم‌اند — هر پروژهٔ شهری زمان‌بندی خودش را دارد،
+    ولی «مرحلهٔ ۳ راستی‌آزمایی است» برای همه یکی است (ADR-0016).
+    """
+    changed = (
+        draft.title_fa.strip() != milestone.title_fa
+        or draft.sort_order != milestone.sort_order
+        or list(draft.checklist or []) != [str(item) for item in milestone.checklist]
+        or draft.output_kind != milestone.output_kind
+        or draft.is_required != milestone.is_required
+    )
+    if changed:
+        raise Conflict("مرحلهٔ گردش‌کار شهری ثابت است؛ فقط شرح، مهلت و بارم آن قابل تغییر است.")
 
 
 def _validate_milestone(draft: MilestoneDraft) -> None:

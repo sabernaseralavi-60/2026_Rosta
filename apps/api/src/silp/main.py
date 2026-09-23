@@ -24,6 +24,7 @@ from silp.routers import health
 from silp.routers.v1 import (
     applications,
     auth,
+    city,
     courses,
     files,
     gamification,
@@ -156,6 +157,9 @@ def _register_routers(app: FastAPI) -> None:
     # ── پژوهش و تیم (M7 بخش ب) ────────────────────────────────────────
     v1.include_router(research.router)
     v1.include_router(teams.router)
+
+    v1.include_router(city.router)
+    v1.include_router(city.project_router)
     app.include_router(v1)
 
 

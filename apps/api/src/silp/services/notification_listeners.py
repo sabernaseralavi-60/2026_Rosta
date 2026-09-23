@@ -27,6 +27,7 @@ from decimal import Decimal
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from silp.domain import city as city_rules
 from silp.domain import research as research_rules
 from silp.domain import ventures as venture_rules
 from silp.domain.calendar import format_datetime_fa
@@ -362,7 +363,7 @@ async def on_deliverable_submitted(
             "milestone": milestone.title_fa,
             "submitter": await _name(session, deliverable.submitter_id),
         },
-        action_url=f"/projects/{project.id}/workspace",
+        action_url=_milestone_url(project),
     )
 
 
@@ -375,7 +376,7 @@ async def on_deliverable_reviewed(session: AsyncSession, event: events.Deliverab
         return
     deliverable, milestone, project = scene
     service = NotificationService(session)
-    url = f"/projects/{project.id}/workspace"
+    url = _milestone_url(project)
     values: dict[str, object] = {"project": project.title_fa, "milestone": milestone.title_fa}
 
     if event.decision == "APPROVED":
@@ -793,6 +794,88 @@ async def on_opening_decided(session: AsyncSession, event: events.OpeningDecided
         action_url=url,
         dedup_key=f"OPENING_DECIDED:{application.id}",
     )
+
+
+# ── آزمایشگاه شهر هوشمند — M7 بخش ج ───────────────────────────────────
+@events.subscribe(events.MilestoneOwnerAssigned)
+async def on_milestone_owner_assigned(
+    session: AsyncSession, event: events.MilestoneOwnerAssigned
+) -> None:
+    """کسی که خودش را مسئول کرد، از خودش خبر نمی‌گیرد."""
+    milestone = await session.get(Milestone, event.milestone_id)
+    if milestone is None or milestone.owner_id is None or milestone.owner_id == event.assigned_by:
+        return
+    project = await session.get(Project, milestone.project_id)
+    if project is None:
+        return
+    await NotificationService(session).notify(
+        "MILESTONE_OWNER_ASSIGNED",
+        [milestone.owner_id],
+        {
+            "project": project.title_fa,
+            "milestone": milestone.title_fa,
+            "assigner": await _name(session, event.assigned_by),
+        },
+        action_url=_milestone_url(project),
+    )
+
+
+@events.subscribe(events.DeliverableReviewed)
+async def on_city_stage_approved(session: AsyncSession, event: events.DeliverableReviewed) -> None:
+    """تأیید مرحلهٔ n، مرحلهٔ n+۱ را باز می‌کند — به مسئولش خبر بده."""
+    if event.decision != "APPROVED":
+        return
+    scene = await _deliverable_scene(session, event.deliverable_id)
+    if scene is None:
+        return
+    _, milestone, project = scene
+    stage = milestone.workflow_stage
+    if stage is None or stage >= city_rules.STAGE_COUNT:
+        return
+    following = await session.scalar(
+        select(Milestone).where(
+            Milestone.project_id == project.id, Milestone.workflow_stage == stage + 1
+        )
+    )
+    if following is None or following.owner_id is None or following.status == "APPROVED":
+        return
+    if following.owner_id == event.reviewer_id:
+        return
+    await NotificationService(session).notify(
+        "CITY_STAGE_UNLOCKED",
+        [following.owner_id],
+        {
+            "project": project.title_fa,
+            "milestone": following.title_fa,
+            "number": to_persian_digits(stage + 1),
+        },
+        action_url=_milestone_url(project),
+        dedup_key=f"CITY_STAGE_UNLOCKED:{following.id}",
+    )
+
+
+@events.subscribe(events.CityWorkflowCompleted)
+async def on_city_workflow_completed(
+    session: AsyncSession, event: events.CityWorkflowCompleted
+) -> None:
+    project = await session.get(Project, event.project_id)
+    if project is None:
+        return
+    recipients = [*await active_member_ids(session, project.id), project.lead_id]
+    await NotificationService(session).notify(
+        "CITY_WORKFLOW_COMPLETED",
+        recipients,
+        {"project": project.title_fa},
+        action_url=f"/projects/{project.id}/city",
+        dedup_key=f"CITY_WORKFLOW_COMPLETED:{project.id}",
+    )
+
+
+def _milestone_url(project: Project) -> str:
+    """پروژهٔ شهری صفحهٔ گردش‌کار خودش را دارد؛ بقیه فضای کاری."""
+    if project.workflow == city_rules.WORKFLOW_CITY:
+        return f"/projects/{project.id}/city"
+    return f"/projects/{project.id}/workspace"
 
 
 __all__ = ["course_title", "fa_number", "level_label"]

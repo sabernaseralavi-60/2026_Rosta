@@ -638,6 +638,131 @@
         "title": "ArchiveIn",
         "type": "object"
       },
+      "ArtifactOut": {
+        "properties": {
+          "artifact": {
+            "enum": [
+              "OSM",
+              "SUMO_NET",
+              "SUMO_ROUTES"
+            ],
+            "title": "Artifact",
+            "type": "string"
+          },
+          "extension": {
+            "title": "Extension",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/ArtifactVersionOut"
+            },
+            "title": "Versions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "artifact",
+          "title_fa",
+          "extension"
+        ],
+        "title": "ArtifactOut",
+        "type": "object"
+      },
+      "ArtifactVersionOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "created_by": {
+            "format": "uuid",
+            "title": "Created By",
+            "type": "string"
+          },
+          "created_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By Name"
+          },
+          "deliverable_id": {
+            "format": "uuid",
+            "title": "Deliverable Id",
+            "type": "string"
+          },
+          "deliverable_status": {
+            "enum": [
+              "SUBMITTED",
+              "UNDER_REVIEW",
+              "APPROVED",
+              "CHANGES_REQUESTED",
+              "REJECTED"
+            ],
+            "title": "Deliverable Status",
+            "type": "string"
+          },
+          "deliverable_status_fa": {
+            "title": "Deliverable Status Fa",
+            "type": "string"
+          },
+          "deliverable_version": {
+            "title": "Deliverable Version",
+            "type": "integer"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileOut"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_current": {
+            "default": false,
+            "title": "Is Current",
+            "type": "boolean"
+          },
+          "milestone_id": {
+            "format": "uuid",
+            "title": "Milestone Id",
+            "type": "string"
+          },
+          "milestone_title_fa": {
+            "title": "Milestone Title Fa",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "file",
+          "deliverable_id",
+          "deliverable_version",
+          "deliverable_status",
+          "deliverable_status_fa",
+          "milestone_id",
+          "milestone_title_fa",
+          "created_by",
+          "created_at"
+        ],
+        "title": "ArtifactVersionOut",
+        "type": "object"
+      },
       "AssetOut": {
         "properties": {
           "category": {
@@ -1750,6 +1875,614 @@
         "title": "ChannelStatusOut",
         "type": "object"
       },
+      "CityAreaOut": {
+        "properties": {
+          "approved": {
+            "title": "Approved",
+            "type": "boolean"
+          },
+          "area_km2": {
+            "title": "Area Km2",
+            "type": "number"
+          },
+          "bbox": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Bbox",
+            "type": "array"
+          },
+          "geometry": {
+            "additionalProperties": true,
+            "title": "Geometry",
+            "type": "object"
+          }
+        },
+        "required": [
+          "geometry",
+          "area_km2",
+          "bbox",
+          "approved"
+        ],
+        "title": "CityAreaOut",
+        "type": "object"
+      },
+      "CityArtifactSummaryOut": {
+        "properties": {
+          "artifact": {
+            "enum": [
+              "OSM",
+              "SUMO_NET",
+              "SUMO_ROUTES"
+            ],
+            "title": "Artifact",
+            "type": "string"
+          },
+          "current_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Version"
+          },
+          "extension": {
+            "title": "Extension",
+            "type": "string"
+          },
+          "latest_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Version"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "versions": {
+            "default": 0,
+            "title": "Versions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "artifact",
+          "title_fa",
+          "extension"
+        ],
+        "title": "CityArtifactSummaryOut",
+        "type": "object"
+      },
+      "CityBoardOut": {
+        "description": "`GET /projects/{id}/city` — برای عضو تیم و سرپرستان پروژه.",
+        "properties": {
+          "approved_count": {
+            "title": "Approved Count",
+            "type": "integer"
+          },
+          "area": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CityAreaOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/CityArtifactSummaryOut"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "can_manage": {
+            "default": false,
+            "title": "Can Manage",
+            "type": "boolean"
+          },
+          "can_review": {
+            "default": false,
+            "title": "Can Review",
+            "type": "boolean"
+          },
+          "current_stage": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stage"
+          },
+          "lead_id": {
+            "format": "uuid",
+            "title": "Lead Id",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/CityStageOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "workflow_completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Completed At"
+          }
+        },
+        "required": [
+          "project_id",
+          "title_fa",
+          "status",
+          "lead_id",
+          "approved_count",
+          "stages",
+          "artifacts"
+        ],
+        "title": "CityBoardOut",
+        "type": "object"
+      },
+      "CityChecklistItemOut": {
+        "properties": {
+          "auto": {
+            "title": "Auto",
+            "type": "boolean"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "auto"
+        ],
+        "title": "CityChecklistItemOut",
+        "type": "object"
+      },
+      "CityEvidenceFieldOut": {
+        "properties": {
+          "hint_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint Fa"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "int",
+              "number",
+              "text",
+              "url",
+              "date"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label_fa": {
+            "title": "Label Fa",
+            "type": "string"
+          },
+          "max_length": {
+            "title": "Max Length",
+            "type": "integer"
+          },
+          "max_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Value"
+          },
+          "min_length": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Length"
+          },
+          "min_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Value"
+          }
+        },
+        "required": [
+          "key",
+          "label_fa",
+          "kind",
+          "max_length"
+        ],
+        "title": "CityEvidenceFieldOut",
+        "type": "object"
+      },
+      "CityFileRuleOut": {
+        "properties": {
+          "exactly_one": {
+            "title": "Exactly One",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "OSM",
+              "SUMO_NET",
+              "SUMO_ROUTES",
+              "PDF",
+              "DATASET"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label_fa": {
+            "title": "Label Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "label_fa",
+          "exactly_one"
+        ],
+        "title": "CityFileRuleOut",
+        "type": "object"
+      },
+      "CityKpiOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "title_fa"
+        ],
+        "title": "CityKpiOut",
+        "type": "object"
+      },
+      "CityOptionOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title_fa"
+        ],
+        "title": "CityOptionOut",
+        "type": "object"
+      },
+      "CityProjectOut": {
+        "description": "پروژهٔ شهری در صفحهٔ عمومی آزمایشگاه.",
+        "properties": {
+          "approved_count": {
+            "title": "Approved Count",
+            "type": "integer"
+          },
+          "area_km2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area Km2"
+          },
+          "current_stage": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Stage"
+          },
+          "project": {
+            "$ref": "#/components/schemas/ProjectSummaryOut"
+          },
+          "workflow_completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Completed At"
+          }
+        },
+        "required": [
+          "project",
+          "approved_count"
+        ],
+        "title": "CityProjectOut",
+        "type": "object"
+      },
+      "CityStageOut": {
+        "properties": {
+          "locked": {
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "milestone": {
+            "$ref": "#/components/schemas/MilestoneOut"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "open_deliverables": {
+            "default": 0,
+            "title": "Open Deliverables",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "number",
+          "milestone",
+          "locked"
+        ],
+        "title": "CityStageOut",
+        "type": "object"
+      },
+      "CityStageSpecOut": {
+        "properties": {
+          "attachments_hint_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attachments Hint Fa"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/CityChecklistItemOut"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "deliverable_fa": {
+            "title": "Deliverable Fa",
+            "type": "string"
+          },
+          "duration_days": {
+            "title": "Duration Days",
+            "type": "integer"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/CityEvidenceFieldOut"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/CityFileRuleOut"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "guide": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Guide",
+            "type": "array"
+          },
+          "min_attachments": {
+            "title": "Min Attachments",
+            "type": "integer"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "structured": {
+            "anyOf": [
+              {
+                "enum": [
+                  "AREA",
+                  "CHECKS",
+                  "SCENARIOS"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Structured"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "code",
+          "title_fa",
+          "deliverable_fa",
+          "points",
+          "duration_days",
+          "guide",
+          "checklist",
+          "evidence",
+          "files",
+          "min_attachments"
+        ],
+        "title": "CityStageSpecOut",
+        "type": "object"
+      },
+      "CityWorkflowOut": {
+        "description": "الگوی ثابت هشت‌مرحله‌ای — `GET /city/workflow`، عمومی.",
+        "properties": {
+          "area_max_km2": {
+            "title": "Area Max Km2",
+            "type": "number"
+          },
+          "area_max_vertices": {
+            "title": "Area Max Vertices",
+            "type": "integer"
+          },
+          "area_min_km2": {
+            "title": "Area Min Km2",
+            "type": "number"
+          },
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/CityOptionOut"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "scenario_kpis": {
+            "items": {
+              "$ref": "#/components/schemas/CityKpiOut"
+            },
+            "title": "Scenario Kpis",
+            "type": "array"
+          },
+          "severities": {
+            "items": {
+              "$ref": "#/components/schemas/CityOptionOut"
+            },
+            "title": "Severities",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/CityOptionOut"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/CityStageSpecOut"
+            },
+            "title": "Stages",
+            "type": "array"
+          },
+          "total_days": {
+            "title": "Total Days",
+            "type": "integer"
+          },
+          "total_points": {
+            "title": "Total Points",
+            "type": "integer"
+          },
+          "verdicts": {
+            "items": {
+              "$ref": "#/components/schemas/CityOptionOut"
+            },
+            "title": "Verdicts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "stages",
+          "total_points",
+          "total_days",
+          "area_min_km2",
+          "area_max_km2",
+          "area_max_vertices",
+          "sources",
+          "verdicts",
+          "severities",
+          "scenario_kpis",
+          "artifacts"
+        ],
+        "title": "CityWorkflowOut",
+        "type": "object"
+      },
       "CommentIn": {
         "additionalProperties": false,
         "properties": {
@@ -2369,6 +3102,26 @@
             ],
             "title": "Body"
           },
+          "checklist_confirmed": {
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 20,
+            "title": "Checklist Confirmed",
+            "type": "array"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
           "file_ids": {
             "items": {
               "format": "uuid",
@@ -2402,6 +3155,18 @@
               }
             ],
             "title": "Body"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
           },
           "feedback": {
             "anyOf": [
@@ -4155,6 +4920,137 @@
         "title": "LevelLabel",
         "type": "object"
       },
+      "LibraryFileOut": {
+        "properties": {
+          "attached_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attached At"
+          },
+          "attached_by": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attached By"
+          },
+          "attached_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attached By Name"
+          },
+          "deliverable_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deliverable Id"
+          },
+          "deliverable_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "SUBMITTED",
+                  "UNDER_REVIEW",
+                  "APPROVED",
+                  "CHANGES_REQUESTED",
+                  "REJECTED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deliverable Status"
+          },
+          "deliverable_status_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deliverable Status Fa"
+          },
+          "deliverable_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deliverable Version"
+          },
+          "file": {
+            "$ref": "#/components/schemas/FileOut"
+          },
+          "milestone_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Milestone Id"
+          },
+          "milestone_title_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Milestone Title Fa"
+          },
+          "source": {
+            "enum": [
+              "DELIVERABLE",
+              "MESSAGE"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "source"
+        ],
+        "title": "LibraryFileOut",
+        "type": "object"
+      },
       "LinkMaterialIn": {
         "additionalProperties": false,
         "properties": {
@@ -5339,6 +6235,29 @@
             ],
             "title": "Output Kind Fa"
           },
+          "owner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          },
+          "owner_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Name"
+          },
           "points": {
             "title": "Points",
             "type": "number"
@@ -5370,6 +6289,17 @@
           "title_fa": {
             "title": "Title Fa",
             "type": "string"
+          },
+          "workflow_stage": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Stage"
           }
         },
         "required": [
@@ -5383,6 +6313,25 @@
           "status_fa"
         ],
         "title": "MilestoneOut",
+        "type": "object"
+      },
+      "MilestoneOwnerIn": {
+        "additionalProperties": false,
+        "properties": {
+          "owner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          }
+        },
+        "title": "MilestoneOwnerIn",
         "type": "object"
       },
       "MyApplicationOut": {
@@ -9382,6 +10331,30 @@
             ],
             "title": "Work Style",
             "type": "string"
+          },
+          "workflow": {
+            "anyOf": [
+              {
+                "const": "CITY",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow"
+          },
+          "workflow_completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Completed At"
           }
         },
         "required": [
@@ -9578,6 +10551,18 @@
             ],
             "title": "Work Style",
             "type": "string"
+          },
+          "workflow": {
+            "anyOf": [
+              {
+                "const": "CITY",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow"
           }
         },
         "required": [
@@ -9588,6 +10573,27 @@
           "expected_output"
         ],
         "title": "ProjectIn",
+        "type": "object"
+      },
+      "ProjectLibraryOut": {
+        "description": "`GET /projects/{id}/files` — کتابخانهٔ فایل پروژه (FR-PRJ-06، FR-CITY-01).",
+        "properties": {
+          "artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/ArtifactOut"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/LibraryFileOut"
+            },
+            "title": "Files",
+            "type": "array"
+          }
+        },
+        "title": "ProjectLibraryOut",
         "type": "object"
       },
       "ProjectRefOut": {
@@ -9778,6 +10784,18 @@
             ],
             "title": "Work Style",
             "type": "string"
+          },
+          "workflow": {
+            "anyOf": [
+              {
+                "const": "CITY",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow"
           }
         },
         "required": [
@@ -11500,6 +12518,11 @@
           "project_ready_to_close": {
             "default": false,
             "title": "Project Ready To Close",
+            "type": "boolean"
+          },
+          "workflow_completed": {
+            "default": false,
+            "title": "Workflow Completed",
             "type": "boolean"
           }
         },
@@ -17092,6 +18115,52 @@
         ]
       }
     },
+    "/api/v1/city/projects": {
+      "get": {
+        "operationId": "city_projects_api_v1_city_projects_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CityProjectOut"
+                  },
+                  "title": "Response City Projects Api V1 City Projects Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "پروژه‌های شهری",
+        "tags": [
+          "city"
+        ]
+      }
+    },
+    "/api/v1/city/workflow": {
+      "get": {
+        "operationId": "workflow_api_v1_city_workflow_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityWorkflowOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "الگوی گردش‌کار شهر هوشمند",
+        "tags": [
+          "city"
+        ]
+      }
+    },
     "/api/v1/courses": {
       "get": {
         "description": "فهرست دروس فعال. بدون احراز هویت کار می‌کند.",
@@ -19848,6 +20917,85 @@
         ]
       }
     },
+    "/api/v1/milestones/{milestone_id}/owner": {
+      "put": {
+        "description": "FR-CITY-01 «هر مرحله … مسئول». مسئول باید مدیر یا عضو فعال تیم باشد.",
+        "operationId": "assign_milestone_owner_api_v1_milestones__milestone_id__owner_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "milestone_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Milestone Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MilestoneOwnerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تعیین مسئول مرحله",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
     "/api/v1/notifications": {
       "get": {
         "operationId": "feed_api_v1_notifications_get",
@@ -21627,6 +22775,74 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/city": {
+      "get": {
+        "operationId": "city_board_api_v1_projects__project_id__city_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CityBoardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "گردش‌کار شهری پروژه",
+        "tags": [
+          "city"
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/complete": {
       "post": {
         "description": "FR-PRJ-08 — همهٔ مراحل الزامی تأییدشده + گزارش نهایی.",
@@ -21904,6 +23120,142 @@
         "summary": "حذف پیام",
         "tags": [
           "projects"
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/files": {
+      "get": {
+        "operationId": "project_library_api_v1_projects__project_id__files_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectLibraryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "کتابخانهٔ فایل پروژه",
+        "tags": [
+          "city"
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/files/{file_id}/download-url": {
+      "get": {
+        "operationId": "project_file_download_api_v1_projects__project_id__files__file_id__download_url_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "file_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "File Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DownloadUrlOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دانلود فایل کتابخانهٔ پروژه",
+        "tags": [
+          "city"
         ]
       }
     },

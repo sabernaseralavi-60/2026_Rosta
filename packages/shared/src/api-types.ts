@@ -503,6 +503,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/city/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** پروژه‌های شهری */
+        get: operations["city_projects_api_v1_city_projects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/city/workflow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** الگوی گردش‌کار شهر هوشمند */
+        get: operations["workflow_api_v1_city_workflow_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/courses": {
         parameters: {
             query?: never;
@@ -1253,6 +1287,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/milestones/{milestone_id}/owner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * تعیین مسئول مرحله
+         * @description FR-CITY-01 «هر مرحله … مسئول». مسئول باید مدیر یا عضو فعال تیم باشد.
+         */
+        put: operations["assign_milestone_owner_api_v1_milestones__milestone_id__owner_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications": {
         parameters: {
             query?: never;
@@ -1699,6 +1753,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/city": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** گردش‌کار شهری پروژه */
+        get: operations["city_board_api_v1_projects__project_id__city_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/complete": {
         parameters: {
             query?: never;
@@ -1749,6 +1820,40 @@ export interface paths {
         post?: never;
         /** حذف پیام */
         delete: operations["delete_message_api_v1_projects__project_id__discussion__message_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** کتابخانهٔ فایل پروژه */
+        get: operations["project_library_api_v1_projects__project_id__files_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/files/{file_id}/download-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** دانلود فایل کتابخانهٔ پروژه */
+        get: operations["project_file_download_api_v1_projects__project_id__files__file_id__download_url_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3803,6 +3908,69 @@ export interface components {
             /** Reason */
             reason: string;
         };
+        /** ArtifactOut */
+        ArtifactOut: {
+            /**
+             * Artifact
+             * @enum {string}
+             */
+            artifact: "OSM" | "SUMO_NET" | "SUMO_ROUTES";
+            /** Extension */
+            extension: string;
+            /** Title Fa */
+            title_fa: string;
+            /** Versions */
+            versions?: components["schemas"]["ArtifactVersionOut"][];
+        };
+        /** ArtifactVersionOut */
+        ArtifactVersionOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Created By
+             * Format: uuid
+             */
+            created_by: string;
+            /** Created By Name */
+            created_by_name?: string | null;
+            /**
+             * Deliverable Id
+             * Format: uuid
+             */
+            deliverable_id: string;
+            /**
+             * Deliverable Status
+             * @enum {string}
+             */
+            deliverable_status: "SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "REJECTED";
+            /** Deliverable Status Fa */
+            deliverable_status_fa: string;
+            /** Deliverable Version */
+            deliverable_version: number;
+            file: components["schemas"]["FileOut"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Is Current
+             * @default false
+             */
+            is_current: boolean;
+            /**
+             * Milestone Id
+             * Format: uuid
+             */
+            milestone_id: string;
+            /** Milestone Title Fa */
+            milestone_title_fa: string;
+            /** Version */
+            version: number;
+        };
         /** AssetOut */
         AssetOut: {
             /** Category */
@@ -4244,6 +4412,221 @@ export interface components {
             /** Title Fa */
             title_fa: string;
         };
+        /** CityAreaOut */
+        CityAreaOut: {
+            /** Approved */
+            approved: boolean;
+            /** Area Km2 */
+            area_km2: number;
+            /** Bbox */
+            bbox: number[];
+            /** Geometry */
+            geometry: {
+                [key: string]: unknown;
+            };
+        };
+        /** CityArtifactSummaryOut */
+        CityArtifactSummaryOut: {
+            /**
+             * Artifact
+             * @enum {string}
+             */
+            artifact: "OSM" | "SUMO_NET" | "SUMO_ROUTES";
+            /** Current Version */
+            current_version?: number | null;
+            /** Extension */
+            extension: string;
+            /** Latest Version */
+            latest_version?: number | null;
+            /** Title Fa */
+            title_fa: string;
+            /**
+             * Versions
+             * @default 0
+             */
+            versions: number;
+        };
+        /**
+         * CityBoardOut
+         * @description `GET /projects/{id}/city` — برای عضو تیم و سرپرستان پروژه.
+         */
+        CityBoardOut: {
+            /** Approved Count */
+            approved_count: number;
+            area?: components["schemas"]["CityAreaOut"] | null;
+            /** Artifacts */
+            artifacts: components["schemas"]["CityArtifactSummaryOut"][];
+            /**
+             * Can Manage
+             * @default false
+             */
+            can_manage: boolean;
+            /**
+             * Can Review
+             * @default false
+             */
+            can_review: boolean;
+            /** Current Stage */
+            current_stage?: number | null;
+            /**
+             * Lead Id
+             * Format: uuid
+             */
+            lead_id: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Stages */
+            stages: components["schemas"]["CityStageOut"][];
+            /** Status */
+            status: string;
+            /** Title Fa */
+            title_fa: string;
+            /** Workflow Completed At */
+            workflow_completed_at?: string | null;
+        };
+        /** CityChecklistItemOut */
+        CityChecklistItemOut: {
+            /** Auto */
+            auto: boolean;
+            /** Text */
+            text: string;
+        };
+        /** CityEvidenceFieldOut */
+        CityEvidenceFieldOut: {
+            /** Hint Fa */
+            hint_fa?: string | null;
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "int" | "number" | "text" | "url" | "date";
+            /** Label Fa */
+            label_fa: string;
+            /** Max Length */
+            max_length: number;
+            /** Max Value */
+            max_value?: number | null;
+            /** Min Length */
+            min_length?: number | null;
+            /** Min Value */
+            min_value?: number | null;
+        };
+        /** CityFileRuleOut */
+        CityFileRuleOut: {
+            /** Exactly One */
+            exactly_one: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "OSM" | "SUMO_NET" | "SUMO_ROUTES" | "PDF" | "DATASET";
+            /** Label Fa */
+            label_fa: string;
+        };
+        /** CityKpiOut */
+        CityKpiOut: {
+            /** Key */
+            key: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** CityOptionOut */
+        CityOptionOut: {
+            /** Code */
+            code: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /**
+         * CityProjectOut
+         * @description پروژهٔ شهری در صفحهٔ عمومی آزمایشگاه.
+         */
+        CityProjectOut: {
+            /** Approved Count */
+            approved_count: number;
+            /** Area Km2 */
+            area_km2?: number | null;
+            /** Current Stage */
+            current_stage?: number | null;
+            project: components["schemas"]["ProjectSummaryOut"];
+            /** Workflow Completed At */
+            workflow_completed_at?: string | null;
+        };
+        /** CityStageOut */
+        CityStageOut: {
+            /** Locked */
+            locked: boolean;
+            milestone: components["schemas"]["MilestoneOut"];
+            /** Number */
+            number: number;
+            /**
+             * Open Deliverables
+             * @default 0
+             */
+            open_deliverables: number;
+        };
+        /** CityStageSpecOut */
+        CityStageSpecOut: {
+            /** Attachments Hint Fa */
+            attachments_hint_fa?: string | null;
+            /** Checklist */
+            checklist: components["schemas"]["CityChecklistItemOut"][];
+            /** Code */
+            code: string;
+            /** Deliverable Fa */
+            deliverable_fa: string;
+            /** Duration Days */
+            duration_days: number;
+            /** Evidence */
+            evidence: components["schemas"]["CityEvidenceFieldOut"][];
+            /** Files */
+            files: components["schemas"]["CityFileRuleOut"][];
+            /** Guide */
+            guide: string[];
+            /** Min Attachments */
+            min_attachments: number;
+            /** Number */
+            number: number;
+            /** Points */
+            points: number;
+            /** Structured */
+            structured?: ("AREA" | "CHECKS" | "SCENARIOS") | null;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /**
+         * CityWorkflowOut
+         * @description الگوی ثابت هشت‌مرحله‌ای — `GET /city/workflow`، عمومی.
+         */
+        CityWorkflowOut: {
+            /** Area Max Km2 */
+            area_max_km2: number;
+            /** Area Max Vertices */
+            area_max_vertices: number;
+            /** Area Min Km2 */
+            area_min_km2: number;
+            /** Artifacts */
+            artifacts: components["schemas"]["CityOptionOut"][];
+            /** Scenario Kpis */
+            scenario_kpis: components["schemas"]["CityKpiOut"][];
+            /** Severities */
+            severities: components["schemas"]["CityOptionOut"][];
+            /** Sources */
+            sources: components["schemas"]["CityOptionOut"][];
+            /** Stages */
+            stages: components["schemas"]["CityStageSpecOut"][];
+            /** Total Days */
+            total_days: number;
+            /** Total Points */
+            total_points: number;
+            /** Verdicts */
+            verdicts: components["schemas"]["CityOptionOut"][];
+        };
         /** CommentIn */
         CommentIn: {
             /** Body */
@@ -4469,6 +4852,12 @@ export interface components {
         DeliverableIn: {
             /** Body */
             body?: string | null;
+            /** Checklist Confirmed */
+            checklist_confirmed?: number[];
+            /** Evidence */
+            evidence?: {
+                [key: string]: unknown;
+            } | null;
             /** File Ids */
             file_ids?: string[];
             /** Links */
@@ -4478,6 +4867,10 @@ export interface components {
         DeliverableOut: {
             /** Body */
             body?: string | null;
+            /** Evidence */
+            evidence?: {
+                [key: string]: unknown;
+            } | null;
             /** Feedback */
             feedback?: string | null;
             /** Files */
@@ -5128,6 +5521,33 @@ export interface components {
             /** Level */
             level: number;
         };
+        /** LibraryFileOut */
+        LibraryFileOut: {
+            /** Attached At */
+            attached_at?: string | null;
+            /** Attached By */
+            attached_by?: string | null;
+            /** Attached By Name */
+            attached_by_name?: string | null;
+            /** Deliverable Id */
+            deliverable_id?: string | null;
+            /** Deliverable Status */
+            deliverable_status?: ("SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "REJECTED") | null;
+            /** Deliverable Status Fa */
+            deliverable_status_fa?: string | null;
+            /** Deliverable Version */
+            deliverable_version?: number | null;
+            file: components["schemas"]["FileOut"];
+            /** Milestone Id */
+            milestone_id?: string | null;
+            /** Milestone Title Fa */
+            milestone_title_fa?: string | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "DELIVERABLE" | "MESSAGE";
+        };
         /** LinkMaterialIn */
         LinkMaterialIn: {
             /**
@@ -5585,6 +6005,10 @@ export interface components {
             output_kind?: ("DOCUMENT" | "CODE" | "DATA" | "MEDIA" | "SALES" | "MIXED") | null;
             /** Output Kind Fa */
             output_kind_fa?: string | null;
+            /** Owner Id */
+            owner_id?: string | null;
+            /** Owner Name */
+            owner_name?: string | null;
             /** Points */
             points: number;
             /**
@@ -5603,6 +6027,13 @@ export interface components {
             status_fa: string;
             /** Title Fa */
             title_fa: string;
+            /** Workflow Stage */
+            workflow_stage?: number | null;
+        };
+        /** MilestoneOwnerIn */
+        MilestoneOwnerIn: {
+            /** Owner Id */
+            owner_id?: string | null;
         };
         /** MyApplicationOut */
         MyApplicationOut: {
@@ -6930,6 +7361,10 @@ export interface components {
              * @enum {string}
              */
             work_style: "SOLO" | "TEAM" | "EITHER";
+            /** Workflow */
+            workflow?: "CITY" | null;
+            /** Workflow Completed At */
+            workflow_completed_at?: string | null;
         };
         /**
          * ProjectIn
@@ -6998,6 +7433,18 @@ export interface components {
              * @enum {string}
              */
             work_style: "SOLO" | "TEAM" | "EITHER";
+            /** Workflow */
+            workflow?: "CITY" | null;
+        };
+        /**
+         * ProjectLibraryOut
+         * @description `GET /projects/{id}/files` — کتابخانهٔ فایل پروژه (FR-PRJ-06، FR-CITY-01).
+         */
+        ProjectLibraryOut: {
+            /** Artifacts */
+            artifacts?: components["schemas"]["ArtifactOut"][];
+            /** Files */
+            files?: components["schemas"]["LibraryFileOut"][];
         };
         /** ProjectRefOut */
         ProjectRefOut: {
@@ -7082,6 +7529,8 @@ export interface components {
              * @enum {string}
              */
             work_style: "SOLO" | "TEAM" | "EITHER";
+            /** Workflow */
+            workflow?: "CITY" | null;
         };
         /** PromoteIn */
         PromoteIn: {
@@ -7717,6 +8166,11 @@ export interface components {
              * @default false
              */
             project_ready_to_close: boolean;
+            /**
+             * Workflow Completed
+             * @default false
+             */
+            workflow_completed: boolean;
         };
         /** RoleGrantOut */
         RoleGrantOut: {
@@ -10387,6 +10841,46 @@ export interface operations {
             };
         };
     };
+    city_projects_api_v1_city_projects_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CityProjectOut"][];
+                };
+            };
+        };
+    };
+    workflow_api_v1_city_workflow_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CityWorkflowOut"];
+                };
+            };
+        };
+    };
     list_courses_api_v1_courses_get: {
         parameters: {
             query?: {
@@ -12154,6 +12648,59 @@ export interface operations {
             };
         };
     };
+    assign_milestone_owner_api_v1_milestones__milestone_id__owner_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                milestone_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MilestoneOwnerIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MilestoneOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     feed_api_v1_notifications_get: {
         parameters: {
             query?: {
@@ -13249,6 +13796,55 @@ export interface operations {
             };
         };
     };
+    city_board_api_v1_projects__project_id__city_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CityBoardOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     complete_project_api_v1_projects__project_id__complete_post: {
         parameters: {
             query?: never;
@@ -13406,6 +14002,96 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    project_library_api_v1_projects__project_id__files_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectLibraryOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    project_file_download_api_v1_projects__project_id__files__file_id__download_url_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadUrlOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
             /** @description Not Found */
             404: {

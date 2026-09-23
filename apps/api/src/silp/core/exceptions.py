@@ -193,6 +193,14 @@ class OpeningClosed(Conflict):
     message = "این آگهی دیگر درخواست نمی‌پذیرد."
 
 
+# ── آزمایشگاه شهر هوشمند — §7.9، M7 بخش ج ──────────────────────────────
+class CityStageLocked(Conflict):
+    """مرحلهٔ n گردش‌کار شهری فقط پس از تأیید مرحلهٔ n−۱ تحویل می‌پذیرد (ADR-0016)."""
+
+    code = "CITY_STAGE_LOCKED"
+    message = "این مرحله هنوز قفل است؛ اول مرحلهٔ قبل باید تأیید شود."
+
+
 # ── آموزش — §5.5 ───────────────────────────────────────────────────────
 class AlreadyEnrolled(Conflict):
     code = "ALREADY_ENROLLED"

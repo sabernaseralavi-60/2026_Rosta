@@ -300,6 +300,28 @@ _KINDS: tuple[Kind, ...] = (
         allow_sms=True,
     ),
     Kind("OPENING_EXPIRED", "PROJECT", "LOW", "پایان مهلت آگهی (آگهی‌دهنده)", ("opening",)),
+    # ── آزمایشگاه شهر هوشمند (M7 بخش ج) ────────────────────────────────
+    Kind(
+        "MILESTONE_OWNER_ASSIGNED",
+        "PROJECT",
+        "NORMAL",
+        "مسئول شدن یک مرحله",
+        ("project", "milestone", "assigner"),
+    ),
+    Kind(
+        "CITY_STAGE_UNLOCKED",
+        "PROJECT",
+        "NORMAL",
+        "باز شدن مرحلهٔ بعد گردش‌کار شهری (مسئول مرحله)",
+        ("project", "milestone", "number"),
+    ),
+    Kind(
+        "CITY_WORKFLOW_COMPLETED",
+        "PROJECT",
+        "IMPORTANT",
+        "کامل شدن گردش‌کار شهر هوشمند",
+        ("project",),
+    ),
     # ── نشان و جامعه ───────────────────────────────────────────────────
     Kind("BADGE_AWARDED", "SOCIAL", "LOW", "نشان تازه", ("badge",)),
     Kind(

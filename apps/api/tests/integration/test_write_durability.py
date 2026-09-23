@@ -517,3 +517,96 @@ async def test_venture_opening_survives_the_request(  # type: ignore[no-untyped-
     finally:
         await committing_session.execute(delete(Venture).where(Venture.id == venture_id))
         await committing_session.commit()
+
+
+async def test_city_workflow_writes_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """M7 بخش ج — پروژهٔ شهری با هشت مرحله، مسئول مرحله و تحویل با شاهد."""
+    from tests.integration.helpers import complete_profile, taxonomy_ids
+
+    from silp.core.permissions import Role
+    from silp.models.delivery import Deliverable, Milestone
+    from silp.models.project import Project
+    from silp.services import authz
+
+    await complete_profile(committing_client, account["token"])
+    await authz.grant_role(committing_session, user_id=account["user_id"], role=Role.INSTRUCTOR)
+    await committing_session.commit()
+    await authz.invalidate_roles(account["user_id"])
+
+    skills = await taxonomy_ids(committing_client, "skills", limit=1)
+    created = await committing_client.post(
+        "/api/v1/projects",
+        headers=auth(account),
+        json={
+            "title_fa": "پروژهٔ شهری پایدار آزمایشی",
+            "summary": "خلاصهٔ کافی برای یک پروژهٔ شهری آزمایشی.",
+            "description": "شرح کافی برای یک پروژهٔ شهری آزمایشی.",
+            "kind": "C_PROBLEM",
+            "expected_output": "مدل SUMO",
+            "required_skills": [{"skill_id": skills[0], "min_level": 2}],
+            "workflow": "CITY",
+        },
+    )
+    assert created.status_code == 201, created.text
+    project_id = uuid.UUID(created.json()["id"])
+    try:
+        for action in ("publish", "start"):
+            response = await committing_client.post(
+                f"/api/v1/projects/{project_id}/{action}", headers=auth(account)
+            )
+            assert response.status_code == 200, response.text
+        await authz.invalidate_roles(account["user_id"])
+
+        extra = await committing_client.post(
+            f"/api/v1/projects/{project_id}/milestones",
+            headers=auth(account),
+            json={"title_fa": "جلسه با شهرداری", "sort_order": 9},
+        )
+        assert extra.status_code == 201, extra.text
+        owned = await committing_client.put(
+            f"/api/v1/milestones/{extra.json()['id']}/owner",
+            headers=auth(account),
+            json={"owner_id": str(account["user_id"])},
+        )
+        assert owned.status_code == 200, owned.text
+
+        board = await committing_client.get(
+            f"/api/v1/projects/{project_id}/city", headers=auth(account)
+        )
+        stage_one = board.json()["stages"][0]["milestone"]["id"]
+        corner = [[57.07, 30.28], [57.08, 30.28], [57.08, 30.29], [57.07, 30.29], [57.07, 30.28]]
+        submitted = await committing_client.post(
+            f"/api/v1/milestones/{stage_one}/deliverables",
+            headers=auth(account),
+            json={
+                "body": "محدودهٔ محور اصلی با مرز تا تقاطع‌های اثرگذار بالادست.",
+                "evidence": {
+                    "area": {"type": "Polygon", "coordinates": [corner]},
+                    "justification": "محور بیشترین صف و شکایت را در گزارش شهرداری دارد و"
+                    " داده‌اش در دسترس است.",
+                },
+            },
+        )
+        assert submitted.status_code == 201, submitted.text
+
+        async with other_connection() as verifier:
+            project = await verifier.get(Project, project_id)
+            assert project is not None and project.workflow == "CITY", "الگو commit نشده است"
+            stages = list(
+                await verifier.scalars(
+                    select(Milestone.workflow_stage).where(
+                        Milestone.project_id == project_id, Milestone.workflow_stage.is_not(None)
+                    )
+                )
+            )
+            assert sorted(stages) == list(range(1, 9))
+            free = await verifier.get(Milestone, uuid.UUID(extra.json()["id"]))
+            assert free is not None and free.owner_id == account["user_id"], "مسئول commit نشده"
+            stored = await verifier.get(Deliverable, uuid.UUID(submitted.json()["id"]))
+            assert stored is not None and stored.evidence is not None, "شاهد commit نشده است"
+            assert stored.evidence["area"]["type"] == "MultiPolygon"
+    finally:
+        await committing_session.execute(delete(Project).where(Project.id == project_id))
+        await committing_session.commit()

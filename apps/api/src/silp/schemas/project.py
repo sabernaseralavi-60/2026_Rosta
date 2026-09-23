@@ -13,6 +13,7 @@ from silp.domain.recommendation.schemas import MatchResult
 ProjectKind = Literal["A_VENTURE", "B_RESEARCH", "C_PROBLEM", "D_PERSONAL"]
 ProjectStatus = Literal["DRAFT", "OPEN", "IN_PROGRESS", "PAUSED", "COMPLETED", "CANCELLED"]
 WorkStyle = Literal["SOLO", "TEAM", "EITHER"]
+ProjectWorkflow = Literal["CITY"]
 Polarity = Literal["POSITIVE", "WARNING"]
 FeedbackVerdict = Literal["NOT_RELEVANT", "INTERESTED", "DISMISSED"]
 SortOrder = Literal["match", "newest", "popular", "deadline"]
@@ -68,10 +69,13 @@ class ProjectSummaryOut(BaseModel):
     tags: list[str] = Field(default_factory=list)
     deadline_on: date | None = None
     applications_close_at: datetime | None = None
+    #: الگوی گردش‌کار — `CITY` یعنی آزمایشگاه شهر هوشمند (ADR-0016).
+    workflow: ProjectWorkflow | None = None
 
 
 class ProjectDetailOut(ProjectSummaryOut):
     description: str
+    workflow_completed_at: datetime | None = None
     expected_output: str
     rewards: dict[str, object] = Field(default_factory=dict)
     required_skills: list[SkillRequirementOut] = Field(default_factory=list)
@@ -224,6 +228,9 @@ class ProjectIn(BaseModel):
     # پروژهٔ یک کسب‌وکار (§7.7). فقط هنگام ساخت خوانده می‌شود؛ پیوند
     # پروژه به کسب‌وکار پس از ساخت عوض نمی‌شود، مثل `kind`.
     venture_id: uuid.UUID | None = None
+    # الگوی گردش‌کار ثابت (§7.9، ADR-0016) — فقط نوع C؛ مثل `kind` پس از
+    # ساخت عوض نمی‌شود.
+    workflow: ProjectWorkflow | None = None
 
 
 class ReasonIn(BaseModel):

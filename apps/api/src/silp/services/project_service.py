@@ -33,6 +33,7 @@ from silp.core.exceptions import (
 )
 from silp.core.logging import get_logger
 from silp.core.permissions import CurrentUser, Permission
+from silp.domain import city as city_rules
 from silp.models.delivery import Milestone, ProjectActivity
 from silp.models.project import (
     PROJECT_KINDS,
@@ -45,6 +46,7 @@ from silp.models.project import (
     TeamMember,
 )
 from silp.services import authz, events
+from silp.services.city_service import CityService
 from silp.services.venture_service import require_venture_member_or_manager
 
 log = get_logger("silp.project")
@@ -117,6 +119,8 @@ class ProjectDraft:
     roles: list[RoleSpec] | None = None
     #: پروژهٔ یک کسب‌وکار (§7.7 «تحویل‌دادنی در پروژه‌های کسب‌وکار»).
     venture_id: uuid.UUID | None = None
+    #: الگوی گردش‌کار ثابت — `CITY` هشت مرحلهٔ §7.9 را می‌سازد (ADR-0016).
+    workflow: str | None = None
 
 
 def _now() -> datetime:
@@ -230,6 +234,7 @@ class ProjectService:
         """
         _validate_sizes(draft.team_size_min, draft.team_size_max)
         _validate_dates(draft.starts_on, draft.deadline_on)
+        _validate_workflow(draft.workflow, draft.kind)
 
         project = Project(
             slug=await self._unique_slug(draft.title_fa),
@@ -256,6 +261,8 @@ class ProjectService:
         self.session.add(project)
         await self.session.flush()
         await self._replace_requirements(project, draft)
+        if draft.workflow == city_rules.WORKFLOW_CITY:
+            await CityService(self.session).apply_workflow(project, starts_on=draft.starts_on)
         return project
 
     async def ensure_team(self, project: Project) -> Team:
@@ -465,6 +472,7 @@ class ProjectService:
         if member is None:
             raise NotFound("این کاربر عضو فعال تیم نیست.")
         await self._deactivate(member, status="REMOVED", reason=reason)
+        await CityService(self.session).release_ownership(project, user_id)
         await self._record(
             project, actor.id, "MEMBER_REMOVED", "یکی از اعضا از تیم کنار گذاشته شد."
         )
@@ -481,6 +489,7 @@ class ProjectService:
         if member is None:
             raise NotTeamMember
         await self._deactivate(member, status="LEFT", reason=reason)
+        await CityService(self.session).release_ownership(project, actor.id)
         await self._record(project, actor.id, "MEMBER_LEFT", "یکی از اعضا تیم را ترک کرد.")
         await self.session.commit()
         await authz.invalidate_roles(actor.id)
@@ -676,6 +685,17 @@ def _validate_sizes(minimum: int, maximum: int) -> None:
         raise ValidationFailed("حداکثر اندازهٔ تیم نمی‌تواند از حداقل کمتر باشد.")
     if maximum > MAX_TEAM_MEMBERS:
         raise ValidationFailed(f"حداکثر اندازهٔ تیم {MAX_TEAM_MEMBERS} نفر است.")
+
+
+def _validate_workflow(workflow: str | None, kind: str) -> None:
+    if workflow is None:
+        return
+    if workflow not in city_rules.WORKFLOWS:
+        raise ValidationFailed("الگوی گردش‌کار معتبر نیست.")
+    if kind != city_rules.WORKFLOW_KIND:
+        raise ValidationFailed(
+            "الگوی گردش‌کار شهر هوشمند فقط برای پروژهٔ «حل مسئلهٔ واقعی» (نوع C) است."
+        )
 
 
 def _validate_dates(starts_on: date | None, deadline_on: date | None) -> None:

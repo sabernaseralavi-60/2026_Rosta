@@ -56,6 +56,11 @@ class MilestoneOut(BaseModel):
     status: MilestoneStatus
     status_fa: str
     approved_at: datetime | None = None
+    #: شمارهٔ مرحله در الگوی گردش‌کار (ADR-0016)؛ تهی یعنی مرحلهٔ آزاد.
+    workflow_stage: int | None = None
+    #: مسئول مرحله — FR-CITY-01.
+    owner_id: uuid.UUID | None = None
+    owner_name: str | None = None
     # فقط برای عضو تیم پر می‌شود؛ بیرون فضای کاری معنا ندارد.
     my_deliverable: DeliverableOut | None = None
     deliverable_count: int = 0
@@ -68,6 +73,17 @@ class DeliverableIn(BaseModel):
     body: Annotated[str, Field(max_length=MAX_TEXT)] | None = None
     file_ids: Annotated[list[uuid.UUID], Field(max_length=10)] = Field(default_factory=list)
     links: Annotated[list[str], Field(max_length=10)] = Field(default_factory=list)
+    #: شاهد ساختاریافتهٔ مرحلهٔ گردش‌کار شهری — شکلش را `GET /city/workflow` می‌گوید.
+    evidence: dict[str, Any] | None = None
+    #: شمارهٔ موارد چک‌لیست که تحویل‌دهنده تأیید کرد (از صفر).
+    checklist_confirmed: Annotated[list[int], Field(max_length=20)] = Field(default_factory=list)
+
+
+class MilestoneOwnerIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    #: تهی یعنی بی‌مسئول — برای مرحلهٔ گردش‌کار شهری پذیرفته نیست.
+    owner_id: uuid.UUID | None = None
 
 
 class DeliverableOut(BaseModel):
@@ -86,6 +102,7 @@ class DeliverableOut(BaseModel):
     score: float | None = None
     feedback: str | None = None
     rubric_scores: dict[str, Any] | None = None
+    evidence: dict[str, Any] | None = None
     reviewed_by: uuid.UUID | None = None
     reviewed_at: datetime | None = None
     submitted_at: datetime
@@ -107,6 +124,8 @@ class ReviewOut(BaseModel):
     milestone: MilestoneOut
     # §7.6 — «آیا همهٔ مراحل الزامی تأیید شد؟ ⇒ پیشنهاد بستن پروژه»
     project_ready_to_close: bool = False
+    #: گردش‌کار شهری با همین تأیید کامل شد (ADR-0016).
+    workflow_completed: bool = False
 
 
 # ── تختهٔ وظایف ────────────────────────────────────────────────────────
@@ -184,6 +203,7 @@ __all__ = [
     "MessageOut",
     "MilestoneIn",
     "MilestoneOut",
+    "MilestoneOwnerIn",
     "ReviewIn",
     "ReviewOut",
     "TaskIn",

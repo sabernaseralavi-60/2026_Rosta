@@ -46,6 +46,8 @@ FEEDBACK_VERDICTS = ("NOT_RELEVANT", "INTERESTED", "DISMISSED")
 INVITATION_STATUSES = ("PENDING", "ACCEPTED", "DECLINED", "CANCELLED")
 #: از کجا آمده — دعوت مستقیم از نیمرخ، ارتقای ایده، یا پاسخ به آگهی (FR-TEAM-03).
 INVITATION_SOURCES = ("DIRECT", "IDEA_PROMOTION", "OPENING")
+#: الگوی گردش‌کار ثابت — فعلاً فقط شهر هوشمند (FR-CITY-01، ADR-0016).
+PROJECT_WORKFLOWS = ("CITY",)
 
 # §11 سند v1 — چهار نوع پروژه با عنوان فارسی برای نمایش و متن دلیل.
 KIND_TITLE_FA: dict[str, str] = {
@@ -117,6 +119,10 @@ class Project(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     applications_close_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     health: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'HEALTHY'"))
+    #: الگوی گردش‌کار (ADR-0016) — هنگام ساخت تعیین می‌شود و عوض نمی‌شود.
+    workflow: Mapped[str | None] = mapped_column(Text)
+    #: هر هشت مرحلهٔ الگو تأیید شد — منبع واقعیت نشان «شهرساز».
+    workflow_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_activity_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=text("now()")
     )
@@ -153,6 +159,15 @@ class Project(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         CheckConstraint("team_size_min >= 1", name="team_size_min_positive"),
         CheckConstraint("team_size_max >= team_size_min", name="team_size"),
         CheckConstraint("jsonb_typeof(rewards) = 'object'", name="rewards_is_object"),
+        CheckConstraint(
+            f"workflow IS NULL OR {_in_list('workflow', PROJECT_WORKFLOWS)}", name="workflow_valid"
+        ),
+        # §7.9 — «ساخت پروژهٔ نوع C با این الگو».
+        CheckConstraint("workflow IS NULL OR kind = 'C_PROBLEM'", name="workflow_kind"),
+        CheckConstraint(
+            "workflow_completed_at IS NULL OR workflow IS NOT NULL",
+            name="workflow_completed_needs_workflow",
+        ),
         # جستجوی فارسی با trigram روی ستون تولیدشده — §4.11.
         Index(
             "idx_projects_search",
@@ -176,6 +191,7 @@ class Project(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         Index(
             "idx_projects_venture", "venture_id", postgresql_where=text("venture_id IS NOT NULL")
         ),
+        Index("idx_projects_workflow", "workflow", postgresql_where=text("workflow IS NOT NULL")),
     )
 
     @property
@@ -481,6 +497,7 @@ __all__ = [
     "KIND_TITLE_FA",
     "PROJECT_KINDS",
     "PROJECT_STATUSES",
+    "PROJECT_WORKFLOWS",
     "Project",
     "ProjectApplication",
     "ProjectInterest",

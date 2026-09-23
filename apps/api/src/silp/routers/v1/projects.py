@@ -132,6 +132,7 @@ def _summary_of_row(project: Project, active_members: int) -> ProjectSummaryOut:
         tags=list(project.tags),
         deadline_on=project.deadline_on,
         applications_close_at=project.applications_close_at,
+        workflow=project.workflow,
     )
 
 
@@ -344,6 +345,7 @@ async def get_project(
     return ProjectDetailOut(
         **base.model_dump(),
         description=project.description,
+        workflow_completed_at=project.workflow_completed_at,
         expected_output=project.expected_output,
         rewards=project.rewards,
         required_skills=[
@@ -433,6 +435,7 @@ def _draft_of(payload: ProjectIn) -> ProjectDraft:
         deadline_on=payload.deadline_on,
         applications_close_at=payload.applications_close_at,
         venture_id=payload.venture_id,
+        workflow=payload.workflow,
         required_skills=[
             SkillRequirement(
                 skill_id=r.skill_id,
@@ -462,6 +465,7 @@ async def _detail_of(
     return ProjectDetailOut(
         **base.model_dump(),
         description=project.description,
+        workflow_completed_at=project.workflow_completed_at,
         expected_output=project.expected_output,
         rewards=project.rewards,
         required_skills=[
@@ -532,6 +536,8 @@ async def update_project(
     project = await projects.require(project_id)
     if payload.kind != project.kind:
         raise ValidationFailed("نوع پروژه پس از ساخت عوض نمی‌شود.")
+    if payload.workflow != project.workflow:
+        raise ValidationFailed("الگوی گردش‌کار پروژه پس از ساخت عوض نمی‌شود.")
     project = await projects.update(project=project, actor=current, draft=_draft_of(payload))
     active = await projects.active_member_count(project.id)
     return await _detail_of(session, project, active_members=active)

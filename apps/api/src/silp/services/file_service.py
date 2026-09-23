@@ -23,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.config import Settings
 from silp.core.exceptions import (
+    Conflict,
     ContentTypeNotAllowed,
     FileScanPending,
     FileTooLarge,
@@ -35,7 +36,9 @@ from silp.core.logging import get_logger
 from silp.core.permissions import CurrentUser, Role
 from silp.domain.files import policy
 from silp.integrations.storage import ObjectMissing, StorageBackend, UploadTicket
+from silp.models.delivery import DeliverableFile
 from silp.models.file import File
+from silp.models.research import ResearchSubmissionFile
 
 log = get_logger("silp.files")
 
@@ -174,6 +177,19 @@ class FileService:
             raise NotFound("فایل پیدا نشد.")
         if file.uploaded_by != actor.id and not actor.has_role(Role.ADMIN):
             raise PermissionDenied("فقط آپلودکننده می‌تواند فایل را حذف کند.")
+        # §7.6 «نسخه‌ها هرگز پاک نمی‌شوند» — پیوست یک تحویل بخشی از همان
+        # نسخه است، و نسخهٔ فایل مدل شهری به آن ارجاع می‌دهد (ADR-0016).
+        attached = await self.session.scalar(
+            select(DeliverableFile.file_id).where(DeliverableFile.file_id == file.id).limit(1)
+        )
+        if attached is None:
+            attached = await self.session.scalar(
+                select(ResearchSubmissionFile.file_id)
+                .where(ResearchSubmissionFile.file_id == file.id)
+                .limit(1)
+            )
+        if attached is not None:
+            raise Conflict("این فایل پیوست یک تحویل است و حذف نمی‌شود.")
         file.deleted_at = _now()
         await self.session.commit()
 

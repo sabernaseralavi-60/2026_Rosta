@@ -48,6 +48,7 @@ from silp.schemas.delivery import (
     MessageOut,
     MilestoneIn,
     MilestoneOut,
+    MilestoneOwnerIn,
     ReviewIn,
     ReviewOut,
     TaskIn,
@@ -69,6 +70,7 @@ def _milestone_out(
     *,
     my_deliverable: DeliverableOut | None = None,
     deliverable_count: int = 0,
+    owner_name: str | None = None,
 ) -> MilestoneOut:
     return MilestoneOut(
         id=milestone.id,
@@ -87,6 +89,9 @@ def _milestone_out(
         status=milestone.status,
         status_fa=MILESTONE_STATUS_TITLE_FA.get(milestone.status, milestone.status),
         approved_at=milestone.approved_at,
+        workflow_stage=milestone.workflow_stage,
+        owner_id=milestone.owner_id,
+        owner_name=owner_name,
         my_deliverable=my_deliverable,
         deliverable_count=deliverable_count,
     )
@@ -112,6 +117,7 @@ def _deliverable_out(
         score=float(deliverable.score) if deliverable.score is not None else None,
         feedback=deliverable.feedback,
         rubric_scores=deliverable.rubric_scores,
+        evidence=deliverable.evidence,
         reviewed_by=deliverable.reviewed_by,
         reviewed_at=deliverable.reviewed_at,
         submitted_at=deliverable.submitted_at,
@@ -174,10 +180,15 @@ async def list_milestones(
     باید وضعیت کار خودش را ببیند، و مدیر پروژه صف بررسی جداگانه دارد.
     """
     await projects.require_member(project_id, current)
-    milestones = await delivery.milestones(project_id)
+    return await milestones_out(session, await delivery.milestones(project_id), current.id)
+
+
+async def milestones_out(
+    session: AsyncSession, milestones: list[Milestone], user_id: uuid.UUID
+) -> list[MilestoneOut]:
+    """مراحل با «تحویل من»، شمار نسخه‌ها و نام مسئول — در سه کوئری."""
     if not milestones:
         return []
-
     ids = [m.id for m in milestones]
     count_rows = await session.execute(
         select(Deliverable.milestone_id, func.count())
@@ -190,7 +201,7 @@ async def list_milestones(
             select(Deliverable)
             .where(
                 Deliverable.milestone_id.in_(ids),
-                Deliverable.submitter_id == current.id,
+                Deliverable.submitter_id == user_id,
             )
             .order_by(Deliverable.milestone_id, Deliverable.version)
         )
@@ -198,12 +209,14 @@ async def list_milestones(
     latest: dict[uuid.UUID, Deliverable] = {d.milestone_id: d for d in mine}
     presented = await _deliverables_out(session, list(latest.values()))
     by_milestone = {d.milestone_id: d for d in presented}
+    owners = await display_names(session, [m.owner_id for m in milestones])
 
     return [
         _milestone_out(
             m,
             my_deliverable=by_milestone.get(m.id),
             deliverable_count=int(counts.get(m.id, 0)),
+            owner_name=name_of(owners, m.owner_id),
         )
         for m in milestones
     ]
@@ -279,6 +292,37 @@ async def delete_milestone(
     await delivery.delete_milestone(milestone=milestone, project=project)
 
 
+@milestone_router.put(
+    "/{milestone_id}/owner",
+    response_model=MilestoneOut,
+    summary="تعیین مسئول مرحله",
+    responses={
+        403: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
+)
+async def assign_milestone_owner(
+    milestone_id: uuid.UUID,
+    payload: MilestoneOwnerIn,
+    projects: ProjectServiceDep,
+    delivery: DeliveryServiceDep,
+    session: SessionDep,
+    current: Annotated[
+        CurrentUser,
+        Depends(require(Permission.PROJECT_MILESTONE_MANAGE, scope=project_of_milestone)),
+    ],
+) -> MilestoneOut:
+    """FR-CITY-01 «هر مرحله … مسئول». مسئول باید مدیر یا عضو فعال تیم باشد."""
+    milestone = await delivery.require_milestone(milestone_id)
+    project = await projects.require(milestone.project_id)
+    milestone = await delivery.city.assign_owner(
+        milestone=milestone, project=project, owner_id=payload.owner_id, actor=current
+    )
+    names = await display_names(session, [milestone.owner_id])
+    return _milestone_out(milestone, owner_name=name_of(names, milestone.owner_id))
+
+
 # ── تحویل‌دادنی — §7.6 ─────────────────────────────────────────────────
 @milestone_router.get(
     "/{milestone_id}/deliverables",
@@ -334,6 +378,8 @@ async def submit_deliverable(
         body=payload.body,
         links=list(payload.links),
         file_ids=[f.id for f in attachments],
+        evidence=payload.evidence,
+        checklist_confirmed=list(payload.checklist_confirmed),
     )
     names = await display_names(session, [deliverable.submitter_id])
     return _deliverable_out(
@@ -373,6 +419,7 @@ async def review_deliverable(
         deliverable=presented[0],
         milestone=_milestone_out(outcome.milestone),
         project_ready_to_close=outcome.project_ready_to_close,
+        workflow_completed=outcome.workflow_completed,
     )
 
 
@@ -599,4 +646,4 @@ async def delete_message(
     await workspace.delete_message(project=project, actor=current, message_id=message_id)
 
 
-__all__ = ["deliverable_router", "milestone_router", "router"]
+__all__ = ["deliverable_router", "milestone_router", "milestones_out", "router"]

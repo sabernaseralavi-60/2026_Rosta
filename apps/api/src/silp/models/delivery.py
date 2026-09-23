@@ -53,6 +53,8 @@ OPENING_TITLE_MAX = 120
 OPENING_DESCRIPTION_MAX = 2000
 OPENING_MESSAGE_MAX = 500
 MAX_OPENING_SKILLS = 10
+#: فایل‌های مدل شهری که در کتابخانهٔ پروژه نسخه می‌خورند — FR-CITY-01.
+ARTIFACT_KINDS = ("OSM", "SUMO_NET", "SUMO_ROUTES")
 
 MILESTONE_STATUS_TITLE_FA: dict[str, str] = {
     "PENDING": "شروع نشده",
@@ -112,6 +114,10 @@ class Milestone(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     status: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'PENDING'"))
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    #: شمارهٔ مرحله در الگوی گردش‌کار پروژه (ADR-0016)؛ تهی یعنی مرحلهٔ آزاد.
+    workflow_stage: Mapped[int | None] = mapped_column(Integer)
+    #: مسئول مرحله — FR-CITY-01 «هر مرحله: تحویل‌دادنی، چک‌لیست کیفیت، و مسئول».
+    owner_id: Mapped[uuid.UUID | None] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id"))
 
     deliverables: Mapped[list[Deliverable]] = relationship(
         back_populates="milestone", cascade="all, delete-orphan", lazy="selectin"
@@ -129,7 +135,22 @@ class Milestone(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             "(status = 'APPROVED') = (approved_at IS NOT NULL)",
             name="approved_at_matches_status",
         ),
+        CheckConstraint(
+            "workflow_stage IS NULL OR workflow_stage BETWEEN 1 AND 8", name="workflow_stage_range"
+        ),
+        # مرحلهٔ الگو همیشه مسئول دارد — پیش‌فرض مدیر پروژه (ADR-0016).
+        CheckConstraint(
+            "workflow_stage IS NULL OR owner_id IS NOT NULL", name="workflow_stage_has_owner"
+        ),
         Index("idx_milestones_project", "project_id", "sort_order"),
+        Index(
+            "idx_milestones_workflow_stage",
+            "project_id",
+            "workflow_stage",
+            unique=True,
+            postgresql_where=text("workflow_stage IS NOT NULL"),
+        ),
+        Index("idx_milestones_owner", "owner_id", postgresql_where=text("owner_id IS NOT NULL")),
         Index(
             "idx_milestones_due",
             "due_on",
@@ -169,6 +190,8 @@ class Deliverable(UUIDPrimaryKeyMixin, Base):
     score: Mapped[Decimal | None] = mapped_column(Numeric(6, 2))
     feedback: Mapped[str | None] = mapped_column(Text)
     rubric_scores: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    #: شاهد ساختاریافتهٔ مرحلهٔ الگو (ADR-0016) — محدوده، جدول راستی‌آزمایی، …
+    evidence: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     reviewed_by: Mapped[uuid.UUID | None] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("users.id")
     )
@@ -199,6 +222,9 @@ class Deliverable(UUIDPrimaryKeyMixin, Base):
             "rubric_scores IS NULL OR jsonb_typeof(rubric_scores) = 'object'",
             name="rubric_is_object",
         ),
+        CheckConstraint(
+            "evidence IS NULL OR jsonb_typeof(evidence) = 'object'", name="evidence_is_object"
+        ),
         Index(
             "idx_deliverables_review_queue",
             "status",
@@ -228,6 +254,47 @@ class DeliverableFile(Base):
     )
 
     deliverable: Mapped[Deliverable] = relationship(back_populates="files")
+
+
+class ProjectArtifactVersion(UUIDPrimaryKeyMixin, Base):
+    """نسخهٔ یک فایل مدل شهری در کتابخانهٔ پروژه — FR-CITY-01، ADR-0016.
+
+    هر تحویل مرحلهٔ ۲ یا ۴ که فایل `.osm`، `.net.xml` یا `.rou.xml` دارد،
+    نسخهٔ بعدی همان نوع را می‌سازد. شماره مال پروژه است، نه مال تحویل‌دهنده:
+    «نسخهٔ ۳ شبکه» برای کل تیم یک معنا دارد. وضعیت نسخه از تحویلش خوانده
+    می‌شود و «نسخهٔ جاری» آخرین نسخهٔ تأییدشده است.
+    """
+
+    __tablename__ = "project_artifact_versions"
+
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
+    )
+    artifact: Mapped[str] = mapped_column(Text, nullable=False)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    file_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("files.id"), nullable=False
+    )
+    deliverable_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("deliverables.id", ondelete="CASCADE"), nullable=False
+    )
+    created_by: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "project_id", "artifact", "version", name="uq_project_artifact_versions_version"
+        ),
+        UniqueConstraint(
+            "deliverable_id", "artifact", name="uq_project_artifact_versions_deliverable"
+        ),
+        CheckConstraint(_in_list("artifact", ARTIFACT_KINDS), name="artifact_valid"),
+        CheckConstraint("version >= 1", name="version_positive"),
+    )
 
 
 class ProjectTask(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -546,6 +613,7 @@ class OpeningApplication(UUIDPrimaryKeyMixin, Base):
 
 
 __all__ = [
+    "ARTIFACT_KINDS",
     "CERTIFICATE_KINDS",
     "DELIVERABLE_STATUSES",
     "DELIVERABLE_STATUS_TITLE_FA",
@@ -568,6 +636,7 @@ __all__ = [
     "Milestone",
     "OpeningApplication",
     "PeerEvaluation",
+    "ProjectArtifactVersion",
     "ProjectActivity",
     "ProjectMessage",
     "ProjectReflection",
