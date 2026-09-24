@@ -74,7 +74,7 @@ export interface TeachOfferingDetail extends TeachOffering {
   enrollment_code: string | null;
   grading_policy: Partial<Record<GradingKey, number>>;
   weeks: WeekSummary[];
-  announcements: Announcement[];
+  announcements: TeachAnnouncement[];
   quiz_count: number;
   allowed_statuses: OfferingStatus[];
   permissions: OfferingPermissions;
@@ -380,6 +380,38 @@ export function publishAnnouncement(offeringId: string, body: AnnouncementInput,
   });
 }
 
+/** نویسندهٔ اعلان، یا استاد درس — آینهٔ قاعدهٔ سرور (ADR-0021). */
+export interface TeachAnnouncement extends Announcement {
+  can_edit: boolean;
+}
+
+/** اهمیت پس از انتشار عوض نمی‌شود؛ ویرایش دوباره نمی‌فرستد. */
+export interface AnnouncementPatch {
+  title?: string;
+  body?: string;
+  expires_at?: string | null;
+}
+
+export function reviseAnnouncement(
+  offeringId: string,
+  announcementId: string,
+  body: AnnouncementPatch,
+  token: string,
+) {
+  return apiFetch<Announcement>(`/teach/offerings/${offeringId}/announcements/${announcementId}`, {
+    method: 'PATCH',
+    body,
+    accessToken: token,
+  });
+}
+
+export function deleteAnnouncement(offeringId: string, announcementId: string, token: string) {
+  return apiFetch<void>(`/teach/offerings/${offeringId}/announcements/${announcementId}`, {
+    method: 'DELETE',
+    accessToken: token,
+  });
+}
+
 // ── داشبورد استثنامحور — FR-DASH-02 ───────────────────────────────────
 export interface Queue {
   count: number;
@@ -583,6 +615,9 @@ export interface BankItem {
   kind: QuestionKind;
   kind_fa: string;
   body: string;
+  payload: Record<string, unknown>;
+  explanation: string | null;
+  course_id: string | null;
   category: string | null;
   difficulty: number | null;
   usage_count: number;
@@ -606,15 +641,27 @@ export function fetchBank(filters: BankFilters, token: string) {
   });
 }
 
-export function addBankItem(
-  body: Omit<QuestionInput, 'points'> & {
-    course_id?: string | null;
-    category?: string | null;
-    difficulty?: number | null;
-  },
-  token: string,
-) {
+export type BankItemInput = Omit<QuestionInput, 'points'> & {
+  course_id?: string | null;
+  category?: string | null;
+  difficulty?: number | null;
+};
+
+export function addBankItem(body: BankItemInput, token: string) {
   return apiFetch<BankItem>('/teach/question-bank', { method: 'POST', body, accessToken: token });
+}
+
+/** جایگزینی کامل — آزمون‌ها کپی دارند و عوض نمی‌شوند (ADR-0021). */
+export function updateBankItem(id: string, body: BankItemInput, token: string) {
+  return apiFetch<BankItem>(`/teach/question-bank/${id}`, {
+    method: 'PUT',
+    body,
+    accessToken: token,
+  });
+}
+
+export function deleteBankItem(id: string, token: string) {
+  return apiFetch<void>(`/teach/question-bank/${id}`, { method: 'DELETE', accessToken: token });
 }
 
 export function copyFromBank(quizId: string, bankIds: string[], points: string, token: string) {

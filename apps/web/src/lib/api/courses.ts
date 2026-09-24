@@ -122,6 +122,8 @@ export interface Announcement {
   priority: 'NORMAL' | 'IMPORTANT' | 'URGENT';
   published_at: string;
   expires_at: string | null;
+  /** پر یعنی پس از انتشار ویرایش شده — ADR-0021. */
+  edited_at?: string | null;
 }
 
 export interface OfferingSummary {
@@ -227,10 +229,11 @@ export function fetchWeek(offeringId: string, weekNumber: number, accessToken: s
 }
 
 export function enroll(offeringId: string, accessToken: string, enrollmentCode?: string) {
-  return apiFetch<{ id: string; status: EnrollmentStatus }>(
-    `/offerings/${offeringId}/enroll`,
-    { method: 'POST', accessToken, body: { enrollment_code: enrollmentCode ?? null } },
-  );
+  return apiFetch<{ id: string; status: EnrollmentStatus }>(`/offerings/${offeringId}/enroll`, {
+    method: 'POST',
+    accessToken,
+    body: { enrollment_code: enrollmentCode ?? null },
+  });
 }
 
 export function drop(offeringId: string, accessToken: string) {

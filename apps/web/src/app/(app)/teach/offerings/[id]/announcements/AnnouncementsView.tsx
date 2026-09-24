@@ -11,7 +11,13 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import type { Announcement } from '@/lib/api/courses';
-import { PRIORITY_LABELS, publishAnnouncement } from '@/lib/api/teach';
+import {
+  deleteAnnouncement,
+  PRIORITY_LABELS,
+  publishAnnouncement,
+  reviseAnnouncement,
+  type TeachAnnouncement,
+} from '@/lib/api/teach';
 import { formatDateTime } from '@/lib/format/date';
 
 /**
@@ -19,6 +25,10 @@ import { formatDateTime } from '@/lib/format/date';
  *
  * «فوری» علاوه بر اعلان داخلی پیامک و پیام‌رسان هم می‌فرستد، پس انتخابش
  * یک تأیید دوم دارد: پیامک هزینه دارد و ساعت آرام را نمی‌شکند مگر همین.
+ *
+ * ویرایش و حذف (ADR-0021): نویسنده اعلان خودش را، استاد هر اعلان را.
+ * ویرایش دوباره نمی‌فرستد ولی متن اعلان‌های رفته را بازنویسی می‌کند؛ حذف
+ * آن‌ها را پس می‌گیرد. اهمیت پس از انتشار عوض نمی‌شود.
  */
 export function AnnouncementsView() {
   const { offering, token, reload } = useOffering();
@@ -132,25 +142,158 @@ export function AnnouncementsView() {
           <ul className="flex flex-col gap-3">
             {offering.announcements.map((item) => (
               <li key={item.id}>
-                <Card className="flex flex-col gap-1.5">
-                  <span className="flex flex-wrap items-center gap-2">
-                    <span className="font-semibold">{item.title}</span>
-                    {item.priority !== 'NORMAL' && (
-                      <Badge tone={item.priority === 'URGENT' ? 'danger' : 'warning'}>
-                        {item.priority === 'URGENT' ? 'فوری' : 'مهم'}
-                      </Badge>
-                    )}
-                  </span>
-                  <p className="whitespace-pre-line text-[14px]">{item.body}</p>
-                  <span className="text-[12px] text-[var(--fg-tertiary)]">
-                    {formatDateTime(item.published_at)}
-                  </span>
-                </Card>
+                <AnnouncementItem
+                  item={item}
+                  offeringId={offering.id}
+                  token={token}
+                  onChanged={reload}
+                />
               </li>
             ))}
           </ul>
         )}
       </section>
     </div>
+  );
+}
+
+function AnnouncementItem({
+  item,
+  offeringId,
+  token,
+  onChanged,
+}: {
+  item: TeachAnnouncement;
+  offeringId: string;
+  token: string;
+  onChanged: () => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState(item.title);
+  const [body, setBody] = useState(item.body);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [busy, setBusy] = useState<'save' | 'delete' | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run(kind: 'save' | 'delete', action: () => Promise<unknown>) {
+    setBusy(kind);
+    setError(null);
+    try {
+      await action();
+      await onChanged();
+      setEditing(false);
+    } catch (cause) {
+      setError(errorText(cause));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  if (editing) {
+    return (
+      <Card className="flex flex-col gap-3">
+        <form
+          className="flex flex-col gap-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void run('save', () =>
+              reviseAnnouncement(
+                offeringId,
+                item.id,
+                { title: title.trim(), body: body.trim() },
+                token,
+              ),
+            );
+          }}
+        >
+          <Input
+            label="عنوان"
+            value={title}
+            required
+            maxLength={200}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+          <Textarea
+            label="متن"
+            rows={4}
+            value={body}
+            required
+            maxLength={4000}
+            onChange={(event) => setBody(event.target.value)}
+          />
+          <p className="text-[13px] text-[var(--fg-secondary)]">
+            دوباره فرستاده نمی‌شود؛ متن اعلانی که دانشجویان گرفته‌اند با همین عوض می‌شود و کنارش
+            «ویرایش‌شده» می‌آید.
+          </p>
+          {error && <ErrorLine>{error}</ErrorLine>}
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="submit"
+              loading={busy === 'save'}
+              disabled={!title.trim() || !body.trim()}
+            >
+              ذخیرهٔ ویرایش
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setEditing(false);
+                setTitle(item.title);
+                setBody(item.body);
+                setError(null);
+              }}
+            >
+              انصراف
+            </Button>
+          </div>
+        </form>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="flex flex-col gap-1.5">
+      <span className="flex flex-wrap items-center gap-2">
+        <span className="font-semibold">{item.title}</span>
+        {item.priority !== 'NORMAL' && (
+          <Badge tone={item.priority === 'URGENT' ? 'danger' : 'warning'}>
+            {item.priority === 'URGENT' ? 'فوری' : 'مهم'}
+          </Badge>
+        )}
+      </span>
+      <p className="whitespace-pre-line text-[14px]">{item.body}</p>
+      <span className="text-[12px] text-[var(--fg-tertiary)]">
+        {formatDateTime(item.published_at)}
+        {item.edited_at && ` (ویرایش‌شده در ${formatDateTime(item.edited_at)})`}
+      </span>
+      {item.can_edit && (
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
+            ویرایش
+          </Button>
+          <Button
+            size="sm"
+            variant={confirmDelete ? 'danger' : 'ghost'}
+            loading={busy === 'delete'}
+            onClick={() => {
+              if (!confirmDelete) {
+                setConfirmDelete(true);
+                return;
+              }
+              void run('delete', () => deleteAnnouncement(offeringId, item.id, token));
+            }}
+          >
+            {confirmDelete ? 'بله، حذف و پس گرفتن' : 'حذف'}
+          </Button>
+          {confirmDelete && (
+            <span role="alert" className="text-[13px] text-[var(--fg-warning)]">
+              اعلان از مرکز اعلان دانشجویان هم برداشته می‌شود؛ پیامک یا ایمیلی که رفته برنمی‌گردد.
+            </span>
+          )}
+        </div>
+      )}
+      {error && <ErrorLine>{error}</ErrorLine>}
+    </Card>
   );
 }

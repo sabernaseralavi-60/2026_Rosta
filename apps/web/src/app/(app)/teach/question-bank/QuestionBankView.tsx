@@ -16,9 +16,11 @@ import {
   KIND_LABELS,
   addBankItem,
   type BankItem,
+  deleteBankItem,
   fetchBank,
   fetchTeachOfferings,
   type TeachOffering,
+  updateBankItem,
 } from '@/lib/api/teach';
 import { useSession } from '@/lib/auth/use-session';
 import { toPersianDigits } from '@/lib/format/digits';
@@ -152,20 +154,13 @@ export function QuestionBankView() {
           <SectionHeader title={`${toPersianDigits(items.length)} سؤال`} />
           <ul className="flex flex-col divide-y divide-[var(--border-subtle)] rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
             {items.map((item) => (
-              <li key={item.id} className="flex flex-col gap-1.5 px-4 py-3">
-                <span className="flex flex-wrap items-center gap-2 text-[13px]">
-                  <Badge tone="brand">{item.kind_fa}</Badge>
-                  {item.category && <Badge tone="neutral">{item.category}</Badge>}
-                  {item.difficulty && (
-                    <span className="text-[var(--fg-secondary)]">
-                      دشواری {toPersianDigits(item.difficulty)} از ۵
-                    </span>
-                  )}
-                  <span className="text-[var(--fg-tertiary)]">
-                    {toPersianDigits(item.usage_count)} بار در آزمون
-                  </span>
-                </span>
-                <p className="whitespace-pre-line text-[14px]">{item.body}</p>
+              <li key={item.id} className="px-4 py-3">
+                <BankItemRow
+                  item={item}
+                  courses={courses}
+                  token={accessToken ?? ''}
+                  onChanged={load}
+                />
               </li>
             ))}
           </ul>
@@ -250,5 +245,151 @@ function NewBankItem({
         }}
       />
     </Card>
+  );
+}
+
+function BankItemRow({
+  item,
+  courses,
+  token,
+  onChanged,
+}: {
+  item: BankItem;
+  courses: [string, string][];
+  token: string;
+  onChanged: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [courseId, setCourseId] = useState(item.course_id ?? '');
+  const [category, setCategory] = useState(item.category ?? '');
+  const [difficulty, setDifficulty] = useState(String(item.difficulty ?? 3));
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [busy, setBusy] = useState<'delete' | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  if (editing) {
+    return (
+      <Card className="flex flex-col gap-4">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Field label="درس">
+            <select
+              className={SELECT_CLASS}
+              value={courseId}
+              onChange={(e) => setCourseId(e.target.value)}
+            >
+              <option value="">بی‌درس</option>
+              {courses.map(([id, title]) => (
+                <option key={id} value={id}>
+                  {title}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Input
+            label="دسته (اختیاری)"
+            maxLength={200}
+            value={category}
+            onChange={(event) => setCategory(event.target.value)}
+          />
+          <Field label="دشواری">
+            <select
+              className={SELECT_CLASS}
+              value={difficulty}
+              onChange={(e) => setDifficulty(e.target.value)}
+            >
+              {[1, 2, 3, 4, 5].map((n) => (
+                <option key={n} value={n}>
+                  {toPersianDigits(n)}
+                </option>
+              ))}
+            </select>
+          </Field>
+        </div>
+        <QuestionEditor
+          question={{
+            id: item.id,
+            kind: item.kind,
+            kind_fa: item.kind_fa,
+            body: item.body,
+            payload: item.payload,
+            explanation: item.explanation,
+            points: '1',
+            sort_order: 0,
+            bank_id: null,
+          }}
+          kind={item.kind}
+          withPoints={false}
+          submitLabel="ذخیرهٔ ویرایش"
+          onCancel={() => setEditing(false)}
+          onSubmit={async (input) => {
+            await updateBankItem(
+              item.id,
+              {
+                kind: input.kind,
+                body: input.body,
+                payload: input.payload,
+                explanation: input.explanation,
+                course_id: courseId || null,
+                category: category.trim() || null,
+                difficulty: Number(difficulty),
+              },
+              token,
+            );
+            setEditing(false);
+            onChanged();
+          }}
+        />
+        <p className="text-[13px] text-[var(--fg-secondary)]">
+          آزمون‌ها کپی دارند، نه ارجاع: ویرایش اینجا نمرهٔ آزمونی که قبلاً برگزار شده را عوض
+          نمی‌کند، فقط کپی‌های بعدی را.
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="flex flex-wrap items-center gap-2 text-[13px]">
+        <Badge tone="brand">{item.kind_fa}</Badge>
+        {item.category && <Badge tone="neutral">{item.category}</Badge>}
+        {item.difficulty && (
+          <span className="text-[var(--fg-secondary)]">
+            دشواری {toPersianDigits(item.difficulty)} از ۵
+          </span>
+        )}
+        <span className="text-[var(--fg-tertiary)]">
+          {toPersianDigits(item.usage_count)} بار در آزمون
+        </span>
+      </span>
+      <p className="whitespace-pre-line text-[14px]">{item.body}</p>
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
+          ویرایش
+        </Button>
+        <Button
+          size="sm"
+          variant={confirmDelete ? 'danger' : 'ghost'}
+          loading={busy === 'delete'}
+          onClick={async () => {
+            if (!confirmDelete) {
+              setConfirmDelete(true);
+              return;
+            }
+            setBusy('delete');
+            setError(null);
+            try {
+              await deleteBankItem(item.id, token);
+              onChanged();
+            } catch (cause) {
+              setError(errorText(cause));
+              setBusy(null);
+            }
+          }}
+        >
+          {confirmDelete ? 'بله، حذف کن' : 'حذف'}
+        </Button>
+      </div>
+      {error && <ErrorLine>{error}</ErrorLine>}
+    </div>
   );
 }

@@ -140,6 +140,7 @@ export function OfferingView({ offeringId }: { offeringId: string }) {
                   </p>
                   <p className="text-[12px] text-[var(--fg-tertiary)]">
                     {formatDateLong(announcement.published_at)}
+                    {announcement.edited_at && ' (ویرایش‌شده)'}
                   </p>
                 </Card>
               </li>
