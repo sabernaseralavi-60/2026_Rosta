@@ -6,6 +6,7 @@
  */
 
 import { ApiError, apiFetch } from './client';
+import type { PointEntry } from './points';
 import type { Certificate } from './public';
 
 export type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED';
@@ -317,6 +318,24 @@ export function recalculatePoints(
     '/admin/point-rules/recalculate',
     { method: 'POST', accessToken: token, body },
   );
+}
+
+/** دفتر کل یک کاربر، تازه‌ترین اول — §9.9. */
+export function fetchUserPoints(token: string, userId: string, cursor?: string | null) {
+  const search = `?limit=10${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`;
+  return apiFetch<{ items: PointEntry[]; next_cursor: string | null }>(
+    `/admin/users/${userId}/points${search}`,
+    { accessToken: token },
+  );
+}
+
+/** اصلاح با رکورد معکوس — ردیف اصلی پاک نمی‌شود (D-09). */
+export function reversePointEntry(token: string, entryId: string, reason: string) {
+  return apiFetch<PointEntry>(`/admin/point-entries/${entryId}/reverse`, {
+    method: 'POST',
+    accessToken: token,
+    body: { reason },
+  });
 }
 
 // ── صف ارسال و الگوها — §7.10، FR-MSG-03 ──────────────────────────────

@@ -193,7 +193,7 @@ function FilterChip({
   );
 }
 
-export function LedgerRow({ entry }: { entry: PointEntry }) {
+export function LedgerRow({ entry, action }: { entry: PointEntry; action?: ReactNode }) {
   const amount = points(entry.amount);
   const reversal = entry.reverses_id !== null;
   return (
@@ -227,6 +227,7 @@ export function LedgerRow({ entry }: { entry: PointEntry }) {
         <time dateTime={entry.created_at} className="text-[12px] text-[var(--fg-tertiary)]">
           {formatDateTime(entry.created_at)}
         </time>
+        {action}
       </div>
       <span
         className={cn(

@@ -10,6 +10,7 @@ import {
   Field,
   SELECT_CLASS,
 } from '@/components/admin/common';
+import { LedgerRow } from '@/app/(app)/me/points/PointsLedgerView';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardTitle } from '@/components/ui/Card';
@@ -20,8 +21,10 @@ import {
   type AdminUserDetail,
   fetchRoleOptions,
   fetchUser,
+  fetchUserPoints,
   grantRole,
   impersonate,
+  reversePointEntry,
   revokeRole,
   ROLE_LABELS,
   type RoleGrant,
@@ -30,6 +33,7 @@ import {
   USER_STATUS_LABELS,
   type UserStatus,
 } from '@/lib/api/admin';
+import type { PointEntry } from '@/lib/api/points';
 import { readSession, startImpersonation } from '@/lib/auth/session';
 import { useSession } from '@/lib/auth/use-session';
 import { formatDateShort, formatDateTime, formatRelative } from '@/lib/format/date';
@@ -122,6 +126,8 @@ export function UserDetailView({ id }: { id: string }) {
           {isAdmin && <StatusCard user={user} token={accessToken} onChange={setUser} />}
         </div>
       </div>
+
+      {isAdmin && <PointsCard user={user} token={accessToken} onChange={load} />}
 
       <Card className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
@@ -460,6 +466,148 @@ function StatusCard({
           {status === 'ACTIVE' ? 'فعال‌سازی حساب' : `تغییر به «${USER_STATUS_LABELS[status]}»`}
         </Button>
       </form>
+      {error && <ErrorLine>{error}</ErrorLine>}
+    </Card>
+  );
+}
+
+/**
+ * دفتر کل امتیاز و اصلاح یک ردیف — §9.9. اصلاح رکورد معکوس می‌سازد و
+ * ردیف اصلی می‌ماند (خط‌خورده)؛ دلیل در دفتر و لاگ حسابرسی ثبت می‌شود.
+ */
+function PointsCard({
+  user,
+  token,
+  onChange,
+}: {
+  user: AdminUserDetail;
+  token: string;
+  onChange: () => void;
+}) {
+  const [items, setItems] = useState<PointEntry[] | null>(null);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [target, setTarget] = useState<string | null>(null);
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    fetchUserPoints(token, user.id)
+      .then((page) => {
+        setItems(page.items);
+        setCursor(page.next_cursor);
+      })
+      .catch((cause) => setError(errorText(cause)));
+  }, [token, user.id]);
+
+  useEffect(load, [load]);
+
+  async function more() {
+    if (!cursor) return;
+    try {
+      const page = await fetchUserPoints(token, user.id, cursor);
+      setItems((current) => [...(current ?? []), ...page.items]);
+      setCursor(page.next_cursor);
+    } catch (cause) {
+      setError(errorText(cause));
+    }
+  }
+
+  async function reverse(event: FormEvent) {
+    event.preventDefault();
+    if (!target) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await reversePointEntry(token, target, reason.trim());
+      setTarget(null);
+      setReason('');
+      load();
+      onChange();
+    } catch (cause) {
+      setError(errorText(cause));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card className="flex flex-col gap-3">
+      <CardTitle as="h2" className="text-[16px]">
+        دفتر کل امتیاز
+      </CardTitle>
+      <p className="text-[13px] text-[var(--fg-secondary)]">
+        اصلاح یک ردیف، رکورد معکوس می‌سازد؛ ردیف اصلی پاک نمی‌شود و برای خود کاربر خط‌خورده دیده
+        می‌شود.
+      </p>
+      {items === null ? (
+        !error && <SkeletonCard label="در حال بارگذاری دفتر کل" />
+      ) : items.length === 0 ? (
+        <p className="text-[13.5px] text-[var(--fg-secondary)]">هنوز امتیازی ثبت نشده.</p>
+      ) : (
+        <ul className="divide-y divide-[var(--border-subtle)] rounded-[var(--radius-md)] border border-[var(--border-subtle)]">
+          {items.map((entry) => (
+            <LedgerRow
+              key={entry.id}
+              entry={entry}
+              action={
+                entry.reverses_id === null && !entry.is_reversed ? (
+                  target === entry.id ? (
+                    <form onSubmit={reverse} className="mt-2 flex flex-col gap-2">
+                      <Textarea
+                        label="دلیل اصلاح"
+                        value={reason}
+                        onChange={(event) => setReason(event.target.value)}
+                        rows={2}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          type="submit"
+                          size="sm"
+                          variant="danger"
+                          loading={busy}
+                          disabled={reason.trim().length < 3}
+                        >
+                          ثبت اصلاح
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setTarget(null);
+                            setReason('');
+                          }}
+                        >
+                          انصراف
+                        </Button>
+                      </div>
+                    </form>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-1 self-start"
+                      onClick={() => {
+                        setTarget(entry.id);
+                        setReason('');
+                        setError(null);
+                      }}
+                    >
+                      اصلاح این ردیف
+                    </Button>
+                  )
+                ) : null
+              }
+            />
+          ))}
+        </ul>
+      )}
+      {cursor && (
+        <Button variant="secondary" size="sm" onClick={() => void more()}>
+          ردیف‌های قدیمی‌تر
+        </Button>
+      )}
       {error && <ErrorLine>{error}</ErrorLine>}
     </Card>
   );
