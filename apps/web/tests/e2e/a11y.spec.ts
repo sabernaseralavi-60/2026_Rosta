@@ -65,6 +65,8 @@ const ADMIN_PAGES = [
   '/admin/audit',
   '/admin/point-rules',
   '/admin/subscriptions',
+  // ADR-0020 — تعریف درس، نیم‌سال و ارائه.
+  '/admin/courses',
 ];
 
 const TEACH_PAGES = ['/teach', '/teach/offerings', '/teach/quizzes', '/teach/question-bank'];

@@ -30,11 +30,24 @@ export const ROLE_LABELS: Record<string, string> = {
   ADMIN: 'مدیر سامانه',
 };
 
-/** نقش‌هایی که پنل مدیریت را می‌بینند؛ سرور هر مسیر را جداگانه می‌سنجد. */
-export const ADMIN_AREA_ROLES = ['ADMIN', 'SUPPORT'];
+/**
+ * نقش‌هایی که پنل مدیریت را می‌بینند؛ سرور هر مسیر را جداگانه می‌سنجد.
+ * مدیر آموزشی فقط «درس‌ها و ارائه‌ها» را دارد (ADR-0020).
+ */
+export const ADMIN_AREA_ROLES = ['ADMIN', 'SUPPORT', 'COORDINATOR'];
+
+/** پشتیبانی و مدیر — شاخص‌ها، کاربران، لاگ و صف‌ها. */
+export const OPERATIONS_ROLES = ['ADMIN', 'SUPPORT'];
 
 export function canSeeAdmin(roles: string[] | undefined | null): boolean {
   return (roles ?? []).some((role) => ADMIN_AREA_ROLES.includes(role));
+}
+
+/** صفحهٔ آغاز پنل برای این نقش‌ها: مدیر آموزشی شاخص‌ها را نمی‌بیند. */
+export function adminHome(roles: string[] | undefined | null): string {
+  return (roles ?? []).some((role) => OPERATIONS_ROLES.includes(role))
+    ? '/admin'
+    : '/admin/courses';
 }
 
 export interface AdminUser {

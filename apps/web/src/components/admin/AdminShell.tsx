@@ -19,15 +19,26 @@ import { cn } from '@/lib/cn';
  * (§3.8).
  */
 
-const LINKS: { href: string; label: string; adminOnly?: boolean }[] = [
-  { href: '/admin', label: 'شاخص‌های کلان' },
-  { href: '/admin/users', label: 'کاربران و نقش‌ها' },
-  { href: '/admin/audit', label: 'لاگ حسابرسی' },
-  { href: '/admin/subscriptions', label: 'اشتراک‌ها' },
-  { href: '/admin/notifications', label: 'صف ارسال و الگوها' },
-  { href: '/admin/point-rules', label: 'قواعد امتیاز', adminOnly: true },
-  { href: '/admin/certificates', label: 'گواهی‌ها', adminOnly: true },
+const OPERATIONS = ['ADMIN', 'SUPPORT'];
+const ADMIN_ONLY = ['ADMIN'];
+const COURSES = ['ADMIN', 'COORDINATOR'];
+
+const LINKS: { href: string; label: string; roles: string[] }[] = [
+  { href: '/admin', label: 'شاخص‌های کلان', roles: OPERATIONS },
+  { href: '/admin/courses', label: 'درس‌ها و ارائه‌ها', roles: COURSES },
+  { href: '/admin/users', label: 'کاربران و نقش‌ها', roles: OPERATIONS },
+  { href: '/admin/audit', label: 'لاگ حسابرسی', roles: OPERATIONS },
+  { href: '/admin/subscriptions', label: 'اشتراک‌ها', roles: OPERATIONS },
+  { href: '/admin/notifications', label: 'صف ارسال و الگوها', roles: OPERATIONS },
+  { href: '/admin/point-rules', label: 'قواعد امتیاز', roles: ADMIN_ONLY },
+  { href: '/admin/certificates', label: 'گواهی‌ها', roles: ADMIN_ONLY },
 ];
+
+function linkFor(pathname: string) {
+  return pathname === '/admin'
+    ? LINKS[0]
+    : LINKS.filter((link) => link.href !== '/admin' && pathname.startsWith(link.href))[0];
+}
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -39,8 +50,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
     return (
       <EmptyState
         as="h1"
-        title="این بخش برای مدیر و پشتیبانی است"
-        description="اگر باید به پنل مدیریت دسترسی داشته باشی، از مدیر سامانه بخواه نقش «پشتیبانی» یا «مدیر سامانه» را به حسابت بدهد. پس از اعطای نقش، یک بار خارج و دوباره وارد شو."
+        title="این بخش برای مدیر، مدیر آموزشی و پشتیبانی است"
+        description="اگر باید به پنل مدیریت دسترسی داشته باشی، از مدیر سامانه بخواه نقش «پشتیبانی»، «مدیر آموزشی» یا «مدیر سامانه» را به حسابت بدهد. پس از اعطای نقش، یک بار خارج و دوباره وارد شو."
         action={
           <Link href="/dashboard" className="text-[14px] font-medium text-[var(--fg-brand)]">
             بازگشت به داشبورد
@@ -49,7 +60,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
       />
     );
   }
-  const isAdmin = roles.includes('ADMIN');
+  const visible = LINKS.filter((link) => link.roles.some((role) => roles.includes(role)));
+  const here = linkFor(pathname);
+  // صفحه‌ای که نقش بیننده به آن نمی‌رسد: توضیح و راه، نه ۴۰۳ خام (§3.8).
+  const blocked = here && !visible.includes(here);
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
@@ -57,7 +71,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         aria-label="ناوبری مدیریت"
         className="flex shrink-0 gap-1 overflow-x-auto lg:sticky lg:top-6 lg:w-52 lg:flex-col"
       >
-        {LINKS.filter((link) => isAdmin || !link.adminOnly).map((link) => {
+        {visible.map((link) => {
           const current =
             link.href === '/admin' ? pathname === '/admin' : pathname.startsWith(link.href);
           return (
@@ -77,7 +91,27 @@ export function AdminShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
-      <div className="min-w-0 flex-1">{children}</div>
+      <div className="min-w-0 flex-1">
+        {blocked ? (
+          <EmptyState
+            as="h1"
+            title="این بخش با نقش تو باز نیست"
+            description="از فهرست کنار، بخشی را که به آن دسترسی داری باز کن."
+            action={
+              visible[0] && (
+                <Link
+                  href={visible[0].href}
+                  className="text-[14px] font-medium text-[var(--fg-brand)]"
+                >
+                  {visible[0].label}
+                </Link>
+              )
+            }
+          />
+        ) : (
+          children
+        )}
+      </div>
     </div>
   );
 }

@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { isGuestBrowsable } from '@/components/domain/AppHeader';
 import { PublicProfileBody } from '@/components/public/PublicProfileBody';
-import { canSeeAdmin } from '@/lib/api/admin';
+import { adminHome, canSeeAdmin } from '@/lib/api/admin';
 import type { AuthUser } from '@/lib/api/auth';
+import { type AdminTerm, slugFromCode, termIsOver } from '@/lib/api/course-admin';
 import type { PublicProfile, PublicStats } from '@/lib/api/public';
 import { matchCommands, normalizeFa } from '@/lib/api/search';
 import {
@@ -87,6 +88,28 @@ describe('جستجوی سراسری ⌘K', () => {
     expect(matchCommands('حسابرسی', ['STUDENT'])).toEqual([]);
     expect(matchCommands('حسابرسی', ['SUPPORT']).map((c) => c.id)).toEqual(['admin-audit']);
     expect(canSeeAdmin(['STUDENT', 'MENTOR'])).toBe(false);
+  });
+
+  it('مدیر آموزشی فقط دروس را دارد و پنلش از دروس شروع می‌شود (ADR-0020)', () => {
+    expect(canSeeAdmin(['COORDINATOR'])).toBe(true);
+    expect(adminHome(['COORDINATOR'])).toBe('/admin/courses');
+    expect(adminHome(['SUPPORT'])).toBe('/admin');
+    expect(matchCommands('حسابرسی', ['COORDINATOR'])).toEqual([]);
+    expect(matchCommands('ارائه', ['COORDINATOR']).map((c) => c.id)).toContain('admin-courses');
+    expect(matchCommands('نیم‌سال', ['SUPPORT'])).toEqual([]);
+  });
+});
+
+describe('تعریف درس و ارائه', () => {
+  it('نشانی پیش‌فرض همان قاعدهٔ سرور است', () => {
+    expect(slugFromCode('TRAFFIC-ENG')).toBe('traffic-eng');
+    expect(slugFromCode('  MTP 1405_a ')).toBe('mtp-1405-a');
+  });
+
+  it('نیم‌سالی که پایانش گذشته ارائهٔ تازه نمی‌گیرد', () => {
+    const term = { ends_on: '2026-09-23' } as AdminTerm;
+    expect(termIsOver(term, '2026-09-24')).toBe(true);
+    expect(termIsOver(term, '2026-09-23')).toBe(false);
   });
 });
 

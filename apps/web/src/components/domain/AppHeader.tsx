@@ -9,7 +9,7 @@ import { ImpersonationBanner } from '@/components/domain/ImpersonationBanner';
 import { NotificationBell } from '@/components/domain/NotificationBell';
 import { PointsBadge } from '@/components/domain/PointsBadge';
 import { Button } from '@/components/ui/Button';
-import { canSeeAdmin } from '@/lib/api/admin';
+import { adminHome, canSeeAdmin } from '@/lib/api/admin';
 import { canSeeTeach } from '@/lib/api/teach';
 import { logout } from '@/lib/api/auth';
 import {
@@ -130,7 +130,7 @@ export function AppHeader() {
               )}
               {canSeeAdmin(roles) && (
                 <Link
-                  href="/admin"
+                  href={adminHome(roles)}
                   aria-current={pathname.startsWith('/admin') ? 'page' : undefined}
                   className="whitespace-nowrap text-[13.5px] font-medium text-[var(--fg-accent)] hover:underline"
                 >

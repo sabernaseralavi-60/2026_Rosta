@@ -106,3 +106,18 @@ export function Field({ label, children }: { label: string; children: ReactNode 
     </label>
   );
 }
+
+/**
+ * چند واقعیت کوتاه در یک خط، با فاصله و نه «·» — نقطهٔ میانی کنار رقم فارسی
+ * همان «۰» خوانده می‌شود («۴۰ · ۴» مثل «۴۰ ۰ ۴» دیده می‌شد، ADR-0020).
+ */
+export function FactList({ items, className }: { items: ReactNode[]; className?: string }) {
+  const shown = items.filter((item) => item !== null && item !== undefined && item !== false);
+  return (
+    <ul className={cn('flex flex-wrap gap-x-4 gap-y-0.5 text-[12.5px]', className)}>
+      {shown.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
+  );
+}

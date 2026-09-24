@@ -6,7 +6,8 @@
  * یکسان‌سازی فارسی سرور انجام می‌شود تا «ي» عربی هم «ثبت ایده» را پیدا کند.
  */
 
-import { canSeeAdmin } from './admin';
+import { OPERATIONS_ROLES } from './admin';
+import { canDefineCourses } from './course-admin';
 import { apiFetch } from './client';
 import { canSeeTeach } from './teach';
 
@@ -44,6 +45,8 @@ export interface Command {
   adminOnly?: boolean;
   /** فقط برای استاد و دستیار — ADR-0019. */
   teachOnly?: boolean;
+  /** فقط برای مدیر آموزشی و مدیر — ADR-0020. */
+  courseAdminOnly?: boolean;
 }
 
 export const COMMANDS: Command[] = [
@@ -115,6 +118,13 @@ export const COMMANDS: Command[] = [
     teachOnly: true,
   },
   {
+    id: 'admin-courses',
+    label: 'درس‌ها و ارائه‌ها (مدیریت)',
+    href: '/admin/courses',
+    keywords: 'درس ارائه نیم‌سال ترم استاد تعریف',
+    courseAdminOnly: true,
+  },
+  {
     id: 'admin-subscriptions',
     label: 'تأیید اشتراک‌ها',
     href: '/admin/subscriptions',
@@ -152,10 +162,15 @@ export function normalizeFa(value: string): string {
 }
 
 export function matchCommands(q: string, roles: string[] | undefined | null): Command[] {
-  const admin = canSeeAdmin(roles);
+  // «adminOnly» یعنی پشتیبانی و مدیر؛ مدیر آموزشی فقط دستور دروس را دارد (ADR-0020).
+  const admin = (roles ?? []).some((role) => OPERATIONS_ROLES.includes(role));
   const teach = canSeeTeach(roles);
+  const courses = canDefineCourses(roles);
   const visible = COMMANDS.filter(
-    (command) => (admin || !command.adminOnly) && (teach || !command.teachOnly),
+    (command) =>
+      (admin || !command.adminOnly) &&
+      (teach || !command.teachOnly) &&
+      (courses || !command.courseAdminOnly),
   );
   const needle = normalizeFa(q);
   if (!needle) return visible.slice(0, 6);
