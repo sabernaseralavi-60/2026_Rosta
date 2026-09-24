@@ -63,7 +63,7 @@ export function UserDetailView({ id }: { id: string }) {
   return (
     <div className="flex flex-col gap-6">
       <nav aria-label="مسیر" className="text-[13px] text-[var(--fg-tertiary)]">
-        <Link href="/admin/users" className="hover:text-[var(--brand-700)]">
+        <Link href="/admin/users" className="hover:text-[var(--fg-brand)]">
           کاربران
         </Link>{' '}
         ‹ {user.name ?? 'کاربر'}
@@ -89,7 +89,7 @@ export function UserDetailView({ id }: { id: string }) {
         {user.is_public && user.username && (
           <Link
             href={`/u/${user.username}`}
-            className="text-[13.5px] font-medium text-[var(--brand-700)]"
+            className="text-[13.5px] font-medium text-[var(--fg-brand)]"
           >
             نیمرخ عمومی ←
           </Link>
@@ -125,10 +125,12 @@ export function UserDetailView({ id }: { id: string }) {
 
       <Card className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-[16px]">تاریخچهٔ حسابرسی</CardTitle>
+          <CardTitle as="h2" className="text-[16px]">
+            تاریخچهٔ حسابرسی
+          </CardTitle>
           <Link
             href={`/admin/audit?user_id=${user.id}`}
-            className="text-[13px] font-medium text-[var(--brand-700)]"
+            className="text-[13px] font-medium text-[var(--fg-brand)]"
           >
             همه ←
           </Link>
@@ -227,7 +229,9 @@ function RolesCard({
 
   return (
     <Card className="flex flex-col gap-4">
-      <CardTitle className="text-[16px]">نقش‌ها</CardTitle>
+      <CardTitle as="h2" className="text-[16px]">
+        نقش‌ها
+      </CardTitle>
       <ul className="flex flex-col gap-2">
         {user.grants.map((grant) => (
           <li
@@ -363,7 +367,9 @@ function ImpersonateCard({ user, token }: { user: AdminUserDetail; token: string
 
   return (
     <Card className="flex flex-col gap-3">
-      <CardTitle className="text-[16px]">مشاهده به‌عنوان این کاربر</CardTitle>
+      <CardTitle as="h2" className="text-[16px]">
+        مشاهده به‌عنوان این کاربر
+      </CardTitle>
       <p className="text-[13.5px] text-[var(--fg-secondary)]">
         سامانه را همان‌طور که این کاربر می‌بیند باز کن — فقط خواندنی، حداکثر ۳۰ دقیقه، با بنر قرمز
         دائمی. هیچ فرمی ارسال نمی‌شود.
@@ -416,7 +422,9 @@ function StatusCard({
 
   return (
     <Card className="flex flex-col gap-3">
-      <CardTitle className="text-[16px]">وضعیت حساب</CardTitle>
+      <CardTitle as="h2" className="text-[16px]">
+        وضعیت حساب
+      </CardTitle>
       <p className="text-[13.5px] text-[var(--fg-secondary)]">
         تعلیق همهٔ نشست‌های باز را می‌بندد و ورود را تا فعال‌سازی دوباره متوقف می‌کند. حذف فیزیکی
         حساب از پنل ممکن نیست.

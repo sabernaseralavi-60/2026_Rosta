@@ -96,14 +96,21 @@ export function ProjectsView() {
       </header>
 
       {recommended === null ? (
-        <SkeletonCard label="در حال آماده‌سازی پیشنهادها" />
+        // هم‌قد بخش واقعی (عنوان + سه کارت) تا بانک پروژه با آمدن پیشنهادها
+        // پایین نپرد؛ برای مهمان اصلاً ساخته نمی‌شود (M7-15، CLS ۰٫۴۸ ← ۰).
+        <div className="signed-in-only flex flex-col gap-4">
+          <div className="h-7 w-40 rounded-[var(--radius-sm)] bg-[var(--bg-sunken)]" />
+          <SkeletonCard label="در حال آماده‌سازی پیشنهادها" className="min-h-[200px]" />
+          <SkeletonCard className="min-h-[200px]" />
+          <SkeletonCard className="min-h-[200px]" />
+        </div>
       ) : recommended.length > 0 ? (
         <section className="flex flex-col gap-4">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-[19px] font-semibold">پیشنهادهای تو</h2>
             <Link
               href="/onboarding/results"
-              className="text-[13.5px] font-medium text-[var(--brand-700)] hover:underline"
+              className="text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
             >
               دیدن همه
             </Link>
@@ -140,7 +147,13 @@ export function ProjectsView() {
                 key={filter.value || 'all'}
                 type="button"
                 aria-pressed={kind === filter.value}
-                onClick={() => setKind(filter.value)}
+                onClick={() => {
+                  if (filter.value === kind) return;
+                  setKind(filter.value);
+                  // اسکلت همان لحظهٔ کلیک، نه وقتی نتیجه رسید: جابه‌جایی کارت‌ها
+                  // پس از ۵۰۰ms از کلیک جهش چیدمان حساب می‌شد (CLS ۰٫۳۲، M7-15).
+                  setProjects(null);
+                }}
                 className={cn(
                   'h-9 rounded-[var(--radius-full)] border px-4 text-[13.5px] font-medium',
                   'transition-colors duration-[var(--dur-instant)]',
@@ -156,7 +169,7 @@ export function ProjectsView() {
         </div>
 
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}

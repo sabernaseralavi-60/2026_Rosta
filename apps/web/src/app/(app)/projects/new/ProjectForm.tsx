@@ -181,7 +181,7 @@ export function ProjectForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <Card className="flex flex-col gap-4">
-        <CardTitle>پروژه چیست؟</CardTitle>
+        <CardTitle as="h2">پروژه چیست؟</CardTitle>
 
         <Input
           label="عنوان"
@@ -222,7 +222,7 @@ export function ProjectForm() {
       </Card>
 
       <Card className="flex flex-col gap-4">
-        <CardTitle>نوع و شرایط</CardTitle>
+        <CardTitle as="h2">نوع و شرایط</CardTitle>
 
         <fieldset className="flex flex-col gap-2">
           <legend className="text-[13.5px] font-medium text-[var(--fg-primary)]">نوع پروژه</legend>
@@ -356,10 +356,10 @@ export function ProjectForm() {
 
       <Card className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
-          <CardTitle>مهارت‌های لازم</CardTitle>
+          <CardTitle as="h2">مهارت‌های لازم</CardTitle>
           <CardDescription>
-            بدون دست‌کم یک مهارت، توصیه‌گر نمی‌داند این پروژه را به چه کسی پیشنهاد بدهد —
-            و پروژه منتشر نمی‌شود.
+            بدون دست‌کم یک مهارت، توصیه‌گر نمی‌داند این پروژه را به چه کسی پیشنهاد بدهد — و پروژه
+            منتشر نمی‌شود.
           </CardDescription>
         </div>
 
@@ -374,7 +374,7 @@ export function ProjectForm() {
                 aria-pressed={selected}
                 className={`rounded-[var(--radius-full)] border px-3 py-1 text-[13px] ${
                   selected
-                    ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--brand-700)]'
+                    ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
                     : 'border-[var(--border-default)] text-[var(--fg-secondary)]'
                 }`}
               >
@@ -412,100 +412,101 @@ export function ProjectForm() {
       </Card>
 
       {!useCity && (
-      <Card className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <CardTitle>مراحل</CardTitle>
-          <CardDescription>
-            هر مرحله یک تحویل‌دادنی دارد. دست‌کم یکی لازم است تا پروژه قابل انتشار باشد.
-          </CardDescription>
-        </div>
+        <Card className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <CardTitle as="h2">مراحل</CardTitle>
+            <CardDescription>
+              هر مرحله یک تحویل‌دادنی دارد. دست‌کم یکی لازم است تا پروژه قابل انتشار باشد.
+            </CardDescription>
+          </div>
 
-        {milestones.map((milestone, index) => (
-          <div key={index} className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] p-4">
-            <Input
-              label={`مرحلهٔ ${toPersianDigits(index + 1)}`}
-              value={milestone.title_fa}
-              onChange={(event) =>
-                setMilestones((current) =>
-                  current.map((item, itemIndex) =>
-                    itemIndex === index ? { ...item, title_fa: event.target.value } : item,
-                  ),
-                )
-              }
-              maxLength={200}
-            />
-            <Textarea
-              label="شرح"
-              value={milestone.description}
-              onChange={(event) =>
-                setMilestones((current) =>
-                  current.map((item, itemIndex) =>
-                    itemIndex === index ? { ...item, description: event.target.value } : item,
-                  ),
-                )
-              }
-              rows={2}
-            />
-            <div className="grid gap-3 sm:grid-cols-2">
+          {milestones.map((milestone, index) => (
+            <div
+              key={index}
+              className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--border-subtle)] p-4"
+            >
               <Input
-                label="بارم امتیاز"
-                type="number"
-                min={0}
-                value={milestone.points}
+                label={`مرحلهٔ ${toPersianDigits(index + 1)}`}
+                value={milestone.title_fa}
                 onChange={(event) =>
                   setMilestones((current) =>
                     current.map((item, itemIndex) =>
-                      itemIndex === index ? { ...item, points: event.target.value } : item,
+                      itemIndex === index ? { ...item, title_fa: event.target.value } : item,
                     ),
                   )
                 }
+                maxLength={200}
               />
-              <label className="flex flex-col gap-1.5">
-                <span className="text-[13.5px] font-medium text-[var(--fg-primary)]">مهلت</span>
-                <input
-                  type="date"
-                  value={milestone.due_on}
+              <Textarea
+                label="شرح"
+                value={milestone.description}
+                onChange={(event) =>
+                  setMilestones((current) =>
+                    current.map((item, itemIndex) =>
+                      itemIndex === index ? { ...item, description: event.target.value } : item,
+                    ),
+                  )
+                }
+                rows={2}
+              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Input
+                  label="بارم امتیاز"
+                  type="number"
+                  min={0}
+                  value={milestone.points}
                   onChange={(event) =>
                     setMilestones((current) =>
                       current.map((item, itemIndex) =>
-                        itemIndex === index ? { ...item, due_on: event.target.value } : item,
+                        itemIndex === index ? { ...item, points: event.target.value } : item,
                       ),
                     )
                   }
-                  className="h-11 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-[14px]"
                 />
-              </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-[13.5px] font-medium text-[var(--fg-primary)]">مهلت</span>
+                  <input
+                    type="date"
+                    value={milestone.due_on}
+                    onChange={(event) =>
+                      setMilestones((current) =>
+                        current.map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, due_on: event.target.value } : item,
+                        ),
+                      )
+                    }
+                    className="h-11 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-[14px]"
+                  />
+                </label>
+              </div>
+              {milestones.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="self-start"
+                  onClick={() => setMilestones((current) => current.filter((_, i) => i !== index))}
+                >
+                  حذف این مرحله
+                </Button>
+              )}
             </div>
-            {milestones.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="self-start"
-                onClick={() =>
-                  setMilestones((current) => current.filter((_, i) => i !== index))
-                }
-              >
-                حذف این مرحله
-              </Button>
-            )}
-          </div>
-        ))}
+          ))}
 
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          className="self-start"
-          onClick={() => setMilestones((current) => [...current, { ...EMPTY_MILESTONE }])}
-        >
-          افزودن مرحله
-        </Button>
-      </Card>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="self-start"
+            onClick={() => setMilestones((current) => [...current, { ...EMPTY_MILESTONE }])}
+          >
+            افزودن مرحله
+          </Button>
+        </Card>
       )}
 
       {error && (
-        <p role="alert" className="text-[14px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[14px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

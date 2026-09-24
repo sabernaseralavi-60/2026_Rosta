@@ -12,12 +12,24 @@ export interface ProgressProps {
   value: number;
   max?: number;
   label?: string;
+  /**
+   * نام دسترس‌پذیر وقتی برچسب دیدنی بیرون از نوار است (مثلاً عنوان کارت).
+   * نوار پیشرفت بی‌نام برای صفحه‌خوان فقط «نوار پیشرفت، صفر» است (M7-14).
+   */
+  ariaLabel?: string;
   /** متن سمت چپ — پیش‌فرض «‹value› از ‹max›». */
   valueText?: string;
   className?: string;
 }
 
-export function Progress({ value, max = 100, label, valueText, className }: ProgressProps) {
+export function Progress({
+  value,
+  max = 100,
+  label,
+  ariaLabel,
+  valueText,
+  className,
+}: ProgressProps) {
   const safeMax = Math.max(1, max);
   const clamped = Math.max(0, Math.min(safeMax, value));
   const percent = (clamped / safeMax) * 100;
@@ -27,7 +39,7 @@ export function Progress({ value, max = 100, label, valueText, className }: Prog
       {(label || valueText) && (
         <div className="flex items-baseline justify-between gap-3 text-[13px]">
           {label && <span className="text-[var(--fg-secondary)]">{label}</span>}
-          <span className="font-medium text-[var(--fg-primary)] tabular-nums">
+          <span className="font-medium tabular-nums text-[var(--fg-primary)]">
             {valueText ?? `${toPersianDigits(clamped)} از ${toPersianDigits(safeMax)}`}
           </span>
         </div>
@@ -37,7 +49,8 @@ export function Progress({ value, max = 100, label, valueText, className }: Prog
         aria-valuenow={clamped}
         aria-valuemin={0}
         aria-valuemax={safeMax}
-        aria-label={label}
+        aria-label={label ?? ariaLabel ?? 'پیشرفت'}
+        aria-valuetext={valueText}
         className="h-2 w-full overflow-hidden rounded-[var(--radius-full)] bg-[var(--bg-sunken)]"
       >
         <div

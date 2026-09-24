@@ -93,7 +93,7 @@ export function NotificationBell() {
         {unread ? (
           <span
             aria-hidden="true"
-            className="absolute -top-0.5 end-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-[var(--radius-full)] bg-[var(--accent-600)] px-1 text-[11px] font-bold leading-none text-[var(--neutral-0)]"
+            className="absolute -top-0.5 end-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-[var(--radius-full)] bg-[var(--accent-700)] px-1 text-[11px] font-bold leading-none text-[var(--neutral-0)]"
           >
             {badgeText(unread)}
           </span>
@@ -113,7 +113,7 @@ export function NotificationBell() {
               <button
                 type="button"
                 onClick={() => void markAllRead()}
-                className="text-[13px] font-medium text-[var(--brand-700)] hover:underline"
+                className="text-[13px] font-medium text-[var(--fg-brand)] hover:underline"
               >
                 همه را خواندم
               </button>
@@ -155,7 +155,7 @@ export function NotificationBell() {
             <Link
               href="/notifications"
               onClick={() => setOpen(false)}
-              className="font-medium text-[var(--brand-700)] hover:underline"
+              className="font-medium text-[var(--fg-brand)] hover:underline"
             >
               همهٔ اعلان‌ها
             </Link>

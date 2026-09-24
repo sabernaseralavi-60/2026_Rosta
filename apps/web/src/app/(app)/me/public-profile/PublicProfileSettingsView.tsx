@@ -71,7 +71,7 @@ export function PublicProfileSettingsView() {
 
   if (!me) {
     return error ? (
-      <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+      <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
         {error}
       </p>
     ) : (
@@ -119,7 +119,7 @@ export function PublicProfileSettingsView() {
               {profile.is_public ? (
                 <>
                   هر کسی با پیوند{' '}
-                  <Link href={url} className="font-medium text-[var(--brand-700)]" dir="ltr">
+                  <Link href={url} className="font-medium text-[var(--fg-brand)]" dir="ltr">
                     {url}
                   </Link>{' '}
                   آن را می‌بیند و در جستجوی هم‌تیمی پیدایت می‌کنند.
@@ -153,7 +153,7 @@ export function PublicProfileSettingsView() {
           </div>
         </fieldset>
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}

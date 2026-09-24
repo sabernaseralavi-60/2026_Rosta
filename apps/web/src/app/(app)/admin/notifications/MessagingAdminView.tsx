@@ -195,7 +195,7 @@ function OutboxPanel() {
         </Button>
       </div>
       {notice && (
-        <p role="status" className="text-[13.5px] text-[var(--success-600)]">
+        <p role="status" className="text-[13.5px] text-[var(--fg-success)]">
           {notice}
         </p>
       )}
@@ -229,7 +229,7 @@ function OutboxPanel() {
                     {toPersianDigits(message.attempts)} تلاش · {formatDateTime(message.created_at)}
                   </span>
                   {message.last_error && (
-                    <span className="break-words text-[12.5px] text-[var(--danger-600)]" dir="auto">
+                    <span className="break-words text-[12.5px] text-[var(--fg-danger)]" dir="auto">
                       {message.last_error}
                     </span>
                   )}
@@ -425,7 +425,7 @@ function TemplateEditor({
         </label>
         {error && <ErrorLine>{error}</ErrorLine>}
         {saved && (
-          <p role="status" className="text-[13.5px] text-[var(--success-600)]">
+          <p role="status" className="text-[13.5px] text-[var(--fg-success)]">
             ذخیره شد و در لاگ حسابرسی ثبت شد.
           </p>
         )}

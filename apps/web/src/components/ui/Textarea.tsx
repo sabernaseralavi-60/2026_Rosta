@@ -78,7 +78,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
 
       <div className="flex items-start justify-between gap-3">
         {error ? (
-          <p id={errorId} role="alert" className="text-[12.5px] text-[var(--danger-600)]">
+          <p id={errorId} role="alert" className="text-[12.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         ) : (
@@ -89,7 +89,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
             id={countId}
             className={cn(
               'shrink-0 text-[12px] tabular-nums',
-              nearLimit ? 'text-[var(--warning-600)]' : 'text-[var(--fg-tertiary)]',
+              nearLimit ? 'text-[var(--fg-warning)]' : 'text-[var(--fg-tertiary)]',
             )}
           >
             {toPersianDigits(used)}/{toPersianDigits(maxLength)}

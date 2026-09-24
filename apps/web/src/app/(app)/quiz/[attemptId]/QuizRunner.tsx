@@ -336,7 +336,7 @@ export function QuizRunner({ attemptId }: { attemptId: string }) {
   if (error && !attempt) {
     return (
       <Card className="p-6">
-        <p className="text-[15px] text-[var(--danger-600)]">{error}</p>
+        <p className="text-[15px] text-[var(--fg-danger)]">{error}</p>
       </Card>
     );
   }
@@ -369,9 +369,9 @@ export function QuizRunner({ attemptId }: { attemptId: string }) {
               'rounded-[var(--radius-md)] px-4 py-2 font-mono text-[20px] tabular-nums',
               level === 'normal' && 'bg-[var(--bg-sunken)] text-[var(--fg-primary)]',
               level === 'warn' &&
-                'bg-[color-mix(in_oklch,var(--warning-500)_18%,transparent)] text-[var(--warning-600)]',
+                'bg-[color-mix(in_oklch,var(--warning-500)_18%,transparent)] text-[var(--fg-warning)]',
               (level === 'danger' || level === 'expired') &&
-                'bg-[color-mix(in_oklch,var(--danger-500)_14%,transparent)] text-[var(--danger-600)]',
+                'bg-[color-mix(in_oklch,var(--danger-500)_14%,transparent)] text-[var(--fg-danger)]',
             )}
           >
             {formatClock(seconds)}
@@ -382,13 +382,16 @@ export function QuizRunner({ attemptId }: { attemptId: string }) {
       {notice ? (
         <div
           role="status"
-          className="rounded-[var(--radius-md)] bg-[color-mix(in_oklch,var(--warning-500)_14%,transparent)] p-3 text-[14px] text-[var(--warning-600)]"
+          className="rounded-[var(--radius-md)] bg-[color-mix(in_oklch,var(--warning-500)_14%,transparent)] p-3 text-[14px] text-[var(--fg-warning)]"
         >
           {notice}
         </div>
       ) : null}
       {error ? (
-        <div role="alert" className="rounded-[var(--radius-md)] bg-[color-mix(in_oklch,var(--danger-500)_12%,transparent)] p-3 text-[14px] text-[var(--danger-600)]">
+        <div
+          role="alert"
+          className="rounded-[var(--radius-md)] bg-[color-mix(in_oklch,var(--danger-500)_12%,transparent)] p-3 text-[14px] text-[var(--fg-danger)]"
+        >
           {error}
         </div>
       ) : null}
@@ -452,9 +455,7 @@ export function QuizRunner({ attemptId }: { attemptId: string }) {
         {/* ── ناوبر سؤالات ── */}
         <div className="space-y-3">
           <Card className="p-4">
-            <h3 className="mb-3 text-[14px] font-medium text-[var(--fg-primary)]">
-              ناوبری سؤالات
-            </h3>
+            <h3 className="mb-3 text-[14px] font-medium text-[var(--fg-primary)]">ناوبری سؤالات</h3>
             <ol className="grid grid-cols-6 gap-2 lg:grid-cols-5">
               {attempt.questions.map((item, index) => {
                 const done = isAnswered(answers[item.id]);
@@ -479,7 +480,7 @@ export function QuizRunner({ attemptId }: { attemptId: string }) {
                       {mark ? (
                         <span
                           aria-hidden
-                          className="absolute -top-1 -start-1 text-[11px] text-[var(--warning-600)]"
+                          className="absolute -start-1 -top-1 text-[11px] text-[var(--fg-warning)]"
                         >
                           ★
                         </span>
@@ -493,11 +494,11 @@ export function QuizRunner({ attemptId }: { attemptId: string }) {
 
           <Card className="space-y-3 p-4">
             {unansweredCount > 0 ? (
-              <p className="text-[13.5px] text-[var(--warning-600)]">
+              <p className="text-[13.5px] text-[var(--fg-warning)]">
                 {toPersianDigits(unansweredCount)} سؤال بی‌پاسخ مانده است.
               </p>
             ) : (
-              <p className="text-[13.5px] text-[var(--success-600)]">
+              <p className="text-[13.5px] text-[var(--fg-success)]">
                 به همهٔ سؤال‌ها پاسخ داده‌اید.
               </p>
             )}

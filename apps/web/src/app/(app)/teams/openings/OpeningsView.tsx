@@ -152,7 +152,7 @@ export function OpeningsView() {
                 <Card className="flex flex-wrap items-center justify-between gap-2">
                   <Link
                     href={`/teams/openings/${app.opening_id}`}
-                    className="text-[14.5px] font-medium hover:text-[var(--brand-700)]"
+                    className="text-[14.5px] font-medium hover:text-[var(--fg-brand)]"
                   >
                     {app.opening_title} — {app.target.title}
                   </Link>
@@ -174,7 +174,7 @@ export function OpeningsView() {
         />
         <ChipGroup label="فیلتر آگهی" options={FILTERS} value={filter} onChange={setFilter} />
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}
@@ -214,7 +214,7 @@ function OpeningCard({ opening }: { opening: Opening }) {
       </div>
       <Link
         href={`/teams/openings/${opening.id}`}
-        className="text-[16px] font-semibold text-[var(--fg-primary)] hover:text-[var(--brand-700)]"
+        className="text-[16px] font-semibold text-[var(--fg-primary)] hover:text-[var(--fg-brand)]"
       >
         {opening.title}
       </Link>
@@ -382,7 +382,7 @@ function OpeningForm({
                 onClick={() => toggle(skill.id)}
                 className={
                   needed.includes(skill.id)
-                    ? 'h-8 rounded-[var(--radius-full)] border border-[var(--brand-600)] bg-[var(--brand-50)] px-3 text-[13px] text-[var(--brand-700)]'
+                    ? 'h-8 rounded-[var(--radius-full)] border border-[var(--brand-600)] bg-[var(--brand-50)] px-3 text-[13px] text-[var(--fg-brand)]'
                     : 'h-8 rounded-[var(--radius-full)] border border-[var(--border-default)] px-3 text-[13px] text-[var(--fg-secondary)]'
                 }
               >
@@ -392,7 +392,7 @@ function OpeningForm({
           </div>
         </fieldset>
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { apiFetch, WRITE_EVENT } from '@/lib/api/client';
@@ -133,13 +133,19 @@ describe('NextStepCard — FR-DASH-01', () => {
 
   it('بدون کار عقب‌افتاده هم کارت خالی نمی‌ماند', () => {
     render(<NextStepCard step={null} />);
-    expect(screen.getByRole('heading', { name: 'فعلاً کار عقب‌افتاده‌ای نداری' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'فعلاً کار عقب‌افتاده‌ای نداری' }),
+    ).toBeInTheDocument();
   });
 });
 
 describe('LedgerRow — دفتر کل شفاف', () => {
   it('منشأ امتیاز پیوند دارد', () => {
-    render(<ul><LedgerRow entry={entry()} /></ul>);
+    render(
+      <ul>
+        <LedgerRow entry={entry()} />
+      </ul>,
+    );
     expect(screen.getByRole('link', { name: 'تحقیق بازار — خرمای صابر' })).toHaveAttribute(
       'href',
       '/projects/p-1/workspace',
@@ -148,7 +154,11 @@ describe('LedgerRow — دفتر کل شفاف', () => {
   });
 
   it('ردیف اصلاح‌شده خط می‌خورد، پاک نمی‌شود', () => {
-    render(<ul><LedgerRow entry={entry({ is_reversed: true })} /></ul>);
+    render(
+      <ul>
+        <LedgerRow entry={entry({ is_reversed: true })} />
+      </ul>,
+    );
     expect(screen.getByText('+۵۰')).toHaveClass('line-through');
   });
 
@@ -220,8 +230,16 @@ describe('PointsTrend — روند هفتگی', () => {
     expect(labels).toEqual(['۷۵']);
   });
 
-  it('هر ستون با کیبورد قابل دسترسی و خواناست', () => {
-    render(<PointsTrend trend={trend} />);
-    expect(screen.getByLabelText(/۴۰ امتیاز$/)).toHaveAttribute('tabindex', '0');
+  it('کل نمودار یک توقف Tab است و فلش بین هفته‌ها جابه‌جا می‌کند (M7-14)', async () => {
+    const { container } = render(<PointsTrend trend={trend} />);
+    // پیش از M7-14 هر ستون `tabindex` و `aria-label` داشت: درون `role="img"`
+    // ممنوع بود و فوکوسش هم دیده نمی‌شد.
+    expect(container.querySelectorAll('[tabindex]')).toHaveLength(1);
+    const chart = screen.getByRole('img', { name: /نمودار ستونی امتیاز هفتگی/ });
+    chart.focus();
+    // فوکوس روی هفتهٔ جاری می‌نشیند؛ فلش چپ هفتهٔ قبل را نشان می‌دهد.
+    expect(await screen.findByText('۷۵ امتیاز')).toBeInTheDocument();
+    fireEvent.keyDown(chart, { key: 'ArrowLeft' });
+    expect(await screen.findByText('۴۰ امتیاز')).toBeInTheDocument();
   });
 });

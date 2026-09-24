@@ -112,9 +112,24 @@
 
   --fg-primary: var(--neutral-900);
   --fg-secondary: var(--neutral-600);
-  --fg-tertiary: var(--neutral-500);
+  /* نه `--neutral-500`: آن روی بوم ۴٫۰ و روی سفید ۴٫۳ به ۱ بود و در ۱۹۹ جا
+   * متن کوچک را زیر ۴٫۵ می‌برد. ۵۳٪ روی سفید، بوم و فرورفته ≥ ۴٫۷ است (M7-14). */
+  --fg-tertiary: oklch(53% 0.012 80);
   --fg-on-brand: var(--neutral-0);
   --fg-inverse: var(--neutral-50);
+
+  /* ── رنگ متن هر لحن (M7-14) ────────────────────────
+   * پلهٔ پالت هم پس‌زمینه است هم متن، و یک پله در هر دو تم برای متن
+   * درست نیست: `--brand-700` در تیره ۲٫۷ به ۱ بود، `--warning-600` در روشن
+   * ۳٫۲ به ۱. متن رنگی همیشه از این نقش‌ها می‌آید، نه از پلهٔ پالت. همه
+   * روی سطح، بوم و پس‌زمینهٔ کم‌رنگ همان لحن ≥ ۴٫۵ به ۱‌اند. */
+  --fg-brand: var(--brand-700);
+  --fg-accent: var(--accent-700);
+  --fg-danger: var(--danger-600);
+  --fg-success: oklch(48% 0.125 150);
+  --fg-warning: oklch(50% 0.12 72);
+  --fg-info: oklch(50% 0.13 245);
+  --fg-research: oklch(50% 0.15 295);
 
   --border-subtle: var(--neutral-200);
   --border-default: var(--neutral-300);
@@ -122,10 +137,8 @@
   --border-focus: var(--brand-600);
 
   --shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.04);
-  --shadow-md:
-    0 2px 6px -1px oklch(0% 0 0 / 0.06), 0 1px 3px -1px oklch(0% 0 0 / 0.04);
-  --shadow-lg:
-    0 8px 24px -6px oklch(0% 0 0 / 0.1), 0 2px 6px -2px oklch(0% 0 0 / 0.05);
+  --shadow-md: 0 2px 6px -1px oklch(0% 0 0 / 0.06), 0 1px 3px -1px oklch(0% 0 0 / 0.04);
+  --shadow-lg: 0 8px 24px -6px oklch(0% 0 0 / 0.1), 0 2px 6px -2px oklch(0% 0 0 / 0.05);
 }
 
 /* ── حالت تیره ───────────────────────────────────── */
@@ -139,8 +152,24 @@
 
     --fg-primary: var(--neutral-100);
     --fg-secondary: var(--neutral-400);
-    --fg-tertiary: var(--neutral-500);
+    /* ۶۵٪: حتی روی سطح برجستهٔ `--neutral-800` ≥ ۴٫۵ به ۱ (M7-14). */
+    --fg-tertiary: oklch(65% 0.012 82);
     --fg-inverse: var(--neutral-900);
+
+    --fg-brand: oklch(78% 0.1 183);
+    --fg-accent: oklch(76% 0.14 60);
+    --fg-danger: oklch(72% 0.15 25);
+    --fg-success: oklch(74% 0.14 150);
+    --fg-warning: oklch(80% 0.14 80);
+    --fg-info: oklch(74% 0.11 245);
+    --fg-research: oklch(74% 0.12 295);
+
+    /* پله‌های ۵۰ و ۱۰۰ فقط پس‌زمینهٔ کم‌رنگ‌اند؛ در تیره، قرص روشن زیر
+     * متن روشن کنتراست را از بین می‌برد. */
+    --brand-50: oklch(26% 0.035 185);
+    --brand-100: oklch(31% 0.05 185);
+    --accent-50: oklch(27% 0.04 70);
+    --accent-100: oklch(32% 0.06 72);
 
     --border-subtle: oklch(26% 0.009 86);
     --border-default: oklch(33% 0.01 85);
@@ -149,6 +178,11 @@
 
     /* در تاریکی، برند روشن‌تر می‌شود تا کنتراست حفظ شود */
     --brand-600: oklch(70% 0.118 183);
+    /* برند روشن‌شده زیر متن سفید ۲٫۵ به ۱ بود؛ روی دکمهٔ برند در تیره متن
+     * تیره می‌نشیند (۸ به ۱) و hover یک پله تیره‌تر است — `--brand-700`
+     * روشن زیر متن تیره گم می‌شد (M7-14). */
+    --fg-on-brand: var(--neutral-950);
+    --brand-700: oklch(63% 0.118 183);
     --accent-500: oklch(76% 0.155 64);
     /* زعفرانی در تاریکی یک پله تیره‌تر تا در باند روشنایی بماند (M5). */
     --cat-startup: oklch(66% 0.16 58);
@@ -165,8 +199,24 @@
 
   --fg-primary: var(--neutral-100);
   --fg-secondary: var(--neutral-400);
-  --fg-tertiary: var(--neutral-500);
+  /* ۶۵٪: حتی روی سطح برجستهٔ `--neutral-800` ≥ ۴٫۵ به ۱ (M7-14). */
+  --fg-tertiary: oklch(65% 0.012 82);
   --fg-inverse: var(--neutral-900);
+
+  --fg-brand: oklch(78% 0.1 183);
+  --fg-accent: oklch(76% 0.14 60);
+  --fg-danger: oklch(72% 0.15 25);
+  --fg-success: oklch(74% 0.14 150);
+  --fg-warning: oklch(80% 0.14 80);
+  --fg-info: oklch(74% 0.11 245);
+  --fg-research: oklch(74% 0.12 295);
+
+  /* پله‌های ۵۰ و ۱۰۰ فقط پس‌زمینهٔ کم‌رنگ‌اند؛ در تیره، قرص روشن زیر
+   * متن روشن کنتراست را از بین می‌برد. */
+  --brand-50: oklch(26% 0.035 185);
+  --brand-100: oklch(31% 0.05 185);
+  --accent-50: oklch(27% 0.04 70);
+  --accent-100: oklch(32% 0.06 72);
 
   --border-subtle: oklch(26% 0.009 86);
   --border-default: oklch(33% 0.01 85);
@@ -174,6 +224,11 @@
   --border-focus: var(--brand-400);
 
   --brand-600: oklch(70% 0.118 183);
+  /* برند روشن‌شده زیر متن سفید ۲٫۵ به ۱ بود؛ روی دکمهٔ برند در تیره متن
+   * تیره می‌نشیند (۸ به ۱) و hover یک پله تیره‌تر است — `--brand-700`
+   * روشن زیر متن تیره گم می‌شد (M7-14). */
+  --fg-on-brand: var(--neutral-950);
+  --brand-700: oklch(63% 0.118 183);
   --accent-500: oklch(76% 0.155 64);
   --cat-startup: oklch(66% 0.16 58);
 }

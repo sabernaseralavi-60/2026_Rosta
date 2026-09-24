@@ -29,7 +29,8 @@ const STATE_TONE: Record<LevelState, BadgeTone> = {
 };
 
 export function ResearchView() {
-  const { accessToken, loading: sessionLoading } = useSession();
+  // ویترین عمومی (ADR-0017): مهمان می‌بیند و هر اقدامی خودش پشت ورود است.
+  const { accessToken, loading: sessionLoading } = useSession({ required: false });
   const [track, setTrack] = useState<Track | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,9 +60,11 @@ export function ResearchView() {
           <Button asChild variant="secondary" size="sm">
             <Link href="/research/topics">بانک موضوع</Link>
           </Button>
-          <Button asChild variant="secondary" size="sm">
-            <Link href="/research/outputs">مقاله‌های من</Link>
-          </Button>
+          {accessToken && (
+            <Button asChild variant="secondary" size="sm">
+              <Link href="/research/outputs">مقاله‌های من</Link>
+            </Button>
+          )}
           {track?.can_review && (
             <Button asChild size="sm">
               <Link href="/research/review">صف بررسی</Link>
@@ -71,7 +74,7 @@ export function ResearchView() {
       </header>
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -95,7 +98,7 @@ export function ResearchView() {
                 <p className="text-[13px] text-[var(--fg-tertiary)]">موضوع پژوهش تو</p>
                 <Link
                   href={`/research/topics/${track.topic.id}`}
-                  className="text-[15.5px] font-semibold hover:text-[var(--brand-700)]"
+                  className="text-[15.5px] font-semibold hover:text-[var(--fg-brand)]"
                 >
                   {track.topic.title}
                 </Link>
@@ -138,7 +141,9 @@ function LevelCard({ level, current }: { level: Level; current: boolean }) {
   return (
     <Card
       variant={current ? 'raised' : 'flat'}
-      className={locked ? 'flex flex-col gap-3 opacity-70' : 'flex flex-col gap-3'}
+      // قفل با حاشیهٔ خط‌چین و نشان «قفل» دیده می‌شود، نه با کم‌رنگ کردن کل
+      // کارت: opacity متن را به ۲٫۶ به ۱ می‌رساند (M7-14).
+      className={locked ? 'flex flex-col gap-3 border-dashed shadow-none' : 'flex flex-col gap-3'}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">

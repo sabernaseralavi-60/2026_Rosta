@@ -195,7 +195,7 @@ export function TasksTab({
       </Card>
 
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

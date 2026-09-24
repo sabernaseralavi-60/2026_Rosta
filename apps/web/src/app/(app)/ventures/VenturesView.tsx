@@ -127,7 +127,7 @@ export function VenturesView() {
         <ChipGroup label="فیلتر کسب‌وکار" options={FILTERS} value={filter} onChange={setFilter} />
 
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}
@@ -171,7 +171,7 @@ function VentureCard({ venture }: { venture: VentureSummary }) {
       </div>
       <Link
         href={`/ventures/${venture.id}`}
-        className="text-[16.5px] font-semibold text-[var(--fg-primary)] hover:text-[var(--brand-700)]"
+        className="text-[16.5px] font-semibold text-[var(--fg-primary)] hover:text-[var(--fg-brand)]"
       >
         {venture.name}
       </Link>

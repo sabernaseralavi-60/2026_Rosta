@@ -56,7 +56,18 @@ export function DashboardView() {
   if (error) {
     return <EmptyState title="داشبورد بارگذاری نشد" description={error} />;
   }
-  if (!data) return <SkeletonCard label="در حال بارگذاری داشبورد" />;
+  if (!data) {
+    // هم‌شکل بخش‌های واقعی و دست‌کم یک صفحه بلند: پیش از M7-15 یک کارت کوچک
+    // بود و آمدن داشبورد «کارهای من» و پیشنهادها را از دید بیرون می‌راند
+    // (CLS ۰٫۴۶). حالا آن‌ها از اول زیر خط دیدند.
+    return (
+      <div className="flex flex-col gap-8">
+        <SkeletonCard label="در حال بارگذاری داشبورد" className="min-h-[360px]" />
+        <SkeletonCard className="min-h-[220px]" />
+        <SkeletonCard className="min-h-[220px]" />
+      </div>
+    );
+  }
 
   const { level } = data.points;
   const toNext = Math.ceil(points(level.to_next));
@@ -72,7 +83,7 @@ export function DashboardView() {
           </h2>
           <Link
             href="/me/points"
-            className="text-[13.5px] font-medium text-[var(--brand-700)] hover:underline"
+            className="text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
           >
             دفتر امتیاز
           </Link>
@@ -83,7 +94,7 @@ export function DashboardView() {
               <span className="text-[13px] text-[var(--fg-secondary)]">
                 سطح {toPersianDigits(level.level)} — {level.title_fa}
               </span>
-              <span className="text-[34px] leading-none font-bold">
+              <span className="text-[34px] font-bold leading-none">
                 {formatNumber(points(data.points.total))}
                 <span className="ms-1.5 text-[15px] font-medium text-[var(--fg-secondary)]">
                   امتیاز
@@ -96,9 +107,7 @@ export function DashboardView() {
                 max={100}
                 label="تا سطح بعد"
                 valueText={
-                  level.next_at === null
-                    ? 'بالاترین سطح'
-                    : `${formatNumber(toNext)} امتیاز مانده`
+                  level.next_at === null ? 'بالاترین سطح' : `${formatNumber(toNext)} امتیاز مانده`
                 }
               />
             </div>
@@ -264,7 +273,7 @@ export function DashboardView() {
             </h2>
             <Link
               href="/me/badges"
-              className="text-[13.5px] font-medium text-[var(--brand-700)] hover:underline"
+              className="text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
             >
               همهٔ نشان‌ها
             </Link>
@@ -291,4 +300,3 @@ export function DashboardView() {
     </div>
   );
 }
-

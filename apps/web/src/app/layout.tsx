@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
+import { SESSION_HINT_SCRIPT } from '@/lib/auth/session';
+
 import '@/styles/globals.css';
 
 /**
@@ -17,8 +19,7 @@ export const metadata: Metadata = {
     // §10.8 — عنوان صفحه در هر مسیر منحصربه‌فرد و توصیفی است.
     template: '%s — سیلپ',
   },
-  description:
-    'اکوسیستمی که دانشجو را از مصرف‌کنندهٔ دانش به تولیدکنندهٔ ارزش تبدیل می‌کند.',
+  description: 'اکوسیستمی که دانشجو را از مصرف‌کنندهٔ دانش به تولیدکنندهٔ ارزش تبدیل می‌کند.',
   applicationName: 'SILP',
   robots: { index: true, follow: true },
 };
@@ -37,6 +38,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
+      <head>
+        {/* M7-15 — `data-session` پیش از اولین رنگ‌آمیزی. next/script این
+            تضمین را نمی‌دهد؛ محتوا ثابت زمان ساخت است، نه ورودی کاربر. */}
+        {/* eslint-disable-next-line react/no-danger -- رشتهٔ ثابت، بی‌ورودی کاربر */}
+        <script dangerouslySetInnerHTML={{ __html: SESSION_HINT_SCRIPT }} />
+      </head>
       <body>
         {/* §10.8 — اولین عنصر focusable صفحه */}
         <a href="#main" className="skip-link">

@@ -49,7 +49,7 @@ export function MyCertificatesView() {
 
   if (error) {
     return (
-      <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+      <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
         {error}
       </p>
     );
@@ -91,7 +91,7 @@ export function MyCertificatesView() {
                   صادرکننده: {certificate.issuer_name} · {formatDateLong(certificate.issued_at)}
                 </CardDescription>
                 {certificate.revoke_reason && (
-                  <p className="text-[13px] text-[var(--danger-600)]">
+                  <p className="text-[13px] text-[var(--fg-danger)]">
                     دلیل ابطال: {certificate.revoke_reason}
                   </p>
                 )}

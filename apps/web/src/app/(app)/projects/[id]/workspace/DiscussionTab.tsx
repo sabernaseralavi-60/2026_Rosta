@@ -85,7 +85,7 @@ export function DiscussionTab({
             placeholder="چیزی بنویس که تیم لازم دارد بداند…"
           />
           {error && (
-            <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+            <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
               {error}
             </p>
           )}
@@ -194,7 +194,10 @@ export function ActivityTab({ activity }: { activity: Activity[] }) {
   return (
     <ol className="flex flex-col gap-3">
       {activity.map((item) => (
-        <li key={item.id} className="flex flex-col gap-0.5 border-s-2 border-[var(--border-subtle)] ps-3">
+        <li
+          key={item.id}
+          className="flex flex-col gap-0.5 border-s-2 border-[var(--border-subtle)] ps-3"
+        >
           <p className="text-[14px] text-[var(--fg-primary)]">{item.summary}</p>
           <p className="text-[12px] text-[var(--fg-tertiary)]">
             {item.actor_name ? `${item.actor_name} — ` : ''}

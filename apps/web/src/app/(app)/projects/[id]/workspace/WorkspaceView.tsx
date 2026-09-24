@@ -131,10 +131,10 @@ export function WorkspaceView({ id }: { id: string }) {
   if (denied) {
     return (
       <Card className="flex flex-col gap-3">
-        <CardTitle>این فضای کاری برای تیم پروژه است</CardTitle>
+        <CardTitle as="h1">این فضای کاری برای تیم پروژه است</CardTitle>
         <CardDescription>
-          برای دیدن مراحل، وظایف و گفتگو باید عضو تیم باشی. از صفحهٔ پروژه می‌توانی
-          درخواست پیوستن بدهی.
+          برای دیدن مراحل، وظایف و گفتگو باید عضو تیم باشی. از صفحهٔ پروژه می‌توانی درخواست پیوستن
+          بدهی.
         </CardDescription>
         <Button asChild variant="secondary" className="self-start">
           <Link href={`/projects/${id}`}>صفحهٔ پروژه</Link>
@@ -176,11 +176,7 @@ export function WorkspaceView({ id }: { id: string }) {
             {STATUS_LABELS[project.status] ?? project.status}
           </Badge>
           <Badge tone="brand">{project.kind_fa}</Badge>
-          {team && (
-            <Badge tone="neutral">
-              {toPersianDigits(team.active_members)} عضو
-            </Badge>
-          )}
+          {team && <Badge tone="neutral">{toPersianDigits(team.active_members)} عضو</Badge>}
         </div>
         <h1>{project.title_fa}</h1>
         <div className="flex flex-wrap gap-2">
@@ -203,17 +199,19 @@ export function WorkspaceView({ id }: { id: string }) {
         </div>
       </header>
 
-      {isLead && (
-        <LeadActions project={project} accessToken={accessToken!} onChanged={load} />
-      )}
+      {isLead && <LeadActions project={project} accessToken={accessToken!} onChanged={load} />}
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
 
-      <div role="tablist" aria-label="بخش‌های فضای کاری" className="flex flex-wrap gap-1 border-b border-[var(--border-subtle)]">
+      <div
+        role="tablist"
+        aria-label="بخش‌های فضای کاری"
+        className="flex flex-wrap gap-1 border-b border-[var(--border-subtle)]"
+      >
         {(project?.kind === 'A_VENTURE' ? [...TABS, VENTURE_TAB] : TABS).map((item) => (
           <button
             key={item.key}
@@ -224,7 +222,7 @@ export function WorkspaceView({ id }: { id: string }) {
             className={cn(
               'relative -mb-px px-3 py-2 text-[14px] font-medium transition-colors',
               tab === item.key
-                ? 'border-b-2 border-[var(--brand-600)] text-[var(--brand-700)]'
+                ? 'border-b-2 border-[var(--brand-600)] text-[var(--fg-brand)]'
                 : 'text-[var(--fg-secondary)] hover:text-[var(--fg-primary)]',
             )}
           >
@@ -315,10 +313,7 @@ function LeadActions({
     }
   }
 
-  function withReason(
-    action: 'pause' | 'cancel',
-    question: string,
-  ): () => void {
+  function withReason(action: 'pause' | 'cancel', question: string): () => void {
     return () => {
       const reason = window.prompt(question);
       if (!reason || reason.trim().length < 3) return;
@@ -382,7 +377,7 @@ function LeadActions({
         ))}
       </div>
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

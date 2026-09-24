@@ -20,7 +20,14 @@ import { BadgeIcon } from './BadgeTile';
 
 export type Celebration =
   | { kind: 'level'; level: number; title: string }
-  | { kind: 'badge'; code: string; title: string; description: string; icon: string; tier_fa: string };
+  | {
+      kind: 'badge';
+      code: string;
+      title: string;
+      description: string;
+      icon: string;
+      tier_fa: string;
+    };
 
 export interface LevelUpModalProps {
   celebration: Celebration | null;
@@ -32,14 +39,12 @@ export function LevelUpModal({ celebration, onClose }: LevelUpModalProps) {
     <Dialog.Root open={celebration !== null} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-[oklch(0%_0_0/0.45)]" />
-        <Dialog.Content
-          className="silp-celebrate fixed inset-x-0 top-1/2 z-50 mx-auto flex w-[min(92vw,380px)] -translate-y-1/2 flex-col items-center gap-4 rounded-[var(--radius-xl)] bg-[var(--bg-surface)] p-8 text-center shadow-[var(--shadow-lg)]"
-        >
+        <Dialog.Content className="silp-celebrate fixed inset-x-0 top-1/2 z-50 mx-auto flex w-[min(92vw,380px)] -translate-y-1/2 flex-col items-center gap-4 rounded-[var(--radius-xl)] bg-[var(--bg-surface)] p-8 text-center shadow-[var(--shadow-lg)]">
           {celebration?.kind === 'level' && (
             <>
               <div
                 aria-hidden="true"
-                className="flex size-24 items-center justify-center rounded-[var(--radius-full)] bg-[var(--brand-50)] text-[40px] font-bold text-[var(--brand-700)]"
+                className="flex size-24 items-center justify-center rounded-[var(--radius-full)] bg-[var(--brand-50)] text-[40px] font-bold text-[var(--fg-brand)]"
               >
                 {toPersianDigits(celebration.level)}
               </div>

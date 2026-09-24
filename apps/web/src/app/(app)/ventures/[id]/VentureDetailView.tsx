@@ -57,7 +57,7 @@ export function VentureDetailView({ id }: { id: string }) {
   if (error && !venture) {
     return (
       <div className="flex flex-col gap-4">
-        <p role="alert" className="text-[15px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[15px] text-[var(--fg-danger)]">
           {error}
         </p>
         <Button asChild variant="secondary" className="self-start">
@@ -80,7 +80,7 @@ export function VentureDetailView({ id }: { id: string }) {
   return (
     <article className="flex flex-col gap-8">
       <nav aria-label="مسیر" className="text-[13px] text-[var(--fg-tertiary)]">
-        <Link href="/ventures" className="hover:text-[var(--brand-700)]">
+        <Link href="/ventures" className="hover:text-[var(--fg-brand)]">
           کسب‌وکارها
         </Link>{' '}
         ‹ {venture.name}
@@ -97,7 +97,7 @@ export function VentureDetailView({ id }: { id: string }) {
         {venture.origin_idea_id && (
           <Link
             href={`/ideas/${venture.origin_idea_id}`}
-            className="self-start text-[13px] font-medium text-[var(--brand-700)] hover:underline"
+            className="self-start text-[13px] font-medium text-[var(--fg-brand)] hover:underline"
           >
             از بانک ایده آمده است ←
           </Link>
@@ -105,7 +105,7 @@ export function VentureDetailView({ id }: { id: string }) {
       </header>
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -177,7 +177,7 @@ export function VentureDetailView({ id }: { id: string }) {
               <li key={project.id}>
                 <Link
                   href={`/projects/${project.id}`}
-                  className="text-[14.5px] font-medium text-[var(--brand-700)] hover:underline"
+                  className="text-[14.5px] font-medium text-[var(--fg-brand)] hover:underline"
                 >
                   {project.title_fa}
                 </Link>
@@ -309,7 +309,7 @@ function NextStepCard({
                 <span
                   aria-hidden="true"
                   className={
-                    criterion.met ? 'text-[var(--success-600)]' : 'text-[var(--fg-tertiary)]'
+                    criterion.met ? 'text-[var(--fg-success)]' : 'text-[var(--fg-tertiary)]'
                   }
                 >
                   {criterion.met ? '✓' : '○'}
@@ -513,7 +513,7 @@ function TeamSection({
                   </span>
                   <button
                     type="button"
-                    className="font-medium text-[var(--danger-600)] hover:underline"
+                    className="font-medium text-[var(--fg-danger)] hover:underline"
                     onClick={async () => {
                       if (!accessToken) return;
                       await cancelInvitation(accessToken, invitation.id).catch((cause) =>

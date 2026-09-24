@@ -84,7 +84,7 @@ export function PublicProfileBody({ profile }: { profile: PublicProfile }) {
                 <span className="text-[14px]">{certificate.title_fa}</span>
                 <Link
                   href={`/verify/${certificate.public_code}`}
-                  className="text-[13px] font-medium text-[var(--brand-700)]"
+                  className="text-[13px] font-medium text-[var(--fg-brand)]"
                 >
                   راستی‌آزمایی <span dir="ltr">{certificate.public_code}</span> ←
                 </Link>

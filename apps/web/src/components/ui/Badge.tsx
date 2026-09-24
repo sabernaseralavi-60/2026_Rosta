@@ -10,25 +10,18 @@ import { cn } from '@/lib/cn';
  */
 
 export type BadgeTone =
-  | 'neutral'
-  | 'brand'
-  | 'accent'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'info'
-  | 'research';
+  'neutral' | 'brand' | 'accent' | 'success' | 'warning' | 'danger' | 'info' | 'research';
 
 const TONES: Record<BadgeTone, string> = {
   neutral: 'bg-[var(--bg-sunken)] text-[var(--fg-secondary)]',
-  brand: 'bg-[var(--brand-50)] text-[var(--brand-700)]',
-  accent: 'bg-[var(--accent-50)] text-[var(--accent-700)]',
-  success: 'bg-[color-mix(in_oklch,var(--success-500)_14%,transparent)] text-[var(--success-600)]',
-  warning: 'bg-[color-mix(in_oklch,var(--warning-500)_18%,transparent)] text-[var(--warning-600)]',
-  danger: 'bg-[color-mix(in_oklch,var(--danger-500)_12%,transparent)] text-[var(--danger-600)]',
-  info: 'bg-[color-mix(in_oklch,var(--info-500)_12%,transparent)] text-[var(--info-500)]',
+  brand: 'bg-[var(--brand-50)] text-[var(--fg-brand)]',
+  accent: 'bg-[var(--accent-50)] text-[var(--fg-accent)]',
+  success: 'bg-[color-mix(in_oklch,var(--success-500)_14%,transparent)] text-[var(--fg-success)]',
+  warning: 'bg-[color-mix(in_oklch,var(--warning-500)_18%,transparent)] text-[var(--fg-warning)]',
+  danger: 'bg-[color-mix(in_oklch,var(--danger-500)_12%,transparent)] text-[var(--fg-danger)]',
+  info: 'bg-[color-mix(in_oklch,var(--info-500)_12%,transparent)] text-[var(--fg-info)]',
   research:
-    'bg-[color-mix(in_oklch,var(--cat-research)_12%,transparent)] text-[var(--cat-research)]',
+    'bg-[color-mix(in_oklch,var(--cat-research)_12%,transparent)] text-[var(--fg-research)]',
 };
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

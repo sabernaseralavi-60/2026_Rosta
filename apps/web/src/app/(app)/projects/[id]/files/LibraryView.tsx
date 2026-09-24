@@ -57,7 +57,7 @@ export function LibraryView({ id }: { id: string }) {
       </header>
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -84,7 +84,7 @@ export function LibraryView({ id }: { id: string }) {
                           <button
                             type="button"
                             onClick={() => void open(version.file.id)}
-                            className="font-medium text-[var(--brand-700)] underline"
+                            className="font-medium text-[var(--fg-brand)] underline"
                           >
                             نسخهٔ {toPersianDigits(version.version)}
                           </button>
@@ -127,7 +127,7 @@ export function LibraryView({ id }: { id: string }) {
                     <button
                       type="button"
                       onClick={() => void open(entry.file.id)}
-                      className="text-start font-medium text-[var(--brand-700)] underline"
+                      className="text-start font-medium text-[var(--fg-brand)] underline"
                       dir="ltr"
                     >
                       {entry.file.original_name}

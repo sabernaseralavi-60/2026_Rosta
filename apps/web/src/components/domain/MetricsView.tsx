@@ -91,7 +91,7 @@ export function MetricsView({
       {!embedded && (
         <header className="flex flex-col gap-1">
           {backHref && (
-            <Link href={backHref} className="text-[13px] text-[var(--brand-700)] hover:underline">
+            <Link href={backHref} className="text-[13px] text-[var(--fg-brand)] hover:underline">
               → بازگشت
             </Link>
           )}
@@ -104,7 +104,7 @@ export function MetricsView({
       )}
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -125,7 +125,7 @@ export function MetricsView({
         <>
           {page.by_member.length > 1 && (
             <Card className="flex flex-col gap-3">
-              <CardTitle>عملکرد هر عضو (تأییدشده)</CardTitle>
+              <CardTitle as="h2">عملکرد هر عضو (تأییدشده)</CardTitle>
               <div className="flex flex-col gap-2">
                 {page.by_member.map((member) => (
                   <div
@@ -223,7 +223,7 @@ function RecordForm({
     <Card>
       <form onSubmit={submit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <CardTitle>ثبت فعالیت یا فروش</CardTitle>
+          <CardTitle as="h2">ثبت فعالیت یا فروش</CardTitle>
           <CardDescription>
             مبلغ فروش را به ریال بنویس. رسید یا مستند را در توضیح ذکر کن.
           </CardDescription>
@@ -353,7 +353,7 @@ function MetricRow({
         <button
           type="button"
           onClick={() => act('DELETE')}
-          className="self-start text-[12.5px] font-medium text-[var(--danger-600)] hover:underline"
+          className="self-start text-[12.5px] font-medium text-[var(--fg-danger)] hover:underline"
         >
           حذف این ثبت
         </button>

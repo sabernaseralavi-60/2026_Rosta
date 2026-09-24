@@ -75,7 +75,7 @@ export function InvitationsView() {
         </p>
       </header>
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -108,7 +108,7 @@ export function InvitationsView() {
                   </div>
                   <Link
                     href={invitation.href}
-                    className="text-[16.5px] font-semibold hover:text-[var(--brand-700)]"
+                    className="text-[16.5px] font-semibold hover:text-[var(--fg-brand)]"
                   >
                     {invitation.target_title}
                   </Link>

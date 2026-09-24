@@ -40,7 +40,9 @@ function isCategory(value: string | null): value is PointCategory {
 export function PointsLedgerView() {
   const params = useSearchParams();
   const { accessToken, loading } = useSession({ required: false });
-  const category = isCategory(params.get('category')) ? (params.get('category') as PointCategory) : undefined;
+  const category = isCategory(params.get('category'))
+    ? (params.get('category') as PointCategory)
+    : undefined;
   const sourceType = params.get('source_type') ?? undefined;
   const sourceId = params.get('source_id') ?? undefined;
 
@@ -65,7 +67,8 @@ export function PointsLedgerView() {
         setCursor(page.next_cursor);
       })
       .catch((cause: unknown) => {
-        if (!cancelled) setError(cause instanceof ApiError ? cause.message : 'دفتر امتیاز بارگذاری نشد.');
+        if (!cancelled)
+          setError(cause instanceof ApiError ? cause.message : 'دفتر امتیاز بارگذاری نشد.');
       });
     return () => {
       cancelled = true;
@@ -123,7 +126,7 @@ export function PointsLedgerView() {
       {sourceType && (
         <p className="text-[13.5px] text-[var(--fg-secondary)]">
           فقط امتیازهای یک منبع نمایش داده می‌شود.{' '}
-          <Link href="/me/points" className="font-medium text-[var(--brand-700)] hover:underline">
+          <Link href="/me/points" className="font-medium text-[var(--fg-brand)] hover:underline">
             نمایش همه
           </Link>
         </p>
@@ -152,7 +155,12 @@ export function PointsLedgerView() {
       )}
 
       {cursor && (
-        <Button variant="secondary" onClick={loadMore} loading={loadingMore} className="self-center">
+        <Button
+          variant="secondary"
+          onClick={loadMore}
+          loading={loadingMore}
+          className="self-center"
+        >
           ردیف‌های قدیمی‌تر
         </Button>
       )}
@@ -176,7 +184,7 @@ function FilterChip({
       className={cn(
         'inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border px-3 py-1.5 text-[13px]',
         active
-          ? 'border-[var(--brand-600)] bg-[var(--brand-50)] font-medium text-[var(--brand-700)]'
+          ? 'border-[var(--brand-600)] bg-[var(--brand-50)] font-medium text-[var(--fg-brand)]'
           : 'border-[var(--border-subtle)] text-[var(--fg-secondary)] hover:border-[var(--border-default)]',
       )}
     >

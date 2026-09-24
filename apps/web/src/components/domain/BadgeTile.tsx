@@ -64,7 +64,7 @@ export function BadgeIcon({
       className={cn(
         'flex shrink-0 items-center justify-center rounded-[var(--radius-full)] ring-2',
         size === 'lg' ? 'size-24 text-[44px]' : 'size-12 text-[22px]',
-        earned ? 'bg-[var(--accent-50)]' : 'bg-[var(--bg-sunken)] grayscale opacity-60',
+        earned ? 'bg-[var(--accent-50)]' : 'bg-[var(--bg-sunken)] opacity-60 grayscale',
         tier ? TIER_RING[tier] : 'ring-[var(--accent-300)]',
       )}
     >
@@ -91,7 +91,7 @@ export function BadgeTile({ badge }: { badge: Badge }) {
         </div>
         <p className="text-[13px] text-[var(--fg-secondary)]">{badge.description}</p>
         {badge.earned ? (
-          <p className="text-[12.5px] font-medium text-[var(--success-600)]">
+          <p className="text-[12.5px] font-medium text-[var(--fg-success)]">
             کسب‌شده{badge.awarded_at && ` — ${formatDateLong(badge.awarded_at)}`}
           </p>
         ) : (

@@ -100,7 +100,7 @@ export function ApplicationsView({ id }: { id: string }) {
       </header>
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -208,7 +208,7 @@ function ApplicationCard({
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/projects/${alternative.project.id}`}
-                  className="text-[14px] font-medium text-[var(--brand-700)]"
+                  className="text-[14px] font-medium text-[var(--fg-brand)]"
                 >
                   {alternative.project.title_fa}
                 </Link>
@@ -252,7 +252,7 @@ function ApplicationCard({
 
       {application.match_breakdown && (
         <details>
-          <summary className="cursor-pointer text-[13px] font-medium text-[var(--brand-700)]">
+          <summary className="cursor-pointer text-[13px] font-medium text-[var(--fg-brand)]">
             تفکیک امتیاز تطابق
           </summary>
           <dl className="mt-2 grid gap-1.5 sm:grid-cols-2">
@@ -291,7 +291,7 @@ function ApplicationCard({
       />
 
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

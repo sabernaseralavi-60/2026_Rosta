@@ -18,10 +18,13 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         <div className="page flex flex-wrap items-center justify-between gap-4 text-[13px] text-[var(--fg-tertiary)]">
           <span>سامانهٔ نوآوری و یادگیری صابر — از مصرف‌کنندهٔ دانش، به تولیدکنندهٔ ارزش</span>
           <nav aria-label="پیوندهای پانویس" className="flex gap-4">
-            <Link href="/projects" className="hover:text-[var(--brand-700)]">
+            <Link href="/projects" className="hover:text-[var(--fg-brand)]">
               پروژه‌ها
             </Link>
-            <Link href="/login" className="hover:text-[var(--brand-700)]">
+            <Link href="/help" className="hover:text-[var(--fg-brand)]">
+              راهنما
+            </Link>
+            <Link href="/login" className="hover:text-[var(--fg-brand)]">
               ورود و ثبت‌نام
             </Link>
           </nav>

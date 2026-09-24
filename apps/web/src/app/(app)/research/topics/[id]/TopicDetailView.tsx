@@ -24,7 +24,8 @@ import { TOPIC_TONE } from '../TopicsView';
  * کادر آموزشی می‌آید — سرور همین را تضمین کرده است.
  */
 export function TopicDetailView({ id }: { id: string }) {
-  const { accessToken, loading: sessionLoading } = useSession();
+  // ویترین عمومی (ADR-0017): مهمان می‌بیند و هر اقدامی خودش پشت ورود است.
+  const { accessToken, loading: sessionLoading } = useSession({ required: false });
   const [topic, setTopic] = useState<Topic | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState('');
@@ -55,7 +56,7 @@ export function TopicDetailView({ id }: { id: string }) {
 
   if (topic === null) {
     return error ? (
-      <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+      <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
         {error}
       </p>
     ) : (
@@ -101,7 +102,7 @@ export function TopicDetailView({ id }: { id: string }) {
           </p>
         )}
         {topic.idle_days_left !== null && (
-          <p className="text-[13.5px] text-[var(--warning-600)]">
+          <p className="text-[13.5px] text-[var(--fg-warning)]">
             اگر تا {toPersianDigits(topic.idle_days_left)} روز دیگر تحویلی از مسیر پژوهش نفرستی،
             رزرو آزاد می‌شود.
           </p>
@@ -137,7 +138,7 @@ export function TopicDetailView({ id }: { id: string }) {
           )}
         </div>
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}

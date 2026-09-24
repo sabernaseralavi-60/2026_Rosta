@@ -68,7 +68,7 @@ export function VoteButton({
         'text-[13px] font-semibold tabular-nums transition-colors duration-[var(--dur-instant)]',
         'disabled:cursor-not-allowed disabled:opacity-60',
         state.voted
-          ? 'border-[var(--brand-600)] bg-[var(--brand-50)] text-[var(--brand-700)]'
+          ? 'border-[var(--brand-600)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
           : 'border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--fg-secondary)] hover:border-[var(--brand-500)]',
       )}
     >

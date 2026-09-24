@@ -27,14 +27,14 @@ function toneFor(score: number): { stroke: string; text: string; label: string }
   if (score >= STRONG_MATCH) {
     return {
       stroke: 'var(--success-600)',
-      text: 'text-[var(--success-600)]',
+      text: 'text-[var(--fg-success)]',
       label: 'تطابق بالا',
     };
   }
   if (score >= MODERATE_MATCH) {
     return {
       stroke: 'var(--accent-600)',
-      text: 'text-[var(--accent-700)]',
+      text: 'text-[var(--fg-accent)]',
       label: 'تطابق متوسط',
     };
   }

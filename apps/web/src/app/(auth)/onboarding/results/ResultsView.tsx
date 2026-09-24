@@ -113,7 +113,7 @@ export function ResultsView() {
           </p>
           <Link
             href="/onboarding/survey/1"
-            className="self-start text-[13.5px] font-medium text-[var(--brand-700)] hover:underline"
+            className="self-start text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
           >
             تکمیل نیمرخ
           </Link>
@@ -121,7 +121,7 @@ export function ResultsView() {
       )}
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -137,28 +137,34 @@ export function ResultsView() {
           }
         />
       ) : (
-        <ul className="flex flex-col gap-4">
-          {items.map((item) => (
-            <li key={item.project.id}>
-              <ProjectCard
-                project={item.project}
-                matchScore={item.match_score}
-                reasons={item.reasons}
-                isStretch={item.is_stretch}
-                footer={
-                  <button
-                    type="button"
-                    onClick={() => dismiss(item.project.id)}
-                    disabled={dismissing === item.project.id}
-                    className="text-[12.5px] text-[var(--fg-tertiary)] hover:text-[var(--fg-secondary)] hover:underline disabled:opacity-50"
-                  >
-                    این به من نمی‌خورد
-                  </button>
-                }
-              />
-            </li>
-          ))}
-        </ul>
+        <section aria-labelledby="recommended-heading">
+          {/* عنوان کارت‌ها h3 است؛ بدون این h2 از h1 مستقیم به h3 می‌پرید (M7-14). */}
+          <h2 id="recommended-heading" className="sr-only">
+            پروژه‌های پیشنهادی
+          </h2>
+          <ul className="flex flex-col gap-4">
+            {items.map((item) => (
+              <li key={item.project.id}>
+                <ProjectCard
+                  project={item.project}
+                  matchScore={item.match_score}
+                  reasons={item.reasons}
+                  isStretch={item.is_stretch}
+                  footer={
+                    <button
+                      type="button"
+                      onClick={() => dismiss(item.project.id)}
+                      disabled={dismissing === item.project.id}
+                      className="text-[12.5px] text-[var(--fg-tertiary)] hover:text-[var(--fg-secondary)] hover:underline disabled:opacity-50"
+                    >
+                      این به من نمی‌خورد
+                    </button>
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <div className="flex flex-col gap-3 sm:flex-row-reverse">

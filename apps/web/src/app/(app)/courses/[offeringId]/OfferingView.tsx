@@ -86,6 +86,7 @@ export function OfferingView({ offeringId }: { offeringId: string }) {
           <CardDescription>پیشرفت مطالعه</CardDescription>
           <Progress
             value={offering.progress_percent}
+            ariaLabel="پیشرفت مطالعه"
             valueText={`${toPersianDigits(offering.progress_percent)}٪`}
           />
         </Card>
@@ -95,7 +96,7 @@ export function OfferingView({ offeringId }: { offeringId: string }) {
           {offering.current_week_number ? (
             <Link
               href={`/courses/${offering.id}/weeks/${offering.current_week_number}`}
-              className="text-[20px] font-semibold text-[var(--brand-700)]"
+              className="text-[20px] font-semibold text-[var(--fg-brand)]"
             >
               هفتهٔ {toPersianDigits(offering.current_week_number)}
             </Link>
@@ -106,10 +107,8 @@ export function OfferingView({ offeringId }: { offeringId: string }) {
 
         <Card className="flex flex-col gap-2">
           <CardDescription>نمرهٔ نهایی</CardDescription>
-          <span className="text-[20px] font-semibold text-[var(--fg-primary)] tabular-nums">
-            {offering.final_grade === null
-              ? '—'
-              : toPersianDigits(offering.final_grade.toFixed(2))}
+          <span className="text-[20px] font-semibold tabular-nums text-[var(--fg-primary)]">
+            {offering.final_grade === null ? '—' : toPersianDigits(offering.final_grade.toFixed(2))}
           </span>
           {Object.keys(offering.grading_policy).length > 0 && (
             <p className="text-[12px] text-[var(--fg-tertiary)]">
@@ -136,7 +135,7 @@ export function OfferingView({ offeringId }: { offeringId: string }) {
                       {announcement.title}
                     </h3>
                   </div>
-                  <p className="text-[13.5px] leading-6 whitespace-pre-line text-[var(--fg-secondary)]">
+                  <p className="whitespace-pre-line text-[13.5px] leading-6 text-[var(--fg-secondary)]">
                     {announcement.body}
                   </p>
                   <p className="text-[12px] text-[var(--fg-tertiary)]">
@@ -155,13 +154,13 @@ export function OfferingView({ offeringId }: { offeringId: string }) {
           <div className="flex items-baseline gap-4">
             <Link
               href={`/courses/${offering.id}/quizzes`}
-              className="text-[13.5px] text-[var(--brand-700)]"
+              className="text-[13.5px] text-[var(--fg-brand)]"
             >
               آزمون‌های این درس
             </Link>
             <Link
               href={`/library/${offering.course_slug}`}
-              className="text-[13.5px] text-[var(--brand-700)]"
+              className="text-[13.5px] text-[var(--fg-brand)]"
             >
               کتابخانهٔ این درس
             </Link>

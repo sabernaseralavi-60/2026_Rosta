@@ -33,6 +33,22 @@ export interface StoredSession {
   user: AuthUser;
 }
 
+/**
+ * نشانهٔ نشست روی `<html data-session>` — M7-15.
+ *
+ * صفحهٔ سمت سرور نمی‌داند کاربر وارد شده یا نه (نشست در `sessionStorage`
+ * است)، پس جای «پیشنهادهای تو» را برای همه نگه می‌داشت و برای مهمان پس از
+ * hydrate برمی‌داشت: جهش چیدمان ۰٫۱۷. اسکریپت کوچک `SESSION_HINT_SCRIPT` در
+ * `<head>` پیش از اولین رنگ‌آمیزی همین ویژگی را می‌گذارد و CSS جای
+ * `.signed-in-only` را برای مهمان از ابتدا نمی‌سازد. ورود و خروج بدون
+ * بارگذاری مجدد هم آن را هم‌گام نگه می‌دارند.
+ */
+export const SESSION_HINT_SCRIPT = `try{document.documentElement.dataset.session=sessionStorage.getItem('${ACCESS_KEY}')?'in':'out'}catch(e){}`;
+
+function markSession(state: 'in' | 'out'): void {
+  if (typeof document !== 'undefined') document.documentElement.dataset.session = state;
+}
+
 export function saveSession(session: StoredSession): void {
   const store = storage();
   if (!store) return;
@@ -43,6 +59,7 @@ export function saveSession(session: StoredSession): void {
   } catch {
     // سهمیهٔ حافظه پر است — نشست در همین تب زنده می‌ماند.
   }
+  markSession('in');
 }
 
 export function readSession(): StoredSession | null {
@@ -68,6 +85,7 @@ export function clearSession(): void {
   for (const key of [ACCESS_KEY, REFRESH_KEY, USER_KEY]) {
     store.removeItem(key);
   }
+  markSession('out');
 }
 
 /**

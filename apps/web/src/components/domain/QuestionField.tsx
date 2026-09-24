@@ -78,9 +78,7 @@ export function QuestionField({ question, value, onChange, disabled }: QuestionF
     case 'ESSAY':
       return <Essay question={question} value={value} onChange={onChange} disabled={disabled} />;
     case 'MATCHING':
-      return (
-        <Matching question={question} value={value} onChange={onChange} disabled={disabled} />
-      );
+      return <Matching question={question} value={value} onChange={onChange} disabled={disabled} />;
     default:
       return null;
   }
@@ -172,7 +170,7 @@ function TrueFalse({
             'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-[var(--radius-md)]',
             'border p-3 text-[15px] transition-colors',
             current === option.flag
-              ? 'border-[var(--brand-600)] bg-[var(--brand-50)] text-[var(--brand-700)]'
+              ? 'border-[var(--brand-600)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
               : 'border-[var(--border-default)] hover:bg-[var(--bg-sunken)]',
             disabled && 'cursor-not-allowed opacity-60',
           )}

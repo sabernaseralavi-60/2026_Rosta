@@ -125,7 +125,7 @@ export function OutputsView() {
       )}
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -166,7 +166,7 @@ export function OutputsView() {
                     target="_blank"
                     rel="noopener noreferrer"
                     dir="ltr"
-                    className="self-start text-[13px] text-[var(--brand-700)] underline"
+                    className="self-start text-[13px] text-[var(--fg-brand)] underline"
                   >
                     doi:{output.doi}
                   </a>
@@ -370,7 +370,7 @@ function OutputForm({
           forceLtr
         />
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)] md:col-span-2">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)] md:col-span-2">
             {error}
           </p>
         )}

@@ -40,7 +40,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         title="این بخش برای مدیر و پشتیبانی است"
         description="اگر باید به پنل مدیریت دسترسی داشته باشی، از مدیر سامانه بخواه نقش «پشتیبانی» یا «مدیر سامانه» را به حسابت بدهد. پس از اعطای نقش، یک بار خارج و دوباره وارد شو."
         action={
-          <Link href="/dashboard" className="text-[14px] font-medium text-[var(--brand-700)]">
+          <Link href="/dashboard" className="text-[14px] font-medium text-[var(--fg-brand)]">
             بازگشت به داشبورد
           </Link>
         }
@@ -66,7 +66,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               className={cn(
                 'whitespace-nowrap rounded-[var(--radius-sm)] px-3 py-2 text-[14px]',
                 current
-                  ? 'bg-[var(--brand-50)] font-semibold text-[var(--brand-700)]'
+                  ? 'bg-[var(--brand-50)] font-semibold text-[var(--fg-brand)]'
                   : 'text-[var(--fg-secondary)] hover:bg-[var(--bg-sunken)]',
               )}
             >

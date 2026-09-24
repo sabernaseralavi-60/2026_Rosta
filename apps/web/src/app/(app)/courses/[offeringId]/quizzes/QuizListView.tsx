@@ -86,7 +86,7 @@ export function QuizListView({ offeringId }: { offeringId: string }) {
   if (error && !quizzes) {
     return (
       <Card className="p-6">
-        <p className="text-[15px] text-[var(--danger-600)]">{error}</p>
+        <p className="text-[15px] text-[var(--fg-danger)]">{error}</p>
       </Card>
     );
   }
@@ -104,7 +104,10 @@ export function QuizListView({ offeringId }: { offeringId: string }) {
     <div className="space-y-4">
       <h1 className="text-[20px] font-semibold text-[var(--fg-primary)]">آزمون‌های این درس</h1>
       {error ? (
-        <div role="alert" className="rounded-[var(--radius-md)] bg-[color-mix(in_oklch,var(--danger-500)_12%,transparent)] p-3 text-[14px] text-[var(--danger-600)]">
+        <div
+          role="alert"
+          className="rounded-[var(--radius-md)] bg-[color-mix(in_oklch,var(--danger-500)_12%,transparent)] p-3 text-[14px] text-[var(--fg-danger)]"
+        >
           {error}
         </div>
       ) : null}
@@ -115,21 +118,19 @@ export function QuizListView({ offeringId }: { offeringId: string }) {
             <Card className="flex flex-wrap items-start justify-between gap-4 p-5">
               <div className="flex-1 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <CardTitle className="text-[16.5px]">{quiz.title_fa}</CardTitle>
+                  <CardTitle as="h2" className="text-[16.5px]">
+                    {quiz.title_fa}
+                  </CardTitle>
                   <Badge tone={TONES[quiz.state]}>{quiz.state_fa}</Badge>
                   {quiz.week_number ? (
                     <Badge tone="neutral">هفتهٔ {toPersianDigits(quiz.week_number)}</Badge>
                   ) : null}
                 </div>
-                {quiz.description ? (
-                  <CardDescription>{quiz.description}</CardDescription>
-                ) : null}
+                {quiz.description ? <CardDescription>{quiz.description}</CardDescription> : null}
                 <p className="text-[13px] text-[var(--fg-secondary)]">
-                  {toPersianDigits(quiz.question_count)} سؤال ·{' '}
-                  {toPersianDigits(quiz.total_points)} نمره ·{' '}
-                  {toPersianDigits(quiz.duration_min)} دقیقه · تلاش{' '}
-                  {toPersianDigits(quiz.used_attempts)} از{' '}
-                  {toPersianDigits(quiz.max_attempts)}
+                  {toPersianDigits(quiz.question_count)} سؤال · {toPersianDigits(quiz.total_points)}{' '}
+                  نمره · {toPersianDigits(quiz.duration_min)} دقیقه · تلاش{' '}
+                  {toPersianDigits(quiz.used_attempts)} از {toPersianDigits(quiz.max_attempts)}
                 </p>
                 <p className="text-[13px] text-[var(--fg-secondary)]">
                   مهلت: {formatDateTime(quiz.closes_at)}
@@ -142,19 +143,16 @@ export function QuizListView({ offeringId }: { offeringId: string }) {
                 {quiz.state === 'AVAILABLE' &&
                 quiz.effective_duration_sec !== null &&
                 quiz.effective_duration_sec < quiz.duration_min * 60 ? (
-                  <p className="text-[13px] text-[var(--warning-600)]">
-                    اگر همین حالا شروع کنید، {formatClock(quiz.effective_duration_sec)} وقت
-                    دارید — چون مهلت آزمون زودتر از مدت آن تمام می‌شود.
+                  <p className="text-[13px] text-[var(--fg-warning)]">
+                    اگر همین حالا شروع کنید، {formatClock(quiz.effective_duration_sec)} وقت دارید —
+                    چون مهلت آزمون زودتر از مدت آن تمام می‌شود.
                   </p>
                 ) : null}
               </div>
 
               <div className="flex items-center">
                 {quiz.state === 'AVAILABLE' || quiz.state === 'IN_PROGRESS' ? (
-                  <Button
-                    onClick={() => void begin(quiz)}
-                    loading={starting === quiz.id}
-                  >
+                  <Button onClick={() => void begin(quiz)} loading={starting === quiz.id}>
                     {quiz.state === 'IN_PROGRESS' ? 'ادامهٔ آزمون' : 'شروع آزمون'}
                   </Button>
                 ) : (

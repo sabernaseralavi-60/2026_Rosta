@@ -166,7 +166,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
               <Toast.Action altText="مشاهده" asChild>
                 <Link
                   href={notification.action_url}
-                  className="self-start text-[13px] font-medium text-[var(--brand-700)] hover:underline"
+                  className="self-start text-[13px] font-medium text-[var(--fg-brand)] hover:underline"
                 >
                   مشاهده
                 </Link>
@@ -175,7 +175,12 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
           </Toast.Root>
         ))}
         {/* پایین صفحه — بالای صفحه مال Toast امتیاز است (§10.6). */}
-        <Toast.Viewport className="fixed inset-x-0 bottom-4 z-50 mx-auto flex w-[min(92vw,380px)] flex-col gap-2 outline-none" />
+        {/* برچسب پیش‌فرض Radix انگلیسی است («Notifications (F8)») و دو ناحیه با
+            یک نام، landmark-unique را می‌شکستند (M7-14). */}
+        <Toast.Viewport
+          label="اعلان‌های تازه ({hotkey})"
+          className="fixed inset-x-0 bottom-4 z-50 mx-auto flex w-[min(92vw,380px)] flex-col gap-2 outline-none"
+        />
       </Toast.Provider>
     </NotificationsContext.Provider>
   );

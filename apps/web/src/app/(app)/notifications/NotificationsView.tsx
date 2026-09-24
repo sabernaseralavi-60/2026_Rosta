@@ -112,7 +112,7 @@ export function NotificationsView() {
               : 'همهٔ اعلان‌ها را خوانده‌ای.'}{' '}
             <Link
               href="/me/settings"
-              className="font-medium text-[var(--brand-700)] hover:underline"
+              className="font-medium text-[var(--fg-brand)] hover:underline"
             >
               کدام خبرها به پیامک و تلگرام بیاید؟
             </Link>
@@ -185,7 +185,7 @@ function Chip({ href, active, children }: { href: string; active: boolean; child
       className={cn(
         'inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border px-3 py-1.5 text-[13px]',
         active
-          ? 'border-[var(--brand-600)] bg-[var(--brand-50)] font-medium text-[var(--brand-700)]'
+          ? 'border-[var(--brand-600)] bg-[var(--brand-50)] font-medium text-[var(--fg-brand)]'
           : 'border-[var(--border-subtle)] text-[var(--fg-secondary)] hover:border-[var(--border-default)]',
       )}
     >

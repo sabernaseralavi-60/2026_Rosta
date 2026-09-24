@@ -101,7 +101,7 @@ export function OnboardingNotice() {
             <h2 className="text-[19px] font-semibold">پیشنهادهای تو</h2>
             <Link
               href="/projects"
-              className="text-[13.5px] font-medium text-[var(--brand-700)] hover:underline"
+              className="text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
             >
               همهٔ پروژه‌ها
             </Link>

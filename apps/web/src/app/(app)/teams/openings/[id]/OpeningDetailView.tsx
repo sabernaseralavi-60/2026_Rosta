@@ -63,7 +63,7 @@ export function OpeningDetailView({ id }: { id: string }) {
 
   if (opening === null) {
     return error ? (
-      <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+      <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
         {error}
       </p>
     ) : (
@@ -89,7 +89,7 @@ export function OpeningDetailView({ id }: { id: string }) {
         </div>
         <p className="text-[14px] text-[var(--fg-secondary)]">
           {opening.target.kind === 'VENTURE' ? 'کسب‌وکار' : 'پروژه'}:{' '}
-          <Link href={opening.target.href} className="font-medium hover:text-[var(--brand-700)]">
+          <Link href={opening.target.href} className="font-medium hover:text-[var(--fg-brand)]">
             {opening.target.title}
           </Link>
           {opening.role && ` · نقش: ${opening.role.title}`}
@@ -114,7 +114,7 @@ export function OpeningDetailView({ id }: { id: string }) {
       </Card>
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

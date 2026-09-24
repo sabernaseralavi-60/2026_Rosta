@@ -74,7 +74,7 @@ export function MetricsView() {
         {dead > 0 && (
           <Link
             href="/admin/notifications"
-            className="text-[13.5px] font-medium text-[var(--brand-700)]"
+            className="text-[13.5px] font-medium text-[var(--fg-brand)]"
           >
             رفتن به صف ارسال ←
           </Link>

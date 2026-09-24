@@ -31,16 +31,14 @@ export function ReasonList({ reasons, className }: ReasonListProps) {
             <span
               className={cn(
                 'mt-[3px] shrink-0',
-                isWarning ? 'text-[var(--warning-600)]' : 'text-[var(--success-600)]',
+                isWarning ? 'text-[var(--fg-warning)]' : 'text-[var(--fg-success)]',
               )}
               aria-hidden="true"
             >
               {isWarning ? <WarningIcon /> : <CheckIcon />}
             </span>
             <span
-              className={cn(
-                isWarning ? 'text-[var(--fg-secondary)]' : 'text-[var(--fg-primary)]',
-              )}
+              className={cn(isWarning ? 'text-[var(--fg-secondary)]' : 'text-[var(--fg-primary)]')}
             >
               <span className="sr-only">{isWarning ? 'هشدار: ' : 'نقطهٔ قوت: '}</span>
               {reason.text}

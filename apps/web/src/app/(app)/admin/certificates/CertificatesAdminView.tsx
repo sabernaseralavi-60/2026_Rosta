@@ -139,14 +139,14 @@ function CertificateRow({
               {formatDateShort(certificate.issued_at)} ·{' '}
               <Link
                 href={certificate.verify_path}
-                className="font-mono text-[var(--brand-700)]"
+                className="font-mono text-[var(--fg-brand)]"
                 dir="ltr"
               >
                 {certificate.public_code}
               </Link>
             </span>
             {certificate.revoke_reason && (
-              <span className="text-[12.5px] text-[var(--danger-600)]">
+              <span className="text-[12.5px] text-[var(--fg-danger)]">
                 دلیل ابطال: {certificate.revoke_reason}
               </span>
             )}

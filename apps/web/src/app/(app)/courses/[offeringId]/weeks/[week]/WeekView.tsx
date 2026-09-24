@@ -39,13 +39,7 @@ const KIND_LABELS: Record<string, string> = {
   OTHER: 'سایر',
 };
 
-export function WeekView({
-  offeringId,
-  weekNumber,
-}: {
-  offeringId: string;
-  weekNumber: number;
-}) {
+export function WeekView({ offeringId, weekNumber }: { offeringId: string; weekNumber: number }) {
   const { accessToken, loading: sessionLoading } = useSession();
   const [week, setWeek] = useState<WeekDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -88,7 +82,7 @@ export function WeekView({
       <header className="flex flex-col gap-3">
         <Link
           href={`/courses/${offeringId}`}
-          className="text-[13px] text-[var(--fg-secondary)] hover:text-[var(--brand-700)]"
+          className="text-[13px] text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
         >
           ← بازگشت به نمای درس
         </Link>
@@ -122,7 +116,7 @@ export function WeekView({
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="text-[19px] font-semibold text-[var(--fg-primary)]">منابع این هفته</h2>
           {week.resources.length > 0 && (
-            <span className="text-[13px] text-[var(--fg-tertiary)] tabular-nums">
+            <span className="text-[13px] tabular-nums text-[var(--fg-tertiary)]">
               {toPersianDigits(done)} از {toPersianDigits(week.resources.length)} مطالعه شده
             </span>
           )}
@@ -149,9 +143,7 @@ export function WeekView({
       {week.materials.length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <h2 className="text-[19px] font-semibold text-[var(--fg-primary)]">
-              از کتابخانهٔ درس
-            </h2>
+            <h2 className="text-[19px] font-semibold text-[var(--fg-primary)]">از کتابخانهٔ درس</h2>
             <p className="text-[13px] text-[var(--fg-secondary)]">
               کتاب‌ها و جزوه‌های ماندگار درس که این هفته به آن‌ها ارجاع می‌دهد.
             </p>
@@ -261,7 +253,7 @@ function ResourceRow({
       </div>
 
       {error && (
-        <p role="alert" className="text-[12.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[12.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

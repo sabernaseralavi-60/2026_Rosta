@@ -82,7 +82,13 @@ export function ApplyPanel({
   if (loading) return null;
 
   if (existing && existing.status !== 'WITHDRAWN' && existing.status !== 'REJECTED') {
-    return <ExistingApplication application={existing} accessToken={accessToken} onWithdrawn={setExisting} />;
+    return (
+      <ExistingApplication
+        application={existing}
+        accessToken={accessToken}
+        onWithdrawn={setExisting}
+      />
+    );
   }
 
   if (project.status !== 'OPEN') {
@@ -107,7 +113,11 @@ export function ApplyPanel({
     setSubmitting(true);
     setError(null);
     try {
-      const created = await applyToProject(project.id, { motivation: motivation.trim() }, accessToken);
+      const created = await applyToProject(
+        project.id,
+        { motivation: motivation.trim() },
+        accessToken,
+      );
       setExisting(created);
       setOpen(false);
       setMotivation('');
@@ -124,8 +134,8 @@ export function ApplyPanel({
         {existing?.status === 'REJECTED' && (
           <p className="text-[13px] text-[var(--fg-secondary)]">
             درخواست قبلی‌ات پذیرفته نشد
-            {existing.decision_note ? `: «${existing.decision_note}»` : '.'} می‌توانی دوباره
-            درخواست بدهی.
+            {existing.decision_note ? `: «${existing.decision_note}»` : '.'} می‌توانی دوباره درخواست
+            بدهی.
           </p>
         )}
         <Button size="lg" onClick={() => setOpen(true)}>
@@ -145,8 +155,8 @@ export function ApplyPanel({
       <div className="flex flex-col gap-1">
         <CardTitle>چرا این پروژه؟</CardTitle>
         <CardDescription>
-          در چند خط بنویس چه چیزی از این پروژه می‌خواهی و چه چیزی به آن اضافه می‌کنی.
-          این تنها چیزی است که مدیر پروژه کنار نیمرخت می‌خواند.
+          در چند خط بنویس چه چیزی از این پروژه می‌خواهی و چه چیزی به آن اضافه می‌کنی. این تنها چیزی
+          است که مدیر پروژه کنار نیمرخت می‌خواند.
         </CardDescription>
       </div>
 
@@ -236,7 +246,7 @@ function ExistingApplication({
       ) : (
         <div className="flex flex-col gap-2">
           {error && (
-            <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+            <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
               {error}
             </p>
           )}

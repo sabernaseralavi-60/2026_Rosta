@@ -121,7 +121,7 @@ export default async function VerifyCertificatePage({
           {cert.holder_username && (
             <Link
               href={`/u/${cert.holder_username}`}
-              className="text-[14px] font-medium text-[var(--brand-700)]"
+              className="text-[14px] font-medium text-[var(--fg-brand)]"
             >
               نیمرخ عمومی {cert.holder_name} ←
             </Link>

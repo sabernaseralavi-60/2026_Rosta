@@ -14,7 +14,8 @@ import { formatNumber } from '@/lib/format/digits';
  *
  * * ستون ≤ ۲۴px، سر گرد ۴px، پایهٔ صاف روی خط مبنا؛ فاصلهٔ ۲px سطح.
  * * برچسب مستقیم فقط روی هفتهٔ جاری — نه عدد روی هر ستون.
- * * هاور/فوکوس روی هر ستون، ناحیهٔ لمس کل ارتفاع ستون (نه فقط خود ستون).
+ * * هاور روی هر ستون، ناحیهٔ لمس کل ارتفاع ستون (نه فقط خود ستون)؛ کیبورد
+ *   با یک توقف Tab و فلش.
  * * جدول معادل برای صفحه‌خوان — نمودار تنها حامل عدد نیست.
  *
  * هفتهٔ منفی (اصلاح امتیاز) زیر خط مبنا و خاکستری است، نه قرمز: «احترام
@@ -51,11 +52,24 @@ export function PointsTrend({ trend }: { trend: TrendPoint[] }) {
         امتیاز هفتگی در {formatNumber(trend.length)} هفتهٔ اخیر
       </figcaption>
       <div className="relative">
+        {/* یک توقف Tab برای کل نمودار، نه یکی برای هر ستون: صفحه‌خوان عددها
+            را از جدول پایین می‌خواند، و کاربر بینای کیبورد با فلش بین هفته‌ها
+            جابه‌جا می‌شود (M7-14). محور زمان چپ‌به‌راست است، پس فلش راست
+            یعنی هفتهٔ بعد، حتی در صفحهٔ راست‌چین. */}
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-          className="h-40 w-full"
+          className="h-40 w-full rounded-[var(--radius-sm)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--border-focus)]"
           role="img"
-          aria-label="نمودار ستونی امتیاز هفتگی"
+          aria-label="نمودار ستونی امتیاز هفتگی؛ عددها در جدول بعدی"
+          tabIndex={0}
+          onFocus={() => setActive((current) => current ?? last)}
+          onBlur={() => setActive(null)}
+          onKeyDown={(event) => {
+            if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+            event.preventDefault();
+            const step = event.key === 'ArrowRight' ? 1 : -1;
+            setActive((current) => Math.max(0, Math.min(last, (current ?? last) + step)));
+          }}
           onMouseLeave={() => setActive(null)}
         >
           <line
@@ -74,15 +88,7 @@ export function PointsTrend({ trend }: { trend: TrendPoint[] }) {
             const height = Math.abs(y(value) - baseline);
             const positive = value >= 0;
             return (
-              <g
-                key={point.week_start}
-                tabIndex={0}
-                aria-label={`هفتهٔ ${formatDateLong(point.week_start)}: ${formatNumber(value)} امتیاز`}
-                onMouseEnter={() => setActive(index)}
-                onFocus={() => setActive(index)}
-                onBlur={() => setActive(null)}
-                className="outline-none"
-              >
+              <g key={point.week_start} onMouseEnter={() => setActive(index)}>
                 {/* ناحیهٔ هدف: کل ارتفاع نوار، بزرگ‌تر از خود ستون. */}
                 <rect x={band * index} y={0} width={band} height={HEIGHT} fill="transparent" />
                 {height > 0 && (

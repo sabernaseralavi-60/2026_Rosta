@@ -262,7 +262,9 @@ function RecalculateCard({ rules, token }: { rules: PointRule[]; token: string }
 
   return (
     <Card className="flex flex-col gap-3">
-      <CardTitle className="text-[16px]">بازمحاسبهٔ گذشته‌نگر</CardTitle>
+      <CardTitle as="h2" className="text-[16px]">
+        بازمحاسبهٔ گذشته‌نگر
+      </CardTitle>
       <form onSubmit={run} className="grid gap-3 md:grid-cols-[2fr_1fr_auto] md:items-end">
         <Field label="قاعده">
           <select
@@ -290,7 +292,7 @@ function RecalculateCard({ rules, token }: { rules: PointRule[]; token: string }
         </Button>
       </form>
       {result && (
-        <p role="status" className="text-[13.5px] text-[var(--success-600)]">
+        <p role="status" className="text-[13.5px] text-[var(--fg-success)]">
           {result}
         </p>
       )}

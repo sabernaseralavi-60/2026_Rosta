@@ -134,9 +134,7 @@ export function BasicInfoForm() {
                     className="w-full px-3 py-2.5 text-start text-[14px] text-[var(--fg-primary)] hover:bg-[var(--bg-sunken)]"
                   >
                     {item.title_fa}
-                    {item.city && (
-                      <span className="text-[var(--fg-tertiary)]"> — {item.city}</span>
-                    )}
+                    {item.city && <span className="text-[var(--fg-tertiary)]"> — {item.city}</span>}
                   </button>
                 </li>
               ))}
@@ -183,7 +181,7 @@ export function BasicInfoForm() {
         </div>
 
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}

@@ -39,10 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label
-        htmlFor={inputId}
-        className="text-[13.5px] font-medium text-[var(--fg-primary)]"
-      >
+      <label htmlFor={inputId} className="text-[13.5px] font-medium text-[var(--fg-primary)]">
         {label}
       </label>
 
@@ -90,7 +87,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         <p
           id={errorId}
           role="alert"
-          className="flex items-center gap-1 text-[12.5px] text-[var(--danger-600)]"
+          className="flex items-center gap-1 text-[12.5px] text-[var(--fg-danger)]"
         >
           {/* §10.2 — رنگ به‌تنهایی کافی نیست؛ آیکن هم لازم است. */}
           <svg

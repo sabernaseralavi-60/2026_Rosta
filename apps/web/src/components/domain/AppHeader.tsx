@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { CommandPalette } from '@/components/domain/CommandPalette';
+import { CommandPaletteTrigger } from '@/components/domain/CommandPaletteTrigger';
 import { ImpersonationBanner } from '@/components/domain/ImpersonationBanner';
 import { NotificationBell } from '@/components/domain/NotificationBell';
 import { PointsBadge } from '@/components/domain/PointsBadge';
@@ -101,18 +101,18 @@ export function AppHeader() {
           <div className="flex min-w-0 items-center gap-4">
             <Link
               href={guest ? '/' : '/dashboard'}
-              className="text-[17px] font-bold text-[var(--brand-700)]"
+              className="text-[17px] font-bold text-[var(--fg-brand)]"
             >
               سیلپ
             </Link>
-            {!guest && <CommandPalette />}
+            {!guest && <CommandPaletteTrigger />}
             <nav aria-label="ناوبری اصلی" className="hidden items-center gap-3 xl:flex">
               {NAV.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
-                  className="whitespace-nowrap text-[13.5px] text-[var(--fg-secondary)] transition-colors hover:text-[var(--brand-700)] aria-[current=page]:font-semibold aria-[current=page]:text-[var(--brand-700)]"
+                  className="whitespace-nowrap text-[13.5px] text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)] aria-[current=page]:font-semibold aria-[current=page]:text-[var(--fg-brand)]"
                 >
                   {item.label}
                 </Link>
@@ -121,7 +121,7 @@ export function AppHeader() {
                 <Link
                   href="/admin"
                   aria-current={pathname.startsWith('/admin') ? 'page' : undefined}
-                  className="whitespace-nowrap text-[13.5px] font-medium text-[var(--accent-700)] hover:text-[var(--accent-600)]"
+                  className="whitespace-nowrap text-[13.5px] font-medium text-[var(--fg-accent)] hover:underline"
                 >
                   مدیریت
                 </Link>
@@ -141,7 +141,7 @@ export function AppHeader() {
                 {displayName && (
                   <Link
                     href="/me/public-profile"
-                    className="hidden text-[13.5px] text-[var(--fg-secondary)] hover:text-[var(--brand-700)] 2xl:inline"
+                    className="hidden text-[13.5px] text-[var(--fg-secondary)] hover:text-[var(--fg-brand)] 2xl:inline"
                   >
                     {displayName}
                   </Link>

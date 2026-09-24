@@ -184,7 +184,7 @@ export default async function HomePage() {
                         <Link
                           key={member.username}
                           href={`/u/${member.username}`}
-                          className="font-medium text-[var(--brand-700)]"
+                          className="font-medium text-[var(--fg-brand)]"
                         >
                           {member.name}
                         </Link>

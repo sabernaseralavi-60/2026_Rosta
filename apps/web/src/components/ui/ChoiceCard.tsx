@@ -70,7 +70,7 @@ export function ChoiceCard({
         <span
           className={cn(
             'text-[15px] font-medium',
-            checked ? 'text-[var(--brand-800)]' : 'text-[var(--fg-primary)]',
+            checked ? 'text-[var(--fg-brand)]' : 'text-[var(--fg-primary)]',
           )}
         >
           {label}

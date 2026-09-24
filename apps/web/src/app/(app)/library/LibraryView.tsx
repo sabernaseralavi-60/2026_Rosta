@@ -72,8 +72,8 @@ export function LibraryView() {
         <div className="flex flex-col gap-1">
           <h1 className="text-[26px] font-bold text-[var(--fg-primary)]">کتابخانهٔ دروس</h1>
           <p className="max-w-[60ch] text-[14px] leading-7 text-[var(--fg-secondary)]">
-            محتوای هر درس برای دانشجویان همان درس رایگان است. برای بقیه، با اشتراک ماهانه در
-            دسترس است.
+            محتوای هر درس برای دانشجویان همان درس رایگان است. برای بقیه، با اشتراک ماهانه در دسترس
+            است.
           </p>
         </div>
         <Button variant="secondary" asChild>
@@ -104,7 +104,7 @@ export function LibraryView() {
       </div>
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -122,9 +122,7 @@ export function LibraryView() {
         />
       ) : (
         <>
-          <p className="text-[13px] text-[var(--fg-tertiary)]">
-            {toPersianDigits(total)} درس
-          </p>
+          <p className="text-[13px] text-[var(--fg-tertiary)]">{toPersianDigits(total)} درس</p>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {courses.map((course) => (
               <li key={course.id}>

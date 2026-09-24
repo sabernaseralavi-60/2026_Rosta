@@ -209,7 +209,7 @@ export function FindTeammatesView() {
       )}
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -289,7 +289,7 @@ function TeammateCard({
         </div>
         {mate.complement_score !== null && (
           <div className="flex flex-col items-center" aria-label="امتیاز مکملیت">
-            <span className="text-[20px] font-bold text-[var(--brand-700)]">
+            <span className="text-[20px] font-bold text-[var(--fg-brand)]">
               {toPersianDigits(Math.round(mate.complement_score))}
             </span>
             <span className="text-[11px] text-[var(--fg-tertiary)]">مکملیت</span>
@@ -297,7 +297,7 @@ function TeammateCard({
         )}
       </div>
       {reason && (
-        <p className="rounded-[var(--radius-md)] bg-[var(--brand-50)] p-2.5 text-[13.5px] leading-[1.9] text-[var(--brand-700)]">
+        <p className="rounded-[var(--radius-md)] bg-[var(--brand-50)] p-2.5 text-[13.5px] leading-[1.9] text-[var(--fg-brand)]">
           {reason}
         </p>
       )}
@@ -328,7 +328,7 @@ function TeammateCard({
         )}
       </div>
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

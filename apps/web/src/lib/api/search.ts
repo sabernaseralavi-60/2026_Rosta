@@ -66,6 +66,8 @@ export const COMMANDS: Command[] = [
   },
   { id: 'city', label: 'آزمایشگاه شهر هوشمند', href: '/city', keywords: 'شهر SUMO ترافیک' },
   { id: 'notifications', label: 'اعلان‌ها', href: '/notifications', keywords: 'پیام خبر' },
+  // M7-19 — راهنمای فارسی از docs/user.
+  { id: 'help', label: 'راهنما', href: '/help', keywords: 'کمک راهنمای کاربری سؤال پرسش' },
   {
     id: 'certificates',
     label: 'گواهی‌های من',

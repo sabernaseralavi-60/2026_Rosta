@@ -56,7 +56,7 @@ export function LevelView({ level: number }: { level: number }) {
 
   if (error) {
     return (
-      <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+      <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
         {error}
       </p>
     );
@@ -313,7 +313,7 @@ function SubmitForm({
         </div>
 
         {missing.length > 0 && (
-          <div role="alert" className="flex flex-col gap-1 text-[13.5px] text-[var(--danger-600)]">
+          <div role="alert" className="flex flex-col gap-1 text-[13.5px] text-[var(--fg-danger)]">
             <p className="font-semibold">تحویل هنوز کامل نیست:</p>
             <ul className="list-disc ps-5">
               {missing.map((item) => (
@@ -323,7 +323,7 @@ function SubmitForm({
           </div>
         )}
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}
@@ -430,7 +430,7 @@ function SubmissionCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 dir="ltr"
-                className="text-[var(--brand-700)] underline"
+                className="text-[var(--fg-brand)] underline"
               >
                 {link}
               </a>
@@ -441,7 +441,7 @@ function SubmissionCard({
               <button
                 type="button"
                 onClick={() => open(file.id)}
-                className="text-[var(--brand-700)] underline"
+                className="text-[var(--fg-brand)] underline"
               >
                 {file.original_name}
               </button>
@@ -458,7 +458,7 @@ function SubmissionCard({
         </p>
       )}
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

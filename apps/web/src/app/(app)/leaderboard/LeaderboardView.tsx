@@ -62,7 +62,8 @@ export function LeaderboardView() {
     })
       .then((value) => !cancelled && setBoard(value))
       .catch((cause: unknown) => {
-        if (!cancelled) setError(cause instanceof ApiError ? cause.message : 'رتبه‌بندی بارگذاری نشد.');
+        if (!cancelled)
+          setError(cause instanceof ApiError ? cause.message : 'رتبه‌بندی بارگذاری نشد.');
       });
     return () => {
       cancelled = true;
@@ -122,7 +123,11 @@ export function LeaderboardView() {
         <>
           <MyStanding board={board} />
           <div className="grid gap-6 lg:grid-cols-2">
-            <Board title="ده نفر برتر" rows={board.entries} empty="هنوز کسی در این جدول امتیاز ندارد." />
+            <Board
+              title="ده نفر برتر"
+              rows={board.entries}
+              empty="هنوز کسی در این جدول امتیاز ندارد."
+            />
             <Board
               title="بیشترین رشد در ۳۰ روز"
               rows={board.growth}
@@ -204,7 +209,7 @@ function Board({
                 row.is_me && 'bg-[var(--brand-50)]',
               )}
             >
-              <span className="w-7 text-center text-[15px] font-semibold text-[var(--fg-secondary)] tabular-nums">
+              <span className="w-7 text-center text-[15px] font-semibold tabular-nums text-[var(--fg-secondary)]">
                 {toPersianDigits(row.rank)}
               </span>
               <span className="flex min-w-0 flex-1 flex-col">
@@ -253,7 +258,7 @@ function Chip({
       className={cn(
         'inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border px-3 py-1.5 text-[13px]',
         active
-          ? 'border-[var(--brand-600)] bg-[var(--brand-50)] font-medium text-[var(--brand-700)]'
+          ? 'border-[var(--brand-600)] bg-[var(--brand-50)] font-medium text-[var(--fg-brand)]'
           : 'border-[var(--border-subtle)] text-[var(--fg-secondary)] hover:border-[var(--border-default)]',
       )}
     >

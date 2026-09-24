@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-[var(--bg-canvas)]">
       <header className="px-4 py-6 md:px-8">
-        <span className="text-[17px] font-bold text-[var(--brand-700)]">سیلپ</span>
+        <span className="text-[17px] font-bold text-[var(--fg-brand)]">سیلپ</span>
       </header>
 
       {/* عرض را خود صفحه تعیین می‌کند: فرم ورود باریک است ولی صفحهٔ

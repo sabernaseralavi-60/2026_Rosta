@@ -51,7 +51,8 @@ export const TOPIC_TONE: Record<TopicStatus, BadgeTone> = {
 };
 
 export function TopicsView() {
-  const { accessToken, loading: sessionLoading } = useSession();
+  // ویترین عمومی (ADR-0017): مهمان می‌بیند و هر اقدامی خودش پشت ورود است.
+  const { accessToken, loading: sessionLoading } = useSession({ required: false });
   const [topics, setTopics] = useState<Topic[] | null>(null);
   const [total, setTotal] = useState(0);
   const [filter, setFilter] = useState<Filter>('');
@@ -138,7 +139,7 @@ export function TopicsView() {
         />
         <ChipGroup label="فیلتر موضوع" options={FILTERS} value={filter} onChange={setFilter} />
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}
@@ -183,7 +184,7 @@ function TopicCard({
       </div>
       <Link
         href={`/research/topics/${topic.id}`}
-        className="text-[16px] font-semibold text-[var(--fg-primary)] hover:text-[var(--brand-700)]"
+        className="text-[16px] font-semibold text-[var(--fg-primary)] hover:text-[var(--fg-brand)]"
       >
         {topic.title}
       </Link>
@@ -297,7 +298,7 @@ function ProposeForm({
           </select>
         </div>
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}

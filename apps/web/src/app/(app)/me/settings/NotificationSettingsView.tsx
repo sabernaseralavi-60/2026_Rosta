@@ -203,7 +203,7 @@ export function NotificationSettingsView() {
             {saved ? 'ذخیره شد.' : dirty ? 'تغییرات ذخیره نشده‌اند.' : ''}
           </span>
         </div>
-        {error && <p className="text-[13.5px] text-[var(--danger-600)]">{error}</p>}
+        {error && <p className="text-[13.5px] text-[var(--fg-danger)]">{error}</p>}
       </section>
 
       <Card>
@@ -240,7 +240,7 @@ function ChannelToggle({
         (disabled
           ? 'cursor-not-allowed border-[var(--border-subtle)] text-[var(--fg-tertiary)]'
           : checked
-            ? 'cursor-pointer border-[var(--brand-600)] bg-[var(--brand-50)] text-[var(--brand-800)]'
+            ? 'cursor-pointer border-[var(--brand-600)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
             : 'cursor-pointer border-[var(--border-default)] text-[var(--fg-secondary)] hover:border-[var(--brand-400)]')
       }
     >
@@ -342,7 +342,7 @@ function ChannelCard({
           className={
             'rounded-[var(--radius-full)] px-2 py-0.5 text-[12px] ' +
             (status.linked
-              ? 'bg-[var(--brand-50)] text-[var(--brand-800)]'
+              ? 'bg-[var(--brand-50)] text-[var(--fg-brand)]'
               : 'bg-[var(--bg-sunken)] text-[var(--fg-secondary)]')
           }
         >
@@ -431,7 +431,7 @@ function ChannelCard({
       )}
 
       {message && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {message}
         </p>
       )}

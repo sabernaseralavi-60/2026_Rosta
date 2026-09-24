@@ -61,7 +61,8 @@ const MAX_WEEKLY_HOURS = 80;
 const STEP_META: Record<number, { title: string; description: string; seconds: number }> = {
   1: {
     title: 'چه می‌دانی؟',
-    description: 'سطح خودت را صادقانه بگو. پایین بودن یک مهارت، در را نمی‌بندد — خیلی از پروژه‌ها همان را به تو یاد می‌دهند.',
+    description:
+      'سطح خودت را صادقانه بگو. پایین بودن یک مهارت، در را نمی‌بندد — خیلی از پروژه‌ها همان را به تو یاد می‌دهند.',
     seconds: 90,
   },
   2: {
@@ -221,7 +222,7 @@ export function SurveySteps({ step }: { step: number }) {
       footer={
         <>
           {error && (
-            <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+            <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
               {error}
             </p>
           )}
@@ -254,10 +255,10 @@ export function SurveySteps({ step }: { step: number }) {
             <button
               type="button"
               onClick={() => setShowAllSkills(true)}
-              className="mt-3 self-start text-[14px] font-medium text-[var(--brand-700)] hover:underline"
+              className="mt-3 self-start text-[14px] font-medium text-[var(--fg-brand)] hover:underline"
             >
-              مهارت‌های بیشتر (
-              {toPersianDigits(taxonomy.skills.length - visibleSkills.length)} مورد)
+              مهارت‌های بیشتر ({toPersianDigits(taxonomy.skills.length - visibleSkills.length)}{' '}
+              مورد)
             </button>
           )}
         </div>
@@ -368,16 +369,14 @@ export function SurveySteps({ step }: { step: number }) {
 function PreviewStrip({ items }: { items: Recommendation[] }) {
   return (
     <div className="mt-2 flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--brand-50)] p-4">
-      <p className="text-[13.5px] font-medium text-[var(--brand-800)]">
+      <p className="text-[13.5px] font-medium text-[var(--fg-brand)]">
         همین حالا {toPersianDigits(items.length)} پروژه به تو می‌خورد:
       </p>
       <ul className="flex flex-col gap-1.5">
         {items.map((item) => (
           <li key={item.project.id} className="flex items-center gap-2.5">
             <MatchRing score={item.match_score} size="sm" />
-            <span className="text-[13.5px] text-[var(--fg-primary)]">
-              {item.project.title_fa}
-            </span>
+            <span className="text-[13.5px] text-[var(--fg-primary)]">{item.project.title_fa}</span>
           </li>
         ))}
       </ul>

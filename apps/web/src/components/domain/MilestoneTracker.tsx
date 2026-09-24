@@ -42,11 +42,7 @@ export interface MilestoneTrackerProps {
   className?: string;
 }
 
-export function MilestoneTracker({
-  milestones,
-  renderExtra,
-  className,
-}: MilestoneTrackerProps) {
+export function MilestoneTracker({ milestones, renderExtra, className }: MilestoneTrackerProps) {
   return (
     <ol className={cn('flex flex-col', className)}>
       {milestones.map((milestone, index) => {
@@ -59,7 +55,7 @@ export function MilestoneTracker({
             {!isLast && (
               <span
                 aria-hidden="true"
-                className="absolute top-6 bottom-0 start-[11px] w-px bg-[var(--border-subtle)]"
+                className="absolute bottom-0 start-[11px] top-6 w-px bg-[var(--border-subtle)]"
               />
             )}
 
@@ -108,7 +104,7 @@ export function MilestoneTracker({
                   <span
                     className={
                       deadline?.isOverdue && milestone.status !== 'APPROVED'
-                        ? 'text-[var(--warning-600)]'
+                        ? 'text-[var(--fg-warning)]'
                         : undefined
                     }
                   >
@@ -129,7 +125,10 @@ export function MilestoneTracker({
                       key={itemIndex}
                       className="flex items-start gap-2 text-[13px] text-[var(--fg-secondary)]"
                     >
-                      <span aria-hidden="true" className="mt-[7px] size-1.5 shrink-0 rounded-full bg-[var(--border-default)]" />
+                      <span
+                        aria-hidden="true"
+                        className="mt-[7px] size-1.5 shrink-0 rounded-full bg-[var(--border-default)]"
+                      />
                       {item}
                     </li>
                   ))}

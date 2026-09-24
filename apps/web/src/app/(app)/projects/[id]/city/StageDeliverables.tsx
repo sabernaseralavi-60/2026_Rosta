@@ -69,7 +69,7 @@ export function StageDeliverables({
 
   if (error) {
     return (
-      <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+      <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
         {error}
       </p>
     );
@@ -145,7 +145,7 @@ export function StageDeliverables({
                       target="_blank"
                       rel="noopener noreferrer"
                       dir="ltr"
-                      className="text-[var(--brand-700)] underline"
+                      className="text-[var(--fg-brand)] underline"
                     >
                       {link}
                     </a>
@@ -156,7 +156,7 @@ export function StageDeliverables({
                     <button
                       type="button"
                       onClick={() => void open(file.id)}
-                      className="text-[var(--brand-700)] underline"
+                      className="text-[var(--fg-brand)] underline"
                     >
                       <span dir="ltr">{file.original_name}</span> ({formatBytes(file.size_bytes)})
                     </button>
@@ -215,9 +215,9 @@ function AreaEvidence({ evidence }: { evidence: Record<string, unknown> }) {
           کیلومتر مربع
         </p>
         {overlaps.length === 0 ? (
-          <p className="text-[var(--success-600)]">با محدودهٔ پروژهٔ فعال دیگری هم‌پوشانی ندارد.</p>
+          <p className="text-[var(--fg-success)]">با محدودهٔ پروژهٔ فعال دیگری هم‌پوشانی ندارد.</p>
         ) : (
-          <p className="text-[var(--warning-600)]">
+          <p className="text-[var(--fg-warning)]">
             هشدار هم‌پوشانی با: {overlaps.map((o) => o.title_fa).join('، ')}
           </p>
         )}
@@ -278,7 +278,7 @@ function ChecksTable({
                       <button
                         type="button"
                         onClick={() => onOpen(id)}
-                        className="text-[var(--brand-700)] underline"
+                        className="text-[var(--fg-brand)] underline"
                         dir="ltr"
                       >
                         {names[id] ?? 'تصویر'}
@@ -391,7 +391,7 @@ function ReviewForm({
             key={option.value}
             className={`cursor-pointer rounded-[var(--radius-sm)] border px-3 py-1.5 text-[13.5px] ${
               decision === option.value
-                ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--brand-700)]'
+                ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
                 : 'border-[var(--border-default)] text-[var(--fg-secondary)]'
             }`}
           >
@@ -416,7 +416,7 @@ function ReviewForm({
         maxLength={5000}
       />
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

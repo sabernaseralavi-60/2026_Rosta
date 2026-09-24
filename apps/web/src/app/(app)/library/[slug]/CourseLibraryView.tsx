@@ -46,7 +46,7 @@ export function CourseLibraryView({ slug }: { slug: string }) {
   if (error) {
     return (
       <Card className="flex flex-col gap-4">
-        <CardTitle>این درس پیدا نشد</CardTitle>
+        <CardTitle as="h1">این درس پیدا نشد</CardTitle>
         <CardDescription>{error}</CardDescription>
         <div>
           <Button variant="secondary" asChild>
@@ -67,7 +67,7 @@ export function CourseLibraryView({ slug }: { slug: string }) {
       <header className="flex flex-col gap-3">
         <Link
           href="/library"
-          className="text-[13px] text-[var(--fg-secondary)] hover:text-[var(--brand-700)]"
+          className="text-[13px] text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
         >
           ← کتابخانهٔ دروس
         </Link>
@@ -98,7 +98,7 @@ export function CourseLibraryView({ slug }: { slug: string }) {
       {course.my_enrollment_offering_id ? (
         <Card className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <CardTitle>شما دانشجوی این درس هستید</CardTitle>
+            <CardTitle as="h2">شما دانشجوی این درس هستید</CardTitle>
             <CardDescription>محتوای این درس برای شما رایگان است.</CardDescription>
           </div>
           <Button asChild>
@@ -108,9 +108,7 @@ export function CourseLibraryView({ slug }: { slug: string }) {
       ) : (
         course.offerings.length > 0 && (
           <section className="flex flex-col gap-3">
-            <h2 className="text-[19px] font-semibold text-[var(--fg-primary)]">
-              ارائه‌های باز
-            </h2>
+            <h2 className="text-[19px] font-semibold text-[var(--fg-primary)]">ارائه‌های باز</h2>
             <ul className="flex flex-col gap-3">
               {course.offerings.map((offering) => (
                 <EnrollRow
@@ -127,9 +125,7 @@ export function CourseLibraryView({ slug }: { slug: string }) {
 
       <section className="flex flex-col gap-3">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-[19px] font-semibold text-[var(--fg-primary)]">
-            کتابخانهٔ درس
-          </h2>
+          <h2 className="text-[19px] font-semibold text-[var(--fg-primary)]">کتابخانهٔ درس</h2>
           <span className="text-[13px] text-[var(--fg-tertiary)]">
             {toPersianDigits(course.materials.length)} محتوا
           </span>
@@ -151,12 +147,10 @@ export function CourseLibraryView({ slug }: { slug: string }) {
       {locked.length > 0 && monthly && (
         <Card variant="raised" className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <CardTitle>
-              {toPersianDigits(locked.length)} محتوا پشت اشتراک است
-            </CardTitle>
+            <CardTitle as="h2">{toPersianDigits(locked.length)} محتوا پشت اشتراک است</CardTitle>
             <CardDescription>
-              اگر دانشجوی این درس نیستید، با اشتراک ماهانه به کتابخانهٔ همهٔ دروس دسترسی
-              پیدا می‌کنید.
+              اگر دانشجوی این درس نیستید، با اشتراک ماهانه به کتابخانهٔ همهٔ دروس دسترسی پیدا
+              می‌کنید.
             </CardDescription>
           </div>
           <Button asChild>
@@ -239,9 +233,9 @@ function EnrollRow({
             ثبت‌نام در این ارائه نیازمند تأیید استاد است.
           </p>
         )}
-        {done && <p className="text-[12.5px] text-[var(--success-600)]">{done}</p>}
+        {done && <p className="text-[12.5px] text-[var(--fg-success)]">{done}</p>}
         {error && (
-          <p role="alert" className="text-[12.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[12.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}

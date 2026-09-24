@@ -40,7 +40,9 @@ export function EmptyState({
       <div aria-hidden="true">{illustration ?? <DefaultIllustration />}</div>
 
       <div className="flex flex-col gap-1.5">
-        <h3 className="text-[18px] font-semibold text-[var(--fg-primary)]">{title}</h3>
+        {/* `h2`: حالت خالی جای محتوای اصلی زیر `h1` صفحه می‌نشیند؛ `h3` سطح
+            عنوان را می‌پراند (M7-14). */}
+        <h2 className="text-[18px] font-semibold text-[var(--fg-primary)]">{title}</h2>
         {description && (
           <p className="max-w-[46ch] text-[13.5px] text-[var(--fg-secondary)]">{description}</p>
         )}
@@ -67,29 +69,11 @@ function DefaultIllustration() {
       className="text-[var(--border-default)]"
     >
       {/* سطح میز */}
-      <path
-        d="M10 50h76"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
+      <path d="M10 50h76" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
       {/* پایه‌ها */}
-      <path
-        d="M20 50v12M76 50v12"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
+      <path d="M20 50v12M76 50v12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
       {/* دو ورق روی میز */}
-      <rect
-        x="30"
-        y="22"
-        width="26"
-        height="28"
-        rx="3"
-        stroke="currentColor"
-        strokeWidth="2.5"
-      />
+      <rect x="30" y="22" width="26" height="28" rx="3" stroke="currentColor" strokeWidth="2.5" />
       <rect
         x="40"
         y="14"

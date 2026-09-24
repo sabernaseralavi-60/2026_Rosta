@@ -35,7 +35,8 @@ import { toPersianDigits } from '@/lib/format/digits';
  */
 export function IdeaDetailView({ id }: { id: string }) {
   const router = useRouter();
-  const { accessToken, loading: sessionLoading } = useSession();
+  // ویترین عمومی (ADR-0017): مهمان می‌بیند و هر اقدامی خودش پشت ورود است.
+  const { accessToken, loading: sessionLoading } = useSession({ required: false });
   const [idea, setIdea] = useState<IdeaDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -55,7 +56,7 @@ export function IdeaDetailView({ id }: { id: string }) {
   if (error && !idea) {
     return (
       <div className="flex flex-col gap-4">
-        <p role="alert" className="text-[15px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[15px] text-[var(--fg-danger)]">
           {error}
         </p>
         <Button asChild variant="secondary" className="self-start">
@@ -90,7 +91,7 @@ export function IdeaDetailView({ id }: { id: string }) {
   return (
     <article className="flex flex-col gap-8">
       <nav aria-label="مسیر" className="text-[13px] text-[var(--fg-tertiary)]">
-        <Link href="/ideas" className="hover:text-[var(--brand-700)]">
+        <Link href="/ideas" className="hover:text-[var(--fg-brand)]">
           بانک ایده
         </Link>{' '}
         ‹ {idea.title}
@@ -170,8 +171,8 @@ export function IdeaDetailView({ id }: { id: string }) {
           role={error ? 'alert' : 'status'}
           className={
             error
-              ? 'text-[13.5px] text-[var(--danger-600)]'
-              : 'text-[13.5px] text-[var(--success-600)]'
+              ? 'text-[13.5px] text-[var(--fg-danger)]'
+              : 'text-[13.5px] text-[var(--fg-success)]'
           }
         >
           {error ?? notice}
@@ -348,7 +349,7 @@ function CommentItem({
         {replyTo && accessToken && (
           <button
             type="button"
-            className="font-medium text-[var(--brand-700)] hover:underline"
+            className="font-medium text-[var(--fg-brand)] hover:underline"
             onClick={() => setReplying((value) => !value)}
           >
             {replying ? 'انصراف' : 'پاسخ'}
@@ -357,7 +358,7 @@ function CommentItem({
         {comment.can_delete && (
           <button
             type="button"
-            className="font-medium text-[var(--danger-600)] hover:underline"
+            className="font-medium text-[var(--fg-danger)] hover:underline"
             onClick={remove}
           >
             حذف

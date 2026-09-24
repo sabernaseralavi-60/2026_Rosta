@@ -35,7 +35,7 @@ export function PointsBadge() {
     >
       <span
         aria-hidden="true"
-        className="flex size-8 items-center justify-center rounded-[var(--radius-full)] bg-[var(--brand-50)] text-[14px] font-bold text-[var(--brand-700)]"
+        className="flex size-8 items-center justify-center rounded-[var(--radius-full)] bg-[var(--brand-50)] text-[14px] font-bold text-[var(--fg-brand)]"
       >
         {toPersianDigits(level.level)}
       </span>

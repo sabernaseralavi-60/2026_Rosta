@@ -59,7 +59,7 @@ export function SkillSlider({
           id={descriptionId}
           className={cn(
             'text-[13px]',
-            answered ? 'text-[var(--brand-700)]' : 'text-[var(--fg-tertiary)]',
+            answered ? 'text-[var(--fg-brand)]' : 'text-[var(--fg-tertiary)]',
           )}
         >
           {answered ? levelLabels[level] : 'هنوز پاسخ نداده‌ای'}
@@ -96,7 +96,7 @@ export function SkillSlider({
                 selected
                   ? 'border-[var(--brand-600)] bg-[var(--brand-600)] text-[var(--fg-on-brand)]'
                   : active
-                    ? 'border-[var(--brand-200)] bg-[var(--brand-50)] text-[var(--brand-700)]'
+                    ? 'border-[var(--brand-200)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
                     : 'border-[var(--border-default)] bg-[var(--bg-surface)] text-[var(--fg-tertiary)] hover:border-[var(--border-strong)]',
               )}
             >

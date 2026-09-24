@@ -51,11 +51,20 @@ export function CardHeader({ className, children, ...props }: HTMLAttributes<HTM
   );
 }
 
-export function CardTitle({ className, children, ...props }: HTMLAttributes<HTMLHeadingElement>) {
+export interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
+  /**
+   * سطح عنوان. پیش‌فرض `h3` برای کارت زیر یک بخش `h2`؛ کارتی که مستقیم زیر
+   * `h1` صفحه است باید `h2` باشد، وگرنه ترتیب عنوان‌ها می‌پرد؛ کارتی که خودش
+   * تمام صفحه است (مثلاً «دسترسی نداری») `h1` (M7-14).
+   */
+  as?: 'h1' | 'h2' | 'h3' | 'h4';
+}
+
+export function CardTitle({ as: Tag = 'h3', className, children, ...props }: CardTitleProps) {
   return (
-    <h3 className={cn('text-[18px] font-semibold text-[var(--fg-primary)]', className)} {...props}>
+    <Tag className={cn('text-[18px] font-semibold text-[var(--fg-primary)]', className)} {...props}>
       {children}
-    </h3>
+    </Tag>
   );
 }
 

@@ -169,7 +169,7 @@ export function AuditView({
                   {entry.actor_id ? (
                     <Link
                       href={`/admin/users/${entry.actor_id}`}
-                      className="hover:text-[var(--brand-700)]"
+                      className="hover:text-[var(--fg-brand)]"
                     >
                       {entry.actor_name ?? 'کاربر'}
                     </Link>
@@ -177,7 +177,7 @@ export function AuditView({
                     'سامانه'
                   )}
                   {entry.impersonator_name && (
-                    <span className="text-[var(--danger-600)]">
+                    <span className="text-[var(--fg-danger)]">
                       {' '}
                       — به دست {entry.impersonator_name}
                     </span>
@@ -190,7 +190,7 @@ export function AuditView({
                       {' '}
                       <Link
                         href={`/admin/users/${entry.entity_id}`}
-                        className="text-[var(--brand-700)]"
+                        className="text-[var(--fg-brand)]"
                       >
                         (نمایش)
                       </Link>

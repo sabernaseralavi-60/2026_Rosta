@@ -56,7 +56,7 @@ export function ResultView({ attemptId }: { attemptId: string }) {
   if (error) {
     return (
       <Card className="p-6">
-        <p className="text-[15px] text-[var(--danger-600)]">{error}</p>
+        <p className="text-[15px] text-[var(--fg-danger)]">{error}</p>
       </Card>
     );
   }
@@ -89,7 +89,7 @@ export function ResultView({ attemptId }: { attemptId: string }) {
         <div className="flex flex-wrap items-end gap-6">
           <div>
             <p className="text-[13px] text-[var(--fg-secondary)]">نمرهٔ شما</p>
-            <p className="text-[32px] font-semibold text-[var(--fg-primary)] tabular-nums">
+            <p className="text-[32px] font-semibold tabular-nums text-[var(--fg-primary)]">
               {toPersianDigits(score)}{' '}
               <span className="text-[18px] text-[var(--fg-secondary)]">
                 از {toPersianDigits(result.total_points)}
@@ -120,8 +120,8 @@ function ClassComparison({ result, percent }: { result: AttemptResult; percent: 
   if (result.class_average === null) {
     return (
       <p className="max-w-xs text-[13px] text-[var(--fg-secondary)]">
-        میانگین کلاس وقتی نشان داده می‌شود که دست‌کم سه نفر آزمون داده باشند — با تعداد کمتر،
-        نمرهٔ بقیه از روی میانگین قابل حدس است.
+        میانگین کلاس وقتی نشان داده می‌شود که دست‌کم سه نفر آزمون داده باشند — با تعداد کمتر، نمرهٔ
+        بقیه از روی میانگین قابل حدس است.
       </p>
     );
   }
@@ -207,17 +207,9 @@ function QuestionResult({
   }
 
   const tone =
-    question.is_correct === true
-      ? 'success'
-      : question.is_correct === false
-        ? 'danger'
-        : 'warning';
+    question.is_correct === true ? 'success' : question.is_correct === false ? 'danger' : 'warning';
   const verdict =
-    question.is_correct === true
-      ? 'درست'
-      : question.is_correct === false
-        ? 'نادرست'
-        : 'نمرهٔ جزئی';
+    question.is_correct === true ? 'درست' : question.is_correct === false ? 'نادرست' : 'نمرهٔ جزئی';
 
   return (
     <Card className="space-y-3 p-5">
@@ -226,9 +218,7 @@ function QuestionResult({
           <p className="text-[13px] text-[var(--fg-secondary)]">
             سؤال {toPersianDigits(index + 1)} · {question.kind_fa}
           </p>
-          <p className="mt-1.5 text-[15.5px] leading-7 text-[var(--fg-primary)]">
-            {question.body}
-          </p>
+          <p className="mt-1.5 text-[15.5px] leading-7 text-[var(--fg-primary)]">{question.body}</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge tone={tone}>{verdict}</Badge>
@@ -262,13 +252,13 @@ function QuestionResult({
       ) : null}
 
       {question.feedback ? (
-        <p className="rounded-[var(--radius-sm)] border-e-2 border-[var(--brand-600)] bg-[var(--brand-50)] p-3 text-[13.5px] leading-6 text-[var(--brand-700)]">
+        <p className="rounded-[var(--radius-sm)] border-e-2 border-[var(--brand-600)] bg-[var(--brand-50)] p-3 text-[13.5px] leading-6 text-[var(--fg-brand)]">
           بازخورد استاد: {question.feedback}
         </p>
       ) : null}
 
       {sent ? (
-        <p className="text-[13.5px] text-[var(--success-600)]">
+        <p className="text-[13.5px] text-[var(--fg-success)]">
           اعتراض شما ثبت شد و به استاد ارجاع شد.
         </p>
       ) : appealing ? (
@@ -280,7 +270,7 @@ function QuestionResult({
             rows={3}
             placeholder="چرا فکر می‌کنید نمرهٔ این سؤال درست نیست؟"
           />
-          {error ? <p className="text-[13px] text-[var(--danger-600)]">{error}</p> : null}
+          {error ? <p className="text-[13px] text-[var(--fg-danger)]">{error}</p> : null}
           <div className="flex gap-2">
             <Button
               size="sm"

@@ -72,7 +72,7 @@ export function PricingView() {
       </header>
 
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -125,9 +125,7 @@ export function PricingView() {
                 key={plan.id}
                 plan={plan}
                 accessToken={accessToken}
-                alreadyCovered={
-                  plan.scope === 'ALL_COURSES' && (mine?.covers_all_courses ?? false)
-                }
+                alreadyCovered={plan.scope === 'ALL_COURSES' && (mine?.covers_all_courses ?? false)}
                 onRequested={load}
               />
             ))}
@@ -193,7 +191,7 @@ function PlanCard({
           <Badge tone="neutral">{plan.scope_fa}</Badge>
         </div>
 
-        <p className="text-[24px] font-bold text-[var(--brand-700)]">{plan.price_fa}</p>
+        <p className="text-[24px] font-bold text-[var(--fg-brand)]">{plan.price_fa}</p>
         <p className="text-[12.5px] text-[var(--fg-tertiary)]">
           برای {toPersianDigits(plan.duration_days)} روز
         </p>
@@ -204,7 +202,7 @@ function PlanCard({
 
         <div className="mt-auto flex flex-col gap-2">
           {alreadyCovered ? (
-            <p className="text-[12.5px] text-[var(--success-600)]">
+            <p className="text-[12.5px] text-[var(--fg-success)]">
               اشتراک فعال شما همهٔ دروس را پوشش می‌دهد.
             </p>
           ) : needsCourse ? (
@@ -212,7 +210,7 @@ function PlanCard({
               <Link href="/library">انتخاب درس</Link>
             </Button>
           ) : done ? (
-            <p className="text-[12.5px] text-[var(--success-600)]">
+            <p className="text-[12.5px] text-[var(--fg-success)]">
               درخواست ثبت شد؛ پس از تأیید پرداخت فعال می‌شود.
             </p>
           ) : (
@@ -226,7 +224,7 @@ function PlanCard({
             </p>
           )}
           {error && (
-            <p role="alert" className="text-[12.5px] text-[var(--danger-600)]">
+            <p role="alert" className="text-[12.5px] text-[var(--fg-danger)]">
               {error}
             </p>
           )}

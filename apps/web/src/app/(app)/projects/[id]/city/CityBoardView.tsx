@@ -72,7 +72,7 @@ export function CityBoardView({ id }: { id: string }) {
   if (denied) {
     return (
       <Card className="flex flex-col gap-3">
-        <CardTitle>این گردش‌کار برای تیم پروژه است</CardTitle>
+        <CardTitle as="h1">این گردش‌کار برای تیم پروژه است</CardTitle>
         <CardDescription>برای دیدن مراحل و تحویل‌ها باید عضو تیم باشی.</CardDescription>
         <Button asChild variant="secondary" className="self-start">
           <Link href={`/projects/${id}`}>صفحهٔ پروژه</Link>
@@ -82,9 +82,12 @@ export function CityBoardView({ id }: { id: string }) {
   }
   if (error) {
     return (
-      <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
-        {error}
-      </p>
+      <div className="flex flex-col gap-3">
+        <h1>گردش‌کار شهر هوشمند</h1>
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
+          {error}
+        </p>
+      </div>
     );
   }
   if (!board || !workflow || !accessToken) return <SkeletonCard label="در حال بارگذاری گردش‌کار" />;
@@ -134,13 +137,18 @@ export function CityBoardView({ id }: { id: string }) {
         <Card className="border-[var(--success-500)]">
           <CardTitle>هر هشت مرحله تأیید شد</CardTitle>
           <CardDescription>
-            گردش‌کار شهر هوشمند این پروژه کامل است. سهیمان نشان «شهرساز» را می‌گیرند و حالا
-            می‌توانی پروژه را از فضای کاری ببندی.
+            گردش‌کار شهر هوشمند این پروژه کامل است. سهیمان نشان «شهرساز» را می‌گیرند و حالا می‌توانی
+            پروژه را از فضای کاری ببندی.
           </CardDescription>
         </Card>
       )}
 
-      <StepRail stages={board.stages} selected={stage.number} onSelect={setSelected} workflow={workflow} />
+      <StepRail
+        stages={board.stages}
+        selected={stage.number}
+        onSelect={setSelected}
+        workflow={workflow}
+      />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         <div className="flex flex-col gap-5">
@@ -256,7 +264,10 @@ export function CityBoardView({ id }: { id: string }) {
                 </li>
               ))}
             </ul>
-            <Link href={`/projects/${id}/files`} className="text-[13px] text-[var(--brand-700)] underline">
+            <Link
+              href={`/projects/${id}/files`}
+              className="text-[13px] text-[var(--fg-brand)] underline"
+            >
               همهٔ نسخه‌ها
             </Link>
           </Card>
@@ -291,7 +302,7 @@ function StepRail({
               className={cn(
                 'flex h-full w-full flex-col items-center gap-1 rounded-[var(--radius-md)] border p-2 text-center text-[12px]',
                 stage.number === selected
-                  ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--brand-700)]'
+                  ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
                   : 'border-[var(--border-subtle)]',
               )}
             >
@@ -309,7 +320,7 @@ function StepRail({
               </span>
               <span className="leading-[1.5]">{title}</span>
               {stage.open_deliverables > 0 && (
-                <span className="text-[11px] text-[var(--info-500)]">
+                <span className="text-[11px] text-[var(--fg-info)]">
                   {toPersianDigits(stage.open_deliverables)} در انتظار
                 </span>
               )}
@@ -358,7 +369,9 @@ function StageHeader({
         <CardTitle>
           مرحلهٔ {toPersianDigits(stage.number)}: {specTitle}
         </CardTitle>
-        <Badge tone={milestone.status === 'APPROVED' ? 'success' : stage.locked ? 'neutral' : 'brand'}>
+        <Badge
+          tone={milestone.status === 'APPROVED' ? 'success' : stage.locked ? 'neutral' : 'brand'}
+        >
           {stage.locked ? 'قفل' : milestone.status_fa}
         </Badge>
       </div>
@@ -396,7 +409,7 @@ function StageHeader({
         </div>
       </dl>
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

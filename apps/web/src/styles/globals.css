@@ -22,8 +22,7 @@
 }
 
 @theme {
-  --font-sans:
-    'Vazirmatn', 'Segoe UI', 'Tahoma', 'Noto Sans Arabic', system-ui, sans-serif;
+  --font-sans: 'Vazirmatn', 'Segoe UI', 'Tahoma', 'Noto Sans Arabic', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, monospace;
 
   --color-brand-50: var(--brand-50);
@@ -56,10 +55,10 @@
   --color-line: var(--border-subtle);
   --color-line-strong: var(--border-default);
 
-  --color-success: var(--success-600);
-  --color-warning: var(--warning-600);
-  --color-danger: var(--danger-600);
-  --color-info: var(--info-500);
+  --color-success: var(--fg-success);
+  --color-warning: var(--fg-warning);
+  --color-danger: var(--fg-danger);
+  --color-info: var(--fg-info);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -225,11 +224,30 @@ bdi {
   }
 }
 
+/* هر تم جدا: `--neutral-800` برای متن ثانویه در تم تیره یعنی متن تیره روی
+ * زمینهٔ تیره — پیش از M7-14 همین بود. */
 @media (prefers-contrast: more) {
   :root {
     --border-subtle: var(--neutral-500);
     --border-default: var(--neutral-600);
     --fg-secondary: var(--neutral-800);
+    --fg-tertiary: var(--neutral-700);
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --border-subtle: var(--neutral-500);
+    --border-default: var(--neutral-400);
+    --fg-secondary: var(--neutral-200);
+    --fg-tertiary: var(--neutral-300);
+  }
+}
+@media (prefers-contrast: more) {
+  :root[data-theme='dark'] {
+    --border-subtle: var(--neutral-500);
+    --border-default: var(--neutral-400);
+    --fg-secondary: var(--neutral-200);
+    --fg-tertiary: var(--neutral-300);
   }
 }
 
@@ -249,8 +267,21 @@ bdi {
   scale: -1 1;
 }
 
+/* ── جای محتوای مخصوص کاربر واردشده — M7-15 ─────────────────────────
+ * اسکلتی که فقط برای کاربر واردشده معنا دارد (مثل «پیشنهادهای تو»)، برای
+ * مهمان از اولین رنگ‌آمیزی ساخته نمی‌شود؛ `data-session` را اسکریپت
+ * `<head>` می‌گذارد (lib/auth/session.ts). */
+html[data-session='out'] .signed-in-only {
+  display: none;
+}
+
 /* ── چیدمان صفحه ───────────────────────────────────────────────────── */
 .page {
+  /* `width` لازم است: `<main class="page">` فرزند یک ستون flex است و حاشیهٔ
+   * auto کشیده شدن را خنثی می‌کند؛ بدون آن main به پهنای محتوایش جمع می‌شد.
+   * اسکلت بارگذاری باریک و وسط‌چین می‌ماند و با آمدن داده تمام‌عرض می‌شد —
+   * جهش چیدمان در هر صفحهٔ واردشده (M7-15). */
+  width: 100%;
   max-width: var(--content-max);
   margin-inline: auto;
   padding-inline: var(--space-4);

@@ -300,7 +300,7 @@ export function StageSubmitForm({
         )}
 
         {missing.length > 0 && (
-          <div role="alert" className="flex flex-col gap-1 text-[13.5px] text-[var(--danger-600)]">
+          <div role="alert" className="flex flex-col gap-1 text-[13.5px] text-[var(--fg-danger)]">
             <p className="font-semibold">تحویل هنوز کامل نیست:</p>
             <ul className="list-disc ps-5">
               {missing.map((item) => (
@@ -310,7 +310,7 @@ export function StageSubmitForm({
           </div>
         )}
         {error && (
-          <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}
@@ -375,7 +375,7 @@ function AreaInput({
         </div>
       )}
       {text.trim() && parsed === undefined && (
-        <p className="text-[12.5px] text-[var(--danger-600)]">این متن JSON معتبر نیست.</p>
+        <p className="text-[12.5px] text-[var(--fg-danger)]">این متن JSON معتبر نیست.</p>
       )}
     </div>
   );
@@ -467,7 +467,7 @@ function ChecksEditor({
                   className={cn(
                     'rounded-[var(--radius-sm)] border px-3 py-1 text-[13px]',
                     active
-                      ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--brand-700)]'
+                      ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
                       : 'border-[var(--border-default)] text-[var(--fg-secondary)]',
                   )}
                 >
@@ -545,9 +545,7 @@ function ScenariosEditor({
                 type="radio"
                 name="baseline"
                 checked={row.is_baseline}
-                onChange={() =>
-                  onChange(rows.map((r, i) => ({ ...r, is_baseline: i === index })))
-                }
+                onChange={() => onChange(rows.map((r, i) => ({ ...r, is_baseline: i === index })))}
               />
               سناریوی پایه
             </label>

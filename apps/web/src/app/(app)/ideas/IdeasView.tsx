@@ -44,9 +44,14 @@ const SCOPES: ChipOption<Scope>[] = [
   { value: 'MINE', label: 'ایده‌های من' },
 ];
 
-export function IdeasView() {
-  const { accessToken, loading: sessionLoading } = useSession();
-  const [categories, setCategories] = useState<IdeaCategoryOption[]>([]);
+export function IdeasView({
+  initialCategories = [],
+}: {
+  initialCategories?: IdeaCategoryOption[];
+}) {
+  // ویترین عمومی (ADR-0017): مهمان می‌بیند و هر اقدامی خودش پشت ورود است.
+  const { accessToken, loading: sessionLoading } = useSession({ required: false });
+  const [categories, setCategories] = useState<IdeaCategoryOption[]>(initialCategories);
   const [ideas, setIdeas] = useState<IdeaSummary[] | null>(null);
   const [total, setTotal] = useState(0);
   const [sort, setSort] = useState<IdeaSort>('hot');
@@ -57,10 +62,12 @@ export function IdeasView() {
   const [reload, setReload] = useState(0);
 
   useEffect(() => {
+    // سرور دسته‌ها را داده باشد، درخواست دوم لازم نیست.
+    if (initialCategories.length > 0) return;
     fetchIdeaCategories()
       .then(setCategories)
       .catch(() => setCategories([]));
-  }, []);
+  }, [initialCategories.length]);
 
   useEffect(() => {
     if (sessionLoading) return;
@@ -120,7 +127,12 @@ export function IdeasView() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
-        <ChipGroup label="کدام ایده‌ها" options={SCOPES} value={scope} onChange={setScope} />
+        <ChipGroup
+          label="کدام ایده‌ها"
+          options={accessToken ? SCOPES : SCOPES.filter((option) => option.value !== 'MINE')}
+          value={scope}
+          onChange={setScope}
+        />
         <ChipGroup label="مرتب‌سازی" options={SORTS} value={sort} onChange={setSort} />
         {categories.length > 0 && (
           <ChipGroup
@@ -133,10 +145,7 @@ export function IdeasView() {
       </div>
 
       {error && (
-        <div
-          role="alert"
-          className="flex items-center gap-3 text-[13.5px] text-[var(--danger-600)]"
-        >
+        <div role="alert" className="flex items-center gap-3 text-[13.5px] text-[var(--fg-danger)]">
           {error}
           <Button variant="secondary" size="sm" onClick={() => setReload((n) => n + 1)}>
             تلاش دوباره

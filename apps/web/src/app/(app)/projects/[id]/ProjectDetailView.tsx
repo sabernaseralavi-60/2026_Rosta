@@ -58,7 +58,7 @@ export function ProjectDetailView({ id }: { id: string }) {
   if (error) {
     return (
       <div className="flex flex-col gap-4">
-        <p role="alert" className="text-[15px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[15px] text-[var(--fg-danger)]">
           {error}
         </p>
         <Button asChild variant="secondary" className="self-start">
@@ -95,9 +95,7 @@ export function ProjectDetailView({ id }: { id: string }) {
           ))}
         </div>
         <h1>{project.title_fa}</h1>
-        <p className="text-[15.5px] leading-[1.95] text-[var(--fg-secondary)]">
-          {project.summary}
-        </p>
+        <p className="text-[15.5px] leading-[1.95] text-[var(--fg-secondary)]">{project.summary}</p>
       </header>
 
       {project.match && (
@@ -107,7 +105,7 @@ export function ProjectDetailView({ id }: { id: string }) {
                 اشتباهی می‌دهد. به‌جایش علت را می‌نویسیم. */}
             {!project.match.is_excluded && <MatchRing score={project.match.match_score} />}
             <div className="flex flex-col gap-0.5">
-              <CardTitle>تطابق تو با این پروژه</CardTitle>
+              <CardTitle as="h2">تطابق تو با این پروژه</CardTitle>
               <p className="text-[13px] text-[var(--fg-secondary)]">
                 {project.match.exclusion_note ?? 'بر اساس نیمرخی که پر کرده‌ای محاسبه شده است.'}
               </p>
@@ -117,7 +115,7 @@ export function ProjectDetailView({ id }: { id: string }) {
           <ReasonList reasons={project.match.reasons} />
 
           <details className="group">
-            <summary className="cursor-pointer text-[13.5px] font-medium text-[var(--brand-700)]">
+            <summary className="cursor-pointer text-[13.5px] font-medium text-[var(--fg-brand)]">
               این عدد از کجا آمد؟
             </summary>
             <dl className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -144,8 +142,8 @@ export function ProjectDetailView({ id }: { id: string }) {
               })}
             </dl>
             <p className="mt-3 text-[12.5px] leading-[1.9] text-[var(--fg-tertiary)]">
-              وزن هر بخش به کامل بودن نیمرخ تو بستگی دارد: بخشی که هنوز پاسخ نداده‌ای،
-              در محاسبه شرکت نمی‌کند.
+              وزن هر بخش به کامل بودن نیمرخ تو بستگی دارد: بخشی که هنوز پاسخ نداده‌ای، در محاسبه
+              شرکت نمی‌کند.
             </p>
           </details>
         </Card>
@@ -164,9 +162,7 @@ export function ProjectDetailView({ id }: { id: string }) {
         <Card className="flex flex-col gap-3">
           <CardTitle>مهارت‌های لازم</CardTitle>
           {project.required_skills.length === 0 ? (
-            <p className="text-[13.5px] text-[var(--fg-tertiary)]">
-              مهارت پیش‌نیاز خاصی ندارد.
-            </p>
+            <p className="text-[13.5px] text-[var(--fg-tertiary)]">مهارت پیش‌نیاز خاصی ندارد.</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {project.required_skills.map((skill) => (
@@ -176,7 +172,7 @@ export function ProjectDetailView({ id }: { id: string }) {
                 >
                   <span className="text-[var(--fg-primary)]">{skill.title_fa}</span>
                   <span className="flex items-center gap-1.5">
-                    <span className="text-[var(--fg-tertiary)] tabular-nums">
+                    <span className="tabular-nums text-[var(--fg-tertiary)]">
                       سطح {toPersianDigits(skill.min_level)}
                     </span>
                     {skill.is_teachable && <Badge tone="success">قابل یادگیری</Badge>}
@@ -190,9 +186,7 @@ export function ProjectDetailView({ id }: { id: string }) {
         <Card className="flex flex-col gap-3">
           <CardTitle>امکانات لازم</CardTitle>
           {project.required_assets.length === 0 ? (
-            <p className="text-[13.5px] text-[var(--fg-tertiary)]">
-              وسیلهٔ خاصی لازم ندارد.
-            </p>
+            <p className="text-[13.5px] text-[var(--fg-tertiary)]">وسیلهٔ خاصی لازم ندارد.</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {project.required_assets.map((asset) => (

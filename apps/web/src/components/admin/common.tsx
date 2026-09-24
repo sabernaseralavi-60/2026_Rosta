@@ -20,7 +20,7 @@ export function errorText(cause: unknown, fallback = 'درخواست انجام 
 
 export function ErrorLine({ children }: { children: ReactNode }) {
   return (
-    <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+    <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
       {children}
     </p>
   );
@@ -43,8 +43,8 @@ export function StatTile({
       <span
         className={cn(
           'text-[26px] font-bold tabular-nums leading-tight',
-          tone === 'warning' && value > 0 && 'text-[var(--warning-600)]',
-          tone === 'danger' && value > 0 && 'text-[var(--danger-600)]',
+          tone === 'warning' && value > 0 && 'text-[var(--fg-warning)]',
+          tone === 'danger' && value > 0 && 'text-[var(--fg-danger)]',
         )}
       >
         {toPersianDigits(value.toLocaleString('en-US').replace(/,/g, '٬'))}

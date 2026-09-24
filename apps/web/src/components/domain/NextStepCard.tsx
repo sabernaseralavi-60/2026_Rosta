@@ -46,8 +46,11 @@ export function NextStepCard({ step, now }: { step: NextStep | null; now?: Date 
       aria-labelledby="next-step-title"
       className="flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--brand-200)] bg-[var(--brand-50)] p-6 sm:p-8"
     >
-      <p className="text-[13px] font-medium text-[var(--brand-700)]">قدم بعدی تو</p>
-      <h2 id="next-step-title" className="text-[22px] font-bold text-[var(--fg-primary)] sm:text-[26px]">
+      <p className="text-[13px] font-medium text-[var(--fg-brand)]">قدم بعدی تو</p>
+      <h2
+        id="next-step-title"
+        className="text-[22px] font-bold text-[var(--fg-primary)] sm:text-[26px]"
+      >
         {step.title}
       </h2>
       <p className="text-[15px] text-[var(--fg-secondary)]">{step.description}</p>
@@ -59,7 +62,7 @@ export function NextStepCard({ step, now }: { step: NextStep | null; now?: Date 
           <span
             className={
               deadline.isOverdue
-                ? 'text-[14px] font-medium text-[var(--danger-600)]'
+                ? 'text-[14px] font-medium text-[var(--fg-danger)]'
                 : 'text-[14px] text-[var(--fg-secondary)]'
             }
           >

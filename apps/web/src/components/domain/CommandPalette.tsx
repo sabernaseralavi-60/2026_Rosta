@@ -16,6 +16,8 @@ import {
 import { readSession } from '@/lib/auth/session';
 import { cn } from '@/lib/cn';
 
+import { SearchIcon } from './SearchIcon';
+
 /**
  * جستجوی سراسری ⌘K — §3.7، M7-13.
  *
@@ -36,9 +38,20 @@ interface Option {
   group: string;
 }
 
-export function CommandPalette() {
+export interface CommandPaletteProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+/**
+ * خود پالت — فقط وقتی بار می‌شود که کسی بازش کند (M7-15).
+ *
+ * Radix Dialog (تلهٔ فوکوس، قفل اسکرول، پورتال) و این پالت روی هر صفحهٔ
+ * واردشده بار می‌شدند، هرچند بیشتر نشست‌ها هرگز ⌘K نمی‌زنند. دکمه و
+ * میان‌بر در `CommandPaletteTrigger` مانده‌اند؛ این جزء با import پویا می‌آید.
+ */
+export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
   const [groups, setGroups] = useState<SearchGroup[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,18 +60,6 @@ export function CommandPalette() {
   const [roles, setRoles] = useState<string[]>([]);
   const listId = useId();
   const listRef = useRef<HTMLDivElement>(null);
-
-  // ⌘K در مک، Ctrl+K در بقیه — از هر جای پوسته.
-  useEffect(() => {
-    function onKey(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        setOpen((value) => !value);
-      }
-    }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -132,11 +133,11 @@ export function CommandPalette() {
   const go = useCallback(
     (option: Option | undefined) => {
       if (!option) return;
-      setOpen(false);
+      onOpenChange(false);
       setQ('');
       router.push(option.href as Route);
     },
-    [router],
+    [router, onOpenChange],
   );
 
   function onInputKey(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -159,30 +160,10 @@ export function CommandPalette() {
     <Dialog.Root
       open={open}
       onOpenChange={(value) => {
-        setOpen(value);
+        onOpenChange(value);
         if (!value) setQ('');
       }}
     >
-      <Dialog.Trigger asChild>
-        <button
-          type="button"
-          className={cn(
-            'flex h-9 items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border-subtle)]',
-            'bg-[var(--bg-sunken)] px-3 text-[13px] text-[var(--fg-secondary)]',
-            'transition-colors hover:border-[var(--border-default)] hover:text-[var(--fg-secondary)]',
-          )}
-          aria-keyshortcuts="Control+K Meta+K"
-        >
-          <SearchIcon />
-          <span className="whitespace-nowrap max-lg:sr-only">جستجو…</span>
-          <kbd
-            dir="ltr"
-            className="hidden whitespace-nowrap rounded border border-[var(--border-subtle)] px-1.5 font-sans text-[11px] 2xl:inline"
-          >
-            Ctrl K
-          </kbd>
-        </button>
-      </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40" />
         <Dialog.Content
@@ -247,7 +228,7 @@ export function CommandPalette() {
                     className={cn(
                       'flex cursor-pointer items-baseline justify-between gap-3 rounded-[var(--radius-sm)] px-3 py-2',
                       index === active
-                        ? 'bg-[var(--brand-50)] text-[var(--brand-700)]'
+                        ? 'bg-[var(--brand-50)] text-[var(--fg-brand)]'
                         : 'text-[var(--fg-primary)]',
                     )}
                   >
@@ -267,7 +248,7 @@ export function CommandPalette() {
               </p>
             )}
             {error && (
-              <p role="alert" className="px-3 py-4 text-[13.5px] text-[var(--danger-600)]">
+              <p role="alert" className="px-3 py-4 text-[13.5px] text-[var(--fg-danger)]">
                 {error}
               </p>
             )}
@@ -278,14 +259,5 @@ export function CommandPalette() {
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
   );
 }

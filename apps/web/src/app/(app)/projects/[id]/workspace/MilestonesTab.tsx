@@ -157,7 +157,7 @@ function MilestonePanel({
             </div>
           )}
           {historyError && (
-            <p role="alert" className="text-[12.5px] text-[var(--danger-600)]">
+            <p role="alert" className="text-[12.5px] text-[var(--fg-danger)]">
               {historyError}
             </p>
           )}
@@ -202,7 +202,7 @@ function DeliverableCard({
                 target="_blank"
                 rel="noreferrer noopener"
                 dir="ltr"
-                className="inline-block text-[12.5px] text-[var(--brand-700)] underline"
+                className="inline-block text-[12.5px] text-[var(--fg-brand)] underline"
               >
                 {link}
               </a>
@@ -261,7 +261,12 @@ function SubmitForm({
 
   if (!open) {
     return (
-      <Button variant={isRevision ? 'primary' : 'secondary'} size="sm" className="self-start" onClick={() => setOpen(true)}>
+      <Button
+        variant={isRevision ? 'primary' : 'secondary'}
+        size="sm"
+        className="self-start"
+        onClick={() => setOpen(true)}
+      >
         {isRevision ? 'ارسال نسخهٔ اصلاح‌شده' : 'ارسال تحویل‌دادنی'}
       </Button>
     );
@@ -355,7 +360,7 @@ function SubmitForm({
         </div>
 
         {error && (
-          <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}
@@ -434,7 +439,7 @@ function ReviewForm({
                 key={option.value}
                 className={`cursor-pointer rounded-[var(--radius-sm)] border px-3 py-1.5 text-[13.5px] ${
                   decision === option.value
-                    ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--brand-700)]'
+                    ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
                     : 'border-[var(--border-default)] text-[var(--fg-secondary)]'
                 }`}
               >
@@ -467,9 +472,7 @@ function ReviewForm({
         />
 
         <label className="flex flex-col gap-1.5">
-          <span className="text-[13.5px] font-medium text-[var(--fg-primary)]">
-            نمره (اختیاری)
-          </span>
+          <span className="text-[13.5px] font-medium text-[var(--fg-primary)]">نمره (اختیاری)</span>
           <input
             type="number"
             min={0}
@@ -481,13 +484,13 @@ function ReviewForm({
         </label>
 
         {error && (
-          <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+          <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
             {error}
           </p>
         )}
 
         {readyToClose && (
-          <p className="text-[13px] text-[var(--success-600)]">
+          <p className="text-[13px] text-[var(--fg-success)]">
             همهٔ مراحل الزامی تأیید شدند — پروژه آمادهٔ بسته شدن است.
           </p>
         )}

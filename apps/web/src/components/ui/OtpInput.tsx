@@ -119,9 +119,7 @@ export function OtpInput({
 
   return (
     <fieldset className="flex flex-col gap-2" disabled={disabled}>
-      <legend className="mb-1 text-[13.5px] font-medium text-[var(--fg-primary)]">
-        {label}
-      </legend>
+      <legend className="mb-1 text-[13.5px] font-medium text-[var(--fg-primary)]">{label}</legend>
 
       <div className="flex justify-center gap-2" dir="ltr">
         {digits.map((digit, index) => (
@@ -157,11 +155,7 @@ export function OtpInput({
       </div>
 
       {error && (
-        <p
-          id={errorId}
-          role="alert"
-          className="text-center text-[12.5px] text-[var(--danger-600)]"
-        >
+        <p id={errorId} role="alert" className="text-center text-[12.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

@@ -66,18 +66,14 @@ export function TeamTab({
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-2 text-[13.5px] text-[var(--fg-secondary)]">
         <span>{team.name}</span>
-        <Badge tone="neutral">
-          {toPersianDigits(team.active_members)} عضو فعال
-        </Badge>
+        <Badge tone="neutral">{toPersianDigits(team.active_members)} عضو فعال</Badge>
         <Badge tone={team.open_seats > 0 ? 'success' : 'neutral'}>
-          {team.open_seats > 0
-            ? `${toPersianDigits(team.open_seats)} جای خالی`
-            : 'ظرفیت تکمیل'}
+          {team.open_seats > 0 ? `${toPersianDigits(team.open_seats)} جای خالی` : 'ظرفیت تکمیل'}
         </Badge>
       </div>
 
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -100,11 +96,7 @@ export function TeamTab({
               </div>
 
               {canRemove && !member.is_lead && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemove(member.user_id)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => handleRemove(member.user_id)}>
                   حذف از تیم
                 </Button>
               )}

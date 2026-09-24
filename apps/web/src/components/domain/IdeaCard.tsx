@@ -50,7 +50,7 @@ export function IdeaCard({
         </div>
         <Link
           href={`/ideas/${idea.id}`}
-          className="text-[16.5px] font-semibold leading-[1.7] text-[var(--fg-primary)] hover:text-[var(--brand-700)]"
+          className="text-[16.5px] font-semibold leading-[1.7] text-[var(--fg-primary)] hover:text-[var(--fg-brand)]"
         >
           {idea.title}
         </Link>

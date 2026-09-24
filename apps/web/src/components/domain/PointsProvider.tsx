@@ -1,6 +1,7 @@
 'use client';
 
 import * as Toast from '@radix-ui/react-toast';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import {
   createContext,
@@ -31,7 +32,13 @@ import {
   rememberLevel,
 } from '@/lib/points/memory';
 
-import { type Celebration, LevelUpModal } from './LevelUpModal';
+import type { Celebration } from './LevelUpModal';
+
+// جشن سطح و نشان چند بار در نیم‌سال رخ می‌دهد، ولی Radix Dialog و خودش در
+// JS اولیهٔ همهٔ صفحه‌ها بودند. فقط وقتی جشنی هست بار می‌شود (M7-15).
+const LevelUpModal = dynamic(() => import('./LevelUpModal').then((m) => m.LevelUpModal), {
+  ssr: false,
+});
 
 /**
  * حالت امتیاز پوستهٔ اپلیکیشن — §9.10.
@@ -87,10 +94,7 @@ export function PointsProvider({ children }: { children: ReactNode }) {
 
     const fresh = freshAwards(next.recent, lastSeenEntry(userId));
     if (fresh.length > 0) {
-      setToasts((current) => [
-        ...current,
-        ...fresh.map((entry) => ({ key: entry.id, entry })),
-      ]);
+      setToasts((current) => [...current, ...fresh.map((entry) => ({ key: entry.id, entry }))]);
     }
     if (next.latest_entry_id) rememberEntry(userId, next.latest_entry_id);
 
@@ -117,16 +121,14 @@ export function PointsProvider({ children }: { children: ReactNode }) {
     if (unseen.length === 0) return;
     setQueue((current) => [
       ...current,
-      ...unseen.map(
-        (badge): Celebration => ({
-          kind: 'badge',
-          code: badge.code,
-          title: badge.title_fa,
-          description: badge.description,
-          icon: badge.icon,
-          tier_fa: badge.tier_fa,
-        }),
-      ),
+      ...unseen.map((badge): Celebration => ({
+        kind: 'badge',
+        code: badge.code,
+        title: badge.title_fa,
+        description: badge.description,
+        icon: badge.icon,
+        tier_fa: badge.tier_fa,
+      })),
     ]);
   }, [accessToken]);
 
@@ -178,7 +180,7 @@ export function PointsProvider({ children }: { children: ReactNode }) {
               if (!open) setToasts((items) => items.filter((item) => item.key !== key));
             }}
           >
-            <Toast.Title className="text-[15px] font-bold text-[var(--brand-700)]">
+            <Toast.Title className="text-[15px] font-bold text-[var(--fg-brand)]">
               +{formatNumber(Number(entry.amount))} امتیاز
             </Toast.Title>
             <Toast.Description className="text-[13.5px] text-[var(--fg-secondary)]">
@@ -187,9 +189,15 @@ export function PointsProvider({ children }: { children: ReactNode }) {
           </Toast.Root>
         ))}
         {/* §10.6 — حداکثر ۳ هم‌زمان، بالا-وسط. */}
-        <Toast.Viewport className="fixed inset-x-0 top-4 z-50 mx-auto flex w-[min(92vw,360px)] flex-col gap-2 outline-none" />
+        {/* کلید میان‌بر جدا از اعلان‌ها (F8)؛ با یک کلید، فوکوس بین دو ناحیه
+            گم می‌شد. */}
+        <Toast.Viewport
+          label="امتیازهای تازه ({hotkey})"
+          hotkey={['F9']}
+          className="fixed inset-x-0 top-4 z-50 mx-auto flex w-[min(92vw,360px)] flex-col gap-2 outline-none"
+        />
       </Toast.Provider>
-      <LevelUpModal celebration={current} onClose={closeCelebration} />
+      {current && <LevelUpModal celebration={current} onClose={closeCelebration} />}
     </PointsContext.Provider>
   );
 }

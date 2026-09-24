@@ -80,9 +80,9 @@ export function MaterialRow({
         <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone={KIND_TONES[material.kind] ?? 'neutral'}>{material.kind_fa}</Badge>
-            <h4 className="text-[15px] font-semibold text-[var(--fg-primary)]">
+            <h3 className="text-[15px] font-semibold text-[var(--fg-primary)]">
               {material.title_fa}
-            </h4>
+            </h3>
             {!access.allowed && (
               <Badge tone="neutral" icon={<LockIcon />}>
                 {access.blocker === 'ENROLLMENT' ? 'ویژهٔ دانشجویان درس' : 'نیازمند اشتراک'}
@@ -139,7 +139,7 @@ export function MaterialRow({
       </p>
 
       {error && (
-        <p role="alert" className="text-[12.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[12.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

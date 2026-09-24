@@ -58,7 +58,7 @@ export function ResearchReviewView() {
         </p>
       </header>
       {error && (
-        <p role="alert" className="text-[13.5px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -175,7 +175,7 @@ function SubmissionReview({
                   target="_blank"
                   rel="noopener noreferrer"
                   dir="ltr"
-                  className="text-[var(--brand-700)] underline"
+                  className="text-[var(--fg-brand)] underline"
                 >
                   {value}
                 </a>
@@ -195,7 +195,7 @@ function SubmissionReview({
                 target="_blank"
                 rel="noopener noreferrer"
                 dir="ltr"
-                className="text-[var(--brand-700)] underline"
+                className="text-[var(--fg-brand)] underline"
               >
                 {link}
               </a>
@@ -206,7 +206,7 @@ function SubmissionReview({
               <button
                 type="button"
                 onClick={() => open(file.id)}
-                className="text-[var(--brand-700)] underline"
+                className="text-[var(--fg-brand)] underline"
               >
                 {file.original_name}
               </button>
@@ -245,7 +245,7 @@ function SubmissionReview({
         rows={3}
       />
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}
@@ -319,7 +319,7 @@ function OutputReview({
             target="_blank"
             rel="noopener noreferrer"
             dir="ltr"
-            className="text-[var(--brand-700)] underline"
+            className="text-[var(--fg-brand)] underline"
           >
             doi:{item.doi}
           </a>
@@ -330,7 +330,7 @@ function OutputReview({
             target="_blank"
             rel="noopener noreferrer"
             dir="ltr"
-            className="text-[var(--brand-700)] underline"
+            className="text-[var(--fg-brand)] underline"
           >
             {item.url}
           </a>
@@ -348,7 +348,7 @@ function OutputReview({
         rows={2}
       />
       {error && (
-        <p role="alert" className="text-[13px] text-[var(--danger-600)]">
+        <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
           {error}
         </p>
       )}

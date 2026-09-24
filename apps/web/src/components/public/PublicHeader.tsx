@@ -23,29 +23,26 @@ export function PublicHeader() {
     <header className="bg-transparent">
       <div className="page flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-[18px] font-bold text-[var(--brand-700)]">
+          <Link href="/" className="text-[18px] font-bold text-[var(--fg-brand)]">
             سیلپ
           </Link>
           <nav aria-label="ناوبری عمومی" className="hidden items-center gap-5 text-[14px] sm:flex">
             <Link
               href="/projects"
-              className="text-[var(--fg-secondary)] hover:text-[var(--brand-700)]"
+              className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
             >
               پروژه‌ها
             </Link>
-            <Link
-              href="/ideas"
-              className="text-[var(--fg-secondary)] hover:text-[var(--brand-700)]"
-            >
+            <Link href="/ideas" className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]">
               ایده‌ها
             </Link>
             <Link
               href="/research"
-              className="text-[var(--fg-secondary)] hover:text-[var(--brand-700)]"
+              className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
             >
               مسیر پژوهش
             </Link>
-            <Link href="/city" className="text-[var(--fg-secondary)] hover:text-[var(--brand-700)]">
+            <Link href="/city" className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]">
               شهر هوشمند
             </Link>
           </nav>
