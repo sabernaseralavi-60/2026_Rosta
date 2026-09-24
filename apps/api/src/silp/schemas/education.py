@@ -159,6 +159,8 @@ class AnnouncementOut(BaseModel):
     priority: AnnouncementPriority
     published_at: datetime
     expires_at: datetime | None = None
+    edited_at: datetime | None = None
+    """پر یعنی پس از انتشار ویرایش شده — ADR-0021."""
 
 
 class OfferingSummaryOut(BaseModel):
@@ -282,6 +284,17 @@ class AnnouncementIn(BaseModel):
     body: Annotated[str, Field(min_length=1, max_length=MAX_BODY)]
     priority: AnnouncementPriority = "NORMAL"
     expires_at: datetime | None = None
+
+
+class AnnouncementPatchIn(BaseModel):
+    """ویرایش اعلان — ADR-0021. اهمیت اینجا نیست: پس از انتشار عوض نمی‌شود."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: Annotated[str | None, Field(min_length=1, max_length=MAX_TITLE)] = None
+    body: Annotated[str | None, Field(min_length=1, max_length=MAX_BODY)] = None
+    expires_at: datetime | None = None
+    """`null` صریح یعنی «بی‌انقضا»؛ نبودن فیلد یعنی دست نزن."""
 
 
 class AttendanceEntryIn(BaseModel):

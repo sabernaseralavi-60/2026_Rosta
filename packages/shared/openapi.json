@@ -1060,6 +1060,18 @@
             "title": "Body",
             "type": "string"
           },
+          "edited_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edited At"
+          },
           "expires_at": {
             "anyOf": [
               {
@@ -1104,6 +1116,52 @@
           "published_at"
         ],
         "title": "AnnouncementOut",
+        "type": "object"
+      },
+      "AnnouncementPatchIn": {
+        "additionalProperties": false,
+        "description": "ویرایش اعلان — ADR-0021. اهمیت اینجا نیست: پس از انتشار عوض نمی‌شود.",
+        "properties": {
+          "body": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "AnnouncementPatchIn",
         "type": "object"
       },
       "AppealDecisionIn": {
@@ -2794,6 +2852,18 @@
             ],
             "title": "Category"
           },
+          "course_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Id"
+          },
           "difficulty": {
             "anyOf": [
               {
@@ -2804,6 +2874,17 @@
               }
             ],
             "title": "Difficulty"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
           },
           "id": {
             "format": "uuid",
@@ -2826,6 +2907,11 @@
           "kind_fa": {
             "title": "Kind Fa",
             "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
           },
           "usage_count": {
             "title": "Usage Count",
@@ -17365,6 +17451,75 @@
         "title": "TaskOut",
         "type": "object"
       },
+      "TeachAnnouncementOut": {
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "can_edit": {
+            "default": false,
+            "title": "Can Edit",
+            "type": "boolean"
+          },
+          "edited_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edited At"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "NORMAL",
+              "IMPORTANT",
+              "URGENT"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "priority",
+          "published_at"
+        ],
+        "title": "TeachAnnouncementOut",
+        "type": "object"
+      },
       "TeachDashboardOut": {
         "properties": {
           "needs_attention": {
@@ -17409,7 +17564,7 @@
           },
           "announcements": {
             "items": {
-              "$ref": "#/components/schemas/AnnouncementOut"
+              "$ref": "#/components/schemas/TeachAnnouncementOut"
             },
             "title": "Announcements",
             "type": "array"
@@ -33543,6 +33698,165 @@
         ]
       }
     },
+    "/api/v1/teach/offerings/{offering_id}/announcements/{announcement_id}": {
+      "delete": {
+        "description": "ADR-0021 — اعلان‌های رفته و پیام‌های صف‌مانده هم پس گرفته می‌شوند.",
+        "operationId": "withdraw_announcement_api_v1_teach_offerings__offering_id__announcements__announcement_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "announcement_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Announcement Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف اعلان درس",
+        "tags": [
+          "teaching"
+        ]
+      },
+      "patch": {
+        "description": "ADR-0021 — دوباره فرستاده نمی‌شود؛ متن اعلان‌های رفته بازنویسی می‌شود.",
+        "operationId": "revise_announcement_api_v1_teach_offerings__offering_id__announcements__announcement_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "announcement_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Announcement Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementPatchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش اعلان درس",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
     "/api/v1/teach/offerings/{offering_id}/attendance": {
       "get": {
         "description": "تا امروز حضور فقط نوشته می‌شد؛ هیچ راهی برای دیدن یا اصلاحش نبود.",
@@ -34764,6 +35078,124 @@
           }
         ],
         "summary": "افزودن سؤال به بانک",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/question-bank/{item_id}": {
+      "delete": {
+        "operationId": "delete_bank_item_api_v1_teach_question_bank__item_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حذف سؤال از بانک",
+        "tags": [
+          "teaching"
+        ]
+      },
+      "put": {
+        "description": "ADR-0021 — آزمون‌ها کپی دارند؛ ویرایش اینجا آزمون گذشته را عوض نمی‌کند.",
+        "operationId": "update_bank_item_api_v1_teach_question_bank__item_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankItemIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ویرایش سؤال بانک",
         "tags": [
           "teaching"
         ]

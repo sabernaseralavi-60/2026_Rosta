@@ -52,7 +52,7 @@ from silp.models.gamification import PointEntry
 from silp.models.identity import User, UserRole
 from silp.models.project import Project
 from silp.models.quiz import Quiz
-from silp.services import authz
+from silp.services import authz, events
 from silp.services.audit_service import AuditService
 from silp.services.teaching_service import (
     MIN_ENROLLMENT_CODE,
@@ -594,6 +594,12 @@ class CourseAdminService:
             entity_id=offering.id,
             after={**_offering_snapshot(offering), "weeks_created": weeks_created},
         )
+        await events.publish(
+            self.session,
+            events.OfferingAssigned(
+                offering_id=offering.id, instructor_id=offering.instructor_id, actor_id=actor.id
+            ),
+        )
         await self.session.commit()
         await self.session.refresh(offering)
         # نقش استاد از همین ردیف مشتق می‌شود و کش نقش ۶۰ ثانیه عمر دارد (§6.1).
@@ -662,6 +668,16 @@ class CourseAdminService:
                 entity_id=offering.id,
                 before={k: v for k, v in before.items() if after[k] != v},
                 after={k: v for k, v in after.items() if before[k] != v},
+            )
+        if previous_instructor != offering.instructor_id:
+            await events.publish(
+                self.session,
+                events.OfferingAssigned(
+                    offering_id=offering.id,
+                    instructor_id=offering.instructor_id,
+                    actor_id=actor.id,
+                    previous_instructor_id=previous_instructor,
+                ),
             )
         await self.session.commit()
         await self.session.refresh(offering)

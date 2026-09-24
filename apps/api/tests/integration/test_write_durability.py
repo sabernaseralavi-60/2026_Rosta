@@ -758,6 +758,95 @@ async def test_offering_settings_and_attendance_survive_the_request(  # type: ig
         await committing_session.commit()
 
 
+async def test_announcement_and_bank_edits_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """ADR-0021 — ویرایش و حذف اعلان، و ویرایش و حذف نرم سؤال بانک."""
+    from datetime import date
+
+    from silp.models.education import Announcement, Course, CourseOffering, Term
+    from silp.models.quiz import QuestionBankItem
+    from silp.services import authz
+
+    marker = uuid.uuid4().hex[:8]
+    term = Term(
+        code=f"T-{marker}",
+        title_fa="نیم‌سال آزمایشی",
+        starts_on=date(2026, 9, 23),
+        ends_on=date(2027, 2, 4),
+    )
+    course = Course(code=f"C-{marker}", slug=f"course-{marker}", title_fa="ایمنی راه")
+    committing_session.add_all([term, course])
+    await committing_session.flush()
+    offering = CourseOffering(
+        course_id=course.id, term_id=term.id, instructor_id=account["user_id"], status="OPEN"
+    )
+    committing_session.add(offering)
+    await committing_session.commit()
+    await authz.invalidate_roles(account["user_id"])
+
+    base = f"/api/v1/teach/offerings/{offering.id}/announcements"
+    question = {
+        "kind": "TRUE_FALSE",
+        "body": "پواسون برای داده‌های بیش‌پراکنده مناسب است.",
+        "payload": {"correct": False},
+    }
+    bank_id: uuid.UUID | None = None
+    try:
+        kept = await committing_client.post(
+            base, headers=auth(account), json={"title": "امتحان جمعه", "body": "ساعت ۱۰"}
+        )
+        dropped = await committing_client.post(
+            base, headers=auth(account), json={"title": "اشتباهی", "body": "نادیده بگیرید"}
+        )
+        assert kept.status_code == dropped.status_code == 201, kept.text
+        response = await committing_client.patch(
+            f"{base}/{kept.json()['id']}", headers=auth(account), json={"title": "امتحان شنبه"}
+        )
+        assert response.status_code == 200, response.text
+        response = await committing_client.delete(
+            f"{base}/{dropped.json()['id']}", headers=auth(account)
+        )
+        assert response.status_code == 204, response.text
+
+        created = await committing_client.post(
+            "/api/v1/teach/question-bank", headers=auth(account), json=question
+        )
+        assert created.status_code == 201, created.text
+        bank_id = uuid.UUID(created.json()["id"])
+        response = await committing_client.put(
+            f"/api/v1/teach/question-bank/{bank_id}",
+            headers=auth(account),
+            json={**question, "difficulty": 2},
+        )
+        assert response.status_code == 200, response.text
+        response = await committing_client.delete(
+            f"/api/v1/teach/question-bank/{bank_id}", headers=auth(account)
+        )
+        assert response.status_code == 204, response.text
+
+        async with other_connection() as verifier:
+            stored = await verifier.get(Announcement, uuid.UUID(kept.json()["id"]))
+            assert stored is not None and stored.title == "امتحان شنبه", "ویرایش commit نشده است"
+            assert stored.edited_at is not None
+            gone = await verifier.get(Announcement, uuid.UUID(dropped.json()["id"]))
+            assert gone is None, "حذف اعلان commit نشده است"
+            item = await verifier.get(QuestionBankItem, bank_id)
+            assert item is not None and item.difficulty == 2, "ویرایش بانک commit نشده است"
+            assert item.deleted_at is not None, "حذف نرم بانک commit نشده است"
+    finally:
+        if bank_id is not None:
+            await committing_session.execute(
+                delete(QuestionBankItem).where(QuestionBankItem.id == bank_id)
+            )
+        await committing_session.execute(
+            delete(CourseOffering).where(CourseOffering.id == offering.id)
+        )
+        await committing_session.execute(delete(Course).where(Course.id == course.id))
+        await committing_session.execute(delete(Term).where(Term.id == term.id))
+        await committing_session.commit()
+
+
 async def test_subscription_activation_survives_with_audit_and_notice(  # type: ignore[no-untyped-def]
     committing_client, committing_session, account
 ) -> None:
@@ -804,10 +893,13 @@ async def test_subscription_activation_survives_with_audit_and_notice(  # type: 
 async def test_course_admin_writes_survive_the_request(  # type: ignore[no-untyped-def]
     committing_client, committing_session, account
 ) -> None:
-    """ADR-0020 — نیم‌سال، درس و ارائه از پنل، هر کدام با ردیف حسابرسی."""
+    """ADR-0020 — نیم‌سال، درس و ارائه از پنل، هر کدام با ردیف حسابرسی؛ و
+    ADR-0021 — اعلان استادی که ارائه به او سپرده شد."""
     from silp.core.permissions import Role
     from silp.models.admin import AuditLog
     from silp.models.education import Course, CourseOffering, Term
+    from silp.models.identity import User
+    from silp.models.messaging import Notification
     from silp.services import authz
 
     await authz.grant_role(committing_session, user_id=account["user_id"], role=Role.COORDINATOR)
@@ -849,6 +941,23 @@ async def test_course_admin_writes_survive_the_request(  # type: ignore[no-untyp
         assert response.status_code == 201, response.text
         ids["offering"] = uuid.UUID(response.json()["id"])
 
+        mobile = f"0913{uuid.uuid4().int % 10_000_000:07d}"
+        response = await committing_client.post(
+            "/api/v1/auth/otp/request", json={"destination": mobile, "channel": "SMS"}
+        )
+        response = await committing_client.post(
+            "/api/v1/auth/otp/verify",
+            json={"challenge_id": response.json()["challenge_id"], "code": "111111"},
+        )
+        assert response.status_code == 200, response.text
+        ids["instructor"] = uuid.UUID(response.json()["user"]["id"])
+        response = await committing_client.patch(
+            f"/api/v1/admin/offerings/{ids['offering']}",
+            headers=auth(account),
+            json={"instructor_id": str(ids["instructor"])},
+        )
+        assert response.status_code == 200, response.text
+
         async with other_connection() as verifier:
             assert await verifier.get(Term, ids["term"]) is not None, "نیم‌سال commit نشده است"
             assert await verifier.get(Course, ids["course"]) is not None, "درس commit نشده است"
@@ -860,7 +969,19 @@ async def test_course_admin_writes_survive_the_request(  # type: ignore[no-untyp
                     select(AuditLog.action).where(AuditLog.entity_id.in_(list(ids.values())))
                 )
             )
-            assert actions == {"TERM_CREATED", "COURSE_CREATED", "OFFERING_CREATED"}
+            assert actions == {
+                "TERM_CREATED",
+                "COURSE_CREATED",
+                "OFFERING_CREATED",
+                "OFFERING_UPDATED",
+            }
+            notice = await verifier.scalar(
+                select(Notification.action_url).where(
+                    Notification.user_id == ids["instructor"],
+                    Notification.kind == "OFFERING_ASSIGNED",
+                )
+            )
+            assert notice == f"/teach/offerings/{ids['offering']}", "اعلان سپردن commit نشده است"
     finally:
         if "offering" in ids:
             await committing_session.execute(
@@ -870,4 +991,6 @@ async def test_course_admin_writes_survive_the_request(  # type: ignore[no-untyp
             await committing_session.execute(delete(Course).where(Course.id == ids["course"]))
         if "term" in ids:
             await committing_session.execute(delete(Term).where(Term.id == ids["term"]))
+        if "instructor" in ids:
+            await committing_session.execute(delete(User).where(User.id == ids["instructor"]))
         await committing_session.commit()

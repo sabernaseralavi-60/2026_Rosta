@@ -314,6 +314,10 @@ class BankItemOut(BaseModel):
     kind: QuestionKindOut
     kind_fa: str
     body: str
+    payload: dict[str, Any] = Field(default_factory=dict)
+    """کلید پاسخ هم هست؛ بانک فقط برای صاحبش خوانده می‌شود."""
+    explanation: str | None = None
+    course_id: uuid.UUID | None = None
     category: str | None = None
     difficulty: int | None = None
     usage_count: int

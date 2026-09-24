@@ -53,6 +53,7 @@ from silp.schemas.common import ErrorResponse
 from silp.schemas.education import (
     AnnouncementIn,
     AnnouncementOut,
+    AnnouncementPatchIn,
     AttendanceIn,
     CopyContentIn,
     CopyResultOut,
@@ -80,6 +81,7 @@ from silp.schemas.teaching import (
     OfferingPermissionsOut,
     OfferingSettingsIn,
     StaffRole,
+    TeachAnnouncementOut,
     TeachOfferingDetailOut,
     TeachOfferingOut,
 )
@@ -212,7 +214,11 @@ async def _detail(
         grading_policy=dict(offering.grading_policy or {}),
         weeks=[week_summary_out(card) for card in cards],
         announcements=[
-            AnnouncementOut.model_validate(a) for a in await courses.announcements_of(offering.id)
+            TeachAnnouncementOut(
+                **AnnouncementOut.model_validate(a).model_dump(),
+                can_edit=a.author_id == viewer.id or can(Permission.OFFERING_MANAGE),
+            )
+            for a in await courses.announcements_of(offering.id)
         ],
         quiz_count=quiz_count,
         allowed_statuses=list(OFFERING_TRANSITIONS.get(offering.status, ())),
@@ -622,6 +628,64 @@ async def publish_announcement(
         expires_at=payload.expires_at,
     )
     return AnnouncementOut.model_validate(announcement)
+
+
+@router.patch(
+    "/offerings/{offering_id}/announcements/{announcement_id}",
+    response_model=AnnouncementOut,
+    summary="ویرایش اعلان درس",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def revise_announcement(
+    offering_id: uuid.UUID,
+    announcement_id: uuid.UUID,
+    payload: AnnouncementPatchIn,
+    teaching: TeachingServiceDep,
+    session: SessionDep,
+    actor: Annotated[
+        CurrentUser,
+        Depends(require(Permission.ANNOUNCEMENT_PUBLISH, scope=offering_from_path)),
+    ],
+) -> AnnouncementOut:
+    """ADR-0021 — دوباره فرستاده نمی‌شود؛ متن اعلان‌های رفته بازنویسی می‌شود."""
+    announcement = await teaching.update_announcement(
+        offering_id=offering_id,
+        announcement_id=announcement_id,
+        actor_id=actor.id,
+        can_manage=await authz.has_permission(
+            session, actor, Permission.OFFERING_MANAGE, offering_id
+        ),
+        changes=payload.model_dump(exclude_unset=True),
+    )
+    return AnnouncementOut.model_validate(announcement)
+
+
+@router.delete(
+    "/offerings/{offering_id}/announcements/{announcement_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
+    summary="حذف اعلان درس",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def withdraw_announcement(
+    offering_id: uuid.UUID,
+    announcement_id: uuid.UUID,
+    teaching: TeachingServiceDep,
+    session: SessionDep,
+    actor: Annotated[
+        CurrentUser,
+        Depends(require(Permission.ANNOUNCEMENT_PUBLISH, scope=offering_from_path)),
+    ],
+) -> None:
+    """ADR-0021 — اعلان‌های رفته و پیام‌های صف‌مانده هم پس گرفته می‌شوند."""
+    await teaching.delete_announcement(
+        offering_id=offering_id,
+        announcement_id=announcement_id,
+        actor_id=actor.id,
+        can_manage=await authz.has_permission(
+            session, actor, Permission.OFFERING_MANAGE, offering_id
+        ),
+    )
 
 
 @router.post(

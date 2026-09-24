@@ -500,6 +500,79 @@ async def test_reassigning_moves_access_between_instructors(client: Any, db_sess
     assert response.json()["error"]["code"] == "OFFERING_HAS_ENROLLMENTS"
 
 
+async def test_assignment_notifies_both_instructors(client: Any, db_session: Any) -> None:
+    """ADR-0021 — استاد تازه اعلانی با پیوند ارائه می‌گیرد، استاد قبلی خبر
+    بسته شدن دسترسی‌اش را؛ جابه‌جایی نیم‌سال و سپردن به خود اعلان ندارد."""
+    from silp.models.messaging import Notification
+
+    token = await _coordinator(client, db_session)
+    _, coordinator_id = await _user(client, COORDINATOR_MOBILE)
+    _, first_id = await _user(client, INSTRUCTOR_MOBILE)
+    _, second_id = await _user(client, SECOND_INSTRUCTOR_MOBILE)
+    term = await _term(client, token, title_fa="نیم‌سال اول ۱۴۰۵")
+    other_term = await _term(client, token)
+    course = await _course(client, token, title_fa="مهندسی ترافیک")
+
+    # همهٔ ردیف‌های فیکسچر یک `created_at` دارند (زمان تراکنش)؛ پس با نوع جدا می‌شوند.
+    async def notices(user_id: str, kind: str = "OFFERING_ASSIGNED") -> list[Any]:
+        return list(
+            await db_session.scalars(
+                select(Notification).where(
+                    Notification.user_id == uuid.UUID(user_id), Notification.kind == kind
+                )
+            )
+        )
+
+    offering = (
+        await _offering(
+            client, token, course_id=course["id"], term_id=term["id"], instructor_id=first_id
+        )
+    ).json()
+    [assigned] = await notices(first_id)
+    assert assigned.action_url == f"/teach/offerings/{offering['id']}"
+    assert assigned.priority == "IMPORTANT"
+    assert "«مهندسی ترافیک»" in assigned.title
+    assert "نیم‌سال اول ۱۴۰۵" in assigned.body
+    assert "خارج و دوباره وارد شو" in assigned.body
+
+    response = await client.patch(
+        f"/api/v1/admin/offerings/{offering['id']}",
+        headers=auth(token),
+        json={"term_id": other_term["id"]},
+    )
+    assert response.status_code == 200, response.text
+    assert len(await notices(first_id)) == 1
+
+    response = await client.patch(
+        f"/api/v1/admin/offerings/{offering['id']}",
+        headers=auth(token),
+        json={"instructor_id": second_id},
+    )
+    assert response.status_code == 200, response.text
+    [reassigned] = await notices(first_id, "OFFERING_REASSIGNED")
+    assert reassigned.data == {"offering_id": offering["id"]}
+    assert "دسترسی تو به آن بسته شد" in reassigned.body
+    assert len(await notices(second_id)) == 1
+    assert await notices(second_id, "OFFERING_REASSIGNED") == []
+
+    # بازگرداندن به استاد اول: اعلان تازه، نه حذف تکراری.
+    response = await client.patch(
+        f"/api/v1/admin/offerings/{offering['id']}",
+        headers=auth(token),
+        json={"instructor_id": first_id},
+    )
+    assert response.status_code == 200, response.text
+    assert len(await notices(first_id)) == 2
+    assert len(await notices(second_id, "OFFERING_REASSIGNED")) == 1
+
+    # مدیری که ارائه را به خودش می‌سپارد اعلان نمی‌گیرد.
+    response = await _offering(
+        client, token, course_id=course["id"], term_id=term["id"], instructor_id=coordinator_id
+    )
+    assert response.status_code == 201, response.text
+    assert await notices(coordinator_id) == []
+
+
 async def test_only_unused_offerings_are_deleted(client: Any, db_session: Any) -> None:
     from silp.core.permissions import Role, ScopeType
     from silp.models.education import CourseWeek, Enrollment

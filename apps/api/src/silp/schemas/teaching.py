@@ -50,13 +50,18 @@ class OfferingPermissionsOut(BaseModel):
     grade_quizzes: bool
 
 
+class TeachAnnouncementOut(AnnouncementOut):
+    can_edit: bool = False
+    """نویسندهٔ اعلان، یا استاد درس — آینهٔ قاعدهٔ سرور (ADR-0021)."""
+
+
 class TeachOfferingDetailOut(TeachOfferingOut):
     """`GET /teach/offerings/{id}` — هفته‌ها با پیش‌نویس، و کد ثبت‌نام خوانا."""
 
     enrollment_code: str | None = None
     grading_policy: dict[str, int] = Field(default_factory=dict)
     weeks: list[WeekSummaryOut] = Field(default_factory=list)
-    announcements: list[AnnouncementOut] = Field(default_factory=list)
+    announcements: list[TeachAnnouncementOut] = Field(default_factory=list)
     quiz_count: int = 0
     allowed_statuses: list[OfferingStatus] = Field(default_factory=list)
     """وضعیت‌هایی که از وضعیت فعلی می‌شود به آن‌ها رفت."""

@@ -621,6 +621,91 @@ async def test_urgent_announcement_forces_sms(client, db_session) -> None:  # ty
     assert "ANNOUNCEMENT_POSTED" not in await _kinds(client, scene["instructor_token"])
 
 
+async def test_edited_announcement_rewrites_what_students_read(client, db_session) -> None:  # type: ignore[no-untyped-def]
+    """ADR-0021 — ویرایش دوباره نمی‌فرستد ولی متن مرکز اعلان و پیامک صف‌مانده
+    را عوض می‌کند؛ حذف هر دو را پس می‌گیرد. دستیار فقط اعلان خودش را."""
+    from tests.integration.test_teach_area import _scoped_ta
+
+    scene = await _scene(client, db_session)
+    offering_id = scene["offering"].id
+    base = f"/api/v1/teach/offerings/{offering_id}/announcements"
+    teacher = auth(scene["instructor_token"])
+
+    response = await client.post(
+        base,
+        headers=teacher,
+        json={"title": "امتحان جمعه", "body": "امتحان میان‌ترم جمعه است.", "priority": "URGENT"},
+    )
+    assert response.status_code == 201, response.text
+    announcement_id = response.json()["id"]
+
+    response = await client.patch(
+        f"{base}/{announcement_id}",
+        headers=teacher,
+        json={"title": "امتحان شنبه", "body": "امتحان میان‌ترم به شنبه افتاد."},
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["edited_at"] is not None
+    assert response.json()["priority"] == "URGENT"
+
+    posted = [
+        i
+        for i in (await _feed(client, scene["student_token"]))["items"]
+        if i["kind"] == "ANNOUNCEMENT_POSTED"
+    ]
+    assert len(posted) == 1, "ویرایش نباید اعلان تازه بسازد"
+    assert posted[0]["title"] == "ایمنی راه: امتحان شنبه"
+    assert "شنبه" in posted[0]["body"] and "جمعه" not in posted[0]["body"]
+    db_session.expire_all()
+    [sms] = [
+        m
+        for m in await _outbox(db_session, scene["student_id"], "ANNOUNCEMENT_POSTED")
+        if m.channel == "SMS"
+    ]
+    assert sms.payload["values"]["title"] == "امتحان شنبه"
+
+    # اهمیت پس از انتشار عوض نمی‌شود؛ ویرایش بی‌تغییر `edited_at` را دست نمی‌زند.
+    response = await client.patch(
+        f"{base}/{announcement_id}", headers=teacher, json={"priority": "NORMAL"}
+    )
+    assert response.status_code == 422
+    response = await client.patch(f"{base}/{announcement_id}", headers=teacher, json={"title": " "})
+    assert response.status_code == 422
+
+    # دستیار اعلان استاد را نه ویرایش می‌کند نه حذف؛ استاد اعلان دستیار را هر دو.
+    ta_token = await _scoped_ta(client, db_session, offering_id)
+    ta = auth(ta_token)
+    response = await client.post(
+        base, headers=ta, json={"title": "کلاس حل تمرین", "body": "ساعت ۱۰"}
+    )
+    assert response.status_code == 201, response.text
+    ta_announcement = response.json()["id"]
+    response = await client.patch(f"{base}/{announcement_id}", headers=ta, json={"body": "لغو"})
+    assert response.status_code == 403
+    assert (await client.delete(f"{base}/{announcement_id}", headers=ta)).status_code == 403
+    detail = await client.get(f"/api/v1/teach/offerings/{offering_id}", headers=ta)
+    editable = {a["id"]: a["can_edit"] for a in detail.json()["announcements"]}
+    assert editable == {announcement_id: False, ta_announcement: True}
+    response = await client.patch(
+        f"{base}/{ta_announcement}", headers=teacher, json={"expires_at": None}
+    )
+    assert response.status_code == 200, response.text
+    assert (await client.delete(f"{base}/{ta_announcement}", headers=teacher)).status_code == 204
+
+    # حذف: اعلان و پیامک نرفته پس گرفته می‌شوند.
+    assert (await client.delete(f"{base}/{announcement_id}", headers=teacher)).status_code == 204
+    assert "ANNOUNCEMENT_POSTED" not in await _kinds(client, scene["student_token"])
+    db_session.expire_all()
+    assert await _outbox(db_session, scene["student_id"], "ANNOUNCEMENT_POSTED") == []
+    listed = await client.get(
+        f"/api/v1/offerings/{offering_id}/announcements", headers=auth(scene["student_token"])
+    )
+    assert listed.status_code == 200, listed.text
+    assert listed.json() == []
+    response = await client.patch(f"{base}/{announcement_id}", headers=teacher, json={"body": "x"})
+    assert response.status_code == 404
+
+
 async def test_week_and_quiz_publication_notify_the_class(client, db_session) -> None:  # type: ignore[no-untyped-def]
     from silp.models.education import CourseWeek
 

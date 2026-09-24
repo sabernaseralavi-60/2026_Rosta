@@ -457,6 +457,8 @@ class Announcement(UUIDPrimaryKeyMixin, Base):
         DateTime(timezone=True), nullable=False, server_default=text("now()")
     )
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    #: ۰۰۱۸ — ویرایش پس از انتشار؛ دانشجو «ویرایش‌شده» را می‌بیند (ADR-0021).
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
     __table_args__ = (
         CheckConstraint(

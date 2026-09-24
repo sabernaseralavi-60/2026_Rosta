@@ -345,6 +345,47 @@ async def add_bank_item(
     return _bank_out(item)
 
 
+@router.put(
+    "/question-bank/{item_id}",
+    response_model=BankItemOut,
+    responses={**NOT_FOUND, 422: {"model": ErrorResponse}},
+    summary="ویرایش سؤال بانک",
+)
+async def update_bank_item(
+    item_id: uuid.UUID,
+    body: BankItemIn,
+    quizzes: QuizServiceDep,
+    current: CurrentUserDep,
+) -> BankItemOut:
+    """ADR-0021 — آزمون‌ها کپی دارند؛ ویرایش اینجا آزمون گذشته را عوض نمی‌کند."""
+    item = await quizzes.update_bank_item(
+        owner_id=current.id,
+        item_id=item_id,
+        draft=QuestionDraft(
+            kind=body.kind, body=body.body, payload=body.payload, explanation=body.explanation
+        ),
+        course_id=body.course_id,
+        category=body.category,
+        difficulty=body.difficulty,
+    )
+    return _bank_out(item)
+
+
+@router.delete(
+    "/question-bank/{item_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
+    responses={**NOT_FOUND},
+    summary="حذف سؤال از بانک",
+)
+async def delete_bank_item(
+    item_id: uuid.UUID,
+    quizzes: QuizServiceDep,
+    current: CurrentUserDep,
+) -> None:
+    await quizzes.delete_bank_item(owner_id=current.id, item_id=item_id)
+
+
 @router.post(
     "/quizzes/{quiz_id}/questions/from-bank",
     response_model=list[QuestionOut],
@@ -762,6 +803,9 @@ def _bank_out(item: object) -> BankItemOut:
         kind=item.kind,  # type: ignore[attr-defined]
         kind_fa=QUESTION_KIND_TITLE_FA[QuestionKind(item.kind)],  # type: ignore[attr-defined]
         body=item.body,  # type: ignore[attr-defined]
+        payload=dict(item.payload or {}),  # type: ignore[attr-defined]
+        explanation=item.explanation,  # type: ignore[attr-defined]
+        course_id=item.course_id,  # type: ignore[attr-defined]
         category=item.category,  # type: ignore[attr-defined]
         difficulty=item.difficulty,  # type: ignore[attr-defined]
         usage_count=item.usage_count,  # type: ignore[attr-defined]

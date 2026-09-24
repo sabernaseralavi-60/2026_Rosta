@@ -43,7 +43,14 @@ from silp.models.delivery import (
     OpeningApplication,
     TeamOpening,
 )
-from silp.models.education import Announcement, Course, CourseOffering, CourseWeek, Enrollment
+from silp.models.education import (
+    Announcement,
+    Course,
+    CourseOffering,
+    CourseWeek,
+    Enrollment,
+    Term,
+)
 from silp.models.gamification import Badge, PointEntry
 from silp.models.idea import Idea, IdeaComment
 from silp.models.project import Project, ProjectApplication, Team, TeamInvitation
@@ -254,13 +261,14 @@ async def on_appeal_resolved(session: AsyncSession, event: events.AppealResolved
     )
 
 
-@events.subscribe(events.AnnouncementPublished)
-async def on_announcement_published(
-    session: AsyncSession, event: events.AnnouncementPublished
-) -> None:
-    announcement = await session.get(Announcement, event.announcement_id)
-    if announcement is None:
-        return
+def announcement_dedup_key(announcement_id: uuid.UUID) -> str:
+    return f"ANNOUNCEMENT:{announcement_id}"
+
+
+async def _announcement_notice(
+    session: AsyncSession, announcement: Announcement
+) -> tuple[list[uuid.UUID], dict[str, str], str] | None:
+    """گیرندگان، متغیرها و پیوند اعلان — مشترک انتشار و ویرایش."""
     if announcement.offering_id is not None:
         recipients = await _active_students(session, announcement.offering_id)
         where = await course_title(session, announcement.offering_id)
@@ -268,24 +276,60 @@ async def on_announcement_published(
     elif announcement.project_id is not None:
         project = await session.get(Project, announcement.project_id)
         if project is None:
-            return
+            return None
         recipients = await active_member_ids(session, project.id)
         where = project.title_fa
         url = f"/projects/{project.id}/workspace"
     else:
+        return None
+    values = {
+        "course": where,
+        "title": announcement.title,
+        "excerpt": excerpt(announcement.body, 280),
+    }
+    return [r for r in recipients if r != announcement.author_id], values, url
+
+
+@events.subscribe(events.AnnouncementPublished)
+async def on_announcement_published(
+    session: AsyncSession, event: events.AnnouncementPublished
+) -> None:
+    announcement = await session.get(Announcement, event.announcement_id)
+    if announcement is None:
         return
+    notice = await _announcement_notice(session, announcement)
+    if notice is None:
+        return
+    recipients, values, url = notice
     await NotificationService(session).notify(
         "ANNOUNCEMENT_POSTED",
-        [r for r in recipients if r != announcement.author_id],
-        {
-            "course": where,
-            "title": announcement.title,
-            "excerpt": excerpt(announcement.body, 280),
-        },
+        recipients,
+        values,
         action_url=url,
         priority=announcement.priority,  # type: ignore[arg-type]
-        dedup_key=f"ANNOUNCEMENT:{announcement.id}",
+        dedup_key=announcement_dedup_key(announcement.id),
     )
+
+
+@events.subscribe(events.AnnouncementRevised)
+async def on_announcement_revised(session: AsyncSession, event: events.AnnouncementRevised) -> None:
+    """ADR-0021 — «امتحان به شنبه افتاد» نباید در مرکز اعلان هنوز «جمعه» بگوید."""
+    announcement = await session.get(Announcement, event.announcement_id)
+    if announcement is None:
+        return
+    notice = await _announcement_notice(session, announcement)
+    if notice is None:
+        return
+    await NotificationService(session).revise(
+        "ANNOUNCEMENT_POSTED", announcement_dedup_key(announcement.id), notice[1]
+    )
+
+
+@events.subscribe(events.AnnouncementWithdrawn)
+async def on_announcement_withdrawn(
+    session: AsyncSession, event: events.AnnouncementWithdrawn
+) -> None:
+    await NotificationService(session).retract(announcement_dedup_key(event.announcement_id))
 
 
 # ── پروژه‌ها ────────────────────────────────────────────────────────────
@@ -947,6 +991,43 @@ async def on_subscription_rejected(
         action_url="/pricing",
         dedup_key=f"SUBSCRIPTION_REJECTED:{subscription.id}",
     )
+
+
+@events.subscribe(events.OfferingAssigned)
+async def on_offering_assigned(session: AsyncSession, event: events.OfferingAssigned) -> None:
+    """ADR-0021 — استاد از پنل ارائه می‌گیرد، نه از کسی که به او زنگ بزند.
+
+    استاد قبلی هم خبر می‌گیرد: دسترسی‌اش همان لحظه بسته می‌شود و بی این
+    اعلان فقط یک ۴۰۳ می‌بیند. کسی که ارائه را به خودش سپرده، اعلان نمی‌گیرد.
+    """
+    offering = await session.get(CourseOffering, event.offering_id)
+    if offering is None or offering.instructor_id != event.instructor_id:
+        return
+    course = await session.get(Course, offering.course_id)
+    term = await session.get(Term, offering.term_id)
+    values = {
+        "course": course.title_fa if course else "",
+        "term": term.title_fa if term else "",
+    }
+    service = NotificationService(session)
+    if event.instructor_id != event.actor_id:
+        await service.notify(
+            "OFFERING_ASSIGNED",
+            [event.instructor_id],
+            values,
+            action_url=f"/teach/offerings/{offering.id}",
+            data={"offering_id": str(offering.id)},
+        )
+    previous = event.previous_instructor_id
+    if previous is not None and previous not in (event.actor_id, event.instructor_id):
+        names = await display_names(session, [event.instructor_id])
+        await service.notify(
+            "OFFERING_REASSIGNED",
+            [previous],
+            {**values, "instructor": name_of(names, event.instructor_id) or "استاد دیگری"},
+            action_url="/dashboard",
+            data={"offering_id": str(offering.id)},
+        )
 
 
 @events.subscribe(events.RoleGranted)

@@ -170,6 +170,20 @@ class AnnouncementPublished:
 
 
 @dataclass(frozen=True, slots=True)
+class AnnouncementRevised:
+    """متن اعلان پس از انتشار عوض شد — ADR-0021. دوباره فرستاده نمی‌شود."""
+
+    announcement_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class AnnouncementWithdrawn:
+    """اعلان حذف شد — ADR-0021. ردیفش دیگر نیست؛ فقط شناسه می‌ماند."""
+
+    announcement_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
 class BadgeAwarded:
     user_id: uuid.UUID
     badge_code: str
@@ -320,6 +334,21 @@ class SubscriptionActivated:
 class SubscriptionRejected:
     subscription_id: uuid.UUID
     reason: str
+
+
+# ── از ADR-0020 بخش هنوز باز — سپردن ارائه ────────────────────────────
+@dataclass(frozen=True, slots=True)
+class OfferingAssigned:
+    """ارائه تازه ساخته شد یا به استاد دیگری سپرده شد.
+
+    `previous_instructor_id` فقط در جابه‌جایی پر است؛ `actor_id` مدیری که
+    سپرد — کسی که ارائه را به خودش می‌سپارد اعلان نمی‌گیرد.
+    """
+
+    offering_id: uuid.UUID
+    instructor_id: uuid.UUID
+    actor_id: uuid.UUID
+    previous_instructor_id: uuid.UUID | None = None
 
 
 @dataclass(frozen=True, slots=True)

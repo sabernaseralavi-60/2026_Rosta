@@ -3326,6 +3326,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teach/offerings/{offering_id}/announcements/{announcement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * حذف اعلان درس
+         * @description ADR-0021 — اعلان‌های رفته و پیام‌های صف‌مانده هم پس گرفته می‌شوند.
+         */
+        delete: operations["withdraw_announcement_api_v1_teach_offerings__offering_id__announcements__announcement_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * ویرایش اعلان درس
+         * @description ADR-0021 — دوباره فرستاده نمی‌شود؛ متن اعلان‌های رفته بازنویسی می‌شود.
+         */
+        patch: operations["revise_announcement_api_v1_teach_offerings__offering_id__announcements__announcement_id__patch"];
+        trace?: never;
+    };
     "/api/v1/teach/offerings/{offering_id}/attendance": {
         parameters: {
             query?: never;
@@ -3593,6 +3617,27 @@ export interface paths {
         /** افزودن سؤال به بانک */
         post: operations["add_bank_item_api_v1_teach_question_bank_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/question-bank/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * ویرایش سؤال بانک
+         * @description ADR-0021 — آزمون‌ها کپی دارند؛ ویرایش اینجا آزمون گذشته را عوض نمی‌کند.
+         */
+        put: operations["update_bank_item_api_v1_teach_question_bank__item_id__put"];
+        post?: never;
+        /** حذف سؤال از بانک */
+        delete: operations["delete_bank_item_api_v1_teach_question_bank__item_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -4650,6 +4695,8 @@ export interface components {
         AnnouncementOut: {
             /** Body */
             body: string;
+            /** Edited At */
+            edited_at?: string | null;
             /** Expires At */
             expires_at?: string | null;
             /**
@@ -4669,6 +4716,18 @@ export interface components {
             published_at: string;
             /** Title */
             title: string;
+        };
+        /**
+         * AnnouncementPatchIn
+         * @description ویرایش اعلان — ADR-0021. اهمیت اینجا نیست: پس از انتشار عوض نمی‌شود.
+         */
+        AnnouncementPatchIn: {
+            /** Body */
+            body?: string | null;
+            /** Expires At */
+            expires_at?: string | null;
+            /** Title */
+            title?: string | null;
         };
         /** AppealDecisionIn */
         AppealDecisionIn: {
@@ -5350,8 +5409,12 @@ export interface components {
             body: string;
             /** Category */
             category?: string | null;
+            /** Course Id */
+            course_id?: string | null;
             /** Difficulty */
             difficulty?: number | null;
+            /** Explanation */
+            explanation?: string | null;
             /**
              * Id
              * Format: uuid
@@ -5364,6 +5427,10 @@ export interface components {
             kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
             /** Kind Fa */
             kind_fa: string;
+            /** Payload */
+            payload?: {
+                [key: string]: unknown;
+            };
             /** Usage Count */
             usage_count: number;
         };
@@ -10559,6 +10626,37 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** TeachAnnouncementOut */
+        TeachAnnouncementOut: {
+            /** Body */
+            body: string;
+            /**
+             * Can Edit
+             * @default false
+             */
+            can_edit: boolean;
+            /** Edited At */
+            edited_at?: string | null;
+            /** Expires At */
+            expires_at?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Priority
+             * @enum {string}
+             */
+            priority: "NORMAL" | "IMPORTANT" | "URGENT";
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Title */
+            title: string;
+        };
         /** TeachDashboardOut */
         TeachDashboardOut: {
             needs_attention: components["schemas"]["NeedsAttentionOut"];
@@ -10578,7 +10676,7 @@ export interface components {
             /** Allowed Statuses */
             allowed_statuses?: ("DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED")[];
             /** Announcements */
-            announcements?: components["schemas"]["AnnouncementOut"][];
+            announcements?: components["schemas"]["TeachAnnouncementOut"][];
             /** Capacity */
             capacity?: number | null;
             /**
@@ -20256,6 +20354,108 @@ export interface operations {
             };
         };
     };
+    withdraw_announcement_api_v1_teach_offerings__offering_id__announcements__announcement_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revise_announcement_api_v1_teach_offerings__offering_id__announcements__announcement_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnouncementPatchIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     attendance_sessions_api_v1_teach_offerings__offering_id__attendance_get: {
         parameters: {
             query?: never;
@@ -20999,6 +21199,88 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_bank_item_api_v1_teach_question_bank__item_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BankItemIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BankItemOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_bank_item_api_v1_teach_question_bank__item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description پیدا نشد */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

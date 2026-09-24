@@ -1045,17 +1045,65 @@ async def test_bank_question_is_copied_not_referenced(client: Any, db_session: A
     assert copied.json()[0]["body"] == "متن اصلی سؤال"
     assert copied.json()[0]["bank_id"] == bank_id
 
-    from silp.models.quiz import QuestionBankItem
-
-    item = await db_session.get(QuestionBankItem, uuid.UUID(bank_id))
-    await db_session.refresh(item)
-    item.body = "متن ویرایش‌شده"
-    await db_session.flush()
+    # ADR-0021 — ویرایش از خود API، نه دست بردن در ردیف.
+    edited = await client.put(
+        f"/api/v1/teach/question-bank/{bank_id}",
+        headers=auth(scene["instructor_token"]),
+        json={
+            "kind": "SINGLE_CHOICE",
+            "body": "متن ویرایش‌شده",
+            "payload": SINGLE_PAYLOAD,
+            "explanation": "توضیح تازه",
+            "category": "مدل‌سازی",
+            "difficulty": 4,
+        },
+    )
+    assert edited.status_code == 200, edited.text
+    assert edited.json()["body"] == "متن ویرایش‌شده"
+    assert edited.json()["explanation"] == "توضیح تازه"
+    assert edited.json()["payload"] == SINGLE_PAYLOAD
+    assert edited.json()["usage_count"] == 1
 
     detail = await client.get(
         f"/api/v1/teach/quizzes/{scene['quiz_id']}", headers=auth(scene["instructor_token"])
     )
     assert detail.json()["questions"][0]["body"] == "متن اصلی سؤال"
+
+
+async def test_bank_is_private_and_deletion_keeps_quiz_copies(client: Any, db_session: Any) -> None:
+    """بانک شخصی است (۴۰۴ برای دیگری)؛ حذف نرم، کپی آزمون و منشأش می‌مانند."""
+    scene = await _scene(client, db_session)
+    teacher = auth(scene["instructor_token"])
+    bank_id = (
+        await client.post(
+            "/api/v1/teach/question-bank",
+            headers=teacher,
+            json={"kind": "SINGLE_CHOICE", "body": "سؤال بانک", "payload": SINGLE_PAYLOAD},
+        )
+    ).json()["id"]
+    copied = await client.post(
+        f"/api/v1/teach/quizzes/{scene['quiz_id']}/questions/from-bank",
+        headers=teacher,
+        json={"bank_ids": [bank_id]},
+    )
+    assert copied.status_code == 201, copied.text
+
+    outsider = auth(await login(client, OUTSIDER_MOBILE))
+    body = {"kind": "SINGLE_CHOICE", "body": "ربودن", "payload": SINGLE_PAYLOAD}
+    path = f"/api/v1/teach/question-bank/{bank_id}"
+    assert (await client.put(path, headers=outsider, json=body)).status_code == 404
+    assert (await client.delete(path, headers=outsider)).status_code == 404
+
+    bad = await client.put(path, headers=teacher, json={**body, "payload": {"options": []}})
+    assert bad.status_code == 422
+
+    assert (await client.delete(path, headers=teacher)).status_code == 204
+    assert (await client.delete(path, headers=teacher)).status_code == 404
+    listed = await client.get("/api/v1/teach/question-bank", headers=teacher)
+    assert bank_id not in {item["id"] for item in listed.json()}
+    detail = await client.get(f"/api/v1/teach/quizzes/{scene['quiz_id']}", headers=teacher)
+    [question] = detail.json()["questions"]
+    assert question["body"] == "سؤال بانک" and question["bank_id"] == bank_id
 
 
 # ── کمکی ───────────────────────────────────────────────────────────────

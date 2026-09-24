@@ -19,7 +19,7 @@ from sqlalchemy import delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from silp.core.exceptions import Conflict, NotFound, ValidationFailed
+from silp.core.exceptions import Conflict, NotFound, PermissionDenied, ValidationFailed
 from silp.core.logging import get_logger
 from silp.models.education import (
     MAX_WEEK_NUMBER,
@@ -513,6 +513,84 @@ class TeachingService:
         )
         await self.session.commit()
         log.info("announcement_published", offering_id=str(offering_id), priority=priority)
+        return announcement
+
+    async def update_announcement(
+        self,
+        *,
+        offering_id: uuid.UUID,
+        announcement_id: uuid.UUID,
+        actor_id: uuid.UUID,
+        can_manage: bool,
+        changes: dict[str, object],
+    ) -> Announcement:
+        """ویرایش عنوان، متن یا انقضا — ADR-0021.
+
+        اهمیت عوض نمی‌شود: «فوری» کردن پس از انتشار پیامکی نمی‌فرستد و
+        گذاشتنش این را پنهان می‌کرد. اعلان دوباره فرستاده نمی‌شود؛ متن
+        اعلان‌های رفته و پیام‌های صف بازنویسی می‌شود (`AnnouncementRevised`).
+        """
+        announcement = await self._announcement_for_edit(
+            offering_id, announcement_id, actor_id=actor_id, can_manage=can_manage
+        )
+        changed = False
+        for field_name in ("title", "body"):
+            if field_name in changes:
+                value = str(changes[field_name] or "").strip()
+                if not value:
+                    raise ValidationFailed("عنوان و متن اعلان خالی نمی‌مانند.")
+                if value != getattr(announcement, field_name):
+                    setattr(announcement, field_name, value)
+                    changed = True
+        if "expires_at" in changes and changes["expires_at"] != announcement.expires_at:
+            announcement.expires_at = changes["expires_at"]  # type: ignore[assignment]
+            changed = True
+        if not changed:
+            return announcement
+        announcement.edited_at = datetime.now(UTC)
+        await self.session.flush()
+        await events.publish(
+            self.session, events.AnnouncementRevised(announcement_id=announcement.id)
+        )
+        await self.session.commit()
+        await self.session.refresh(announcement)
+        log.info("announcement_revised", announcement_id=str(announcement.id))
+        return announcement
+
+    async def delete_announcement(
+        self,
+        *,
+        offering_id: uuid.UUID,
+        announcement_id: uuid.UUID,
+        actor_id: uuid.UUID,
+        can_manage: bool,
+    ) -> None:
+        """حذف سخت، با پس‌گرفتن اعلان‌ها و پیام‌های نرفته (`AnnouncementWithdrawn`)."""
+        announcement = await self._announcement_for_edit(
+            offering_id, announcement_id, actor_id=actor_id, can_manage=can_manage
+        )
+        await self.session.delete(announcement)
+        await self.session.flush()
+        await events.publish(
+            self.session, events.AnnouncementWithdrawn(announcement_id=announcement_id)
+        )
+        await self.session.commit()
+        log.info("announcement_withdrawn", announcement_id=str(announcement_id))
+
+    async def _announcement_for_edit(
+        self,
+        offering_id: uuid.UUID,
+        announcement_id: uuid.UUID,
+        *,
+        actor_id: uuid.UUID,
+        can_manage: bool,
+    ) -> Announcement:
+        """نویسنده اعلان خودش را، استاد (`offering.manage`) هر اعلان ارائه را."""
+        announcement = await self.session.get(Announcement, announcement_id)
+        if announcement is None or announcement.offering_id != offering_id:
+            raise NotFound("این اعلان پیدا نشد.")
+        if announcement.author_id != actor_id and not can_manage:
+            raise PermissionDenied("فقط نویسندهٔ اعلان یا استاد درس آن را ویرایش یا حذف می‌کند.")
         return announcement
 
     # ── حضور و غیاب — FR-EDU-05 ────────────────────────────────────────

@@ -335,6 +335,49 @@ class QuizService:
         await self.session.refresh(item)
         return item
 
+    async def update_bank_item(
+        self,
+        *,
+        owner_id: uuid.UUID,
+        item_id: uuid.UUID,
+        draft: QuestionDraft,
+        course_id: uuid.UUID | None = None,
+        category: str | None = None,
+        difficulty: int | None = None,
+    ) -> QuestionBankItem:
+        """جایگزینی کامل سؤال بانک — ADR-0021.
+
+        آزمون‌ها کپی دارند نه ارجاع؛ ویرایش اینجا نمرهٔ هیچ آزمونی را عوض
+        نمی‌کند، فقط کپی‌های بعدی را.
+        """
+        item = await self._own_bank_item(owner_id, item_id)
+        _validate_question(draft)
+        if difficulty is not None and not 1 <= difficulty <= 5:
+            raise ValidationFailed("سطح دشواری باید بین ۱ تا ۵ باشد.")
+        item.course_id = course_id
+        item.category = category.strip() if category else None
+        item.difficulty = difficulty
+        item.kind = draft.kind
+        item.body = draft.body.strip()
+        item.payload = draft.payload
+        item.explanation = draft.explanation
+        await self.session.commit()
+        await self.session.refresh(item)
+        return item
+
+    async def delete_bank_item(self, *, owner_id: uuid.UUID, item_id: uuid.UUID) -> None:
+        """حذف نرم: `quiz_questions.bank_id` منشأ را نگه می‌دارد و شمار استفاده معنا دارد."""
+        item = await self._own_bank_item(owner_id, item_id)
+        item.deleted_at = datetime.now(UTC)
+        await self.session.commit()
+
+    async def _own_bank_item(self, owner_id: uuid.UUID, item_id: uuid.UUID) -> QuestionBankItem:
+        """بانک شخصی است: سؤال دیگری ۴۰۴ است، نه ۴۰۳ — وجودش هم گفته نمی‌شود."""
+        item = await self.session.get(QuestionBankItem, item_id)
+        if item is None or item.deleted_at is not None or item.owner_id != owner_id:
+            raise NotFound("این سؤال در بانک تو نیست.")
+        return item
+
     async def search_bank(
         self,
         *,

@@ -64,6 +64,8 @@ ARCHIVE_AFTER = timedelta(days=90)
 #: §4.12 — «outbox_messages ارسال‌شده، ۳۰ روز».
 SENT_OUTBOX_RETENTION = timedelta(days=30)
 MAX_FEED_PAGE = 50
+#: پیام‌هایی که هنوز نرفته‌اند و بازنویسی یا پس‌گرفتنشان معنا دارد.
+PENDING_OUTBOX = ("QUEUED", "FAILED")
 #: کانال Redis که جریان SSE هر کاربر به آن گوش می‌دهد.
 WAKEUP_PREFIX = "silp:notify:"
 _PENDING_WAKEUPS = "silp_notify_users"
@@ -310,6 +312,78 @@ class NotificationService:
                 if link.address:
                     recipients[link.user_id].linked[link.channel] = link.address
         return recipients
+
+    # ── بازنویسی و پس‌گرفتن — ADR-0021 ─────────────────────────────────
+    async def revise(self, kind_code: str, dedup_key: str, values: Mapping[str, object]) -> int:
+        """متن اعلان‌هایی که از یک منبع ویرایش‌شده ساخته شده‌اند را از نو می‌سازد.
+
+        دوباره فرستاده نمی‌شود: فقط متن مرکز اعلان و بار پیام‌هایی که هنوز در
+        صف‌اند (`QUEUED`/`FAILED`) عوض می‌شود. پیامی که رفته، رفته است.
+        خروجی: شمار اعلان‌های بازنویسی‌شده.
+        """
+        kind = catalog.kind(kind_code)
+        in_app = await self.template(kind.code, "IN_APP")
+        if in_app is None:
+            return 0
+        notifications = list(
+            await self.session.scalars(
+                select(Notification).where(
+                    Notification.kind == kind.code, Notification.dedup_key == dedup_key
+                )
+            )
+        )
+        if not notifications:
+            return 0
+        first_names = dict(
+            (
+                await self.session.execute(
+                    select(Profile.user_id, Profile.first_name).where(
+                        Profile.user_id.in_([n.user_id for n in notifications])
+                    )
+                )
+            )
+            .tuples()
+            .all()
+        )
+        base = {k: _str(v) for k, v in values.items()}
+        for notification in notifications:
+            user_values = {
+                **base,
+                "name": first_names.get(notification.user_id) or "",
+                "link": self.absolute_url(notification.action_url),
+            }
+            rendered = render(in_app.subject or kind.title_fa, in_app.body, user_values)
+            notification.title = rendered.subject or kind.title_fa
+            notification.body = rendered.body
+            await self.session.execute(
+                update(OutboxMessage)
+                .where(
+                    OutboxMessage.notification_id == notification.id,
+                    OutboxMessage.status.in_(PENDING_OUTBOX),
+                )
+                .values(payload={"values": user_values})
+            )
+        await self.session.flush()
+        return len(notifications)
+
+    async def retract(self, dedup_key: str) -> int:
+        """اعلان‌های یک منبع حذف‌شده را پس می‌گیرد، با پیام‌هایی که هنوز نرفته‌اند.
+
+        بی این کار دانشجو اعلانی می‌خواند که پیوندش به چیزی ناموجود می‌رود، و
+        پیامکِ صف‌مانده پس از حذف هم فرستاده می‌شد (`notification_id` فقط
+        `SET NULL` می‌شود). خروجی: شمار اعلان‌های حذف‌شده.
+        """
+        ids = select(Notification.id).where(Notification.dedup_key == dedup_key)
+        await self.session.execute(
+            delete(OutboxMessage).where(
+                OutboxMessage.notification_id.in_(ids),
+                OutboxMessage.status.in_(PENDING_OUTBOX),
+            )
+        )
+        result = await self.session.execute(
+            delete(Notification).where(Notification.dedup_key == dedup_key)
+        )
+        return int(result.rowcount or 0)  # type: ignore[attr-defined]
 
     # ── مرکز اعلان — FR-MSG-01 ─────────────────────────────────────────
     async def feed(

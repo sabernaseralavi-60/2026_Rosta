@@ -133,6 +133,21 @@ _KINDS: tuple[Kind, ...] = (
         ("course", "title", "excerpt"),
         allow_sms=True,
     ),
+    # ── سپردن ارائه — ADR-0021 ────────────────────────────────────────
+    Kind(
+        "OFFERING_ASSIGNED",
+        "COURSE",
+        "IMPORTANT",
+        "سپرده شدن ارائه به تو (استاد)",
+        ("course", "term"),
+    ),
+    Kind(
+        "OFFERING_REASSIGNED",
+        "COURSE",
+        "IMPORTANT",
+        "سپرده شدن ارائه‌ات به استاد دیگر",
+        ("course", "term", "instructor"),
+    ),
     # ── پروژه‌ها ────────────────────────────────────────────────────────
     Kind(
         "APPLICATION_SUBMITTED",
