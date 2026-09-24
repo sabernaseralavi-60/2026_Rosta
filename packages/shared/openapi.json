@@ -12977,6 +12977,18 @@
             "title": "Kind",
             "type": "string"
           },
+          "offering_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offering Id"
+          },
           "required_assets": {
             "items": {
               "$ref": "#/components/schemas/AssetRequirementIn"
@@ -15492,6 +15504,149 @@
         "title": "ReviewOut",
         "type": "object"
       },
+      "ReviewQueueItemOut": {
+        "description": "یک تحویل منتظر بررسی — با آنچه برای تصمیم لازم است، نه بیشتر.",
+        "properties": {
+          "course_title_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Title Fa"
+          },
+          "days_waiting": {
+            "title": "Days Waiting",
+            "type": "integer"
+          },
+          "deliverable_id": {
+            "format": "uuid",
+            "title": "Deliverable Id",
+            "type": "string"
+          },
+          "excerpt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Excerpt"
+          },
+          "is_late": {
+            "title": "Is Late",
+            "type": "boolean"
+          },
+          "link_count": {
+            "title": "Link Count",
+            "type": "integer"
+          },
+          "milestone_id": {
+            "format": "uuid",
+            "title": "Milestone Id",
+            "type": "string"
+          },
+          "milestone_title_fa": {
+            "title": "Milestone Title Fa",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "project_title_fa": {
+            "title": "Project Title Fa",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "submitted_at": {
+            "format": "date-time",
+            "title": "Submitted At",
+            "type": "string"
+          },
+          "submitter_id": {
+            "format": "uuid",
+            "title": "Submitter Id",
+            "type": "string"
+          },
+          "submitter_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitter Name"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "deliverable_id",
+          "project_id",
+          "project_title_fa",
+          "milestone_id",
+          "milestone_title_fa",
+          "submitter_id",
+          "version",
+          "status",
+          "status_fa",
+          "is_late",
+          "submitted_at",
+          "days_waiting",
+          "link_count"
+        ],
+        "title": "ReviewQueueItemOut",
+        "type": "object"
+      },
+      "ReviewQueueOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewQueueItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "oldest_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest Days"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total"
+        ],
+        "title": "ReviewQueueOut",
+        "type": "object"
+      },
       "RoleGrantAdminOut": {
         "properties": {
           "code": {
@@ -17897,6 +18052,149 @@
           "has_enrollment_code"
         ],
         "title": "TeachOfferingOut",
+        "type": "object"
+      },
+      "TeachProjectOut": {
+        "description": "یک پروژه از دید استاد ناظر — `GET /teach/projects`.",
+        "properties": {
+          "active_members": {
+            "title": "Active Members",
+            "type": "integer"
+          },
+          "course_title_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Title Fa"
+          },
+          "days_inactive": {
+            "title": "Days Inactive",
+            "type": "integer"
+          },
+          "deadline_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline On"
+          },
+          "health": {
+            "title": "Health",
+            "type": "string"
+          },
+          "health_fa": {
+            "title": "Health Fa",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "lead_id": {
+            "format": "uuid",
+            "title": "Lead Id",
+            "type": "string"
+          },
+          "lead_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Name"
+          },
+          "milestones_approved": {
+            "title": "Milestones Approved",
+            "type": "integer"
+          },
+          "milestones_overdue": {
+            "title": "Milestones Overdue",
+            "type": "integer"
+          },
+          "milestones_total": {
+            "title": "Milestones Total",
+            "type": "integer"
+          },
+          "offering_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offering Id"
+          },
+          "oldest_open_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest Open Days"
+          },
+          "open_deliverables": {
+            "title": "Open Deliverables",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "team_size_max": {
+            "title": "Team Size Max",
+            "type": "integer"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa",
+          "kind",
+          "kind_fa",
+          "status",
+          "health",
+          "health_fa",
+          "lead_id",
+          "active_members",
+          "team_size_max",
+          "milestones_total",
+          "milestones_approved",
+          "milestones_overdue",
+          "open_deliverables",
+          "days_inactive"
+        ],
+        "title": "TeachProjectOut",
         "type": "object"
       },
       "TeamMemberOut": {
@@ -34930,6 +35228,37 @@
         ]
       }
     },
+    "/api/v1/teach/projects": {
+      "get": {
+        "description": "پروژه‌های ارائه‌های من و پروژه‌هایی که خودم مدیرشان هستم — «متوقف» و\n«در خطر» اول. کسی که ارائه ندارد، فهرست خالی می‌گیرد (مثل `/teach/offerings`).",
+        "operationId": "supervised_projects_api_v1_teach_projects_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TeachProjectOut"
+                  },
+                  "title": "Response Supervised Projects Api V1 Teach Projects Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پروژه‌های تحت نظارت",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
     "/api/v1/teach/question-bank": {
       "get": {
         "operationId": "search_bank_api_v1_teach_question_bank_get",
@@ -36676,6 +37005,33 @@
           }
         ],
         "summary": "حذف منبع",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/review-queue": {
+      "get": {
+        "description": "همهٔ تحویل‌های منتظر بررسی در همهٔ پروژه‌های تحت نظارت، قدیمی‌ترین اول.\nهر تحویل با `POST /deliverables/{id}/review` بررسی می‌شود.",
+        "operationId": "review_queue_api_v1_teach_review_queue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewQueueOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "صف واحد بررسی تحویل‌ها",
         "tags": [
           "teaching"
         ]

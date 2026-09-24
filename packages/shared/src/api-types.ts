@@ -3604,6 +3604,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teach/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * پروژه‌های تحت نظارت
+         * @description پروژه‌های ارائه‌های من و پروژه‌هایی که خودم مدیرشان هستم — «متوقف» و
+         *     «در خطر» اول. کسی که ارائه ندارد، فهرست خالی می‌گیرد (مثل `/teach/offerings`).
+         */
+        get: operations["supervised_projects_api_v1_teach_projects_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teach/question-bank": {
         parameters: {
             query?: never;
@@ -3951,6 +3972,27 @@ export interface paths {
         post?: never;
         /** حذف منبع */
         delete: operations["remove_resource_api_v1_teach_resources__resource_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/review-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * صف واحد بررسی تحویل‌ها
+         * @description همهٔ تحویل‌های منتظر بررسی در همهٔ پروژه‌های تحت نظارت، قدیمی‌ترین اول.
+         *     هر تحویل با `POST /deliverables/{id}/review` بررسی می‌شود.
+         */
+        get: operations["review_queue_api_v1_teach_review_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -8957,6 +8999,8 @@ export interface components {
              * @enum {string}
              */
             kind: "A_VENTURE" | "B_RESEARCH" | "C_PROBLEM" | "D_PERSONAL";
+            /** Offering Id */
+            offering_id?: string | null;
             /** Required Assets */
             required_assets?: components["schemas"]["AssetRequirementIn"][];
             /** Required Skills */
@@ -9888,6 +9932,68 @@ export interface components {
              */
             workflow_completed: boolean;
         };
+        /**
+         * ReviewQueueItemOut
+         * @description یک تحویل منتظر بررسی — با آنچه برای تصمیم لازم است، نه بیشتر.
+         */
+        ReviewQueueItemOut: {
+            /** Course Title Fa */
+            course_title_fa?: string | null;
+            /** Days Waiting */
+            days_waiting: number;
+            /**
+             * Deliverable Id
+             * Format: uuid
+             */
+            deliverable_id: string;
+            /** Excerpt */
+            excerpt?: string | null;
+            /** Is Late */
+            is_late: boolean;
+            /** Link Count */
+            link_count: number;
+            /**
+             * Milestone Id
+             * Format: uuid
+             */
+            milestone_id: string;
+            /** Milestone Title Fa */
+            milestone_title_fa: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Project Title Fa */
+            project_title_fa: string;
+            /** Status */
+            status: string;
+            /** Status Fa */
+            status_fa: string;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            /**
+             * Submitter Id
+             * Format: uuid
+             */
+            submitter_id: string;
+            /** Submitter Name */
+            submitter_name?: string | null;
+            /** Version */
+            version: number;
+        };
+        /** ReviewQueueOut */
+        ReviewQueueOut: {
+            /** Items */
+            items?: components["schemas"]["ReviewQueueItemOut"][];
+            /** Oldest Days */
+            oldest_days?: number | null;
+            /** Total */
+            total: number;
+        };
         /** RoleGrantAdminOut */
         RoleGrantAdminOut: {
             /** Code */
@@ -10806,6 +10912,58 @@ export interface components {
             term_code: string;
             /** Term Title Fa */
             term_title_fa: string;
+        };
+        /**
+         * TeachProjectOut
+         * @description یک پروژه از دید استاد ناظر — `GET /teach/projects`.
+         */
+        TeachProjectOut: {
+            /** Active Members */
+            active_members: number;
+            /** Course Title Fa */
+            course_title_fa?: string | null;
+            /** Days Inactive */
+            days_inactive: number;
+            /** Deadline On */
+            deadline_on?: string | null;
+            /** Health */
+            health: string;
+            /** Health Fa */
+            health_fa: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Kind Fa */
+            kind_fa: string;
+            /**
+             * Lead Id
+             * Format: uuid
+             */
+            lead_id: string;
+            /** Lead Name */
+            lead_name?: string | null;
+            /** Milestones Approved */
+            milestones_approved: number;
+            /** Milestones Overdue */
+            milestones_overdue: number;
+            /** Milestones Total */
+            milestones_total: number;
+            /** Offering Id */
+            offering_id?: string | null;
+            /** Oldest Open Days */
+            oldest_open_days?: number | null;
+            /** Open Deliverables */
+            open_deliverables: number;
+            /** Status */
+            status: string;
+            /** Team Size Max */
+            team_size_max: number;
+            /** Title Fa */
+            title_fa: string;
         };
         /** TeamMemberOut */
         TeamMemberOut: {
@@ -21136,6 +21294,26 @@ export interface operations {
             };
         };
     };
+    supervised_projects_api_v1_teach_projects_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeachProjectOut"][];
+                };
+            };
+        };
+    };
     search_bank_api_v1_teach_question_bank_get: {
         parameters: {
             query?: {
@@ -22251,6 +22429,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_queue_api_v1_teach_review_queue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewQueueOut"];
                 };
             };
         };

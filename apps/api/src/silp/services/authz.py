@@ -122,7 +122,40 @@ async def load_grants(session: AsyncSession, user_id: uuid.UUID) -> tuple[RoleGr
     """همهٔ اعطاهای مؤثر کاربر — ثبت‌شده و مشتق. بدون کش."""
     stored = await load_stored_grants(session, user_id)
     derived = await load_derived_grants(session, user_id)
-    return stored + derived
+    grants = stored + derived
+    return grants + await load_supervision_grants(session, grants)
+
+
+async def load_supervision_grants(
+    session: AsyncSession, grants: tuple[RoleGrant, ...]
+) -> tuple[RoleGrant, ...]:
+    """§3.5 — استادِ یک ارائه، پروژه‌های همان ارائه را هم اداره می‌کند (ADR-0022).
+
+    `DELIVERABLE_REVIEW` و هم‌خانواده‌هایش قلمرو **پروژه** دارند ولی نقش استاد
+    قلمرو **ارائه**؛ بی این پل، `covers(project_id)` برای استاد هرگز درست
+    نبود و او تحویل پروژهٔ ارائهٔ خودش را نمی‌توانست بررسی کند، مگر با نقش
+    سراسری (که همهٔ ارائه‌ها را باز می‌کند).
+
+    فقط `INSTRUCTOR` — چه رسمی (`instructor_id`)، چه ثبت‌شدهٔ قلمرودار. دستیار
+    (`TA`) پروژه‌ای نمی‌گیرد: ماتریس مجوز پروژه‌ای برایش چیزی ندارد و اعطای
+    بی‌مصرف فقط `admin/users` را شلوغ می‌کند.
+    """
+    offering_ids = {
+        g.scope_id
+        for g in grants
+        if g.role is Role.INSTRUCTOR and g.scope_type is ScopeType.OFFERING and g.scope_id
+    }
+    if not offering_ids:
+        return ()
+    project_ids = await session.scalars(
+        select(Project.id).where(
+            Project.offering_id.in_(offering_ids), Project.deleted_at.is_(None)
+        )
+    )
+    return tuple(
+        RoleGrant(role=Role.INSTRUCTOR, scope_type=ScopeType.PROJECT, scope_id=project_id)
+        for project_id in project_ids
+    )
 
 
 def _serialize(grants: tuple[RoleGrant, ...]) -> str:

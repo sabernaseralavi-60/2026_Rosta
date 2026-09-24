@@ -994,3 +994,90 @@ async def test_course_admin_writes_survive_the_request(  # type: ignore[no-untyp
         if "instructor" in ids:
             await committing_session.execute(delete(User).where(User.id == ids["instructor"]))
         await committing_session.commit()
+
+
+async def test_project_linked_to_an_offering_survives_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """ADR-0022 — پیوند پروژه به ارائه، و اینکه استادش بی‌نقش سراسری آن را می‌بیند."""
+    from silp.core.permissions import Role
+    from silp.models.education import Course, CourseOffering, Term
+    from silp.models.identity import User
+    from silp.models.project import Project
+    from silp.services import authz
+
+    await authz.grant_role(committing_session, user_id=account["user_id"], role=Role.COORDINATOR)
+    await committing_session.commit()
+    await authz.invalidate_roles(account["user_id"])
+
+    marker = uuid.uuid4().hex[:6].upper()
+    ids: dict[str, uuid.UUID] = {}
+    try:
+        response = await committing_client.post(
+            "/api/v1/admin/terms",
+            headers=auth(account),
+            json={
+                "code": f"P{marker}",
+                "title_fa": "نیم‌سال پروژه",
+                "starts_on": "2026-09-01",
+                "ends_on": "2099-02-01",
+            },
+        )
+        assert response.status_code == 201, response.text
+        ids["term"] = uuid.UUID(response.json()["id"])
+        response = await committing_client.post(
+            "/api/v1/admin/courses",
+            headers=auth(account),
+            json={"code": f"P-{marker}", "title_fa": "درس پروژه"},
+        )
+        assert response.status_code == 201, response.text
+        ids["course"] = uuid.UUID(response.json()["id"])
+        response = await committing_client.post(
+            "/api/v1/admin/offerings",
+            headers=auth(account),
+            json={
+                "course_id": str(ids["course"]),
+                "term_id": str(ids["term"]),
+                "instructor_id": str(account["user_id"]),
+                "enrollment_code": "PRJ-1405",
+            },
+        )
+        assert response.status_code == 201, response.text
+        ids["offering"] = uuid.UUID(response.json()["id"])
+
+        response = await committing_client.post(
+            "/api/v1/projects",
+            headers=auth(account),
+            json={
+                "title_fa": "پروژهٔ پایداری ارائه",
+                "summary": "پروژه‌ای که به ارائه وصل است و باید ماندگار باشد.",
+                "description": "شرح کامل پروژه با جزئیات کافی برای آزمون پایداری.",
+                "kind": "C_PROBLEM",
+                "expected_output": "گزارش نهایی",
+                "offering_id": str(ids["offering"]),
+            },
+        )
+        assert response.status_code == 201, response.text
+        ids["project"] = uuid.UUID(response.json()["id"])
+
+        async with other_connection() as verifier:
+            stored = await verifier.get(Project, ids["project"])
+            assert stored is not None, "پروژه commit نشده است"
+            assert stored.offering_id == ids["offering"], "پیوند ارائه commit نشده است"
+
+        listed = await committing_client.get("/api/v1/teach/projects", headers=auth(account))
+        assert listed.status_code == 200, listed.text
+        assert [p["id"] for p in listed.json()] == [str(ids["project"])]
+    finally:
+        if "project" in ids:
+            await committing_session.execute(delete(Project).where(Project.id == ids["project"]))
+        if "offering" in ids:
+            await committing_session.execute(
+                delete(CourseOffering).where(CourseOffering.id == ids["offering"])
+            )
+        if "course" in ids:
+            await committing_session.execute(delete(Course).where(Course.id == ids["course"]))
+        if "term" in ids:
+            await committing_session.execute(delete(Term).where(Term.id == ids["term"]))
+        await committing_session.execute(delete(User).where(User.id == account["user_id"]))
+        await committing_session.commit()

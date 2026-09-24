@@ -35,6 +35,7 @@ from silp.core.logging import get_logger
 from silp.core.permissions import CurrentUser, Permission
 from silp.domain import city as city_rules
 from silp.models.delivery import Milestone, ProjectActivity
+from silp.models.education import CourseOffering
 from silp.models.project import (
     PROJECT_KINDS,
     Project,
@@ -119,6 +120,8 @@ class ProjectDraft:
     roles: list[RoleSpec] | None = None
     #: پروژهٔ یک کسب‌وکار (§7.7 «تحویل‌دادنی در پروژه‌های کسب‌وکار»).
     venture_id: uuid.UUID | None = None
+    #: پروژهٔ یک ارائه — استاد آن ارائه (یا مدیر) می‌سازد؛ نظارتش با استاد است.
+    offering_id: uuid.UUID | None = None
     #: الگوی گردش‌کار ثابت — `CITY` هشت مرحلهٔ §7.9 را می‌سازد (ADR-0016).
     workflow: str | None = None
 
@@ -211,13 +214,45 @@ class ProjectService:
             )
         if draft.venture_id is not None:
             await require_venture_member_or_manager(self.session, draft.venture_id, actor)
+        offering = await self._offering_to_supervise(draft.offering_id, actor)
         project = await self.build(lead_id=actor.id, draft=draft)
         await self.session.commit()
 
-        # نقش `PROJECT_LEAD` مشتق است و همین حالا برای سازنده برقرار شد.
+        # نقش `PROJECT_LEAD` مشتق است و همین حالا برای سازنده برقرار شد؛ نقش
+        # `INSTRUCTOR` پروژه‌ای هم برای استاد ارائه (ADR-0022).
         await authz.invalidate_roles(actor.id)
+        if offering is not None and offering.instructor_id != actor.id:
+            await authz.invalidate_roles(offering.instructor_id)
         log.info("project_created", project_id=str(project.id), kind=draft.kind)
         return project
+
+    async def _offering_to_supervise(
+        self, offering_id: uuid.UUID | None, actor: CurrentUser
+    ) -> CourseOffering | None:
+        """ارائه‌ای که پروژه به آن وصل می‌شود — فقط کسی که آن را اداره می‌کند.
+
+        سنجش با `OFFERING_MANAGE` در قلمرو همان ارائه است، نه «استاد است»:
+        استاد ارائهٔ الف نمی‌تواند پروژه‌اش را به ارائهٔ ب بچسباند و نظارتش
+        را بگیرد. ارائهٔ ناموجود، حذف‌شده و بایگانی‌شده ۴۲۲ است، نه ۴۰۴ —
+        شناسه از بدنه آمده، نه از مسیر.
+        """
+        if offering_id is None:
+            return None
+        offering = await self.session.scalar(
+            select(CourseOffering).where(
+                CourseOffering.id == offering_id, CourseOffering.deleted_at.is_(None)
+            )
+        )
+        if offering is None or offering.status == "ARCHIVED":
+            raise ValidationFailed("ارائهٔ انتخاب‌شده معتبر نیست.")
+        if not await authz.has_permission(
+            self.session, actor, Permission.OFFERING_MANAGE, offering.id
+        ):
+            raise PermissionDenied(
+                "فقط استاد یا مدیر آموزشی یک ارائه می‌تواند برایش پروژه بسازد.",
+                permission=Permission.OFFERING_MANAGE.value,
+            )
+        return offering
 
     async def build(
         self,
@@ -256,6 +291,7 @@ class ProjectService:
             deadline_on=draft.deadline_on,
             applications_close_at=draft.applications_close_at,
             venture_id=draft.venture_id,
+            offering_id=draft.offering_id,
             origin_idea_id=origin_idea_id,
         )
         self.session.add(project)

@@ -36,6 +36,7 @@ from silp.models.project import Project
 from silp.models.quiz import GradeAppeal, Quiz, QuizAnswer, QuizAttempt, QuizQuestion
 from silp.services.directory import display_names, name_of
 from silp.services.learning_score_service import LearningScoreService, StudentLearning
+from silp.services.teach_projects_service import supervision_scope
 
 INACTIVE_AFTER = timedelta(days=14)
 LOW_LEARNING_SCORE = Decimal(40)
@@ -111,10 +112,19 @@ class TeachDashboardService:
         self.session = session
 
     async def for_instructor(
-        self, user_id: uuid.UUID, *, extra_offering_ids: Iterable[uuid.UUID] = ()
+        self,
+        user_id: uuid.UUID,
+        *,
+        extra_offering_ids: Iterable[uuid.UUID] = (),
+        supervised_offering_ids: Iterable[uuid.UUID] = (),
     ) -> TeachDashboard:
         """`extra_offering_ids` ارائه‌هایی است که کاربر در آن‌ها نقش قلمرودار
-        استاد یا دستیار دارد — استاد رسمی ارائه نیست ولی مسئول است."""
+        استاد یا دستیار دارد — استاد رسمی ارائه نیست ولی مسئول است.
+
+        `supervised_offering_ids` فقط آن‌هایی است که **استاد** است (نه دستیار)؛
+        پروژه‌ها و تحویل‌های منتظر با همین‌ها شمرده می‌شوند تا عدد داشبورد با
+        طول `/teach/review-queue` برابر باشد (ADR-0022).
+        """
         now = _now()
         offerings = list(
             await self.session.execute(
@@ -134,10 +144,8 @@ class TeachDashboardService:
         offering_ids = [o.id for o, _ in offerings]
         titles = {o.id: t for o, t in offerings}
 
-        project_scope = or_(
-            Project.lead_id == user_id,
-            Project.offering_id.in_(offering_ids),
-        )
+        official = {o.id for o, _ in offerings if o.instructor_id == user_id}
+        project_scope = supervision_scope(user_id, official | set(supervised_offering_ids))
         dashboard = TeachDashboard(
             deliverables_pending=await self._deliverables(project_scope, now),
             essays_pending=await self._essays(offering_ids, now),

@@ -152,6 +152,61 @@ class GradebookOut(BaseModel):
     rows: list[GradebookRowOut] = Field(default_factory=list)
 
 
+# ── پروژه‌های تحت نظارت و صف بررسی — ADR-0022 ─────────────────────────
+class TeachProjectOut(BaseModel):
+    """یک پروژه از دید استاد ناظر — `GET /teach/projects`."""
+
+    id: uuid.UUID
+    title_fa: str
+    kind: str
+    kind_fa: str
+    status: str
+    health: str
+    health_fa: str
+    offering_id: uuid.UUID | None = None
+    course_title_fa: str | None = None
+    """درس ارائه‌ای که پروژه به آن وصل است؛ `None` برای پروژه‌ای که خود استاد مدیرش است."""
+    lead_id: uuid.UUID
+    lead_name: str | None = None
+    active_members: int
+    team_size_max: int
+    milestones_total: int
+    milestones_approved: int
+    milestones_overdue: int
+    open_deliverables: int
+    oldest_open_days: int | None = None
+    days_inactive: int
+    deadline_on: date | None = None
+
+
+class ReviewQueueItemOut(BaseModel):
+    """یک تحویل منتظر بررسی — با آنچه برای تصمیم لازم است، نه بیشتر."""
+
+    deliverable_id: uuid.UUID
+    project_id: uuid.UUID
+    project_title_fa: str
+    course_title_fa: str | None = None
+    milestone_id: uuid.UUID
+    milestone_title_fa: str
+    submitter_id: uuid.UUID
+    submitter_name: str | None = None
+    version: int
+    status: str
+    status_fa: str
+    is_late: bool
+    submitted_at: datetime
+    days_waiting: int
+    excerpt: str | None = None
+    link_count: int
+
+
+class ReviewQueueOut(BaseModel):
+    total: int
+    """شمار کل؛ اگر از `items` بیشتر بود، فهرست بریده شده است."""
+    oldest_days: int | None = None
+    items: list[ReviewQueueItemOut] = Field(default_factory=list)
+
+
 __all__ = [
     "AttendanceMarkOut",
     "AttendanceSessionOut",
@@ -163,7 +218,10 @@ __all__ = [
     "GradebookRowOut",
     "OfferingPermissionsOut",
     "OfferingSettingsIn",
+    "ReviewQueueItemOut",
+    "ReviewQueueOut",
     "StaffRole",
     "TeachOfferingDetailOut",
     "TeachOfferingOut",
+    "TeachProjectOut",
 ]

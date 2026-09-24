@@ -413,14 +413,14 @@ def _queue(q: Queue) -> QueueOut:
     return QueueOut(count=q.count, oldest_days=q.oldest_days)
 
 
-def _scoped_offerings(current: CurrentUser) -> list[uuid.UUID]:
+def _scoped_offerings(
+    current: CurrentUser, *, roles: tuple[Role, ...] = (Role.INSTRUCTOR, Role.TA)
+) -> list[uuid.UUID]:
     """ارائه‌هایی که کاربر در آن‌ها نقش قلمرودار استاد یا دستیار دارد."""
     return [
         g.scope_id
         for g in current.grants
-        if g.role in (Role.INSTRUCTOR, Role.TA)
-        and g.scope_type is ScopeType.OFFERING
-        and g.scope_id is not None
+        if g.role in roles and g.scope_type is ScopeType.OFFERING and g.scope_id is not None
     ]
 
 
@@ -429,7 +429,9 @@ async def teach_dashboard(current: CurrentUserDep, session: SessionDep) -> Teach
     """فقط آنچه اقدام می‌خواهد (FR-DASH-02). کاربری که ارائه‌ای ندارد، صف‌های
     خالی می‌بیند — همان رفتار `GET /teach/offerings`."""
     data = await TeachDashboardService(session).for_instructor(
-        current.id, extra_offering_ids=_scoped_offerings(current)
+        current.id,
+        extra_offering_ids=_scoped_offerings(current),
+        supervised_offering_ids=_scoped_offerings(current, roles=(Role.INSTRUCTOR,)),
     )
     return TeachDashboardOut(
         needs_attention=NeedsAttentionOut(

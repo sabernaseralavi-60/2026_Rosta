@@ -435,6 +435,7 @@ def _draft_of(payload: ProjectIn) -> ProjectDraft:
         deadline_on=payload.deadline_on,
         applications_close_at=payload.applications_close_at,
         venture_id=payload.venture_id,
+        offering_id=payload.offering_id,
         workflow=payload.workflow,
         required_skills=[
             SkillRequirement(
@@ -538,6 +539,8 @@ async def update_project(
         raise ValidationFailed("نوع پروژه پس از ساخت عوض نمی‌شود.")
     if payload.workflow != project.workflow:
         raise ValidationFailed("الگوی گردش‌کار پروژه پس از ساخت عوض نمی‌شود.")
+    if payload.offering_id is not None and payload.offering_id != project.offering_id:
+        raise ValidationFailed("ارائهٔ پروژه پس از ساخت عوض نمی‌شود.")
     project = await projects.update(project=project, actor=current, draft=_draft_of(payload))
     active = await projects.active_member_count(project.id)
     return await _detail_of(session, project, active_members=active)

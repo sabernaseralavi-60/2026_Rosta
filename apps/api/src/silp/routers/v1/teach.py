@@ -25,6 +25,9 @@ from silp.core.permissions import (
     RoleGrant,
     ScopeType,
 )
+from silp.domain.project_health import HEALTH_TITLE_FA
+from silp.domain.recommendation.schemas import KIND_TITLE_FA, ProjectKind
+from silp.models.delivery import DELIVERABLE_STATUS_TITLE_FA
 from silp.models.education import (
     ATTENDANCE_STATUSES,
     Course,
@@ -80,15 +83,19 @@ from silp.schemas.teaching import (
     GradebookRowOut,
     OfferingPermissionsOut,
     OfferingSettingsIn,
+    ReviewQueueItemOut,
+    ReviewQueueOut,
     StaffRole,
     TeachAnnouncementOut,
     TeachOfferingDetailOut,
     TeachOfferingOut,
+    TeachProjectOut,
 )
 from silp.services import authz
 from silp.services.course_service import CourseService
 from silp.services.directory import display_names, name_of
 from silp.services.gradebook_service import GradebookService
+from silp.services.teach_projects_service import TeachProjectsService
 from silp.services.teaching_service import (
     OFFERING_TRANSITIONS,
     AttendanceEntry,
@@ -882,6 +889,99 @@ async def pending_enrollments(
         )
         for row in rows
     ]
+
+
+# ── پروژه‌های تحت نظارت و صف واحد بررسی — ADR-0022 ─────────────────────
+async def _supervised_offerings(session: AsyncSession, current: CurrentUser) -> list[uuid.UUID]:
+    """ارائه‌هایی که کاربر در آن‌ها **استاد** است — چه رسمی، چه قلمرودار.
+
+    از اعطاهای تازه می‌آید، نه از JWT (تا ۱۵ دقیقه کهنه): استادی که همین حالا
+    ارائه‌ای گرفته، باید پروژه‌هایش را ببیند. دستیار نه — مجوز بررسی ندارد.
+    """
+    grants = await authz.get_grants(session, current.id)
+    return [
+        g.scope_id
+        for g in grants
+        if g.role is Role.INSTRUCTOR and g.scope_type is ScopeType.OFFERING and g.scope_id
+    ]
+
+
+@router.get(
+    "/projects",
+    response_model=list[TeachProjectOut],
+    summary="پروژه‌های تحت نظارت",
+)
+async def supervised_projects(
+    session: SessionDep, current: CurrentUserDep
+) -> list[TeachProjectOut]:
+    """پروژه‌های ارائه‌های من و پروژه‌هایی که خودم مدیرشان هستم — «متوقف» و
+    «در خطر» اول. کسی که ارائه ندارد، فهرست خالی می‌گیرد (مثل `/teach/offerings`)."""
+    rows = await TeachProjectsService(session).projects(
+        current.id, await _supervised_offerings(session, current)
+    )
+    return [
+        TeachProjectOut(
+            id=r.project.id,
+            title_fa=r.project.title_fa,
+            kind=r.project.kind,
+            kind_fa=KIND_TITLE_FA[ProjectKind(r.project.kind)],
+            status=r.project.status,
+            health=r.project.health,
+            health_fa=HEALTH_TITLE_FA.get(r.project.health, r.project.health),
+            offering_id=r.project.offering_id,
+            course_title_fa=r.course_title_fa,
+            lead_id=r.project.lead_id,
+            lead_name=r.lead_name,
+            active_members=r.active_members,
+            team_size_max=r.project.team_size_max,
+            milestones_total=r.milestones_total,
+            milestones_approved=r.milestones_approved,
+            milestones_overdue=r.milestones_overdue,
+            open_deliverables=r.open_deliverables,
+            oldest_open_days=r.oldest_open_days,
+            days_inactive=r.days_inactive,
+            deadline_on=r.project.deadline_on,
+        )
+        for r in rows
+    ]
+
+
+@router.get(
+    "/review-queue",
+    response_model=ReviewQueueOut,
+    summary="صف واحد بررسی تحویل‌ها",
+)
+async def review_queue(session: SessionDep, current: CurrentUserDep) -> ReviewQueueOut:
+    """همهٔ تحویل‌های منتظر بررسی در همهٔ پروژه‌های تحت نظارت، قدیمی‌ترین اول.
+    هر تحویل با `POST /deliverables/{id}/review` بررسی می‌شود."""
+    queue = await TeachProjectsService(session).review_queue(
+        current.id, await _supervised_offerings(session, current)
+    )
+    return ReviewQueueOut(
+        total=queue.total,
+        oldest_days=queue.oldest_days,
+        items=[
+            ReviewQueueItemOut(
+                deliverable_id=i.deliverable_id,
+                project_id=i.project_id,
+                project_title_fa=i.project_title_fa,
+                course_title_fa=i.course_title_fa,
+                milestone_id=i.milestone_id,
+                milestone_title_fa=i.milestone_title_fa,
+                submitter_id=i.submitter_id,
+                submitter_name=i.submitter_name,
+                version=i.version,
+                status=i.status,
+                status_fa=DELIVERABLE_STATUS_TITLE_FA.get(i.status, i.status),
+                is_late=i.is_late,
+                submitted_at=i.submitted_at,
+                days_waiting=i.days_waiting,
+                excerpt=i.excerpt,
+                link_count=i.link_count,
+            )
+            for i in queue.items
+        ],
+    )
 
 
 __all__ = ["router"]
