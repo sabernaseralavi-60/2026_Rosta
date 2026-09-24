@@ -196,7 +196,8 @@ axe روی دوازده نما (سه زبانه و فرم در روشن، تیر
 * ~~اعلان «ارائه‌ای به شما سپرده شد» برای استاد~~ و ~~ویرایش اعلان و سؤال
   بانک~~ — بسته در [ADR-0021](../adr/0021-offering-assignment-notice-and-announcement-bank-edits.md).
 * تغییر درسِ یک ارائه و ادغام دو درس — عمداً نه؛ حذف و ساخت.
-* `/teach/projects` و `/teach/review-queue` (ADR-0019 بند ۲۰)؛ آزمون بار k6،
+* ~~`/teach/projects` و `/teach/review-queue` (ADR-0019 بند ۲۰)~~ — بسته در
+  [ADR-0022](../adr/0022-supervised-projects-and-review-queue.md)؛ آزمون بار k6،
   اجرای `compose.prod.yml` و Sentry در روز استقرار.
 
 ---

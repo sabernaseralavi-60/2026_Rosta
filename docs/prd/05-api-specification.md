@@ -462,7 +462,7 @@ Authorization: Bearer <access_token>
 | `GET` | `/projects` | همه | فهرست با فیلتر و مرتب‌سازی |
 | `GET` | `/projects/recommended` | دانشجو | **پیشنهادهای شخصی با دلیل** |
 | `GET` | `/projects/{id}` | همه | جزئیات + تطابق من |
-| `POST` | `/projects` | LEAD+ | ساخت پروژه |
+| `POST` | `/projects` | LEAD+ | ساخت پروژه. `offering_id` (اختیاری، فقط هنگام ساخت) پروژه را به ارائه می‌چسباند و نیازمند `OFFERING_MANAGE` در همان ارائه است؛ بعد عوض نمی‌شود (ADR-0022) |
 | `PATCH` | `/projects/{id}` | مدیر پروژه | ویرایش |
 | `GET` | `/projects/mine` | کاربر | پروژه‌هایی که مدیر یا عضوشانم (شامل پیش‌نویس) |
 | `POST` | `/projects/{id}/publish` | مدیر پروژه | انتشار (DRAFT→OPEN) |
@@ -714,6 +714,8 @@ Authorization: Bearer <access_token>
 | متد | مسیر | توضیح |
 |-----|------|-------|
 | `GET` | `/teach/dashboard` | داشبورد استثنامحور |
+| `GET` | `/teach/projects` | پروژه‌های تحت نظارت (مدیرشان خودم یا ارائه‌شان از آنِ من)؛ «متوقف» و «در خطر» اول، با مرحله‌ها، تحویل منتظر و بی‌فعالیتی (ADR-0022) |
+| `GET` | `/teach/review-queue` | صف واحد بررسی: تحویل‌های منتظر همهٔ آن پروژه‌ها، قدیمی‌ترین اول، `total` روی کل و `items` تا ۲۰۰. بررسی با `POST /deliverables/{id}/review` (ADR-0022) |
 | `GET` | `/teach/offerings` | ارائه‌های من — استاد اصلی و اعطای قلمرودار، با `staff_role` |
 | `GET` | `/teach/offerings/{id}` | ارائه از دید کادر: هفته‌ها با پیش‌نویس، کد ثبت‌نام، `allowed_statuses`، `permissions` |
 | `PATCH` | `/teach/offerings/{id}` | وضعیت (جدول گذار ADR-0019)، تأیید ثبت‌نام، ظرفیت، کد |
@@ -737,8 +739,10 @@ Authorization: Bearer <access_token>
 | `PATCH/DELETE` | `/teach/offerings/{id}/announcements/{id}` | ویرایش یا حذف — نویسنده یا مدیر ارائه؛ ویرایش دوباره نمی‌فرستد، بازنویسی می‌کند (ADR-0021) |
 
 آزمون، سؤال، بانک، تصحیح و اعتراض در §5.6 («ناحیهٔ استاد») آمده‌اند. خروجی
-Excel دفتر نمره در کلاینت از همین پاسخ ساخته می‌شود (CSV با BOM)؛ صف واحد
-بررسی (`/teach/review-queue`) ساخته نشده است ([ADR-0019](../adr/0019-instructor-area-and-subscription-activation.md)).
+Excel دفتر نمره در کلاینت از همین پاسخ ساخته می‌شود (CSV با BOM). «ارائه‌های
+استاد» برای `/teach/projects` و `/teach/review-queue` از اعطاهای **تازه** و فقط
+نقش `INSTRUCTOR` می‌آید؛ دستیار هر دو را خالی می‌بیند
+([ADR-0022](../adr/0022-supervised-projects-and-review-queue.md)).
 
 **`GET /teach/dashboard` — پاسخ**
 ```jsonc

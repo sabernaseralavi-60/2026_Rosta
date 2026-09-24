@@ -182,8 +182,8 @@ silp.ir
 | `/teach/projects` | پروژه‌های تحت نظارت با شاخص سلامت |
 | `/teach/review-queue` | **صف واحد بررسی:** همهٔ تحویل‌دادنی‌های منتظر |
 
-**ساخته‌شده (ADR-0019):** همهٔ مسیرهای بالا جز `/teach/projects` و
-`/teach/review-queue`، به‌علاوهٔ `/teach/offerings/[id]/weeks/[n]` (ویرایشگر هفته؛
+**ساخته‌شده (ADR-0019 و ADR-0022):** همهٔ مسیرهای بالا، به‌علاوهٔ
+`/teach/offerings/[id]/weeks/[n]` (ویرایشگر هفته؛
 به‌جای `…/weeks/[n]/edit`)، `/teach/offerings/[id]/quizzes` و
 `/teach/offerings/[id]/settings`، و ویرایشگر آزمون در `/teach/quizzes/[id]/edit`
 با زبانه‌های `/grade` و `/analytics`. پوسته مثل پنل مدیریت است؛ زبانه‌ای که
