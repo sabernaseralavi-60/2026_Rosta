@@ -647,7 +647,7 @@ axe روی هر دو صفحه در روشن، تیره و موبایل پاک.
 | داشبورد استثنامحور استاد (M5-11) | `/teach` | `GET /teach/dashboard` |
 | دفتر نمره با ستون نمرهٔ یادگیری و «پیشنهاد» (§9.6) | `/teach/offerings/[id]/grades` | `GET …/gradebook` — **تازه**، به‌جای ترکیب در کلاینت |
 | ✅ ویرایش قواعد امتیاز (FR-GAM-02) — مدیر، `/admin/point-rules` در بخش د | `GET/PATCH /admin/point-rules` |
-| ✅ بازمحاسبهٔ گذشته‌نگر (بخش د) و اصلاح یک ردیف (§9.9، هنوز فقط API) — مدیر | `POST /admin/point-rules/recalculate`، `POST /admin/point-entries/{id}/reverse` |
+| ✅ بازمحاسبهٔ گذشته‌نگر (بخش د) و ✅ اصلاح یک ردیف (§9.9، ADR-0023: `/admin/users/[id]`) — مدیر | `POST /admin/point-rules/recalculate`، `GET /admin/users/{id}/points`، `POST /admin/point-entries/{id}/reverse` |
 
 ### از M6 — ✅ ساخته شد در M7 بخش د (`/admin/notifications`)
 

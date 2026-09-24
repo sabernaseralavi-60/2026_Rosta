@@ -799,6 +799,7 @@ Excel دفتر نمره در کلاینت از همین پاسخ ساخته می
 | `GET/POST/PATCH` | `/admin/taxonomy/*` | مدیریت طبقه‌بندی |
 | `GET/PATCH` | `/admin/point-rules` | قواعد امتیاز |
 | `POST` | `/admin/point-rules/recalculate` | بازمحاسبهٔ گذشته‌نگر |
+| `GET` | `/admin/users/{id}/points` | دفتر کل یک کاربر برای اصلاح (`POINTS_RECALCULATE`، ADR-0023) |
 | `POST` | `/admin/point-entries/{id}/reverse` | اصلاح یک ردیف با رکورد معکوس (با دلیل) |
 | `GET/POST/PATCH` | `/admin/badges` | مدیریت نشان |
 | `GET/PATCH` | `/admin/settings` | تنظیمات |
