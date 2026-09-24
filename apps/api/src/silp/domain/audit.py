@@ -33,6 +33,16 @@ MESSAGE_TEMPLATE_UPDATED: Final = "MESSAGE_TEMPLATE_UPDATED"
 SUBSCRIPTION_GRANTED: Final = "SUBSCRIPTION_GRANTED"
 SUBSCRIPTION_ACTIVATED: Final = "SUBSCRIPTION_ACTIVATED"
 SUBSCRIPTION_REJECTED: Final = "SUBSCRIPTION_REJECTED"
+# ── تعریف آموزش — ADR-0020 ─────────────────────────────────────────────
+# ارائه به استاد اختیار نمره می‌دهد؛ سپردن و پس گرفتنش باید ردی بگذارد.
+TERM_CREATED: Final = "TERM_CREATED"
+TERM_UPDATED: Final = "TERM_UPDATED"
+TERM_DELETED: Final = "TERM_DELETED"
+COURSE_CREATED: Final = "COURSE_CREATED"
+COURSE_UPDATED: Final = "COURSE_UPDATED"
+OFFERING_CREATED: Final = "OFFERING_CREATED"
+OFFERING_UPDATED: Final = "OFFERING_UPDATED"
+OFFERING_DELETED: Final = "OFFERING_DELETED"
 
 ACTION_TITLE_FA: dict[str, str] = {
     ROLE_GRANTED: "اعطای نقش",
@@ -53,6 +63,14 @@ ACTION_TITLE_FA: dict[str, str] = {
     SUBSCRIPTION_GRANTED: "فعال‌سازی مستقیم اشتراک",
     SUBSCRIPTION_ACTIVATED: "تأیید پرداخت و فعال‌سازی اشتراک",
     SUBSCRIPTION_REJECTED: "رد درخواست اشتراک",
+    TERM_CREATED: "تعریف نیم‌سال",
+    TERM_UPDATED: "ویرایش نیم‌سال",
+    TERM_DELETED: "حذف نیم‌سال",
+    COURSE_CREATED: "تعریف درس",
+    COURSE_UPDATED: "ویرایش درس",
+    OFFERING_CREATED: "تعریف ارائه و سپردن به استاد",
+    OFFERING_UPDATED: "تغییر استاد یا نیم‌سال ارائه",
+    OFFERING_DELETED: "حذف ارائهٔ بی‌استفاده",
 }
 
 ENTITY_TITLE_FA: dict[str, str] = {
@@ -66,6 +84,9 @@ ENTITY_TITLE_FA: dict[str, str] = {
     "CERTIFICATE": "گواهی",
     "MESSAGE_TEMPLATE": "الگوی پیام",
     "SUBSCRIPTION": "اشتراک",
+    "TERM": "نیم‌سال",
+    "COURSE": "درس",
+    "OFFERING": "ارائهٔ درس",
     "REQUEST": "درخواست",
 }
 
@@ -79,6 +100,8 @@ __all__ = [
     "APPEAL_RESOLVED",
     "ATTEMPT_VOIDED",
     "CERTIFICATE_REVOKED",
+    "COURSE_CREATED",
+    "COURSE_UPDATED",
     "ENTITY_TITLE_FA",
     "FINAL_GRADE_SET",
     "GRADE_OVERRIDDEN",
@@ -86,9 +109,15 @@ __all__ = [
     "IMPERSONATION_ENDED",
     "IMPERSONATION_STARTED",
     "MESSAGE_TEMPLATE_UPDATED",
+    "OFFERING_CREATED",
+    "OFFERING_DELETED",
+    "OFFERING_UPDATED",
     "SUBSCRIPTION_ACTIVATED",
     "SUBSCRIPTION_GRANTED",
     "SUBSCRIPTION_REJECTED",
+    "TERM_CREATED",
+    "TERM_DELETED",
+    "TERM_UPDATED",
     "POINTS_RECALCULATED",
     "POINT_ENTRY_REVERSED",
     "POINT_RULE_UPDATED",

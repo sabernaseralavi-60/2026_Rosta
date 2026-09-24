@@ -799,3 +799,75 @@ async def test_subscription_activation_survives_with_audit_and_notice(  # type: 
             )
         )
         assert notice is not None, "اعلان فعال شدن commit نشده است"
+
+
+async def test_course_admin_writes_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """ADR-0020 — نیم‌سال، درس و ارائه از پنل، هر کدام با ردیف حسابرسی."""
+    from silp.core.permissions import Role
+    from silp.models.admin import AuditLog
+    from silp.models.education import Course, CourseOffering, Term
+    from silp.services import authz
+
+    await authz.grant_role(committing_session, user_id=account["user_id"], role=Role.COORDINATOR)
+    await committing_session.commit()
+    await authz.invalidate_roles(account["user_id"])
+
+    marker = uuid.uuid4().hex[:6].upper()
+    ids: dict[str, uuid.UUID] = {}
+    try:
+        response = await committing_client.post(
+            "/api/v1/admin/terms",
+            headers=auth(account),
+            json={
+                "code": f"D{marker}",
+                "title_fa": "نیم‌سال پایداری",
+                "starts_on": "2026-09-01",
+                "ends_on": "2099-02-01",
+            },
+        )
+        assert response.status_code == 201, response.text
+        ids["term"] = uuid.UUID(response.json()["id"])
+        response = await committing_client.post(
+            "/api/v1/admin/courses",
+            headers=auth(account),
+            json={"code": f"D-{marker}", "title_fa": "درس پایداری"},
+        )
+        assert response.status_code == 201, response.text
+        ids["course"] = uuid.UUID(response.json()["id"])
+        response = await committing_client.post(
+            "/api/v1/admin/offerings",
+            headers=auth(account),
+            json={
+                "course_id": str(ids["course"]),
+                "term_id": str(ids["term"]),
+                "instructor_id": str(account["user_id"]),
+                "enrollment_code": "DUR-1405",
+            },
+        )
+        assert response.status_code == 201, response.text
+        ids["offering"] = uuid.UUID(response.json()["id"])
+
+        async with other_connection() as verifier:
+            assert await verifier.get(Term, ids["term"]) is not None, "نیم‌سال commit نشده است"
+            assert await verifier.get(Course, ids["course"]) is not None, "درس commit نشده است"
+            stored = await verifier.get(CourseOffering, ids["offering"])
+            assert stored is not None, "ارائه commit نشده است"
+            assert stored.enrollment_code == "DUR-1405"
+            actions = set(
+                await verifier.scalars(
+                    select(AuditLog.action).where(AuditLog.entity_id.in_(list(ids.values())))
+                )
+            )
+            assert actions == {"TERM_CREATED", "COURSE_CREATED", "OFFERING_CREATED"}
+    finally:
+        if "offering" in ids:
+            await committing_session.execute(
+                delete(CourseOffering).where(CourseOffering.id == ids["offering"])
+            )
+        if "course" in ids:
+            await committing_session.execute(delete(Course).where(Course.id == ids["course"]))
+        if "term" in ids:
+            await committing_session.execute(delete(Term).where(Term.id == ids["term"]))
+        await committing_session.commit()

@@ -75,6 +75,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** همهٔ دروس، با غیرفعال‌ها */
+        get: operations["list_courses_api_v1_admin_courses_get"];
+        put?: never;
+        /** تعریف درس */
+        post: operations["create_course_api_v1_admin_courses_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/courses/{course_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** ویرایش درسی که در پنل ساخته شده */
+        patch: operations["update_course_api_v1_admin_courses__course_id__patch"];
+        trace?: never;
+    };
     "/api/v1/admin/impersonation/end": {
         parameters: {
             query?: never;
@@ -86,6 +121,27 @@ export interface paths {
         put?: never;
         /** پایان مشاهده به‌عنوان کاربر */
         post: operations["end_impersonation_api_v1_admin_impersonation_end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/instructor-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * جستجوی کاربر برای سپردن ارائه
+         * @description فقط حساب فعال؛ حداکثر ده نفر. مدیر آموزشی `user.view_all` ندارد و
+         *     فهرست کاربران را نمی‌بیند — فقط کسی را که دنبالش است (ADR-0020).
+         */
+        get: operations["instructor_candidates_api_v1_admin_instructor_candidates_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -158,6 +214,42 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/offerings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** همهٔ ارائه‌ها */
+        get: operations["list_offerings_api_v1_admin_offerings_get"];
+        put?: never;
+        /** تعریف ارائه و سپردن به استاد */
+        post: operations["create_offering_api_v1_admin_offerings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/offerings/{offering_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** حذف ارائه‌ای که به اشتباه ساخته شده */
+        delete: operations["delete_offering_api_v1_admin_offerings__offering_id__delete"];
+        options?: never;
+        head?: never;
+        /** سپردن ارائه به استاد دیگر یا نیم‌سال دیگر */
+        patch: operations["reassign_offering_api_v1_admin_offerings__offering_id__patch"];
         trace?: never;
     };
     "/api/v1/admin/outbox": {
@@ -300,6 +392,42 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** نیم‌سال‌ها */
+        get: operations["list_terms_api_v1_admin_terms_get"];
+        put?: never;
+        /** تعریف نیم‌سال */
+        post: operations["create_term_api_v1_admin_terms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/terms/{term_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** حذف نیم‌سال بی‌استفاده */
+        delete: operations["delete_term_api_v1_admin_terms__term_id__delete"];
+        options?: never;
+        head?: never;
+        /** ویرایش نیم‌سال یا جاری کردنش */
+        patch: operations["update_term_api_v1_admin_terms__term_id__patch"];
         trace?: never;
     };
     "/api/v1/admin/users": {
@@ -4191,6 +4319,109 @@ export interface components {
             /** Summary */
             summary: string;
         };
+        /** AdminCourseOut */
+        AdminCourseOut: {
+            /** Code */
+            code: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Credits */
+            credits: number | null;
+            /**
+             * Default Access Tier
+             * @enum {string}
+             */
+            default_access_tier: "PUBLIC" | "SUBSCRIBER" | "ENROLLED";
+            /** Degree Level */
+            degree_level: ("BACHELOR" | "MASTER" | "PHD" | "PUBLIC") | null;
+            /** Description */
+            description: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Is Public */
+            is_public: boolean;
+            /** Material Count */
+            material_count: number;
+            /** Offering Count */
+            offering_count: number;
+            /** Slug */
+            slug: string;
+            /** Source Dir */
+            source_dir: string | null;
+            /** Syllabus Weeks */
+            syllabus_weeks: number | null;
+            /** Title En */
+            title_en: string | null;
+            /** Title Fa */
+            title_fa: string;
+            /** Topics */
+            topics: string[];
+        };
+        /** AdminOfferingOut */
+        AdminOfferingOut: {
+            /** Active Students */
+            active_students: number;
+            /** Capacity */
+            capacity: number | null;
+            /** Course Code */
+            course_code: string;
+            /**
+             * Course Id
+             * Format: uuid
+             */
+            course_id: string;
+            /** Course Title Fa */
+            course_title_fa: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Has Enrollment Code */
+            has_enrollment_code: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Instructor Id
+             * Format: uuid
+             */
+            instructor_id: string;
+            /** Instructor Name */
+            instructor_name: string | null;
+            /** Pending Students */
+            pending_students: number;
+            /** Published Weeks */
+            published_weeks: number;
+            /** Requires Approval */
+            requires_approval: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED";
+            /** Term Code */
+            term_code: string;
+            /**
+             * Term Id
+             * Format: uuid
+             */
+            term_id: string;
+            /** Term Title Fa */
+            term_title_fa: string;
+            /** Week Count */
+            week_count: number;
+        };
         /**
          * AdminSubscriptionOut
          * @description یک اشتراک از دید پشتیبانی — با صاحبش، تا فیش به آدم درست برسد.
@@ -4254,6 +4485,35 @@ export interface components {
             user_name?: string | null;
             /** Username */
             username?: string | null;
+        };
+        /** AdminTermOut */
+        AdminTermOut: {
+            /** Code */
+            code: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Current */
+            is_current: boolean;
+            /**
+             * Offering Count
+             * @default 0
+             */
+            offering_count: number;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /** Title Fa */
+            title_fa: string;
         };
         /** AdminUserDetailOut */
         AdminUserDetailOut: {
@@ -5576,6 +5836,41 @@ export interface components {
             /** Term Title Fa */
             term_title_fa: string;
         };
+        /** CourseCreateIn */
+        CourseCreateIn: {
+            /** Code */
+            code: string;
+            /** Credits */
+            credits?: number | null;
+            /**
+             * Default Access Tier
+             * @default SUBSCRIBER
+             * @enum {string}
+             */
+            default_access_tier: "PUBLIC" | "SUBSCRIBER" | "ENROLLED";
+            /** Degree Level */
+            degree_level?: ("BACHELOR" | "MASTER" | "PHD" | "PUBLIC") | null;
+            /** Description */
+            description?: string | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /**
+             * Is Public
+             * @default false
+             */
+            is_public: boolean;
+            /** Slug */
+            slug?: string | null;
+            /** Title En */
+            title_en?: string | null;
+            /** Title Fa */
+            title_fa: string;
+            /** Topics */
+            topics?: string[];
+        };
         /**
          * CourseDetailOut
          * @description جزئیات درس — §5.5 `GET /courses/{slug}`.
@@ -5671,6 +5966,31 @@ export interface components {
             title_fa: string;
             /** Topics */
             topics?: string[];
+        };
+        /** CourseUpdateIn */
+        CourseUpdateIn: {
+            /** Code */
+            code?: string | null;
+            /** Credits */
+            credits?: number | null;
+            /** Default Access Tier */
+            default_access_tier?: ("PUBLIC" | "SUBSCRIBER" | "ENROLLED") | null;
+            /** Degree Level */
+            degree_level?: ("BACHELOR" | "MASTER" | "PHD" | "PUBLIC") | null;
+            /** Description */
+            description?: string | null;
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Is Public */
+            is_public?: boolean | null;
+            /** Slug */
+            slug?: string | null;
+            /** Title En */
+            title_en?: string | null;
+            /** Title Fa */
+            title_fa?: string | null;
+            /** Topics */
+            topics?: string[] | null;
         };
         /** CriterionOut */
         CriterionOut: {
@@ -6278,6 +6598,22 @@ export interface components {
             user_id: string;
             /** User Name */
             user_name: string | null;
+            /** Username */
+            username: string | null;
+        };
+        /** InstructorCandidateOut */
+        InstructorCandidateOut: {
+            /** Active Offerings */
+            active_offerings: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Mobile */
+            mobile: string | null;
+            /** Name */
+            name: string | null;
             /** Username */
             username: string | null;
         };
@@ -7179,6 +7515,110 @@ export interface components {
             /** Code */
             code: string;
         };
+        /** OfferingCreateIn */
+        OfferingCreateIn: {
+            /** Capacity */
+            capacity?: number | null;
+            /** Copy From Offering Id */
+            copy_from_offering_id?: string | null;
+            /**
+             * Course Id
+             * Format: uuid
+             */
+            course_id: string;
+            /** Enrollment Code */
+            enrollment_code?: string | null;
+            /** Grading Policy */
+            grading_policy?: {
+                [key: string]: number;
+            } | null;
+            /**
+             * Instructor Id
+             * Format: uuid
+             */
+            instructor_id: string;
+            /**
+             * Requires Approval
+             * @default false
+             */
+            requires_approval: boolean;
+            /**
+             * Status
+             * @default DRAFT
+             * @enum {string}
+             */
+            status: "DRAFT" | "OPEN";
+            /**
+             * Term Id
+             * Format: uuid
+             */
+            term_id: string;
+            /**
+             * Weeks From
+             * @default NONE
+             * @enum {string}
+             */
+            weeks_from: "SYLLABUS" | "OFFERING" | "NONE";
+        };
+        /** OfferingCreatedOut */
+        OfferingCreatedOut: {
+            /** Active Students */
+            active_students: number;
+            /** Capacity */
+            capacity: number | null;
+            /** Course Code */
+            course_code: string;
+            /**
+             * Course Id
+             * Format: uuid
+             */
+            course_id: string;
+            /** Course Title Fa */
+            course_title_fa: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Has Enrollment Code */
+            has_enrollment_code: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Instructor Id
+             * Format: uuid
+             */
+            instructor_id: string;
+            /** Instructor Name */
+            instructor_name: string | null;
+            /** Pending Students */
+            pending_students: number;
+            /** Published Weeks */
+            published_weeks: number;
+            /** Requires Approval */
+            requires_approval: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED";
+            /** Term Code */
+            term_code: string;
+            /**
+             * Term Id
+             * Format: uuid
+             */
+            term_id: string;
+            /** Term Title Fa */
+            term_title_fa: string;
+            /** Week Count */
+            week_count: number;
+            /** Weeks Created */
+            weeks_created: number;
+        };
         /** OfferingDetailOut */
         OfferingDetailOut: {
             /**
@@ -7269,6 +7709,16 @@ export interface components {
             submit_final_grades: boolean;
             /** Upload Resources */
             upload_resources: boolean;
+        };
+        /**
+         * OfferingReassignIn
+         * @description `PATCH /admin/offerings/{id}` — استاد یا نیم‌سال. بقیه در `/teach`.
+         */
+        OfferingReassignIn: {
+            /** Instructor Id */
+            instructor_id?: string | null;
+            /** Term Id */
+            term_id?: string | null;
         };
         /** OfferingRefOut */
         OfferingRefOut: {
@@ -10432,6 +10882,41 @@ export interface components {
             /** Subject */
             subject?: string | null;
         };
+        /** TermCreateIn */
+        TermCreateIn: {
+            /** Code */
+            code: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /**
+             * Is Current
+             * @default false
+             */
+            is_current: boolean;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /** Title Fa */
+            title_fa: string;
+        };
+        /** TermUpdateIn */
+        TermUpdateIn: {
+            /** Code */
+            code?: string | null;
+            /** Ends On */
+            ends_on?: string | null;
+            /** Is Current */
+            is_current?: boolean | null;
+            /** Starts On */
+            starts_on?: string | null;
+            /** Title Fa */
+            title_fa?: string | null;
+        };
         /** TokenPairOut */
         TokenPairOut: {
             /** Access Token */
@@ -11296,6 +11781,186 @@ export interface operations {
             };
         };
     };
+    list_courses_api_v1_admin_courses_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCourseOut"][];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_course_api_v1_admin_courses_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CourseCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCourseOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description COURSE_CODE_TAKEN | COURSE_SLUG_TAKEN */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_course_api_v1_admin_courses__course_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                course_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CourseUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCourseOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description COURSE_MANAGED_BY_FOLDER | …_TAKEN */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     end_impersonation_api_v1_admin_impersonation_end_post: {
         parameters: {
             query?: never;
@@ -11315,6 +11980,55 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    instructor_candidates_api_v1_admin_instructor_candidates_get: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstructorCandidateOut"][];
+                };
             };
             /** @description احراز هویت نشده */
             401: {
@@ -11495,6 +12209,262 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_offerings_api_v1_admin_offerings_get: {
+        parameters: {
+            query?: {
+                term_id?: string | null;
+                course_id?: string | null;
+                status?: ("DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOfferingOut"][];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_offering_api_v1_admin_offerings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfferingCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferingCreatedOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description OFFERING_EXISTS */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description TERM_ENDED | COURSE_INACTIVE | INSTRUCTOR_INACTIVE | SYLLABUS_UNAVAILABLE */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_offering_api_v1_admin_offerings__offering_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description OFFERING_IN_USE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reassign_offering_api_v1_admin_offerings__offering_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfferingReassignIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOfferingOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description OFFERING_EXISTS | OFFERING_HAS_ENROLLMENTS */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -11879,6 +12849,240 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_terms_api_v1_admin_terms_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTermOut"][];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_term_api_v1_admin_terms_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TermCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTermOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description TERM_CODE_TAKEN */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_term_api_v1_admin_terms__term_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                term_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description TERM_IN_USE */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_term_api_v1_admin_terms__term_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                term_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TermUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminTermOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description بدون مجوز */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

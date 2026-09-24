@@ -105,6 +105,7 @@ class Permission(StrEnum):
 
     # ── آموزش (M3) ─────────────────────────────────────────────────────
     COURSE_CREATE = "course.create"
+    TERM_MANAGE = "term.manage"
     OFFERING_CREATE = "offering.create"
     OFFERING_MANAGE = "offering.manage"
     COURSE_WEEK_EDIT = "course.week.edit"
@@ -203,8 +204,12 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     Permission.USER_VIEW_ALL: frozenset({Role.SUPPORT, Role.ADMIN}),
     Permission.ADMIN_METRICS_VIEW: frozenset({Role.SUPPORT, Role.ADMIN}),
     # آموزش
+    # تعریف درس، نیم‌سال و ارائه با مدیر آموزشی است (`/admin/courses`،
+    # ADR-0020). استاد ارائه نمی‌سازد: ارائه او را استاد می‌کند و کسی خودش را
+    # استاد درسی نمی‌کند (ADR-0019 بند ۱).
     Permission.COURSE_CREATE: frozenset({Role.COORDINATOR, Role.ADMIN}),
-    Permission.OFFERING_CREATE: frozenset({Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}),
+    Permission.TERM_MANAGE: frozenset({Role.COORDINATOR, Role.ADMIN}),
+    Permission.OFFERING_CREATE: frozenset({Role.COORDINATOR, Role.ADMIN}),
     Permission.OFFERING_MANAGE: frozenset({Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}),
     Permission.COURSE_WEEK_EDIT: frozenset(
         {Role.TA, Role.INSTRUCTOR, Role.COORDINATOR, Role.ADMIN}

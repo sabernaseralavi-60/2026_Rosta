@@ -58,6 +58,15 @@ def test_higher_rank_does_not_inherit_lower_permissions() -> None:
     assert coordinator.has_permission(Permission.GRADE_FINAL_SUBMIT) is False
 
 
+def test_only_coordinator_and_admin_define_courses_terms_and_offerings() -> None:
+    """ADR-0020 — ارائه استاد را می‌سازد، نه برعکس (ADR-0019 بند ۱)."""
+    defining = (Permission.COURSE_CREATE, Permission.TERM_MANAGE, Permission.OFFERING_CREATE)
+    for role in (Role.COORDINATOR, Role.ADMIN):
+        assert all(user_with(RoleGrant(role)).has_permission(p) for p in defining)
+    for role in (Role.INSTRUCTOR, Role.TA, Role.SUPPORT, Role.STUDENT):
+        assert not any(user_with(RoleGrant(role)).has_permission(p) for p in defining), role
+
+
 def test_support_can_read_audit_but_not_assign_roles() -> None:
     support = user_with(RoleGrant(Role.SUPPORT))
     assert support.has_permission(Permission.AUDIT_LOG_VIEW) is True

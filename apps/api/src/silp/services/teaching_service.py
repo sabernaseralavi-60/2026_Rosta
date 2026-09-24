@@ -53,6 +53,15 @@ OFFERING_TRANSITIONS: dict[str, tuple[str, ...]] = {
 }
 
 
+def validate_grading_policy(policy: dict[str, int]) -> None:
+    unknown = set(policy) - set(GRADING_POLICY_KEYS)
+    if unknown:
+        raise ValidationFailed(f"کلید ناشناخته در سیاست نمره: {', '.join(sorted(unknown))}")
+    total = sum(policy.values())
+    if total != GRADING_POLICY_TOTAL:
+        raise ValidationFailed(f"مجموع وزن‌ها باید ۱۰۰ باشد، نه {total}.")
+
+
 @dataclass(frozen=True, slots=True)
 class WeekDraft:
     week_number: int
@@ -217,12 +226,7 @@ class TeachingService:
         self, *, offering_id: uuid.UUID, policy: dict[str, int]
     ) -> CourseOffering:
         """§4.4 — مجموع وزن‌ها باید ۱۰۰ باشد. قید در اپلیکیشن است، نه SQL."""
-        unknown = set(policy) - set(GRADING_POLICY_KEYS)
-        if unknown:
-            raise ValidationFailed(f"کلید ناشناخته در سیاست نمره: {', '.join(sorted(unknown))}")
-        total = sum(policy.values())
-        if total != GRADING_POLICY_TOTAL:
-            raise ValidationFailed(f"مجموع وزن‌ها باید ۱۰۰ باشد، نه {total}.")
+        validate_grading_policy(policy)
         offering = await self.offering(offering_id)
         offering.grading_policy = dict(policy)
         await self.session.commit()
@@ -398,6 +402,22 @@ class TeachingService:
 
         هفته‌ای که در مقصد هست، دست‌نخورده می‌ماند: کپی افزودنی است.
         """
+        copied = await self.stage_copy_weeks(
+            target_offering_id=target_offering_id, source_offering_id=source_offering_id
+        )
+        await self.session.commit()
+        log.info(
+            "offering_content_copied",
+            target=str(target_offering_id),
+            source=str(source_offering_id),
+            weeks=copied,
+        )
+        return copied
+
+    async def stage_copy_weeks(
+        self, *, target_offering_id: uuid.UUID, source_offering_id: uuid.UUID
+    ) -> int:
+        """همان کپی، بی commit — برای ساخت ارائه در یک تراکنش (ADR-0020)."""
         target = await self.offering(target_offering_id)
         source = await self.offering(source_offering_id)
         if target.course_id != source.course_id:
@@ -462,13 +482,7 @@ class TeachingService:
                 )
             copied += 1
 
-        await self.session.commit()
-        log.info(
-            "offering_content_copied",
-            target=str(target_offering_id),
-            source=str(source_offering_id),
-            weeks=copied,
-        )
+        await self.session.flush()
         return copied
 
     # ── اعلان — FR-EDU-06 ──────────────────────────────────────────────
@@ -639,6 +653,7 @@ def _now() -> datetime:
 __all__ = [
     "GRADING_POLICY_KEYS",
     "OFFERING_TRANSITIONS",
+    "validate_grading_policy",
     "AttendanceEntry",
     "ResourceDraft",
     "SessionTally",

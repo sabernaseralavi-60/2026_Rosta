@@ -23,6 +23,7 @@ from silp.db.session import dispose_engine
 from silp.routers import health
 from silp.routers.v1 import (
     admin,
+    admin_courses,
     applications,
     auth,
     certificates,
@@ -171,6 +172,7 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(certificates.me_router)
     v1.include_router(certificates.admin_router)
     v1.include_router(admin.router)
+    v1.include_router(admin_courses.router)
     v1.include_router(search.router)
     app.include_router(v1)
 
