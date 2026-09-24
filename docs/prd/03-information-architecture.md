@@ -182,6 +182,14 @@ silp.ir
 | `/teach/projects` | پروژه‌های تحت نظارت با شاخص سلامت |
 | `/teach/review-queue` | **صف واحد بررسی:** همهٔ تحویل‌دادنی‌های منتظر |
 
+**ساخته‌شده (ADR-0019):** همهٔ مسیرهای بالا جز `/teach/projects` و
+`/teach/review-queue`، به‌علاوهٔ `/teach/offerings/[id]/weeks/[n]` (ویرایشگر هفته؛
+به‌جای `…/weeks/[n]/edit`)، `/teach/offerings/[id]/quizzes` و
+`/teach/offerings/[id]/settings`، و ویرایشگر آزمون در `/teach/quizzes/[id]/edit`
+با زبانه‌های `/grade` و `/analytics`. پوسته مثل پنل مدیریت است؛ زبانه‌ای که
+بیننده مجوزش را ندارد (دستیار: دفتر نمره و تنظیمات) نشان داده نمی‌شود. پیوند
+«تدریس» در هدر برای استاد، دستیار و مدیر آموزشی همان «جابه‌جاگر نقش» §3.7 است.
+
 **صف تصحیح تشریحی — مشخصهٔ ویژه:** تصحیح **بر اساس سؤال** انجام می‌شود، نه بر اساس
 دانشجو. استاد یک سؤال را برای همهٔ دانشجویان پشت سر هم می‌بیند. این کار سرعت و
 یکنواختی نمره‌دهی را به‌شدت بالا می‌برد و در LMSهای رایج وجود ندارد.
@@ -206,8 +214,9 @@ silp.ir
 | `/admin/settings` | تنظیمات سامانه |
 | `/admin/health` | سلامت فنی: خطاها، صف، ذخیره‌سازی |
 | `/admin/certificates` | جستجوی گواهی با کد و ابطال با دلیل |
+| `/admin/subscriptions` | تأیید پرداخت، رد با دلیل و فعال‌سازی مستقیم اشتراک (ADR-0019) |
 
-**ساخته‌شده در M7 بخش د** (زیر پوستهٔ اپلیکیشن، با ناوبری فرعی): `/admin`، `/admin/users` و `/admin/users/[id]`، `/admin/audit`، `/admin/point-rules`، `/admin/notifications` (صف ارسال و الگوها)، `/admin/certificates`. `/admin/courses`، `/admin/taxonomy`، `/admin/badges`، `/admin/settings` و `/admin/health` مانده‌اند ([ADR-0017](../adr/0017-public-certificates-admin-and-search.md)).
+**ساخته‌شده در M7 بخش د** (زیر پوستهٔ اپلیکیشن، با ناوبری فرعی): `/admin`، `/admin/users` و `/admin/users/[id]`، `/admin/audit`، `/admin/point-rules`، `/admin/notifications` (صف ارسال و الگوها)، `/admin/certificates`؛ و `/admin/subscriptions` در ADR-0019. `/admin/courses`، `/admin/taxonomy`، `/admin/badges`، `/admin/settings` و `/admin/health` مانده‌اند ([ADR-0017](../adr/0017-public-certificates-admin-and-search.md)).
 
 ---
 

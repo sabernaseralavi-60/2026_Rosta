@@ -307,13 +307,19 @@ Authorization: Bearer <access_token>
 | `GET` | `/subscriptions` | کاربر | اشتراک‌های من |
 | `POST` | `/subscriptions` | کاربر | ثبت درخواست (وضعیت `PENDING`) |
 | `DELETE` | `/subscriptions/{id}` | کاربر | لغو |
-| `GET` | `/subscriptions/pending` | SUPPORT | درخواست‌های در انتظار تأیید |
-| `POST` | `/subscriptions/{id}/activate` | SUPPORT | تأیید پرداخت بیرونی |
-| `POST` | `/subscriptions/grant` | SUPPORT | ساخت و فعال‌سازی در یک گام |
+| `GET` | `/subscriptions/admin?status=&user_id=` | SUPPORT | اشتراک‌ها با صاحب (نام، موبایل پوشانده برای پشتیبانی، یادداشت) |
+| `GET` | `/subscriptions/pending` | SUPPORT | همان، فقط در انتظار — قدیمی‌ترین اول |
+| `POST` | `/subscriptions/{id}/activate` | SUPPORT | تأیید پرداخت بیرونی — `payment_ref` الزامی |
+| `POST` | `/subscriptions/{id}/reject` | SUPPORT | رد درخواست در انتظار با دلیل (به کاربر اعلان می‌شود) |
+| `POST` | `/subscriptions/grant` | SUPPORT | ساخت و فعال‌سازی در یک تراکنش — کد پیگیری یا یادداشت الزامی |
 
 **پرداخت درون سامانه انجام نمی‌شود** (§02). `POST /subscriptions` یک
 رسید «در انتظار» می‌سازد و `activate` آن را فعال می‌کند. وقتی درگاه
 آمد، فقط `activate` یک صداکنندهٔ تازه پیدا می‌کند.
+
+**دوره از لحظهٔ تأیید شمرده می‌شود**، نه از لحظهٔ درخواست: `activate` شروع را
+پس از پایان اشتراک فعال هم‌دامنه یا همین حالا می‌گذارد. فعال‌سازی، اعطا و رد در
+لاگ حسابرسی ثبت می‌شوند و به کاربر اعلان می‌رسد ([ADR-0019](../adr/0019-instructor-area-and-subscription-activation.md)).
 
 **`POST /offerings/{id}/enroll`**
 ```jsonc
@@ -380,7 +386,11 @@ Authorization: Bearer <access_token>
 | `GET` | `/teach/quizzes/{id}/question-stats` | ضریب دشواری و تمیز |
 | `GET` | `/teach/quizzes/{id}/appeals` | اعتراض‌های باز |
 | `POST` | `/teach/appeals/{id}/resolve` | رسیدگی |
-| `POST` | `/teach/attempts/close-expired` | اجرای دستی کار پس‌زمینه |
+| `GET` | `/teach/quizzes/{id}/attempts/{aid}/result` | نتیجهٔ یک دانشجو از دید استاد |
+
+بستن تلاش‌های منقضی endpoint ندارد و عمداً: قلمرو `QUIZ_GRADE` ارائه است و
+مسیر سراسری با آن مجوز را هیچ‌کس نمی‌تواند صدا بزند؛ کار زمان‌بندی‌شدهٔ
+`close_expired_attempts` هر ۶۰ ثانیه همین کار را می‌کند (§7.11).
 
 **`POST /quizzes/{id}/attempts` — پاسخ ۲۰۱**
 ```jsonc
@@ -701,28 +711,30 @@ Authorization: Bearer <access_token>
 | متد | مسیر | توضیح |
 |-----|------|-------|
 | `GET` | `/teach/dashboard` | داشبورد استثنامحور |
-| `GET` | `/teach/offerings` | ارائه‌های من |
+| `GET` | `/teach/offerings` | ارائه‌های من — استاد اصلی و اعطای قلمرودار، با `staff_role` |
+| `GET` | `/teach/offerings/{id}` | ارائه از دید کادر: هفته‌ها با پیش‌نویس، کد ثبت‌نام، `allowed_statuses`، `permissions` |
+| `PATCH` | `/teach/offerings/{id}` | وضعیت (جدول گذار ADR-0019)، تأیید ثبت‌نام، ظرفیت، کد |
 | `PUT` | `/teach/offerings/{id}/weeks` | ساخت یا ویرایش هفته (کلید: شمارهٔ هفته) |
 | `POST` | `/teach/weeks/{id}/publish` | انتشار (فوری یا زمان‌بندی‌شده) |
-| `POST` | `/teach/offerings/{id}/copy-content` | کپی محتوا از ارائهٔ قبلی |
+| `POST` | `/teach/offerings/{id}/copy-content` | کپی محتوا از ارائهٔ قبلی — قلمرو مبدأ هم سنجیده می‌شود |
 | `POST` | `/teach/offerings/{id}/weeks/{wid}/resources` | افزودن منبع هفته |
 | `DELETE` | `/teach/resources/{id}` | حذف منبع |
-| `POST` | `/teach/offerings/{id}/weeks/{wid}/materials` | بستن محتوای کتابخانه به هفته |
+| `POST/DELETE` | `/teach/offerings/{id}/weeks/{wid}/materials[/{mid}]` | بستن و برداشتن محتوای کتابخانه |
 | `PUT` | `/teach/offerings/{id}/grading-policy` | وزن‌های نمره (مجموع = ۱۰۰) |
-| `GET` | `/teach/offerings/{id}/students` | دانشجویان با پیشرفت و پرچم خطر |
-| `POST` | `/teach/offerings/{id}/attendance` | ثبت گروهی حضور |
-| `GET` | `/teach/offerings/{id}/gradebook` | دفتر نمره |
-| `PATCH` | `/teach/enrollments/{id}/grade` | ثبت نمرهٔ نهایی |
-| `GET` | `/teach/offerings/{id}/export` | خروجی Excel |
-| `POST` | `/teach/quizzes` | ساخت آزمون |
-| `POST` | `/teach/quizzes/{id}/questions` | افزودن سؤال |
-| `POST` | `/teach/quizzes/{id}/questions/from-bank` | افزودن از بانک |
-| `GET` | `/teach/quizzes/{id}/grading-queue` | **صف تصحیح بر اساس سؤال** |
-| `POST` | `/teach/answers/{attempt_id}/{qid}/grade` | ثبت نمرهٔ تشریحی |
-| `GET` | `/teach/quizzes/{id}/analytics` | تحلیل سؤال |
-| `GET` | `/teach/review-queue` | صف واحد بررسی تحویل‌دادنی |
-| `GET` | `/teach/offerings/{id}/learning-scores` | نمرهٔ یادگیری و نمرهٔ پیشنهادی (`LS × 0.2`) همهٔ دانشجویان — فقط خواندنی |
+| `GET` | `/teach/offerings/{id}/students` | فهرست کلاس — همهٔ کادر؛ نمرهٔ نهایی فقط برای مدیر ارائه |
+| `GET` | `/teach/offerings/{id}/enrollment-requests` | درخواست‌های ثبت‌نام در انتظار |
 | `POST` | `/teach/enrollments/{id}/decide` | تأیید یا رد ثبت‌نام |
+| `POST` | `/teach/offerings/{id}/attendance` | ثبت گروهی حضور (ثبت دوبارهٔ همان روز = اصلاح) |
+| `GET` | `/teach/offerings/{id}/attendance` | جلسه‌های ثبت‌شده با شمار هر وضعیت |
+| `GET` | `/teach/offerings/{id}/attendance/{held_on}` | حضور یک روز برای اصلاح |
+| `GET` | `/teach/offerings/{id}/gradebook` | دفتر نمره: آزمون‌ها، حضور، نمرهٔ یادگیری، نمرهٔ نهایی |
+| `GET` | `/teach/offerings/{id}/learning-scores` | نمرهٔ یادگیری و نمرهٔ پیشنهادی (`LS × 0.2`) همهٔ دانشجویان — فقط خواندنی |
+| `PATCH` | `/teach/enrollments/{id}/grade` | ثبت نمرهٔ نهایی (ثبت‌نام در انتظار ۴۲۲) |
+| `POST` | `/teach/offerings/{id}/announcements` | انتشار اعلان درس |
+
+آزمون، سؤال، بانک، تصحیح و اعتراض در §5.6 («ناحیهٔ استاد») آمده‌اند. خروجی
+Excel دفتر نمره در کلاینت از همین پاسخ ساخته می‌شود (CSV با BOM)؛ صف واحد
+بررسی (`/teach/review-queue`) ساخته نشده است ([ADR-0019](../adr/0019-instructor-area-and-subscription-activation.md)).
 
 **`GET /teach/dashboard` — پاسخ**
 ```jsonc
