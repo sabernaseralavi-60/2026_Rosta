@@ -67,6 +67,8 @@ export interface ProjectInput {
   roles: { title_fa: string; description: string | null; slots: number }[];
   /** فقط هنگام ساخت — الگوی هشت‌مرحله‌ای شهر هوشمند برای نوع C (ADR-0016). */
   workflow?: 'CITY' | null;
+  /** فقط هنگام ساخت — پروژهٔ یک ارائهٔ درس؛ استاد آن ارائه ناظر پروژه می‌شود (ADR-0022). */
+  offering_id?: string | null;
 }
 
 export function createProject(input: ProjectInput, accessToken: string) {

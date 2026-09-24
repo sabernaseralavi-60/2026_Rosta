@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { DeliverableReviewForm } from '@/components/domain/DeliverableReviewForm';
 import { MilestoneTracker } from '@/components/domain/MilestoneTracker';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -14,9 +15,7 @@ import { formatBytes, uploadFile } from '@/lib/api/files';
 import {
   type Deliverable,
   type Milestone,
-  type ReviewDecision,
   fetchDeliverables,
-  reviewDeliverable,
   submitDeliverable,
 } from '@/lib/api/workspace';
 import { formatDateLong, formatRelative } from '@/lib/format/date';
@@ -126,7 +125,11 @@ function MilestonePanel({
       {mine && <DeliverableCard deliverable={mine} label="آخرین تحویل تو" />}
 
       {!isCityStage && mine && canReview && mine.status !== 'APPROVED' && (
-        <ReviewForm deliverable={mine} accessToken={accessToken} onReviewed={onChanged} />
+        <DeliverableReviewForm
+          deliverableId={mine.id}
+          accessToken={accessToken}
+          onReviewed={onChanged}
+        />
       )}
 
       {canSubmit && (
@@ -373,131 +376,6 @@ function SubmitForm({
             انصراف
           </Button>
         </div>
-      </form>
-    </Card>
-  );
-}
-
-const DECISIONS: { value: ReviewDecision; label: string }[] = [
-  { value: 'APPROVED', label: 'تأیید' },
-  { value: 'CHANGES_REQUESTED', label: 'اصلاح کن' },
-  { value: 'REJECTED', label: 'رد' },
-];
-
-function ReviewForm({
-  deliverable,
-  accessToken,
-  onReviewed,
-}: {
-  deliverable: Deliverable;
-  accessToken: string;
-  onReviewed: () => void;
-}) {
-  const [decision, setDecision] = useState<ReviewDecision>('APPROVED');
-  const [feedback, setFeedback] = useState('');
-  const [score, setScore] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [readyToClose, setReadyToClose] = useState(false);
-
-  const feedbackRequired = decision !== 'APPROVED';
-  const blocked = feedbackRequired && feedback.trim().length === 0;
-
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      const result = await reviewDeliverable(
-        deliverable.id,
-        {
-          decision,
-          feedback: feedback.trim() || null,
-          score: score.trim() ? Number(score) : null,
-        },
-        accessToken,
-      );
-      setReadyToClose(result.project_ready_to_close);
-      onReviewed();
-    } catch (cause) {
-      setError(messageFor(cause));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <Card variant="raised" className="flex flex-col gap-3">
-      <CardTitle>بررسی تحویل</CardTitle>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <fieldset className="flex flex-col gap-2">
-          <legend className="text-[13.5px] font-medium text-[var(--fg-primary)]">تصمیم</legend>
-          <div className="flex flex-wrap gap-2">
-            {DECISIONS.map((option) => (
-              <label
-                key={option.value}
-                className={`cursor-pointer rounded-[var(--radius-sm)] border px-3 py-1.5 text-[13.5px] ${
-                  decision === option.value
-                    ? 'border-[var(--brand-500)] bg-[var(--brand-50)] text-[var(--fg-brand)]'
-                    : 'border-[var(--border-default)] text-[var(--fg-secondary)]'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name={`decision-${deliverable.id}`}
-                  value={option.value}
-                  checked={decision === option.value}
-                  onChange={() => setDecision(option.value)}
-                  className="sr-only"
-                />
-                {option.label}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-
-        <Textarea
-          label="بازخورد"
-          hint={
-            feedbackRequired
-              ? 'برای «اصلاح کن» و «رد» اجباری است: دانشجو باید بداند چه چیزی را درست کند.'
-              : 'اختیاری، ولی یک جملهٔ کوتاه هم بهتر از سکوت است.'
-          }
-          value={feedback}
-          onChange={(event) => setFeedback(event.target.value)}
-          maxLength={5000}
-          rows={3}
-          required={feedbackRequired}
-        />
-
-        <label className="flex flex-col gap-1.5">
-          <span className="text-[13.5px] font-medium text-[var(--fg-primary)]">نمره (اختیاری)</span>
-          <input
-            type="number"
-            min={0}
-            step="0.5"
-            value={score}
-            onChange={(event) => setScore(event.target.value)}
-            className="h-10 w-28 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-[14px] tabular-nums"
-          />
-        </label>
-
-        {error && (
-          <p role="alert" className="text-[13px] text-[var(--fg-danger)]">
-            {error}
-          </p>
-        )}
-
-        {readyToClose && (
-          <p className="text-[13px] text-[var(--fg-success)]">
-            همهٔ مراحل الزامی تأیید شدند — پروژه آمادهٔ بسته شدن است.
-          </p>
-        )}
-
-        <Button type="submit" size="sm" className="self-start" loading={busy} disabled={blocked}>
-          ثبت بررسی
-        </Button>
       </form>
     </Card>
   );

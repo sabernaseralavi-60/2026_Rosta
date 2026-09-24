@@ -11,7 +11,9 @@
 
 import { apiFetch } from './client';
 import type { Announcement, EnrollmentStatus, ResourceKind, WeekSummary } from './courses';
+import type { ProjectKind } from './projects';
 import type { Appeal, AttemptResult, AttemptStatus, QuestionKind } from './quizzes';
+import type { DeliverableStatus } from './workspace';
 
 // ── ارائه ─────────────────────────────────────────────────────────────
 export type OfferingStatus = 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'ARCHIVED';
@@ -802,4 +804,76 @@ export function resolveAppeal(
     body,
     accessToken: token,
   });
+}
+
+// ── پروژه‌های تحت نظارت و صف بررسی — ADR-0022 ─────────────────────────
+export type ProjectHealth = 'HEALTHY' | 'AT_RISK' | 'STALLED';
+export type SupervisedProjectStatus =
+  'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+
+export const SUPERVISED_STATUS_LABELS: Record<SupervisedProjectStatus, string> = {
+  DRAFT: 'پیش‌نویس',
+  OPEN: 'باز برای عضو',
+  IN_PROGRESS: 'در جریان',
+  PAUSED: 'متوقف‌شده موقت',
+  COMPLETED: 'تمام‌شده',
+  CANCELLED: 'لغو‌شده',
+};
+
+export interface TeachProject {
+  id: string;
+  title_fa: string;
+  kind: ProjectKind;
+  kind_fa: string;
+  status: SupervisedProjectStatus;
+  health: ProjectHealth;
+  health_fa: string;
+  offering_id: string | null;
+  /** درس ارائه‌ای که پروژه به آن وصل است؛ `null` برای پروژه‌ای که خود استاد مدیرش است. */
+  course_title_fa: string | null;
+  lead_id: string;
+  lead_name: string | null;
+  active_members: number;
+  team_size_max: number;
+  milestones_total: number;
+  milestones_approved: number;
+  milestones_overdue: number;
+  open_deliverables: number;
+  oldest_open_days: number | null;
+  days_inactive: number;
+  deadline_on: string | null;
+}
+
+export interface ReviewQueueItem {
+  deliverable_id: string;
+  project_id: string;
+  project_title_fa: string;
+  course_title_fa: string | null;
+  milestone_id: string;
+  milestone_title_fa: string;
+  submitter_id: string;
+  submitter_name: string | null;
+  version: number;
+  status: DeliverableStatus;
+  status_fa: string;
+  is_late: boolean;
+  submitted_at: string;
+  days_waiting: number;
+  excerpt: string | null;
+  link_count: number;
+}
+
+export interface ReviewQueue {
+  /** شمار کل؛ اگر از `items.length` بیشتر بود، فهرست بریده شده است. */
+  total: number;
+  oldest_days: number | null;
+  items: ReviewQueueItem[];
+}
+
+export function fetchTeachProjects(token: string) {
+  return apiFetch<TeachProject[]>('/teach/projects', { accessToken: token });
+}
+
+export function fetchReviewQueue(token: string) {
+  return apiFetch<ReviewQueue>('/teach/review-queue', { accessToken: token });
 }

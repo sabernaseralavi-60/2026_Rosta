@@ -81,7 +81,11 @@ export function TeachDashboardView() {
             href="/teach/offerings"
           />
           <QueueTile label="اعتراض به نمره" queue={attention.grade_appeals} href="/teach/quizzes" />
-          <QueueTile label="تحویل‌دادنی پروژه" queue={attention.deliverables_pending} />
+          <QueueTile
+            label="تحویل‌دادنی پروژه"
+            queue={attention.deliverables_pending}
+            href="/teach/review-queue"
+          />
         </div>
       </section>
 
@@ -131,9 +135,14 @@ export function TeachDashboardView() {
 
       {attention.projects_at_risk.length > 0 && (
         <section aria-labelledby="projects-risk" className="flex flex-col gap-2">
-          <h2 id="projects-risk" className="text-[18px]">
-            پروژهٔ در خطر
-          </h2>
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <h2 id="projects-risk" className="text-[18px]">
+              پروژهٔ در خطر
+            </h2>
+            <Link href="/teach/projects" className="text-[13.5px] text-[var(--fg-brand)]">
+              همهٔ پروژه‌های تحت نظارت
+            </Link>
+          </div>
           <ul className="flex flex-col divide-y divide-[var(--border-subtle)] rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
             {attention.projects_at_risk.map((project) => (
               <li

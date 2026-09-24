@@ -69,7 +69,15 @@ const ADMIN_PAGES = [
   '/admin/courses',
 ];
 
-const TEACH_PAGES = ['/teach', '/teach/offerings', '/teach/quizzes', '/teach/question-bank'];
+const TEACH_PAGES = [
+  '/teach',
+  '/teach/offerings',
+  '/teach/quizzes',
+  '/teach/question-bank',
+  // ADR-0022 — پروژه‌های تحت نظارت و صف واحد بررسی.
+  '/teach/projects',
+  '/teach/review-queue',
+];
 
 /** زبانه‌های یک ارائه و یک آزمون — شناسه‌ها از API استاد (ADR-0019). */
 const OFFERING_TABS = [

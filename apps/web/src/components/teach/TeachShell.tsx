@@ -22,6 +22,8 @@ import { cn } from '@/lib/cn';
 const LINKS: { href: string; label: string; exact?: boolean }[] = [
   { href: '/teach', label: 'آنچه اقدام می‌خواهد', exact: true },
   { href: '/teach/offerings', label: 'ارائه‌های من' },
+  { href: '/teach/projects', label: 'پروژه‌های تحت نظارت' },
+  { href: '/teach/review-queue', label: 'صف بررسی تحویل‌ها' },
   { href: '/teach/quizzes', label: 'آزمون‌ها' },
   { href: '/teach/question-bank', label: 'بانک سؤال' },
 ];

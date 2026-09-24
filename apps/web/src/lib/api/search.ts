@@ -104,6 +104,20 @@ export const COMMANDS: Command[] = [
     teachOnly: true,
   },
   {
+    id: 'teach-projects',
+    label: 'پروژه‌های تحت نظارت',
+    href: '/teach/projects',
+    keywords: 'پروژه نظارت سلامت متوقف ارائه',
+    teachOnly: true,
+  },
+  {
+    id: 'teach-review-queue',
+    label: 'صف بررسی تحویل‌ها',
+    href: '/teach/review-queue',
+    keywords: 'تحویل بررسی تأیید اصلاح صف پروژه',
+    teachOnly: true,
+  },
+  {
     id: 'teach-quizzes',
     label: 'آزمون‌ها و تصحیح',
     href: '/teach/quizzes',

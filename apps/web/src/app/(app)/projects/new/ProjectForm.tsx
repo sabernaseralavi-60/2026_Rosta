@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { ApiError, NetworkError } from '@/lib/api/client';
 import type { ProjectKind, WorkStyle } from '@/lib/api/projects';
 import { type Skill, fetchSkills } from '@/lib/api/taxonomy';
+import { type TeachOffering, fetchTeachOfferings } from '@/lib/api/teach';
 import { createMilestone, createProject } from '@/lib/api/workspace';
 import { readSession } from '@/lib/auth/session';
 import { useSession } from '@/lib/auth/use-session';
@@ -78,6 +79,9 @@ export function ProjectForm() {
   const [milestones, setMilestones] = useState<MilestoneDraft[]>([{ ...EMPTY_MILESTONE }]);
   const [cityWorkflow, setCityWorkflow] = useState(false);
   const [startsOn, setStartsOn] = useState('');
+  // ارائه‌هایی که کاربر استادشان است؛ پروژهٔ وصل‌شده به ارائه، زیر نظر همان استاد می‌رود.
+  const [offerings, setOfferings] = useState<TeachOffering[]>([]);
+  const [offeringId, setOfferingId] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -89,6 +93,15 @@ export function ProjectForm() {
       .then((list) => setSkills(list.items))
       .catch(() => undefined);
   }, []);
+
+  useEffect(() => {
+    if (!accessToken || !canCreateManaged) return;
+    fetchTeachOfferings(accessToken)
+      .then((list) =>
+        setOfferings(list.filter((o) => o.staff_role === 'INSTRUCTOR' && o.status !== 'ARCHIVED')),
+      )
+      .catch(() => setOfferings([]));
+  }, [accessToken, canCreateManaged]);
 
   const filledMilestones = milestones.filter((milestone) => milestone.title_fa.trim());
   // الگوی شهر هوشمند هشت مرحلهٔ ثابتش را خودش می‌سازد (ADR-0016).
@@ -149,6 +162,7 @@ export function ProjectForm() {
           interests: [],
           roles: [],
           workflow: useCity ? 'CITY' : null,
+          offering_id: kind !== 'D_PERSONAL' && offeringId ? offeringId : null,
         },
         accessToken,
       );
@@ -285,6 +299,29 @@ export function ProjectForm() {
               />
             )}
           </div>
+        )}
+
+        {kind !== 'D_PERSONAL' && offerings.length > 0 && (
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[13.5px] font-medium text-[var(--fg-primary)]">
+              پروژهٔ کدام ارائه؟ (اختیاری)
+            </span>
+            <select
+              value={offeringId}
+              onChange={(event) => setOfferingId(event.target.value)}
+              className="h-11 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 text-[14px]"
+            >
+              <option value="">پروژهٔ مستقل — به ارائه‌ای وصل نیست</option>
+              {offerings.map((offering) => (
+                <option key={offering.id} value={offering.id}>
+                  {offering.course_title_fa} — {offering.term_title_fa}
+                </option>
+              ))}
+            </select>
+            <span className="text-[12.5px] text-[var(--fg-tertiary)]">
+              پروژهٔ وصل‌شده در «پروژه‌های تحت نظارت» و صف بررسی تو می‌آید. بعد از ساخت عوض نمی‌شود.
+            </span>
+          </label>
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
