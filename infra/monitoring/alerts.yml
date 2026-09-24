@@ -1,0 +1,166 @@
+# SILP — قواعد هشدار — NFR-15، M7-17
+#
+# هر ردیف جدول NFR-15 یک قاعده است؛ چند قاعدهٔ «کور شدن» هم افزوده شده:
+# هشداری که منبع معیارش مرده باشد هرگز نمی‌سوزد، پس مردن خود منبع هشدار است.
+# آزمون: promtool test rules infra/monitoring/alerts.test.yml
+
+groups:
+  - name: silp-http
+    rules:
+      - alert: HighErrorRate
+        # NFR-15 — نرخ ۵xx بیش از ۱٪ در ۵ دقیقه. با کمتر از ۶ درخواست در دقیقه
+        # یک خطای تنها ۱٪ را رد می‌کند؛ کف ترافیک هشدار شبانهٔ بی‌معنا را می‌گیرد.
+        expr: |
+          (
+            sum(rate(http_request_duration_seconds_count{status=~"5.."}[5m]))
+            / sum(rate(http_request_duration_seconds_count[5m]))
+          ) > 0.01
+          and sum(rate(http_request_duration_seconds_count[5m])) > 0.1
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "نرخ خطای ۵xx بالای ۱٪ است"
+          description: "{{ $value | humanizePercentage }} درخواست‌ها در ۵ دقیقهٔ اخیر ۵xx گرفتند."
+
+      - alert: SlowResponses
+        # NFR-15 — p95 بیش از دو برابر هدف در ۱۰ دقیقه. سقف p95 سنگین‌ترین
+        # عملیات عادی (بارگذاری صفحهٔ آزمون) ۱ ثانیه است؛ دو برابرش ۲ ثانیه.
+        # جریان SSE اعلان عمداً طولانی است و بیرون می‌ماند.
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{route!="/api/v1/notifications/stream"}[10m]))
+          ) > 2
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "p95 زمان پاسخ بالای ۲ ثانیه"
+
+      - alert: QuizAnswerSaveSlow
+        # NFR-06 — ذخیرهٔ پاسخ آزمون بحرانی‌ترین مسیر است (سقف p95 ۲۰۰ms).
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{route=~".*/attempts/.*/answers.*",method="PUT"}[5m]))
+          ) > 0.4
+          and sum(rate(http_request_duration_seconds_count{route=~".*/attempts/.*/answers.*",method="PUT"}[5m])) > 0.2
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "ذخیرهٔ پاسخ آزمون کند است (p95 بالای ۴۰۰ms)"
+
+      - alert: ApiDown
+        expr: up{job="api"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "API پاسخ خراش Prometheus را نمی‌دهد"
+
+  - name: silp-outbox
+    rules:
+      - alert: OutboxBacklog
+        # NFR-15 — عمق صف بیش از ۱۰۰۰.
+        expr: sum(outbox_queue_depth{status=~"QUEUED|FAILED|SENDING"}) > 1000
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "صف ارسال عقب افتاده ({{ $value }} پیام)"
+
+      - alert: OutboxDeadLetters
+        # NFR-15 — بیش از ۱۰ پیام DEAD در ساعت. شمار DEAD جز با «تلاش دوباره»
+        # مدیر کم نمی‌شود، پس delta همان «تازه‌مرده‌ها»ست.
+        expr: sum(delta(outbox_queue_depth{status="DEAD"}[1h])) > 10
+        labels: { severity: warning }
+        annotations:
+          summary: "بیش از ۱۰ پیام در ساعت گذشته DEAD شد"
+          description: "کانال مقصد را در /admin/notifications ببینید."
+
+  - name: silp-jobs
+    rules:
+      - alert: CloseExpiredAttemptsFailed
+        # NFR-15 — هر شکست close_expired_attempts بحرانی است: دانشجویی که وقتش
+        # تمام شده، نمره نمی‌گیرد.
+        expr: sum(increase(background_job_failures_total{task="close_expired_attempts"}[5m])) > 0
+        labels: { severity: critical }
+        annotations:
+          summary: "بستن خودکار آزمون‌های منقضی شکست خورد"
+
+      - alert: CloseExpiredAttemptsStalled
+        # هر ۶۰ ثانیه اجرا می‌شود؛ ۵ دقیقه بی‌موفقیت یعنی کارگر مرده یا گیر کرده.
+        expr: time() - max(silp_background_job_last_success_timestamp_seconds{task="close_expired_attempts"}) > 300
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "close_expired_attempts پنج دقیقه است موفق اجرا نشده"
+
+      - alert: BackgroundJobFailing
+        expr: sum by (task) (increase(background_job_failures_total[1h])) > 3
+        labels: { severity: warning }
+        annotations:
+          summary: "کار {{ $labels.task }} در ساعت گذشته بیش از ۳ بار شکست خورد"
+
+      - alert: WorkerDown
+        expr: absent(up{job="worker"} == 1)
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "هیچ کارگر ARQ زنده‌ای خراش نمی‌شود"
+
+  - name: silp-database
+    rules:
+      - alert: DatabaseConnectionsHigh
+        # NFR-15 — اتصال‌ها بیش از ۸۰٪.
+        expr: sum(silp_db_connections) / max(silp_db_max_connections) > 0.8
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "اتصال‌های دیتابیس بالای ۸۰٪ سقف"
+
+      - alert: MetricsQueriesFailing
+        expr: max(silp_metrics_scrape_errors) > 0
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "کوئری معیارهای دیتابیس شکست می‌خورد — هشدارهای صف و اتصال کورند"
+
+  - name: silp-host
+    rules:
+      - alert: DiskAlmostFull
+        # NFR-15 — فضای دیسک بیش از ۸۰٪.
+        expr: |
+          1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"} > 0.8
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "دیسک {{ $labels.mountpoint }} بیش از ۸۰٪ پر است"
+
+  - name: silp-backup
+    rules:
+      - alert: BackupFailed
+        # NFR-15 — هر شکست پشتیبان‌گیری بحرانی است.
+        expr: min by (kind) (silp_backup_last_run_ok) == 0
+        labels: { severity: critical }
+        annotations:
+          summary: "پشتیبان‌گیری {{ $labels.kind }} شکست خورد"
+
+      - alert: BackupStale
+        # روزانه ۴ بامداد؛ ۲۶ ساعت بی‌پشتیبان یعنی نوبت دیشب اجرا نشده —
+        # حتی اگر اسکریپت خطایی ننوشته باشد (کانتینر مرده).
+        expr: time() - max by (kind) (silp_backup_last_success_timestamp_seconds) > 26 * 3600
+        labels: { severity: critical }
+        annotations:
+          summary: "آخرین پشتیبان {{ $labels.kind }} قدیمی‌تر از ۲۶ ساعت است"
+
+      - alert: BackupMetricsMissing
+        expr: absent(silp_backup_last_success_timestamp_seconds{kind="logical"})
+        for: 30h
+        labels: { severity: critical }
+        annotations:
+          summary: "هیچ پشتیبانی تا امروز ثبت نشده — کانتینر backup را بررسی کنید"
+
+      - alert: WalArchiveStale
+        # NFR-09 — RPO ۱۵ دقیقه: WAL باید دست‌کم هر ۱۵ دقیقه بیرون از سرور برود.
+        expr: time() - silp_backup_wal_synced_timestamp_seconds > 20 * 60
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "WAL بیش از ۲۰ دقیقه است به فضای ابری جدا نرفته (RPO در خطر)"

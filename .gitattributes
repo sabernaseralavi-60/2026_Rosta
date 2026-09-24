@@ -1,0 +1,4 @@
+# اسکریپت‌ها و پیکربندی‌هایی که داخل کانتینر لینوکس اجرا می‌شوند همیشه LF‌اند؛
+# با core.autocrlf ویندوز، CRLF در shebang یعنی «bash\r: not found» (M7-17).
+*.sh text eol=lf
+infra/** text eol=lf

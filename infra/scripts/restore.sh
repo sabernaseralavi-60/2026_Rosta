@@ -49,7 +49,10 @@ if [[ -f "$counts" ]]; then
   checked=0
   while IFS=$'\t' read -r table expected; do
     [[ -z "$table" ]] && continue
-    actual="$(psql -X -At -d "$TARGET" -c "SELECT count(*) FROM $table" 2>/dev/null || echo missing)"
+    # psql ویندوز CRLF می‌نویسد؛ با \r مقایسهٔ رشته‌ای همیشه «نابرابر» بود.
+    expected="${expected%$'\r'}"
+    actual="$(psql -X -At -d "$TARGET" -c "SELECT count(*) FROM $table" 2>/dev/null | tr -d '\r')"
+    actual="${actual:-missing}"
     checked=$((checked + 1))
     if [[ "$actual" != "$expected" ]]; then
       echo "   ✗ $table: پشتیبان $expected، بازیابی‌شده $actual"

@@ -75,15 +75,17 @@ on_error() {
 trap on_error ERR
 
 echo "۱. شمار ردیف جدول‌ها"
+# فقط جدول عادی (relkind r): نمای مادی مثل user_point_totals هنگام بازیابی
+# با REFRESH از نو ساخته می‌شود و شمارش با نسخهٔ کهنهٔ مبدأ فرق دارد — آزمون
+# بازیابی M7-18 همین را نشان داد.
 psql -X -At -v ON_ERROR_STOP=1 -F $'\t' -c "
-  SELECT format('%I.%I', schemaname, relname), n
-  FROM (
-    SELECT schemaname, relname,
-           (xpath('/row/c/text()', query_to_xml(
-              format('SELECT count(*) AS c FROM %I.%I', schemaname, relname),
-              false, true, '')))[1]::text::bigint AS n
-    FROM pg_stat_user_tables
-  ) t ORDER BY 1" >"$DEST_DIR/$NAME.counts.tsv"
+  SELECT format('%I.%I', n.nspname, c.relname),
+         (xpath('/row/c/text()', query_to_xml(
+            format('SELECT count(*) AS c FROM %I.%I', n.nspname, c.relname),
+            false, true, '')))[1]::text::bigint
+  FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE c.relkind = 'r' AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+  ORDER BY 1" | tr -d '\r' >"$DEST_DIR/$NAME.counts.tsv"
 
 echo "۲. pg_dump → $DUMP"
 # فشرده‌سازی سطح ۶: ۹ برای دیتابیس چندصد مگابایتی دو برابر کندتر است و

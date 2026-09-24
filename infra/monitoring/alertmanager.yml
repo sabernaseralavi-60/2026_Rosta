@@ -1,0 +1,47 @@
+# SILP — Alertmanager — NFR-15، M7-17
+#
+# رازها در این فایل نیستند: رمز SMTP و توکن ربات از infra/monitoring/secrets/
+# (خارج از git) خوانده می‌شوند. نشانی‌ها را پیش از استقرار عوض کنید —
+# فهرست بررسی در docs/ops/runbook.md.
+#
+# ایمیل کانال اصلی است. تلگرام در ایران فیلتر است؛ اگر پروکسی خروجی دارید،
+# گیرندهٔ telegram را فعال کنید. بحرانی هر ۱ ساعت تکرار می‌شود، هشدار هر ۶ ساعت.
+
+global:
+  smtp_smarthost: "smtp.example.ir:587"
+  smtp_from: "alerts@silp.ir"
+  smtp_auth_username: "alerts@silp.ir"
+  smtp_auth_password_file: /etc/alertmanager/secrets/smtp_password
+  smtp_require_tls: true
+
+route:
+  receiver: ops-email
+  group_by: [alertname, kind, job]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 6h
+  routes:
+    - matchers: [severity="critical"]
+      receiver: ops-critical
+      repeat_interval: 1h
+
+inhibit_rules:
+  # API که پایین است، هشدار کندی و خطای همان API نویز است.
+  - source_matchers: [alertname="ApiDown"]
+    target_matchers: [alertname=~"HighErrorRate|SlowResponses|QuizAnswerSaveSlow"]
+
+receivers:
+  - name: ops-email
+    email_configs:
+      - to: "ops@silp.ir"
+        send_resolved: true
+
+  - name: ops-critical
+    email_configs:
+      - to: "ops@silp.ir"
+        send_resolved: true
+    # telegram_configs:
+    #   - bot_token_file: /etc/alertmanager/secrets/telegram_bot_token
+    #     chat_id: -1000000000000
+    #     api_url: https://api.telegram.org
+    #     parse_mode: ""

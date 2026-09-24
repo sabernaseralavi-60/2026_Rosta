@@ -1,0 +1,14 @@
+# هدرهای امنیتی — NFR-03، M7-17. در هر location که خودش add_header دارد
+# دوباره include می‌شود (قاعدهٔ ارث‌بری add_header در nginx).
+#
+# CSP: script-src شامل 'unsafe-inline' است. App Router در Next.js دادهٔ RSC
+# را با اسکریپت درون‌خطی (self.__next_f.push) می‌فرستد و nonce را فقط با
+# رندر پویای همهٔ صفحه‌ها می‌پذیرد؛ نسخهٔ پیش از M7-17 با
+# `'nonce-$request_id'` هیدریت را در تولید کامل می‌شکست (ADR-0018). بقیهٔ
+# دستورها سخت‌اند: هیچ منبع بیرونی جز فضای ذخیره‌سازی، frame-ancestors none.
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-Frame-Options "DENY" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=(self)" always;
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: ${SILP_S3_ORIGIN}; font-src 'self'; connect-src 'self' ${SILP_S3_ORIGIN}; media-src 'self' ${SILP_S3_ORIGIN}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'" always;

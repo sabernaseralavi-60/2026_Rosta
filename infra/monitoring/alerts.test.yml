@@ -1,0 +1,110 @@
+# آزمون واحد قواعد هشدار — promtool test rules infra/monitoring/alerts.test.yml
+# هشداری که هرگز در آزمون نسوخته، معلوم نیست در حادثه بسوزد.
+rule_files:
+  - alerts.yml
+
+evaluation_interval: 30s
+
+tests:
+  # ۲٪ خطا با ترافیک کافی ⇒ بحرانی
+  - interval: 30s
+    input_series:
+      - series: 'http_request_duration_seconds_count{route="/api/v1/projects",method="GET",status="200"}'
+        values: '0+60x20'
+      - series: 'http_request_duration_seconds_count{route="/api/v1/projects",method="GET",status="500"}'
+        values: '0+2x20'
+    alert_rule_test:
+      - eval_time: 9m
+        alertname: HighErrorRate
+        exp_alerts:
+          - exp_labels: { severity: critical }
+            exp_annotations:
+              summary: "نرخ خطای ۵xx بالای ۱٪ است"
+              description: "3.226% درخواست‌ها در ۵ دقیقهٔ اخیر ۵xx گرفتند."
+
+  # یک خطا در ترافیک شبانهٔ ناچیز ⇒ هیچ هشداری
+  - interval: 1m
+    input_series:
+      - series: 'http_request_duration_seconds_count{route="/api/v1/me",method="GET",status="200"}'
+        values: '0+1x20'
+      - series: 'http_request_duration_seconds_count{route="/api/v1/me",method="GET",status="500"}'
+        values: '0+1x20'
+    alert_rule_test:
+      - eval_time: 15m
+        alertname: HighErrorRate
+        exp_alerts: []
+
+  # یازده پیام DEAD در یک ساعت ⇒ هشدار؛ ده ⇒ نه
+  - interval: 5m
+    input_series:
+      - series: 'outbox_queue_depth{channel="SMS",status="DEAD"}'
+        values: '0 0 0 0 0 0 1 3 5 7 9 11 11'
+      - series: 'outbox_queue_depth{channel="EMAIL",status="DEAD"}'
+        values: '4 4 4 4 4 4 4 4 4 4 4 4 4'
+    alert_rule_test:
+      - eval_time: 60m
+        alertname: OutboxDeadLetters
+        exp_alerts:
+          - exp_labels: { severity: warning }
+            exp_annotations:
+              summary: "بیش از ۱۰ پیام در ساعت گذشته DEAD شد"
+              description: "کانال مقصد را در /admin/notifications ببینید."
+
+  # یک شکست close_expired_attempts ⇒ بحرانی فوری
+  - interval: 1m
+    input_series:
+      - series: 'background_job_failures_total{task="close_expired_attempts",instance="w1"}'
+        values: '0 0 0 1 1'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: CloseExpiredAttemptsFailed
+        exp_alerts:
+          - exp_labels: { severity: critical }
+            exp_annotations:
+              summary: "بستن خودکار آزمون‌های منقضی شکست خورد"
+
+  # پشتیبان دیشب شکست خورد ⇒ بحرانی؛ پشتیبان پایه سالم ⇒ فقط logical
+  - interval: 1m
+    input_series:
+      - series: 'silp_backup_last_run_ok{kind="logical"}'
+        values: '1 1 0 0'
+      - series: 'silp_backup_last_run_ok{kind="base"}'
+        values: '1 1 1 1'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: BackupFailed
+        exp_alerts:
+          - exp_labels: { severity: critical, kind: logical }
+            exp_annotations:
+              summary: "پشتیبان‌گیری logical شکست خورد"
+
+  # آخرین پشتیبان موفق ۲۷ ساعت پیش ⇒ بحرانی، حتی بدون هیچ «شکست» ثبت‌شده
+  - interval: 1h
+    input_series:
+      - series: 'silp_backup_last_success_timestamp_seconds{kind="logical"}'
+        values: '0x30'
+    alert_rule_test:
+      - eval_time: 27h
+        alertname: BackupStale
+        exp_alerts:
+          - exp_labels: { severity: critical, kind: logical }
+            exp_annotations:
+              summary: "آخرین پشتیبان logical قدیمی‌تر از ۲۶ ساعت است"
+      - eval_time: 25h
+        alertname: BackupStale
+        exp_alerts: []
+
+  # دیسک ۸۵٪ پر ⇒ هشدار
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{mountpoint="/",fstype="ext4"}'
+        values: '15x20'
+      - series: 'node_filesystem_size_bytes{mountpoint="/",fstype="ext4"}'
+        values: '100x20'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: DiskAlmostFull
+        exp_alerts:
+          - exp_labels: { severity: warning, mountpoint: "/", fstype: ext4 }
+            exp_annotations:
+              summary: "دیسک / بیش از ۸۰٪ پر است"

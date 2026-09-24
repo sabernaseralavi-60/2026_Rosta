@@ -32,6 +32,8 @@ next-env.d.ts
 playwright-report/
 test-results/
 .playwright/
+# توکن نشست تست‌های e2e (global-setup.ts)
+apps/web/tests/e2e/.auth/
 # قلم در زمان ساخت دریافت می‌شود (§10.3، apps/web/scripts/fetch-fonts.mjs)
 apps/web/public/fonts/*.woff2
 apps/web/public/fonts/*.woff
@@ -44,3 +46,8 @@ Courses/**
 !Courses/**/
 !Courses/**/course.yml
 !Courses/README.md
+
+# ── تولید (M7-17) ───────────────────────────────────────────────────
+# نسخهٔ جاری و قبلی استقرار (deploy.sh)، و رازهای Prometheus و Alertmanager
+.deploy/
+infra/monitoring/secrets/
