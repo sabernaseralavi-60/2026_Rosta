@@ -10,6 +10,7 @@
 | `GET /teach/dashboard` | §5.11، FR-DASH-02، M5-11 |
 | `GET /teach/offerings/{id}/learning-scores` | §9.6 «دفتر نمره» |
 | `/admin/point-rules…`، `/admin/point-entries/{id}/reverse` | §5.12، FR-GAM-02، M5-08 |
+| `GET /admin/users/{id}/points` | §9.9 — دفتر کلِ کاربر برای اصلاح |
 
 داشبورد و دفتر امتیاز فقط دادهٔ **خودِ** کاربر را برمی‌گردانند و شناسهٔ
 کاربر هرگز از ورودی خوانده نمی‌شود — پس «امتیاز دیگری را ببین» حتی با
@@ -25,6 +26,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from silp.core.exceptions import NotFound
 from silp.core.permissions import CurrentUser, Permission, Role, ScopeType
 from silp.domain import audit
 from silp.domain.gamification.learning_score import COMPONENT_TITLE_FA
@@ -37,6 +39,7 @@ from silp.models.gamification import (
     PointEntry,
     UserBadge,
 )
+from silp.models.identity import User
 from silp.routers.deps import CurrentUserDep, SessionDep, offering_from_path, require
 from silp.schemas.common import ErrorResponse
 from silp.schemas.gamification import (
@@ -580,6 +583,30 @@ async def recalculate_points(
     )
 
 
+@admin_router.get(
+    "/users/{user_id}/points",
+    response_model=PointLedgerOut,
+    summary="دفتر کل امتیاز یک کاربر، برای اصلاح",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def user_points(
+    user_id: uuid.UUID,
+    session: SessionDep,
+    # همان مجوزِ اصلاح: دیدن دفتر کل دیگران فقط برای کسی است که می‌تواند
+    # آن را اصلاح کند — استاد امتیاز دستی می‌دهد ولی دفتر دیگران را نمی‌خواند.
+    _: Annotated[CurrentUser, Depends(require(Permission.POINTS_RECALCULATE))],
+    category: PointCategory | None = None,
+    cursor: uuid.UUID | None = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 30,
+) -> PointLedgerOut:
+    if await session.get(User, user_id) is None:
+        raise NotFound("این کاربر پیدا نشد.")
+    entries, next_cursor = await PointsService(session).ledger(
+        user_id, category=category, before=cursor, limit=limit
+    )
+    return PointLedgerOut(items=await entries_out(session, entries), next_cursor=next_cursor)
+
+
 @admin_router.post(
     "/point-entries/{entry_id}/reverse",
     response_model=PointEntryOut,
@@ -595,7 +622,11 @@ async def reverse_point_entry(
     # و آن سراسری است — پس با آن، هر استادی امتیاز هر دانشجویی را صفر می‌کرد.
     actor: Annotated[CurrentUser, Depends(require(Permission.POINTS_RECALCULATE))],
 ) -> PointEntryOut:
-    reversal = await PointsService(session).reverse_by_id(entry_id, payload.reason, actor=actor)
+    points = PointsService(session)
+    reversal = await points.reverse_by_id(entry_id, payload.reason, actor=actor)
+    await session.commit()
+    # مثل بازمحاسبه: جدول رتبه‌بندی تا اجرای زمان‌بند بعدی کهنه نماند.
+    await points.refresh_totals()
     await session.commit()
     return (await entries_out(session, [reversal]))[0]
 

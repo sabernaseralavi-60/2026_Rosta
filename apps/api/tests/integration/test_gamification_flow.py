@@ -650,6 +650,61 @@ async def test_students_cannot_touch_point_rules(client: Any, db_session: Any) -
     assert response.status_code == 403
 
 
+async def test_admin_reads_a_users_ledger_and_reverses_one_entry(
+    client: Any, db_session: Any
+) -> None:
+    """§9.9 — مدیر دفتر کل کاربر را می‌بیند و ردیف را با رکورد معکوس اصلاح می‌کند."""
+    from silp.services.points_service import Award, PointsService
+
+    admin_token = await login(client, "09121500111")
+    await grant_role(db_session, (await me(client, admin_token))["id"], "ADMIN")
+    admin_token = await login(client, "09121500111")
+
+    user = await _user(db_session, "09121500112")
+    entry = await PointsService(db_session).award(
+        user.id, Award("QUIZ_ATTEMPTED", "QUIZ", uuid.uuid4())
+    )
+    assert entry is not None
+
+    url = f"/api/v1/admin/users/{user.id}/points"
+    response = await client.get(url, headers=auth(admin_token))
+    assert response.status_code == 200, response.text
+    [row] = response.json()["items"]
+    assert (row["id"], row["is_reversed"]) == (str(entry.id), False)
+
+    response = await client.post(
+        f"/api/v1/admin/point-entries/{entry.id}/reverse",
+        headers=auth(admin_token),
+        json={"reason": "ثبت اشتباه"},
+    )
+    assert response.status_code == 201, response.text
+
+    items = (await client.get(url, headers=auth(admin_token))).json()["items"]
+    assert [(i["reverses_id"], i["is_reversed"]) for i in items] == [
+        (str(entry.id), False),
+        (None, True),
+    ]  # اصلاح، سپس اصلیِ خط‌خورده — هیچ ردیفی پاک نشد.
+
+
+async def test_only_point_admins_read_another_users_ledger(client: Any, db_session: Any) -> None:
+    admin_token = await login(client, "09121500121")
+    await grant_role(db_session, (await me(client, admin_token))["id"], "ADMIN")
+    admin_token = await login(client, "09121500121")
+    target = await _user(db_session, "09121500122")
+    url = f"/api/v1/admin/users/{target.id}/points"
+
+    # دانشجو و استاد (که امتیاز دستی می‌دهد) دفتر دیگران را نمی‌خوانند.
+    for phone, role in (("09121500123", None), ("09121500124", "INSTRUCTOR")):
+        token = await login(client, phone)
+        if role:
+            await grant_role(db_session, (await me(client, token))["id"], role)
+            token = await login(client, phone)
+        assert (await client.get(url, headers=auth(token))).status_code == 403
+
+    missing = f"/api/v1/admin/users/{uuid.uuid4()}/points"
+    assert (await client.get(missing, headers=auth(admin_token))).status_code == 404
+
+
 async def test_milestone_due_soon_becomes_the_next_step(client: Any, db_session: Any) -> None:
     lead_token, _ = await _actor(client, db_session, "09121500091", first_name="مدیر")
     project_id = await _published_project(client, db_session, lead_token)
