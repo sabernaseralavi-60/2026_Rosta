@@ -380,6 +380,7 @@ Authorization: Bearer <access_token>
 | `POST/PUT/DELETE` | `/teach/quizzes/{id}/questions[/{qid}]` | ویرایشگر سؤال |
 | `POST` | `/teach/quizzes/{id}/questions/reorder` | ترتیب سؤال‌ها |
 | `GET/POST` | `/teach/question-bank` | بانک سؤال |
+| `PUT/DELETE` | `/teach/question-bank/{id}` | ویرایش کامل یا حذف نرم — فقط صاحبش، آزمون کپی‌شده تکان نمی‌خورد (ADR-0021) |
 | `POST` | `/teach/quizzes/{id}/questions/from-bank` · `/random` | کپی و انتخاب تصادفی |
 | `GET` | `/teach/quizzes/{id}/attempts` | تلاش‌های این آزمون |
 | `GET` | `/teach/quizzes/{id}/grading-queue` | صف تصحیح، **بر اساس سؤال** |
@@ -733,6 +734,7 @@ Authorization: Bearer <access_token>
 | `GET` | `/teach/offerings/{id}/learning-scores` | نمرهٔ یادگیری و نمرهٔ پیشنهادی (`LS × 0.2`) همهٔ دانشجویان — فقط خواندنی |
 | `PATCH` | `/teach/enrollments/{id}/grade` | ثبت نمرهٔ نهایی (ثبت‌نام در انتظار ۴۲۲) |
 | `POST` | `/teach/offerings/{id}/announcements` | انتشار اعلان درس |
+| `PATCH/DELETE` | `/teach/offerings/{id}/announcements/{id}` | ویرایش یا حذف — نویسنده یا مدیر ارائه؛ ویرایش دوباره نمی‌فرستد، بازنویسی می‌کند (ADR-0021) |
 
 آزمون، سؤال، بانک، تصحیح و اعتراض در §5.6 («ناحیهٔ استاد») آمده‌اند. خروجی
 Excel دفتر نمره در کلاینت از همین پاسخ ساخته می‌شود (CSV با BOM)؛ صف واحد

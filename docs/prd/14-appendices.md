@@ -315,6 +315,8 @@ INSERT INTO point_rules (code, title_fa, category, base_points, daily_cap, term_
 | `QUIZ_OPENED` | IN_APP | `آزمون «{{quiz}}» باز شد. مهلت: {{closes_at}}` |
 | `QUIZ_RESULT` | IN_APP | `نتیجهٔ «{{quiz}}»: {{score}} از {{total}}` |
 | `WEEK_PUBLISHED` | IN_APP | `محتوای هفتهٔ {{week}} درس «{{course}}» منتشر شد.` |
+| `OFFERING_ASSIGNED` | IN_APP | `ارائهٔ «{{course}}» در {{term}} به تو سپرده شد.` (ADR-0021) |
+| `OFFERING_REASSIGNED` | IN_APP | `ارائهٔ «{{course}}» در {{term}} به {{instructor}} سپرده شد و دسترسی تو بسته شد.` (ADR-0021) |
 | `BADGE_AWARDED` | IN_APP | `نشان «{{badge}}» را گرفتی!` |
 | `LEVEL_UP` | IN_APP | `به سطح {{level}} رسیدی: {{title}}` |
 | `PROJECT_STALLED` | IN_APP | `پروژهٔ «{{project}}» {{days}} روز است بی‌تحرک مانده.` |
