@@ -205,12 +205,19 @@ async def seed_plans(session: AsyncSession) -> tuple[int, int]:
 
 
 async def seed_offerings(
-    session: AsyncSession, *, instructor_id: uuid.UUID, courses_root: Path
+    session: AsyncSession,
+    *,
+    instructor_id: uuid.UUID,
+    courses_root: Path,
+    publish_weeks: int = PUBLISHED_WEEKS,
 ) -> tuple[int, int]:
     """ارائهٔ نیم‌سال جاری برای هر درسی که در پایگاه‌داده هست.
 
     درسی که هنوز همگام نشده، ارائه هم نمی‌گیرد — و این درست است: ارائهٔ
     بی‌درس معنا ندارد.
+
+    `publish_weeks=0` هیچ هفته‌ای را منتشر نمی‌کند: در تولید، انتشار
+    تصمیم استاد است، نه اسکریپت (`seed_launch`، ADR-0018).
     """
     term = await session.scalar(select(Term).where(Term.is_current.is_(True)))
     if term is None:
@@ -263,13 +270,16 @@ async def seed_offerings(
         syllabus = manifests.get(spec.course_slug)
         if syllabus is not None:
             await apply_syllabus(session, offering_id=offering.id, manifest=syllabus)
-            await _publish_first_weeks(session, offering.id)
+            if publish_weeks > 0:
+                await _publish_first_weeks(session, offering.id, publish_weeks)
 
     await session.flush()
     return created, existing
 
 
-async def _publish_first_weeks(session: AsyncSession, offering_id: uuid.UUID) -> None:
+async def _publish_first_weeks(
+    session: AsyncSession, offering_id: uuid.UUID, weeks_to_publish: int
+) -> None:
     """چند هفتهٔ اول را منتشر می‌کند تا کلاس در توسعه خالی نباشد."""
     from datetime import UTC, datetime
 
@@ -277,7 +287,7 @@ async def _publish_first_weeks(session: AsyncSession, offering_id: uuid.UUID) ->
         select(CourseWeek)
         .where(
             CourseWeek.offering_id == offering_id,
-            CourseWeek.week_number <= PUBLISHED_WEEKS,
+            CourseWeek.week_number <= weeks_to_publish,
             CourseWeek.status == "DRAFT",
         )
         .order_by(CourseWeek.week_number)

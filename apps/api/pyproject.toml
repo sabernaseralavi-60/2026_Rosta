@@ -23,6 +23,8 @@ dependencies = [
   "python-multipart>=0.0.12,<0.1",
   # ADR-0008 — مانیفست پوشهٔ درس (`course.yml`).
   "pyyaml>=6.0.2,<7",
+  # M7-17 — معیارهای /metrics و کارگر (NFR-14).
+  "prometheus-client>=0.21,<1",
 ]
 
 [project.optional-dependencies]

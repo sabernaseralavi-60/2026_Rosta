@@ -5,6 +5,7 @@
 * ``/health``        زنده‌ام؟ — برای healthcheck داکر. هرگز به I/O دست نمی‌زند.
 * ``/health/ready``  آماده‌ام؟ — دیتابیس و Redis بررسی می‌شوند.
 * ``/health/live``   همان ``/health``، با نام متعارف Kubernetes.
+* ``/metrics``       معیارهای Prometheus (NFR-14، M7-17) — فقط شبکهٔ داخلی.
 
 تفکیک مهم است: اگر دیتابیس قطع شود، کانتینر نباید بازراه‌اندازی شود؛
 باید ترافیک نگیرد ولی زنده بماند تا وقتی دیتابیس برگشت، بی‌درنگ ادامه دهد.
@@ -12,9 +13,13 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Response, status
+import hmac
+
+from fastapi import APIRouter, Request, Response, status
+from prometheus_client import CONTENT_TYPE_LATEST
 from sqlalchemy import text
 
+from silp.core import metrics
 from silp.core import redis as redis_core
 from silp.core.logging import get_logger
 from silp.routers.deps import SessionDep, SettingsDep
@@ -74,6 +79,22 @@ async def ready(
         version=VERSION,
         checks=checks,
     )
+
+
+@router.get("/metrics", summary="معیارهای Prometheus")
+async def prometheus_metrics(
+    request: Request, settings: SettingsDep, session: SessionDep
+) -> Response:
+    """قالب متنی Prometheus. توکن تنظیم‌شده ⇒ بدون Bearer درست، ۴۰۴.
+
+    ۴۰۴ و نه ۴۰۱: وجود این مسیر لازم نیست برای بیرون معلوم باشد.
+    """
+    if settings.metrics_token:
+        supplied = request.headers.get("Authorization", "").removeprefix("Bearer ").strip()
+        if not hmac.compare_digest(supplied, settings.metrics_token):
+            return Response(status_code=status.HTTP_404_NOT_FOUND)
+    body = await metrics.render(session)
+    return Response(content=body, media_type=CONTENT_TYPE_LATEST)
 
 
 __all__ = ["router"]

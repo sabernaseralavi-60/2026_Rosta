@@ -22,6 +22,7 @@ from silp.core.logging import (
     user_agent_var,
     user_id_var,
 )
+from silp.core.metrics import UNMATCHED_ROUTE, observe_request
 
 log = get_logger("silp.request")
 
@@ -67,14 +68,18 @@ class RequestLogMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestHandler) -> Response:
         started = time.perf_counter()
         response = await call_next(request)
-        duration_ms = round((time.perf_counter() - started) * 1000, 2)
+        elapsed = time.perf_counter() - started
+        duration_ms = round(elapsed * 1000, 2)
 
         path = request.url.path
         if path in QUIET_PATHS:
             return response
 
         # الگوی مسیر (نه مقدار واقعی پارامتر) تا کاردینالیتی لاگ منفجر نشود.
-        route = getattr(request.scope.get("route"), "path", path)
+        template = getattr(request.scope.get("route"), "path", None)
+        route = template or path
+        # در معیار، مسیرِ پیدانشده یک برچسب ثابت است، نه مسیر خام (NFR-14).
+        observe_request(template or UNMATCHED_ROUTE, request.method, response.status_code, elapsed)
         log.info(
             "http_request",
             route=route,

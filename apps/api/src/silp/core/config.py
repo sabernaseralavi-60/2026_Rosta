@@ -119,6 +119,11 @@ class Settings(BaseSettings):
     # ── رصد ────────────────────────────────────────────────────────────
     sentry_dsn: str = ""
     otel_exporter_otlp_endpoint: str = ""
+    # M7-17 — `/metrics` فقط از شبکهٔ داخلی خراشیده می‌شود؛ اگر این تنظیم
+    # باشد، Bearer همین مقدار را هم می‌خواهد (دفاع لایهٔ دوم).
+    metrics_token: str = ""
+    # کارگر ARQ پورت HTTP ندارد؛ معیارهایش را روی این پورت می‌دهد. ۰ یعنی خاموش.
+    worker_metrics_port: Annotated[int, Field(ge=0, le=65535)] = 9101
 
     # ── محصول ──────────────────────────────────────────────────────────
     frontend_url: str = "http://localhost:3000"
@@ -206,6 +211,9 @@ class Settings(BaseSettings):
             )
         if self.eitaa_provider == "eitaayar" and not self.eitaa_api_token:
             problems.append("EITAA_API_TOKEN برای ایتایار لازم است.")
+        if not self.metrics_token:
+            # /metrics شمار کاربران و عمق صف را نشان می‌دهد (M7-17).
+            problems.append("METRICS_TOKEN در تولید لازم است.")
         if problems:
             raise ValueError(" ".join(problems))
         return self

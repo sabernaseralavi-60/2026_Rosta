@@ -15,9 +15,11 @@ from typing import Any, ClassVar
 
 from arq.connections import RedisSettings
 from arq.cron import cron
+from prometheus_client import start_http_server
 
 from silp.core.config import get_settings
 from silp.core.logging import configure_logging, get_logger
+from silp.core.metrics import timed_job
 from silp.core.redis import close_redis
 from silp.db.session import dispose_engine, session_scope
 from silp.integrations.sms import MemorySMSSender
@@ -38,6 +40,7 @@ from silp.services.topic_service import TopicService
 log = get_logger("silp.worker")
 
 
+@timed_job
 async def purge_expired_otps(ctx: dict[str, Any]) -> int:
     """NFR-01 — OTP پس از ۲۴ ساعت فیزیکی حذف می‌شود.
 
@@ -53,6 +56,7 @@ async def purge_expired_otps(ctx: dict[str, Any]) -> int:
     return removed
 
 
+@timed_job
 async def purge_expired_tokens(ctx: dict[str, Any]) -> int:
     """حذف توکن‌های مدت‌ها منقضی. یک هفته برای حسابرسی نگه داشته می‌شوند."""
     settings = get_settings()
@@ -62,6 +66,7 @@ async def purge_expired_tokens(ctx: dict[str, Any]) -> int:
     return removed
 
 
+@timed_job
 async def close_expired_attempts(ctx: dict[str, Any]) -> int:
     """بستن خودکار تلاش‌های منقضی — §7.11، §7.3 قاعدهٔ ۲.
 
@@ -80,6 +85,7 @@ async def close_expired_attempts(ctx: dict[str, Any]) -> int:
     return closed
 
 
+@timed_job
 async def refresh_point_totals(ctx: dict[str, Any]) -> None:
     """§7.11 — نمای تجمیعی جدول رتبه‌بندی. `CONCURRENTLY`: خواندن را قفل نمی‌کند."""
     async with session_scope() as session:
@@ -87,6 +93,7 @@ async def refresh_point_totals(ctx: dict[str, Any]) -> None:
         await session.commit()
 
 
+@timed_job
 async def evaluate_badges(ctx: dict[str, Any]) -> int:
     """§9.5 — نشان‌های کاربرانی که اخیراً امتیاز گرفته‌اند. خارج از مسیر درخواست."""
     async with session_scope() as session:
@@ -96,18 +103,21 @@ async def evaluate_badges(ctx: dict[str, Any]) -> int:
     return awarded
 
 
+@timed_job
 async def evaluate_all_badges(ctx: dict[str, Any]) -> int:
     """جارو کردن شبانهٔ همهٔ کاربران — جاماندهٔ زمان خرابی کارگر را می‌گیرد."""
     async with session_scope() as session:
         return await BadgeService(session).evaluate_recent(all_users=True)
 
 
+@timed_job
 async def release_quiz_points(ctx: dict[str, Any]) -> int:
     """امتیاز آزمون‌های «نتیجه پس از پایان» که تازه بسته شده‌اند — ADR-0012."""
     async with session_scope() as session:
         return await LearningPoints(session).release_closed_quizzes()
 
 
+@timed_job
 async def compute_project_health(ctx: dict[str, Any]) -> int:
     """§7.4 — شاخص سلامت روزانهٔ پروژه‌های در جریان."""
     async with session_scope() as session:
@@ -116,6 +126,7 @@ async def compute_project_health(ctx: dict[str, Any]) -> int:
     return changed
 
 
+@timed_job
 async def dispatch_outbox(ctx: dict[str, Any]) -> int:
     """§7.10 — هر ۵ ثانیه. `SKIP LOCKED`: چند کارگر هم‌زمان با هم تداخل ندارند."""
     async with session_scope() as session:
@@ -123,6 +134,7 @@ async def dispatch_outbox(ctx: dict[str, Any]) -> int:
     return stats.sent
 
 
+@timed_job
 async def send_deadline_reminders(ctx: dict[str, Any]) -> int:
     """§7.11 — یادآوری مهلت‌های ۳ و ۱ روزه. بی‌اثر در تکرار (`dedup_key`)."""
     async with session_scope() as session:
@@ -130,6 +142,7 @@ async def send_deadline_reminders(ctx: dict[str, Any]) -> int:
     return stats.milestones + stats.quizzes
 
 
+@timed_job
 async def weekly_digest(ctx: dict[str, Any]) -> int:
     """§7.11 — خلاصهٔ هفتگی دانشجو و استاد. بی‌اثر در تکرار."""
     async with session_scope() as session:
@@ -137,6 +150,7 @@ async def weekly_digest(ctx: dict[str, Any]) -> int:
     return stats.students + stats.teachers
 
 
+@timed_job
 async def publish_scheduled_weeks(ctx: dict[str, Any]) -> int:
     """§7.11، FR-EDU-02 — هفته‌هایی که زمان انتشارشان رسیده. اعلان هم همین‌جا."""
     published = 0
@@ -150,6 +164,7 @@ async def publish_scheduled_weeks(ctx: dict[str, Any]) -> int:
     return published
 
 
+@timed_job
 async def cleanup_notifications(ctx: dict[str, Any]) -> None:
     """§4.12 — آرشیو اعلان خوانده‌شدهٔ ۹۰ روزه، حذف پیام ارسال‌شدهٔ ۳۰ روزه."""
     async with session_scope() as session:
@@ -157,6 +172,7 @@ async def cleanup_notifications(ctx: dict[str, Any]) -> None:
     log.info("notifications_cleaned", archived=archived, outbox_purged=purged)
 
 
+@timed_job
 async def release_stale_topics(ctx: dict[str, Any]) -> int:
     """§7.11، FR-RES-03 — هشدار روز ۲۵ و آزادسازی رزرو ۳۰ روز بی‌تحرک."""
     async with session_scope() as session:
@@ -164,6 +180,7 @@ async def release_stale_topics(ctx: dict[str, Any]) -> int:
     return stats.released
 
 
+@timed_job
 async def expire_team_openings(ctx: dict[str, Any]) -> int:
     """§7.11 — آگهی‌دهندهٔ آگهی تازه‌منقضی خبردار می‌شود تا تمدیدش کند.
 
@@ -179,7 +196,16 @@ async def startup(ctx: dict[str, Any]) -> None:
         settings.log_level,
         renderer="console" if settings.is_development else "json",
     )
-    log.info("worker_starting", environment=settings.environment)
+    # M7-17 — کارگر پورت HTTP ندارد؛ Prometheus مدت، شکست و آخرین موفقیت
+    # هر کار را از همین پورت می‌خواند. هشدار «شکست close_expired_attempts»
+    # (NFR-15) بدون آن کور است.
+    if settings.worker_metrics_port:
+        start_http_server(settings.worker_metrics_port)
+    log.info(
+        "worker_starting",
+        environment=settings.environment,
+        metrics_port=settings.worker_metrics_port,
+    )
 
 
 async def shutdown(ctx: dict[str, Any]) -> None:
