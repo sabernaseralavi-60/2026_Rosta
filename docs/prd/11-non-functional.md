@@ -42,8 +42,16 @@ add_header X-Content-Type-Options "nosniff" always;
 add_header X-Frame-Options "DENY" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 add_header Permissions-Policy "camera=(), microphone=(), geolocation=(self)" always;
-add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'nonce-$req_id'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn.silp.ir; font-src 'self'; connect-src 'self' https://api.silp.ir; frame-ancestors 'none'; base-uri 'self'" always;
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: ${SILP_S3_ORIGIN}; font-src 'self'; connect-src 'self' ${SILP_S3_ORIGIN}; media-src 'self' ${SILP_S3_ORIGIN}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'" always;
 ```
+
+**M7-17 (ADR-0018):** نسخهٔ پیشین `script-src 'nonce-…'` بود؛ App Router دادهٔ
+RSC را با اسکریپت درون‌خطی بی‌nonce می‌فرستد و پشت nginx واقعی فرم ورود اصلاً
+ساخته نمی‌شد. nonce در Next فقط با رندر پویای همهٔ صفحه‌ها ممکن است؛
+`'unsafe-inline'` برای script پذیرفته شد و هیچ جای برنامه HTML کاربر را خام
+رندر نمی‌کند. `connect-src` مبدأ فضای ذخیره‌سازی را دارد (بارگذاری مستقیم
+مرورگر به S3). هدرها در `infra/nginx/templates/security-headers.inc.template`اند
+و در هر location که خودش `add_header` دارد دوباره include می‌شوند.
 
 ### NFR-04 · مدیریت اسرار
 
@@ -129,6 +137,13 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'nonce
 **الزام حیاتی:** آزمون بازیابی **ماهانه**. پشتیبانی که بازیابی‌اش آزمایش نشده،
 پشتیبان نیست. نتیجهٔ هر آزمون در `docs/ops/restore-drills.md` ثبت می‌شود.
 
+**پیاده‌سازی (M7-17، M7-18):** کانتینر `backup` از ایمیج `postgres:16` (نه ایمیج
+API که `pg_dump` ۱۵ دارد)؛ «کامل روزانه» دو پشتیبان است: منطقی (`pg_dump`، با
+sha256 و شمار ردیف جدول‌ها) و پایهٔ فیزیکی (`pg_basebackup`) که بازیابی نقطه‌ای
+با WAL بدون آن ممکن نیست. `archive_timeout = 900` تا RPO در ساعت کم‌ترافیک هم
+۱۵ دقیقه بماند. رویه‌ها در `docs/ops/runbook.md`؛ اولین آزمون (منطقی و نقطه‌ای)
+در `restore-drills.md`.
+
 ### NFR-11 · تاب‌آوری
 
 | سناریو | رفتار مورد انتظار |
@@ -176,9 +191,18 @@ db_query_duration_seconds{operation}
 outbox_queue_depth{channel, status}
 outbox_delivery_total{channel, result}
 cache_hit_ratio{key_prefix}
-background_job_duration_seconds{job}
-background_job_failures_total{job}
+background_job_duration_seconds{task}
+background_job_failures_total{task}
+silp_background_job_last_success_timestamp_seconds{task}
 ```
+
+**M7-17 (ADR-0018):** برچسب کار `task` است نه `job` — `job` برچسب هدف خود
+Prometheus است و برچسب هم‌نام به `exported_job` تغییر نام می‌داد. معیارهای
+کسب‌وکار و صف هنگام خراش از PostgreSQL خوانده می‌شوند (نه شمارندهٔ
+درون‌فرایندی)؛ `cache_hit_ratio` و `db_query_duration_seconds` هنوز ساخته
+نشده‌اند و جای دومی `silp_db_connections{state}` است. `/metrics` در تولید
+`METRICS_TOKEN` می‌خواهد و از nginx عبور نمی‌کند؛ قواعد NFR-15 در
+`infra/monitoring/alerts.yml` با آزمون `promtool`.
 
 ### NFR-15 · هشدار
 

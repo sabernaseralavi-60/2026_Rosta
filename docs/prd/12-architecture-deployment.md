@@ -229,6 +229,13 @@ lint:
 
 ### `compose.prod.yml` — ساختار
 
+> **پیاده‌شده در M7-17** (`infra/docker/compose.prod.yml`، ADR-0018). تفاوت با
+> طرح زیر: پشتیبان‌گیری ایمیج جدا از `postgres:16` دارد (`pg_dump` ایمیج API
+> نسخهٔ ۱۵ است و از سرور ۱۶ پشتیبان نمی‌گیرد)؛ `init-backups` مالکیت حجم
+> `/backups` را می‌دهد؛ `certbot`، `prometheus`، `alertmanager` و `node-exporter`
+> افزوده شدند؛ MinIO پشت profile `minio` است؛ nginx از قالب envsubst می‌خواند
+> (`infra/nginx/templates`). راه‌اندازی و عملیات: `docs/ops/runbook.md`.
+
 ```yaml
 services:
   nginx:
@@ -383,6 +390,14 @@ echo "۵. بررسی سلامت"
 echo "استقرار نسخهٔ $VERSION موفق بود."
 ```
 
+**پیاده‌شده در M7-17:** `deploy.sh` نسخهٔ قبلی را در `.deploy/` نگه می‌دارد تا
+`rollback.sh` بداند به کجا برگردد، و راز خراش `/metrics` را از `.env` برای
+Prometheus می‌نویسد. `healthcheck.sh` سه چیز را می‌سنجد: آمادگی API (دیتابیس)،
+صفحهٔ اصلی و API از لبه، و اجرای موفق `close_expired_attempts` در سه دقیقهٔ
+اخیر. CI کار `infra` دارد: `promtool check/test rules`، `amtool check-config`،
+`nginx -t` روی قالب رندرشده و نحو اسکریپت‌ها. اسکریپت‌ها و `infra/` با
+`.gitattributes` همیشه LF‌اند.
+
 ### قواعد مهاجرت دیتابیس
 
 مهاجرت‌ها **باید با نسخهٔ قبلی کد سازگار باشند** (Expand/Contract):
@@ -456,6 +471,10 @@ DEFAULT_TERM_CODE=1404-2
 QUIET_HOURS_START=23
 QUIET_HOURS_END=8
 ```
+
+**افزوده در M7-17:** `METRICS_TOKEN` (در تولید الزامی)، `WORKER_METRICS_PORT`،
+`SILP_DOMAIN`، `SILP_S3_ORIGIN` (CSP)، و `BACKUP_S3_BUCKET` / `BACKUP_S3_*`
+(باکت پشتیبان، جدا از باکت فایل‌ها). `.env.example` همه را دارد.
 
 **اعتبارسنجی پیکربندی:** اپ در زمان راه‌اندازی همهٔ متغیرها را با Pydantic
 Settings بررسی می‌کند و در صورت نقص، **بالا نمی‌آید**. خطای پیکربندی باید
