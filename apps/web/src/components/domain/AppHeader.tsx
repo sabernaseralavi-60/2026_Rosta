@@ -10,6 +10,7 @@ import { NotificationBell } from '@/components/domain/NotificationBell';
 import { PointsBadge } from '@/components/domain/PointsBadge';
 import { Button } from '@/components/ui/Button';
 import { canSeeAdmin } from '@/lib/api/admin';
+import { canSeeTeach } from '@/lib/api/teach';
 import { logout } from '@/lib/api/auth';
 import {
   clearSession,
@@ -22,8 +23,9 @@ import {
  * هدر اپلیکیشن — §3.7.
  *
  * `[لوگو] [جستجوی سراسری ⌘K] … [امتیاز و سطح] [زنگوله] [آواتار]`. ناوبری
- * عمدی کوتاه است: مقصدهایی که دانشجو هر روز می‌خواهد. پیوند «مدیریت» فقط
- * برای مدیر و پشتیبانی دیده می‌شود؛ سرور هر مسیر را جداگانه می‌سنجد.
+ * عمدی کوتاه است: مقصدهایی که دانشجو هر روز می‌خواهد. پیوند «تدریس» فقط
+ * برای کادر آموزشی و «مدیریت» فقط برای مدیر و پشتیبانی دیده می‌شود؛ سرور
+ * هر مسیر را جداگانه می‌سنجد.
  *
  * مهمان در صفحه‌های ویترین (پروژه‌ها، ایده‌ها، شهر هوشمند، پژوهش) به
  * ورود فرستاده نمی‌شود — دکمهٔ «پروژه‌ها را ببین» صفحهٔ اصلی باید به خود
@@ -117,6 +119,15 @@ export function AppHeader() {
                   {item.label}
                 </Link>
               ))}
+              {canSeeTeach(roles) && (
+                <Link
+                  href="/teach"
+                  aria-current={pathname.startsWith('/teach') ? 'page' : undefined}
+                  className="whitespace-nowrap text-[13.5px] font-medium text-[var(--fg-accent)] hover:underline"
+                >
+                  تدریس
+                </Link>
+              )}
               {canSeeAdmin(roles) && (
                 <Link
                   href="/admin"

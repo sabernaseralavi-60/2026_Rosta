@@ -19,6 +19,8 @@ export interface EmptyStateProps {
   action?: ReactNode;
   illustration?: ReactNode;
   className?: string;
+  /** `h1` وقتی حالت خالی خودِ صفحه است — «دسترسی نداری» و «پیدا نشد» (ADR-0018). */
+  as?: 'h1' | 'h2';
 }
 
 export function EmptyState({
@@ -27,6 +29,7 @@ export function EmptyState({
   action,
   illustration,
   className,
+  as: Heading = 'h2',
 }: EmptyStateProps) {
   return (
     <div
@@ -42,7 +45,7 @@ export function EmptyState({
       <div className="flex flex-col gap-1.5">
         {/* `h2`: حالت خالی جای محتوای اصلی زیر `h1` صفحه می‌نشیند؛ `h3` سطح
             عنوان را می‌پراند (M7-14). */}
-        <h2 className="text-[18px] font-semibold text-[var(--fg-primary)]">{title}</h2>
+        <Heading className="text-[18px] font-semibold text-[var(--fg-primary)]">{title}</Heading>
         {description && (
           <p className="max-w-[46ch] text-[13.5px] text-[var(--fg-secondary)]">{description}</p>
         )}

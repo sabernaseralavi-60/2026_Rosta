@@ -59,7 +59,27 @@ const STUDENT_PAGES = [
   '/onboarding/survey/1',
 ];
 
-const ADMIN_PAGES = ['/admin', '/admin/users', '/admin/audit', '/admin/point-rules'];
+const ADMIN_PAGES = [
+  '/admin',
+  '/admin/users',
+  '/admin/audit',
+  '/admin/point-rules',
+  '/admin/subscriptions',
+];
+
+const TEACH_PAGES = ['/teach', '/teach/offerings', '/teach/quizzes', '/teach/question-bank'];
+
+/** زبانه‌های یک ارائه و یک آزمون — شناسه‌ها از API استاد (ADR-0019). */
+const OFFERING_TABS = [
+  '',
+  '/students',
+  '/attendance',
+  '/grades',
+  '/quizzes',
+  '/announcements',
+  '/settings',
+];
+const QUIZ_TABS = ['/edit', '/grade', '/analytics'];
 
 function sessions(): Record<Role, StoredSession> {
   return JSON.parse(readFileSync(SESSIONS_FILE, 'utf-8')) as Record<Role, StoredSession>;
@@ -126,6 +146,29 @@ for (const scheme of ['light', 'dark'] as const) {
       const page = await openAs(browser, 'student', scheme);
       if (projects.items[0]) await audit(page, `/projects/${projects.items[0].id}`);
       if (ideas.items[0]) await audit(page, `/ideas/${ideas.items[0].id}`);
+    });
+
+    for (const path of TEACH_PAGES) {
+      test(`استاد ${path}`, async ({ browser }) => {
+        await audit(await openAs(browser, 'instructor', scheme), path);
+      });
+    }
+
+    test('استاد — زبانه‌های یک ارائه و یک آزمون', async ({ browser }) => {
+      const headers = { Authorization: `Bearer ${sessions().instructor.access_token}` };
+      const offerings = (await (await fetch(`${API}/teach/offerings`, { headers })).json()) as {
+        id: string;
+      }[];
+      test.skip(!offerings[0], 'استاد نمونه ارائه‌ای ندارد');
+      const offering = offerings[0]!.id;
+      const page = await openAs(browser, 'instructor', scheme);
+      for (const tab of OFFERING_TABS) await audit(page, `/teach/offerings/${offering}${tab}`);
+      const quizzes = (await (
+        await fetch(`${API}/teach/offerings/${offering}/quizzes`, { headers })
+      ).json()) as { id: string }[];
+      if (quizzes[0]) {
+        for (const tab of QUIZ_TABS) await audit(page, `/teach/quizzes/${quizzes[0].id}${tab}`);
+      }
     });
 
     for (const path of ADMIN_PAGES) {

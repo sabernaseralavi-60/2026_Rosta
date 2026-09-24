@@ -8,6 +8,7 @@
 
 import { canSeeAdmin } from './admin';
 import { apiFetch } from './client';
+import { canSeeTeach } from './teach';
 
 export type SearchKind =
   'COURSE' | 'PROJECT' | 'IDEA' | 'VENTURE' | 'TOPIC' | 'PERSON' | 'MATERIAL';
@@ -41,6 +42,8 @@ export interface Command {
   /** واژه‌های دیگری که کاربر ممکن است تایپ کند. */
   keywords: string;
   adminOnly?: boolean;
+  /** فقط برای استاد و دستیار — ADR-0019. */
+  teachOnly?: boolean;
 }
 
 export const COMMANDS: Command[] = [
@@ -83,6 +86,41 @@ export const COMMANDS: Command[] = [
   { id: 'points', label: 'دفتر امتیاز', href: '/me/points', keywords: 'امتیاز سطح' },
   { id: 'leaderboard', label: 'رتبه‌بندی', href: '/leaderboard', keywords: 'رتبه جدول' },
   { id: 'settings', label: 'تنظیمات اعلان', href: '/me/settings', keywords: 'پیامک ایمیل تلگرام' },
+  {
+    id: 'teach',
+    label: 'ناحیهٔ تدریس',
+    href: '/teach',
+    keywords: 'استاد تدریس کلاس',
+    teachOnly: true,
+  },
+  {
+    id: 'teach-offerings',
+    label: 'ارائه‌های من (تدریس)',
+    href: '/teach/offerings',
+    keywords: 'ارائه درس هفته حضور غیاب دفتر نمره',
+    teachOnly: true,
+  },
+  {
+    id: 'teach-quizzes',
+    label: 'آزمون‌ها و تصحیح',
+    href: '/teach/quizzes',
+    keywords: 'آزمون سؤال تصحیح اعتراض',
+    teachOnly: true,
+  },
+  {
+    id: 'teach-bank',
+    label: 'بانک سؤال',
+    href: '/teach/question-bank',
+    keywords: 'سؤال بانک',
+    teachOnly: true,
+  },
+  {
+    id: 'admin-subscriptions',
+    label: 'تأیید اشتراک‌ها',
+    href: '/admin/subscriptions',
+    keywords: 'اشتراک پرداخت فیش',
+    adminOnly: true,
+  },
   { id: 'admin', label: 'پنل مدیریت', href: '/admin', keywords: 'مدیر شاخص', adminOnly: true },
   {
     id: 'admin-users',
@@ -115,7 +153,10 @@ export function normalizeFa(value: string): string {
 
 export function matchCommands(q: string, roles: string[] | undefined | null): Command[] {
   const admin = canSeeAdmin(roles);
-  const visible = COMMANDS.filter((command) => admin || !command.adminOnly);
+  const teach = canSeeTeach(roles);
+  const visible = COMMANDS.filter(
+    (command) => (admin || !command.adminOnly) && (teach || !command.teachOnly),
+  );
   const needle = normalizeFa(q);
   if (!needle) return visible.slice(0, 6);
   return visible.filter((command) =>

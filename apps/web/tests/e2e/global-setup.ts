@@ -17,6 +17,8 @@ import { fileURLToPath } from 'node:url';
 export const ROLES = {
   student: '09120000010',
   admin: '09120000001',
+  // استاد نمونهٔ seed با چهار ارائه — ناحیهٔ استاد، ADR-0019.
+  instructor: '09120000002',
 } as const;
 
 export type Role = keyof typeof ROLES;

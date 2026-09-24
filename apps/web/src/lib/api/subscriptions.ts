@@ -71,3 +71,75 @@ export function cancelSubscription(subscriptionId: string, accessToken: string) 
     accessToken,
   });
 }
+
+// ── پشتیبانی — ADR-0019 ──────────────────────────────────────────────
+export interface AdminSubscription extends Subscription {
+  user_id: string;
+  user_name: string | null;
+  username: string | null;
+  /** کامل برای مدیر، پوشانده برای پشتیبانی. */
+  user_mobile: string | null;
+  note: string | null;
+  created_at: string;
+  granted_by_name: string | null;
+  cancelled_at: string | null;
+}
+
+export const SUBSCRIPTION_STATUS_LABELS: Record<SubscriptionStatus, string> = {
+  PENDING: 'در انتظار تأیید',
+  ACTIVE: 'فعال',
+  EXPIRED: 'منقضی',
+  CANCELLED: 'لغو یا رد شده',
+};
+
+export function fetchAdminSubscriptions(
+  accessToken: string,
+  filters: { status?: SubscriptionStatus; user_id?: string } = {},
+) {
+  const params = new URLSearchParams();
+  if (filters.status) params.set('status', filters.status);
+  if (filters.user_id) params.set('user_id', filters.user_id);
+  const query = params.toString();
+  return apiFetch<AdminSubscription[]>(`/subscriptions/admin${query ? `?${query}` : ''}`, {
+    accessToken,
+  });
+}
+
+/** دوره از لحظهٔ تأیید شمرده می‌شود؛ کد پیگیری الزامی است. */
+export function activateSubscription(
+  subscriptionId: string,
+  paymentRef: string,
+  accessToken: string,
+) {
+  return apiFetch<Subscription>(`/subscriptions/${subscriptionId}/activate`, {
+    method: 'POST',
+    body: { payment_ref: paymentRef },
+    accessToken,
+  });
+}
+
+export function rejectSubscription(subscriptionId: string, reason: string, accessToken: string) {
+  return apiFetch<Subscription>(`/subscriptions/${subscriptionId}/reject`, {
+    method: 'POST',
+    body: { reason },
+    accessToken,
+  });
+}
+
+/** فیش دستی یا هدیه — بی کد پیگیری، علت در یادداشت لازم است. */
+export function grantSubscription(
+  accessToken: string,
+  payload: {
+    user_id: string;
+    plan_code: string;
+    course_slug?: string;
+    payment_ref?: string;
+    note?: string;
+  },
+) {
+  return apiFetch<Subscription>('/subscriptions/grant', {
+    method: 'POST',
+    body: payload,
+    accessToken,
+  });
+}

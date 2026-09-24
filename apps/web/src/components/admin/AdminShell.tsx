@@ -23,6 +23,7 @@ const LINKS: { href: string; label: string; adminOnly?: boolean }[] = [
   { href: '/admin', label: 'شاخص‌های کلان' },
   { href: '/admin/users', label: 'کاربران و نقش‌ها' },
   { href: '/admin/audit', label: 'لاگ حسابرسی' },
+  { href: '/admin/subscriptions', label: 'اشتراک‌ها' },
   { href: '/admin/notifications', label: 'صف ارسال و الگوها' },
   { href: '/admin/point-rules', label: 'قواعد امتیاز', adminOnly: true },
   { href: '/admin/certificates', label: 'گواهی‌ها', adminOnly: true },
@@ -37,6 +38,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   if (!canSeeAdmin(roles)) {
     return (
       <EmptyState
+        as="h1"
         title="این بخش برای مدیر و پشتیبانی است"
         description="اگر باید به پنل مدیریت دسترسی داشته باشی، از مدیر سامانه بخواه نقش «پشتیبانی» یا «مدیر سامانه» را به حسابت بدهد. پس از اعطای نقش، یک بار خارج و دوباره وارد شو."
         action={
