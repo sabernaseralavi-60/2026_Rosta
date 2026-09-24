@@ -57,6 +57,14 @@ PROGRESS_STATUSES = ("NOT_STARTED", "IN_PROGRESS", "COMPLETED")
 ATTENDANCE_STATUSES = ("PRESENT", "ABSENT", "LATE", "EXCUSED")
 ANNOUNCEMENT_PRIORITIES = ("NORMAL", "IMPORTANT", "URGENT")
 
+OFFERING_STATUS_TITLE_FA: dict[str, str] = {
+    "DRAFT": "پیش‌نویس",
+    "OPEN": "باز برای ثبت‌نام",
+    "IN_PROGRESS": "در حال برگزاری",
+    "CLOSED": "پایان‌یافته",
+    "ARCHIVED": "بایگانی",
+}
+
 # ── کتابخانهٔ درس (ADR-0008) ────────────────────────────────────────────
 MATERIAL_KINDS = (
     "BOOK",
@@ -575,6 +583,7 @@ __all__ = [
     "MATERIAL_STATUSES",
     "MAX_WEEK_NUMBER",
     "OFFERING_STATUSES",
+    "OFFERING_STATUS_TITLE_FA",
     "PROGRESS_STATUSES",
     "RESOURCE_KINDS",
     "WEEK_STATUSES",

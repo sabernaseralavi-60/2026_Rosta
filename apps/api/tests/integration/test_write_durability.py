@@ -699,3 +699,103 @@ async def test_public_profile_privacy_survives_the_request(  # type: ignore[no-u
         stored = await verifier.get(Profile, account["user_id"])
         assert stored is not None and stored.is_public, "نیمرخ عمومی commit نشده است"
         assert stored.privacy_settings == {"points": False}
+
+
+async def test_offering_settings_and_attendance_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """ADR-0019 — تنظیمات ارائه و جلسهٔ حضور از ناحیهٔ استاد."""
+    from datetime import date
+
+    from silp.models.education import ClassSession, Course, CourseOffering, Term
+
+    marker = uuid.uuid4().hex[:8]
+    term = Term(
+        code=f"T-{marker}",
+        title_fa="نیم‌سال آزمایشی",
+        starts_on=date(2026, 9, 23),
+        ends_on=date(2027, 2, 4),
+    )
+    course = Course(code=f"C-{marker}", slug=f"course-{marker}", title_fa="برنامه‌ریزی حمل‌ونقل")
+    committing_session.add_all([term, course])
+    await committing_session.flush()
+    offering = CourseOffering(
+        course_id=course.id, term_id=term.id, instructor_id=account["user_id"], status="DRAFT"
+    )
+    committing_session.add(offering)
+    await committing_session.commit()
+    from silp.services import authz
+
+    await authz.invalidate_roles(account["user_id"])
+    try:
+        response = await committing_client.patch(
+            f"/api/v1/teach/offerings/{offering.id}",
+            headers=auth(account),
+            json={"status": "OPEN", "requires_approval": True, "enrollment_code": "ROAD-05"},
+        )
+        assert response.status_code == 200, response.text
+        response = await committing_client.post(
+            f"/api/v1/teach/offerings/{offering.id}/attendance",
+            headers=auth(account),
+            json={"held_on": "2026-10-04", "week_number": 2, "entries": []},
+        )
+        assert response.status_code == 200, response.text
+
+        async with other_connection() as verifier:
+            stored = await verifier.get(CourseOffering, offering.id)
+            assert stored is not None and stored.status == "OPEN", "وضعیت ارائه commit نشده است"
+            assert stored.requires_approval and stored.enrollment_code == "ROAD-05"
+            held = await verifier.scalar(
+                select(ClassSession.week_number).where(ClassSession.offering_id == offering.id)
+            )
+            assert held == 2, "جلسهٔ حضور commit نشده است"
+    finally:
+        await committing_session.execute(
+            delete(CourseOffering).where(CourseOffering.id == offering.id)
+        )
+        await committing_session.execute(delete(Course).where(Course.id == course.id))
+        await committing_session.execute(delete(Term).where(Term.id == term.id))
+        await committing_session.commit()
+
+
+async def test_subscription_activation_survives_with_audit_and_notice(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """ADR-0019 — فعال‌سازی، ردیف حسابرسی و اعلان در یک تراکنش."""
+    from silp.core.permissions import Role
+    from silp.models.access import Subscription
+    from silp.models.admin import AuditLog
+    from silp.models.messaging import Notification
+    from silp.services import authz
+
+    await authz.grant_role(committing_session, user_id=account["user_id"], role=Role.ADMIN)
+    await committing_session.commit()
+    await authz.invalidate_roles(account["user_id"])
+
+    requested = await committing_client.post(
+        "/api/v1/subscriptions", headers=auth(account), json={"plan_code": "MONTHLY_ALL"}
+    )
+    assert requested.status_code == 201, requested.text
+    subscription_id = uuid.UUID(requested.json()["id"])
+    response = await committing_client.post(
+        f"/api/v1/subscriptions/{subscription_id}/activate",
+        headers=auth(account),
+        json={"payment_ref": "RRN-2201"},
+    )
+    assert response.status_code == 200, response.text
+
+    async with other_connection() as verifier:
+        stored = await verifier.get(Subscription, subscription_id)
+        assert stored is not None and stored.status == "ACTIVE", "فعال‌سازی commit نشده است"
+        assert stored.payment_ref == "RRN-2201"
+        action = await verifier.scalar(
+            select(AuditLog.action).where(AuditLog.entity_id == subscription_id)
+        )
+        assert action == "SUBSCRIPTION_ACTIVATED", "لاگ حسابرسی commit نشده است"
+        notice = await verifier.scalar(
+            select(Notification.id).where(
+                Notification.user_id == account["user_id"],
+                Notification.kind == "SUBSCRIPTION_ACTIVATED",
+            )
+        )
+        assert notice is not None, "اعلان فعال شدن commit نشده است"

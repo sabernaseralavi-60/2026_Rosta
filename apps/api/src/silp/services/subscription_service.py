@@ -23,12 +23,18 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from silp.core.exceptions import NotFound, PlanScopeMismatch, ValidationFailed
+from silp.core.exceptions import Conflict, NotFound, PlanScopeMismatch, ValidationFailed
 from silp.core.logging import get_logger
+from silp.core.permissions import CurrentUser
+from silp.domain import audit
 from silp.models.access import Subscription, SubscriptionPlan
 from silp.models.education import Course
+from silp.services import events
+from silp.services.audit_service import AuditService
 
 log = get_logger("silp.subscriptions")
+
+MIN_REJECT_REASON = 5
 
 
 class SubscriptionService:
@@ -62,6 +68,21 @@ class SubscriptionService:
         note: str | None = None,
     ) -> Subscription:
         """ثبت درخواست اشتراک — وضعیت `PENDING` تا تأیید پرداخت."""
+        subscription, plan = await self._new_row(
+            user_id=user_id, plan_id=plan_id, course_id=course_id, note=note
+        )
+        await self.session.commit()
+        log.info("subscription_requested", plan=plan.code, user_id=str(user_id))
+        return subscription
+
+    async def _new_row(
+        self,
+        *,
+        user_id: uuid.UUID,
+        plan_id: uuid.UUID,
+        course_id: uuid.UUID | None,
+        note: str | None,
+    ) -> tuple[Subscription, SubscriptionPlan]:
         plan = await self.session.get(SubscriptionPlan, plan_id)
         if plan is None or not plan.is_active:
             raise NotFound("این طرح اشتراک پیدا نشد.")
@@ -80,9 +101,8 @@ class SubscriptionService:
             note=note,
         )
         self.session.add(subscription)
-        await self.session.commit()
-        log.info("subscription_requested", plan=plan.code, user_id=str(user_id))
-        return subscription
+        await self.session.flush()
+        return subscription, plan
 
     async def _validated_course(
         self, plan: SubscriptionPlan, course_id: uuid.UUID | None
@@ -99,29 +119,39 @@ class SubscriptionService:
             raise PlanScopeMismatch("طرح «همهٔ دروس» به انتخاب درس نیاز ندارد.")
         return None
 
-    async def _next_start(self, user_id: uuid.UUID, course_id: uuid.UUID | None) -> datetime:
+    async def _next_start(
+        self,
+        user_id: uuid.UUID,
+        course_id: uuid.UUID | None,
+        *,
+        statuses: tuple[str, ...] = ("ACTIVE", "PENDING"),
+        exclude: uuid.UUID | None = None,
+    ) -> datetime:
         """شروع دورهٔ تازه: پایان دورهٔ فعلیِ هم‌دامنه، یا همین حالا."""
         now = _now()
-        latest_end = await self.session.scalar(
+        stmt = (
             select(Subscription.ends_at)
             .where(
                 Subscription.user_id == user_id,
                 Subscription.course_id.is_(None)
                 if course_id is None
                 else Subscription.course_id == course_id,
-                Subscription.status.in_(("ACTIVE", "PENDING")),
+                Subscription.status.in_(statuses),
                 Subscription.ends_at > now,
             )
             .order_by(Subscription.ends_at.desc())
             .limit(1)
         )
+        if exclude is not None:
+            stmt = stmt.where(Subscription.id != exclude)
+        latest_end = await self.session.scalar(stmt)
         return latest_end if latest_end and latest_end > now else now
 
     async def activate(
         self,
         *,
         subscription_id: uuid.UUID,
-        granted_by: uuid.UUID,
+        granted_by: CurrentUser | uuid.UUID,
         payment_ref: str | None = None,
     ) -> Subscription:
         """تأیید پرداخت و فعال‌سازی — پشتیبانی یا مدیر."""
@@ -133,15 +163,13 @@ class SubscriptionService:
         if subscription.status in ("EXPIRED", "CANCELLED"):
             raise ValidationFailed("اشتراک منقضی یا لغوشده دوباره فعال نمی‌شود.")
 
-        subscription.status = "ACTIVE"
-        subscription.granted_by = granted_by
-        subscription.payment_ref = payment_ref
-        await self.session.commit()
-        log.info(
-            "subscription_activated",
-            subscription_id=str(subscription_id),
-            ends_at=subscription.ends_at.isoformat(),
+        await self._activate_row(
+            subscription,
+            actor=granted_by,
+            payment_ref=payment_ref,
+            action=audit.SUBSCRIPTION_ACTIVATED,
         )
+        await self.session.commit()
         return subscription
 
     async def grant(
@@ -149,18 +177,116 @@ class SubscriptionService:
         *,
         user_id: uuid.UUID,
         plan_id: uuid.UUID,
-        granted_by: uuid.UUID,
+        granted_by: CurrentUser | uuid.UUID,
         course_id: uuid.UUID | None = None,
         payment_ref: str | None = None,
         note: str | None = None,
     ) -> Subscription:
-        """ساخت و فعال‌سازی در یک گام — برای فیش دستی و اشتراک هدیه."""
-        subscription = await self.request(
+        """ساخت و فعال‌سازی در **یک تراکنش** — برای فیش دستی و اشتراک هدیه.
+
+        پیش از ADR-0019 این دو commit جدا بود: اگر فعال‌سازی شکست می‌خورد،
+        یک درخواست «در انتظار» بی‌صاحب در صف پشتیبانی می‌ماند.
+        """
+        subscription, _plan = await self._new_row(
             user_id=user_id, plan_id=plan_id, course_id=course_id, note=note
         )
-        return await self.activate(
-            subscription_id=subscription.id, granted_by=granted_by, payment_ref=payment_ref
+        await self._activate_row(
+            subscription,
+            actor=granted_by,
+            payment_ref=payment_ref,
+            action=audit.SUBSCRIPTION_GRANTED,
         )
+        await self.session.commit()
+        return subscription
+
+    async def _activate_row(
+        self,
+        subscription: Subscription,
+        *,
+        actor: CurrentUser | uuid.UUID,
+        payment_ref: str | None,
+        action: str,
+    ) -> None:
+        """دوره از **لحظهٔ تأیید** شمرده می‌شود، نه از لحظهٔ درخواست (ADR-0019).
+
+        درخواستی که ده روز در صف ماند، اگر از روز درخواست شمرده می‌شد، ده
+        روز از دورهٔ پرداخت‌شده را پیش از باز شدن می‌سوزاند. دورهٔ تازه
+        پس از اشتراک **فعال** هم‌دامنه شروع می‌شود؛ درخواست‌های در انتظار
+        دیگر حساب نمی‌شوند چون هنوز پولشان تأیید نشده.
+        """
+        plan = await self.session.get(SubscriptionPlan, subscription.plan_id)
+        if plan is None:  # pragma: no cover — کلید خارجی تضمینش می‌کند
+            raise NotFound("طرح این اشتراک پیدا نشد.")
+        before = {
+            "status": subscription.status,
+            "starts_at": subscription.starts_at,
+            "ends_at": subscription.ends_at,
+        }
+        starts_at = await self._next_start(
+            subscription.user_id,
+            subscription.course_id,
+            statuses=("ACTIVE",),
+            exclude=subscription.id,
+        )
+        subscription.starts_at = starts_at
+        subscription.ends_at = starts_at + timedelta(days=plan.duration_days)
+        subscription.status = "ACTIVE"
+        subscription.granted_by = actor.id if isinstance(actor, CurrentUser) else actor
+        subscription.payment_ref = payment_ref
+        AuditService(self.session).stage(
+            action,
+            actor=actor,
+            entity_type="SUBSCRIPTION",
+            entity_id=subscription.id,
+            before=before if action == audit.SUBSCRIPTION_ACTIVATED else None,
+            after={
+                "user_id": subscription.user_id,
+                "plan": plan.code,
+                "course_id": subscription.course_id,
+                "status": "ACTIVE",
+                "starts_at": subscription.starts_at,
+                "ends_at": subscription.ends_at,
+                "payment_ref": payment_ref,
+                "amount_irr": subscription.amount_irr,
+            },
+        )
+        await events.publish(
+            self.session, events.SubscriptionActivated(subscription_id=subscription.id)
+        )
+        log.info(
+            "subscription_activated",
+            subscription_id=str(subscription.id),
+            ends_at=subscription.ends_at.isoformat(),
+        )
+
+    async def reject(
+        self, *, subscription_id: uuid.UUID, actor: CurrentUser | uuid.UUID, reason: str
+    ) -> Subscription:
+        """رد درخواست در انتظار — مثلاً فیش نامعتبر. دلیل به کاربر گفته می‌شود."""
+        cleaned = reason.strip()
+        if len(cleaned) < MIN_REJECT_REASON:
+            raise ValidationFailed("دلیل رد را بنویس — کاربر آن را در اعلان می‌بیند.")
+        subscription = await self.session.get(Subscription, subscription_id)
+        if subscription is None:
+            raise NotFound("این اشتراک پیدا نشد.")
+        if subscription.status != "PENDING":
+            raise Conflict("فقط درخواست در انتظار رد می‌شود.", code="SUBSCRIPTION_NOT_PENDING")
+        subscription.status = "CANCELLED"
+        subscription.cancelled_at = _now()
+        AuditService(self.session).stage(
+            audit.SUBSCRIPTION_REJECTED,
+            actor=actor,
+            entity_type="SUBSCRIPTION",
+            entity_id=subscription.id,
+            before={"status": "PENDING"},
+            after={"status": "CANCELLED", "reason": cleaned, "user_id": subscription.user_id},
+        )
+        await events.publish(
+            self.session,
+            events.SubscriptionRejected(subscription_id=subscription.id, reason=cleaned),
+        )
+        await self.session.commit()
+        return subscription
 
     async def cancel(self, *, subscription_id: uuid.UUID, user_id: uuid.UUID) -> Subscription:
         subscription = await self.session.get(Subscription, subscription_id)

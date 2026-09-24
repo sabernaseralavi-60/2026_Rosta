@@ -29,6 +29,10 @@ POINT_ENTRY_REVERSED: Final = "POINT_ENTRY_REVERSED"
 # ── گواهی و پیام ───────────────────────────────────────────────────────
 CERTIFICATE_REVOKED: Final = "CERTIFICATE_REVOKED"
 MESSAGE_TEMPLATE_UPDATED: Final = "MESSAGE_TEMPLATE_UPDATED"
+# ── اشتراک — ADR-0019 ──────────────────────────────────────────────────
+SUBSCRIPTION_GRANTED: Final = "SUBSCRIPTION_GRANTED"
+SUBSCRIPTION_ACTIVATED: Final = "SUBSCRIPTION_ACTIVATED"
+SUBSCRIPTION_REJECTED: Final = "SUBSCRIPTION_REJECTED"
 
 ACTION_TITLE_FA: dict[str, str] = {
     ROLE_GRANTED: "اعطای نقش",
@@ -46,6 +50,9 @@ ACTION_TITLE_FA: dict[str, str] = {
     POINT_ENTRY_REVERSED: "اصلاح ردیف امتیاز",
     CERTIFICATE_REVOKED: "ابطال گواهی",
     MESSAGE_TEMPLATE_UPDATED: "ویرایش الگوی پیام",
+    SUBSCRIPTION_GRANTED: "فعال‌سازی مستقیم اشتراک",
+    SUBSCRIPTION_ACTIVATED: "تأیید پرداخت و فعال‌سازی اشتراک",
+    SUBSCRIPTION_REJECTED: "رد درخواست اشتراک",
 }
 
 ENTITY_TITLE_FA: dict[str, str] = {
@@ -58,6 +65,7 @@ ENTITY_TITLE_FA: dict[str, str] = {
     "POINT_ENTRY": "ردیف امتیاز",
     "CERTIFICATE": "گواهی",
     "MESSAGE_TEMPLATE": "الگوی پیام",
+    "SUBSCRIPTION": "اشتراک",
     "REQUEST": "درخواست",
 }
 
@@ -78,6 +86,9 @@ __all__ = [
     "IMPERSONATION_ENDED",
     "IMPERSONATION_STARTED",
     "MESSAGE_TEMPLATE_UPDATED",
+    "SUBSCRIPTION_ACTIVATED",
+    "SUBSCRIPTION_GRANTED",
+    "SUBSCRIPTION_REJECTED",
     "POINTS_RECALCULATED",
     "POINT_ENTRY_REVERSED",
     "POINT_RULE_UPDATED",

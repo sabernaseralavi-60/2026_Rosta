@@ -379,6 +379,22 @@ _KINDS: tuple[Kind, ...] = (
         "بررسی حساب به دست پشتیبانی",
         ("agent",),
     ),
+    # ── اشتراک — ADR-0019 ──────────────────────────────────────────────
+    Kind(
+        "SUBSCRIPTION_ACTIVATED",
+        "SYSTEM",
+        "IMPORTANT",
+        "فعال شدن اشتراک",
+        ("plan", "ends_on"),
+        allow_sms=True,
+    ),
+    Kind(
+        "SUBSCRIPTION_REJECTED",
+        "SYSTEM",
+        "IMPORTANT",
+        "تأیید نشدن درخواست اشتراک",
+        ("plan", "reason"),
+    ),
 )
 
 KINDS: dict[str, Kind] = {kind.code: kind for kind in _KINDS}

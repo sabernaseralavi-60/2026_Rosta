@@ -31,9 +31,11 @@ from silp.core.permissions import ROLE_TITLE_FA, Role
 from silp.domain import city as city_rules
 from silp.domain import research as research_rules
 from silp.domain import ventures as venture_rules
-from silp.domain.calendar import format_datetime_fa
+from silp.domain.calendar import format_date_fa, format_datetime_fa
+from silp.domain.gamification.formulas import LOCAL_TZ
 from silp.domain.notifications.templating import excerpt
 from silp.domain.text import format_number_fa, join_fa, to_persian_digits
+from silp.models.access import Subscription, SubscriptionPlan
 from silp.models.delivery import (
     Certificate,
     Deliverable,
@@ -905,6 +907,45 @@ async def on_certificate_revoked(session: AsyncSession, event: events.Certificat
         {"title": certificate.title_fa, "reason": certificate.revoke_reason or ""},
         action_url="/me/certificates",
         dedup_key=f"CERTIFICATE_REVOKED:{certificate.id}",
+    )
+
+
+@events.subscribe(events.SubscriptionActivated)
+async def on_subscription_activated(
+    session: AsyncSession, event: events.SubscriptionActivated
+) -> None:
+    """ADR-0019 — کسی که پول داده باید بداند دسترسی‌اش باز شد، نه حدس بزند."""
+    subscription = await session.get(Subscription, event.subscription_id)
+    if subscription is None or subscription.status != "ACTIVE":
+        return
+    plan = await session.get(SubscriptionPlan, subscription.plan_id)
+    ends_on = subscription.ends_at.astimezone(LOCAL_TZ).date()
+    await NotificationService(session).notify(
+        "SUBSCRIPTION_ACTIVATED",
+        [subscription.user_id],
+        {
+            "plan": plan.title_fa if plan else "",
+            "ends_on": format_date_fa(ends_on, with_year=True),
+        },
+        action_url="/pricing",
+        dedup_key=f"SUBSCRIPTION_ACTIVATED:{subscription.id}",
+    )
+
+
+@events.subscribe(events.SubscriptionRejected)
+async def on_subscription_rejected(
+    session: AsyncSession, event: events.SubscriptionRejected
+) -> None:
+    subscription = await session.get(Subscription, event.subscription_id)
+    if subscription is None:
+        return
+    plan = await session.get(SubscriptionPlan, subscription.plan_id)
+    await NotificationService(session).notify(
+        "SUBSCRIPTION_REJECTED",
+        [subscription.user_id],
+        {"plan": plan.title_fa if plan else "", "reason": event.reason},
+        action_url="/pricing",
+        dedup_key=f"SUBSCRIPTION_REJECTED:{subscription.id}",
     )
 
 

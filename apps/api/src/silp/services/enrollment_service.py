@@ -213,6 +213,10 @@ class EnrollmentService:
             raise NotFound("این ثبت‌نام پیدا نشد.")
         if enrollment.status in ("DROPPED", "REJECTED"):
             raise ValidationFailed("برای ثبت‌نام لغوشده نمره ثبت نمی‌شود.")
+        if enrollment.status == "PENDING":
+            # ثبت نمره درس را COMPLETED می‌کند؛ بی این بند، نمره دادن به
+            # درخواستی که استاد هنوز ندیده، ثبت‌نام را دور می‌زد (ADR-0019).
+            raise ValidationFailed("اول درخواست ثبت‌نام این دانشجو را تأیید کنید.")
         if not 0 <= grade <= 20:
             raise ValidationFailed("نمره باید بین ۰ تا ۲۰ باشد.")
 

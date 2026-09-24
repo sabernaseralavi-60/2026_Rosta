@@ -61,6 +61,7 @@ from silp.schemas.quiz import (
     QuizIn,
     ReorderIn,
 )
+from silp.services import authz
 from silp.services.directory import display_names
 from silp.services.quiz_service import QuestionDraft, QuizDraft
 
@@ -478,7 +479,7 @@ async def grading_queue(
 @router.put(
     "/quizzes/{quiz_id}/attempts/{attempt_id}/answers/{question_id}",
     response_model=GradedAnswerOut,
-    responses={**NOT_FOUND, 422: {"model": ErrorResponse}},
+    responses={**NOT_FOUND, 403: {"model": ErrorResponse}, 422: {"model": ErrorResponse}},
     summary="ثبت یا بازنویسی نمرهٔ یک سؤال",
 )
 async def grade_answer(
@@ -490,6 +491,12 @@ async def grade_answer(
     session: SessionDep,
     user: Annotated[CurrentUser, Depends(require(Permission.QUIZ_GRADE, scope=offering_of_quiz))],
 ) -> GradedAnswerOut:
+    """تصحیح نخست با `QUIZ_GRADE` (دستیار هم)؛ عوض کردن نمرهٔ موجود با
+    `GRADE_OVERRIDE` (فقط استاد) — §6.2، ADR-0019."""
+    offering_id = await session.scalar(select(Quiz.offering_id).where(Quiz.id == quiz_id))
+    may_override = offering_id is not None and await authz.has_permission(
+        session, user, Permission.GRADE_OVERRIDE, offering_id
+    )
     answer = await grading.grade_answer(
         quiz_id=quiz_id,
         attempt_id=attempt_id,
@@ -497,6 +504,7 @@ async def grade_answer(
         score=body.score,
         grader_id=user.id,
         feedback=body.feedback,
+        may_override=may_override,
     )
     attempt = await session.get(QuizAttempt, attempt_id)
     return GradedAnswerOut(

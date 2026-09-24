@@ -166,6 +166,188 @@
         "title": "ActivityOut",
         "type": "object"
       },
+      "AdminSubscriptionOut": {
+        "description": "یک اشتراک از دید پشتیبانی — با صاحبش، تا فیش به آدم درست برسد.",
+        "properties": {
+          "amount_irr": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Irr"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          },
+          "course_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Id"
+          },
+          "course_title_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Title Fa"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "days_remaining": {
+            "title": "Days Remaining",
+            "type": "integer"
+          },
+          "ends_at": {
+            "format": "date-time",
+            "title": "Ends At",
+            "type": "string"
+          },
+          "granted_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Granted By Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "payment_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Ref"
+          },
+          "plan_code": {
+            "title": "Plan Code",
+            "type": "string"
+          },
+          "plan_title_fa": {
+            "title": "Plan Title Fa",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "title": "Starts At",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "EXPIRED",
+              "CANCELLED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "user_mobile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Mobile"
+          },
+          "user_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Name"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "id",
+          "plan_code",
+          "plan_title_fa",
+          "status",
+          "status_fa",
+          "starts_at",
+          "ends_at",
+          "days_remaining",
+          "user_id",
+          "created_at"
+        ],
+        "title": "AdminSubscriptionOut",
+        "type": "object"
+      },
       "AdminUserDetailOut": {
         "properties": {
           "can_impersonate": {
@@ -1587,6 +1769,189 @@
           "entries"
         ],
         "title": "AttendanceIn",
+        "type": "object"
+      },
+      "AttendanceMarkOut": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "status": {
+            "enum": [
+              "PRESENT",
+              "ABSENT",
+              "LATE",
+              "EXCUSED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "student_id",
+          "status"
+        ],
+        "title": "AttendanceMarkOut",
+        "type": "object"
+      },
+      "AttendanceSessionOut": {
+        "description": "یک جلسهٔ ثبت‌شده با شمارش هر وضعیت.",
+        "properties": {
+          "absent": {
+            "default": 0,
+            "title": "Absent",
+            "type": "integer"
+          },
+          "excused": {
+            "default": 0,
+            "title": "Excused",
+            "type": "integer"
+          },
+          "held_on": {
+            "format": "date",
+            "title": "Held On",
+            "type": "string"
+          },
+          "late": {
+            "default": 0,
+            "title": "Late",
+            "type": "integer"
+          },
+          "present": {
+            "default": 0,
+            "title": "Present",
+            "type": "integer"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "week_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Number"
+          }
+        },
+        "required": [
+          "held_on"
+        ],
+        "title": "AttendanceSessionOut",
+        "type": "object"
+      },
+      "AttendanceSheetOut": {
+        "description": "`GET /teach/offerings/{id}/attendance/{held_on}` — برای اصلاح همان روز.",
+        "properties": {
+          "absent": {
+            "default": 0,
+            "title": "Absent",
+            "type": "integer"
+          },
+          "excused": {
+            "default": 0,
+            "title": "Excused",
+            "type": "integer"
+          },
+          "held_on": {
+            "format": "date",
+            "title": "Held On",
+            "type": "string"
+          },
+          "late": {
+            "default": 0,
+            "title": "Late",
+            "type": "integer"
+          },
+          "marks": {
+            "items": {
+              "$ref": "#/components/schemas/AttendanceMarkOut"
+            },
+            "title": "Marks",
+            "type": "array"
+          },
+          "present": {
+            "default": 0,
+            "title": "Present",
+            "type": "integer"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "week_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Week Number"
+          }
+        },
+        "required": [
+          "held_on"
+        ],
+        "title": "AttendanceSheetOut",
+        "type": "object"
+      },
+      "AttendanceTallyOut": {
+        "properties": {
+          "absent": {
+            "default": 0,
+            "title": "Absent",
+            "type": "integer"
+          },
+          "excused": {
+            "default": 0,
+            "title": "Excused",
+            "type": "integer"
+          },
+          "late": {
+            "default": 0,
+            "title": "Late",
+            "type": "integer"
+          },
+          "present": {
+            "default": 0,
+            "title": "Present",
+            "type": "integer"
+          }
+        },
+        "title": "AttendanceTallyOut",
         "type": "object"
       },
       "AuditEntryOut": {
@@ -4395,6 +4760,208 @@
           "score"
         ],
         "title": "GradeAnswerIn",
+        "type": "object"
+      },
+      "GradebookCellOut": {
+        "description": "بهترین تلاش تصحیح‌شدهٔ یک دانشجو در یک آزمون.",
+        "properties": {
+          "attempts": {
+            "default": 0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "is_provisional": {
+            "default": false,
+            "title": "Is Provisional",
+            "type": "boolean"
+          },
+          "quiz_id": {
+            "format": "uuid",
+            "title": "Quiz Id",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          }
+        },
+        "required": [
+          "quiz_id"
+        ],
+        "title": "GradebookCellOut",
+        "type": "object"
+      },
+      "GradebookOut": {
+        "properties": {
+          "offering_id": {
+            "format": "uuid",
+            "title": "Offering Id",
+            "type": "string"
+          },
+          "quizzes": {
+            "items": {
+              "$ref": "#/components/schemas/GradebookQuizOut"
+            },
+            "title": "Quizzes",
+            "type": "array"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/GradebookRowOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "sessions_held": {
+            "title": "Sessions Held",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "offering_id",
+          "sessions_held"
+        ],
+        "title": "GradebookOut",
+        "type": "object"
+      },
+      "GradebookQuizOut": {
+        "properties": {
+          "closes_at": {
+            "format": "date-time",
+            "title": "Closes At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "total_points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Points",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title_fa",
+          "status",
+          "total_points",
+          "closes_at"
+        ],
+        "title": "GradebookQuizOut",
+        "type": "object"
+      },
+      "GradebookRowOut": {
+        "properties": {
+          "attendance": {
+            "$ref": "#/components/schemas/AttendanceTallyOut"
+          },
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/LearningComponentOut"
+            },
+            "title": "Components",
+            "type": "array"
+          },
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "final_grade": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Grade"
+          },
+          "learning_score": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learning Score"
+          },
+          "quizzes": {
+            "items": {
+              "$ref": "#/components/schemas/GradebookCellOut"
+            },
+            "title": "Quizzes",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "DROPPED",
+              "COMPLETED",
+              "REJECTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "student_id": {
+            "format": "uuid",
+            "title": "Student Id",
+            "type": "string"
+          },
+          "student_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Name"
+          },
+          "suggested_grade": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Grade"
+          }
+        },
+        "required": [
+          "enrollment_id",
+          "student_id",
+          "status",
+          "attendance"
+        ],
+        "title": "GradebookRowOut",
         "type": "object"
       },
       "GradedAnswerOut": {
@@ -7696,6 +8263,65 @@
         "title": "OfferingDetailOut",
         "type": "object"
       },
+      "OfferingPermissionsOut": {
+        "description": "آنچه بیننده در این ارائه می‌تواند — آینهٔ `require()` سرور، نه جایگزینش.",
+        "properties": {
+          "approve_enrollments": {
+            "title": "Approve Enrollments",
+            "type": "boolean"
+          },
+          "create_quizzes": {
+            "title": "Create Quizzes",
+            "type": "boolean"
+          },
+          "edit_weeks": {
+            "title": "Edit Weeks",
+            "type": "boolean"
+          },
+          "grade_quizzes": {
+            "title": "Grade Quizzes",
+            "type": "boolean"
+          },
+          "manage": {
+            "title": "Manage",
+            "type": "boolean"
+          },
+          "publish_announcements": {
+            "title": "Publish Announcements",
+            "type": "boolean"
+          },
+          "publish_weeks": {
+            "title": "Publish Weeks",
+            "type": "boolean"
+          },
+          "record_attendance": {
+            "title": "Record Attendance",
+            "type": "boolean"
+          },
+          "submit_final_grades": {
+            "title": "Submit Final Grades",
+            "type": "boolean"
+          },
+          "upload_resources": {
+            "title": "Upload Resources",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "manage",
+          "edit_weeks",
+          "publish_weeks",
+          "upload_resources",
+          "record_attendance",
+          "approve_enrollments",
+          "submit_final_grades",
+          "publish_announcements",
+          "create_quizzes",
+          "grade_quizzes"
+        ],
+        "title": "OfferingPermissionsOut",
+        "type": "object"
+      },
       "OfferingRefOut": {
         "properties": {
           "active_students": {
@@ -7767,6 +8393,79 @@
           "has_enrollment_code"
         ],
         "title": "OfferingRefOut",
+        "type": "object"
+      },
+      "OfferingSettingsIn": {
+        "additionalProperties": false,
+        "description": "`PATCH /teach/offerings/{id}` — فقط فیلدهای فرستاده‌شده عوض می‌شوند.",
+        "properties": {
+          "capacity": {
+            "anyOf": [
+              {
+                "maximum": 2000.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "clear_capacity": {
+            "default": false,
+            "title": "Clear Capacity",
+            "type": "boolean"
+          },
+          "clear_enrollment_code": {
+            "default": false,
+            "title": "Clear Enrollment Code",
+            "type": "boolean"
+          },
+          "enrollment_code": {
+            "anyOf": [
+              {
+                "maxLength": 32,
+                "minLength": 4,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enrollment Code"
+          },
+          "requires_approval": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requires Approval"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "DRAFT",
+                  "OPEN",
+                  "IN_PROGRESS",
+                  "CLOSED",
+                  "ARCHIVED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "title": "OfferingSettingsIn",
         "type": "object"
       },
       "OfferingStatsOut": {
@@ -15001,18 +15700,15 @@
         "additionalProperties": false,
         "properties": {
           "payment_ref": {
-            "anyOf": [
-              {
-                "maxLength": 200,
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Payment Ref"
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Payment Ref",
+            "type": "string"
           }
         },
+        "required": [
+          "payment_ref"
+        ],
         "title": "SubscriptionActivateIn",
         "type": "object"
       },
@@ -15218,6 +15914,22 @@
           "scope"
         ],
         "title": "SubscriptionPlanRefOut",
+        "type": "object"
+      },
+      "SubscriptionRejectIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 5,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "SubscriptionRejectIn",
         "type": "object"
       },
       "SubscriptionRequestIn": {
@@ -15751,6 +16463,365 @@
           "offerings"
         ],
         "title": "TeachDashboardOut",
+        "type": "object"
+      },
+      "TeachOfferingDetailOut": {
+        "description": "`GET /teach/offerings/{id}` — هفته‌ها با پیش‌نویس، و کد ثبت‌نام خوانا.",
+        "properties": {
+          "active_students": {
+            "default": 0,
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "allowed_statuses": {
+            "items": {
+              "enum": [
+                "DRAFT",
+                "OPEN",
+                "IN_PROGRESS",
+                "CLOSED",
+                "ARCHIVED"
+              ],
+              "type": "string"
+            },
+            "title": "Allowed Statuses",
+            "type": "array"
+          },
+          "announcements": {
+            "items": {
+              "$ref": "#/components/schemas/AnnouncementOut"
+            },
+            "title": "Announcements",
+            "type": "array"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "course_id": {
+            "format": "uuid",
+            "title": "Course Id",
+            "type": "string"
+          },
+          "course_slug": {
+            "title": "Course Slug",
+            "type": "string"
+          },
+          "course_title_fa": {
+            "title": "Course Title Fa",
+            "type": "string"
+          },
+          "current_week_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Week Number"
+          },
+          "enrollment_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enrollment Code"
+          },
+          "grading_policy": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Grading Policy",
+            "type": "object"
+          },
+          "has_enrollment_code": {
+            "title": "Has Enrollment Code",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "instructor_id": {
+            "format": "uuid",
+            "title": "Instructor Id",
+            "type": "string"
+          },
+          "instructor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor Name"
+          },
+          "my_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PENDING",
+                  "ACTIVE",
+                  "DROPPED",
+                  "COMPLETED",
+                  "REJECTED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Status"
+          },
+          "pending_enrollments": {
+            "default": 0,
+            "title": "Pending Enrollments",
+            "type": "integer"
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/OfferingPermissionsOut"
+          },
+          "progress_percent": {
+            "default": 0,
+            "title": "Progress Percent",
+            "type": "integer"
+          },
+          "quiz_count": {
+            "default": 0,
+            "title": "Quiz Count",
+            "type": "integer"
+          },
+          "requires_approval": {
+            "title": "Requires Approval",
+            "type": "boolean"
+          },
+          "staff_role": {
+            "anyOf": [
+              {
+                "enum": [
+                  "INSTRUCTOR",
+                  "TA",
+                  "COORDINATOR",
+                  "ADMIN"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Role"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "IN_PROGRESS",
+              "CLOSED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "term_code": {
+            "title": "Term Code",
+            "type": "string"
+          },
+          "term_title_fa": {
+            "title": "Term Title Fa",
+            "type": "string"
+          },
+          "weeks": {
+            "items": {
+              "$ref": "#/components/schemas/WeekSummaryOut"
+            },
+            "title": "Weeks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "course_id",
+          "course_slug",
+          "course_title_fa",
+          "term_code",
+          "term_title_fa",
+          "instructor_id",
+          "status",
+          "requires_approval",
+          "has_enrollment_code",
+          "permissions"
+        ],
+        "title": "TeachOfferingDetailOut",
+        "type": "object"
+      },
+      "TeachOfferingOut": {
+        "description": "یک ارائه از دید کادر آموزشی — `GET /teach/offerings[/{id}]`.",
+        "properties": {
+          "active_students": {
+            "default": 0,
+            "title": "Active Students",
+            "type": "integer"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "course_id": {
+            "format": "uuid",
+            "title": "Course Id",
+            "type": "string"
+          },
+          "course_slug": {
+            "title": "Course Slug",
+            "type": "string"
+          },
+          "course_title_fa": {
+            "title": "Course Title Fa",
+            "type": "string"
+          },
+          "current_week_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Week Number"
+          },
+          "has_enrollment_code": {
+            "title": "Has Enrollment Code",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "instructor_id": {
+            "format": "uuid",
+            "title": "Instructor Id",
+            "type": "string"
+          },
+          "instructor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor Name"
+          },
+          "my_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "PENDING",
+                  "ACTIVE",
+                  "DROPPED",
+                  "COMPLETED",
+                  "REJECTED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "My Status"
+          },
+          "pending_enrollments": {
+            "default": 0,
+            "title": "Pending Enrollments",
+            "type": "integer"
+          },
+          "progress_percent": {
+            "default": 0,
+            "title": "Progress Percent",
+            "type": "integer"
+          },
+          "requires_approval": {
+            "title": "Requires Approval",
+            "type": "boolean"
+          },
+          "staff_role": {
+            "anyOf": [
+              {
+                "enum": [
+                  "INSTRUCTOR",
+                  "TA",
+                  "COORDINATOR",
+                  "ADMIN"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Staff Role"
+          },
+          "status": {
+            "enum": [
+              "DRAFT",
+              "OPEN",
+              "IN_PROGRESS",
+              "CLOSED",
+              "ARCHIVED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "term_code": {
+            "title": "Term Code",
+            "type": "string"
+          },
+          "term_title_fa": {
+            "title": "Term Title Fa",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "course_id",
+          "course_slug",
+          "course_title_fa",
+          "term_code",
+          "term_title_fa",
+          "instructor_id",
+          "status",
+          "requires_approval",
+          "has_enrollment_code"
+        ],
+        "title": "TeachOfferingOut",
         "type": "object"
       },
       "TeamMemberOut": {
@@ -29353,9 +30424,113 @@
         ]
       }
     },
+    "/api/v1/subscriptions/admin": {
+      "get": {
+        "description": "در انتظارها قدیمی‌ترین اول (صف است)؛ بقیه تازه‌ترین اول (تاریخچه است).",
+        "operationId": "admin_subscriptions_api_v1_subscriptions_admin_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "PENDING",
+                    "ACTIVE",
+                    "EXPIRED",
+                    "CANCELLED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "User Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdminSubscriptionOut"
+                  },
+                  "title": "Response Admin Subscriptions Api V1 Subscriptions Admin Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "اشتراک‌ها برای پشتیبانی",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
     "/api/v1/subscriptions/grant": {
       "post": {
-        "description": "§02 — «پرداخت خارج از سامانه انجام می‌شود».\n\n`payment_ref` شمارهٔ فیش یا کد رهگیری است و **باید** پر شود مگر\nاشتراک هدیه باشد؛ بدون آن، بعداً معلوم نیست چرا فعال شده.",
+        "description": "§02 — «پرداخت خارج از سامانه انجام می‌شود».\n\n`payment_ref` شمارهٔ فیش یا کد رهگیری است و **باید** پر شود مگر\nاشتراک هدیه باشد؛ آن‌وقت علتش در `note` می‌آید. بدون هیچ‌کدام، بعداً\nمعلوم نیست چرا فعال شده (ADR-0019).",
         "operationId": "grant_subscription_api_v1_subscriptions_grant_post",
         "requestBody": {
           "content": {
@@ -29402,11 +30577,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             },
-            "description": "Validation Error"
+            "description": "Unprocessable Entity"
           }
         },
         "security": [
@@ -29422,6 +30597,7 @@
     },
     "/api/v1/subscriptions/pending": {
       "get": {
+        "description": "همان `GET /subscriptions/admin?status=PENDING` — تا ADR-0019 بی‌نام صاحب بود.",
         "operationId": "pending_subscriptions_api_v1_subscriptions_pending_get",
         "responses": {
           "200": {
@@ -29429,7 +30605,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/SubscriptionOut"
+                    "$ref": "#/components/schemas/AdminSubscriptionOut"
                   },
                   "title": "Response Pending Subscriptions Api V1 Subscriptions Pending Get",
                   "type": "array"
@@ -29546,6 +30722,7 @@
     },
     "/api/v1/subscriptions/{subscription_id}/activate": {
       "post": {
+        "description": "دوره از لحظهٔ تأیید شمرده می‌شود، نه از لحظهٔ درخواست (ADR-0019).",
         "operationId": "activate_subscription_api_v1_subscriptions__subscription_id__activate_post",
         "parameters": [
           {
@@ -29604,6 +30781,95 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تأیید پرداخت و فعال‌سازی",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
+    "/api/v1/subscriptions/{subscription_id}/reject": {
+      "post": {
+        "description": "فیش نامعتبر یا مبلغ ناقص — دلیل در اعلان به کاربر می‌رسد.",
+        "operationId": "reject_subscription_api_v1_subscriptions__subscription_id__reject_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "subscription_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Subscription Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionRejectIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "SUBSCRIPTION_NOT_PENDING"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
@@ -29616,7 +30882,7 @@
             "Bearer": []
           }
         ],
-        "summary": "تأیید پرداخت و فعال‌سازی",
+        "summary": "رد درخواست اشتراک",
         "tags": [
           "subscriptions"
         ]
@@ -29999,6 +31265,7 @@
     },
     "/api/v1/teach/offerings": {
       "get": {
+        "description": "استاد اصلی، و هر ارائه‌ای که کاربر در آن اعطای قلمرودار دارد (ADR-0019).",
         "operationId": "my_offerings_api_v1_teach_offerings_get",
         "responses": {
           "200": {
@@ -30006,7 +31273,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/OfferingSummaryOut"
+                    "$ref": "#/components/schemas/TeachOfferingOut"
                   },
                   "title": "Response My Offerings Api V1 Teach Offerings Get",
                   "type": "array"
@@ -30022,6 +31289,151 @@
           }
         ],
         "summary": "ارائه‌های من",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}": {
+      "get": {
+        "description": "هفته‌ها با پیش‌نویس، کد ثبت‌نام (فقط برای مدیر ارائه)، و آنچه بیننده\nمی‌تواند — دستیار همان صفحه را می‌بیند با دکمه‌های کمتر.",
+        "operationId": "offering_detail_api_v1_teach_offerings__offering_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachOfferingDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ارائه از دید کادر آموزشی",
+        "tags": [
+          "teaching"
+        ]
+      },
+      "patch": {
+        "operationId": "update_offering_api_v1_teach_offerings__offering_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfferingSettingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachOfferingDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "OFFERING_TRANSITION_INVALID | …"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تنظیمات ثبت‌نام و وضعیت ارائه",
         "tags": [
           "teaching"
         ]
@@ -30096,6 +31508,67 @@
       }
     },
     "/api/v1/teach/offerings/{offering_id}/attendance": {
+      "get": {
+        "description": "تا امروز حضور فقط نوشته می‌شد؛ هیچ راهی برای دیدن یا اصلاحش نبود.",
+        "operationId": "attendance_sessions_api_v1_teach_offerings__offering_id__attendance_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AttendanceSessionOut"
+                  },
+                  "title": "Response Attendance Sessions Api V1 Teach Offerings  Offering Id  Attendance Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "جلسه‌های ثبت‌شده با شمار حضور",
+        "tags": [
+          "teaching"
+        ]
+      },
       "post": {
         "description": "FR-EDU-05 — یک درخواست برای کل کلاس، نه یکی به‌ازای هر دانشجو.",
         "operationId": "record_attendance_api_v1_teach_offerings__offering_id__attendance_post",
@@ -30168,9 +31641,87 @@
         ]
       }
     },
+    "/api/v1/teach/offerings/{offering_id}/attendance/{held_on}": {
+      "get": {
+        "operationId": "attendance_sheet_api_v1_teach_offerings__offering_id__attendance__held_on__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "held_on",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Held On",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceSheetOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "حضور یک روز، برای اصلاح",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
     "/api/v1/teach/offerings/{offering_id}/copy-content": {
       "post": {
-        "description": "هفته‌ها **پیش‌نویس** کپی می‌شوند؛ انتشار تصمیم تازه‌ای است.",
+        "description": "هفته‌ها **پیش‌نویس** کپی می‌شوند؛ انتشار تصمیم تازه‌ای است.\n\nمبدأ هم قلمرو می‌خواهد (ADR-0019): وگرنه استاد یک ارائه، پیش‌نویس‌های\nارائهٔ استاد دیگرِ همان درس را با یک شناسه کپی می‌کرد و می‌خواند.",
         "operationId": "copy_content_api_v1_teach_offerings__offering_id__copy_content_post",
         "parameters": [
           {
@@ -30294,6 +31845,75 @@
           }
         ],
         "summary": "درخواست‌های ثبت‌نام در انتظار",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/offerings/{offering_id}/gradebook": {
+      "get": {
+        "description": "§3.5 — آزمون‌ها، حضور، نمرهٔ یادگیری و نمرهٔ نهایی در یک پاسخ.\n\nهیچ چیزی نمی‌نویسد؛ نمرهٔ نهایی با `PATCH /teach/enrollments/{id}/grade`.",
+        "operationId": "gradebook_api_v1_teach_offerings__offering_id__gradebook_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "offering_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Offering Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradebookOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "دفتر نمره",
         "tags": [
           "teaching"
         ]
@@ -30564,6 +32184,7 @@
     },
     "/api/v1/teach/offerings/{offering_id}/students": {
       "get": {
+        "description": "همهٔ کادر ارائه فهرست را می‌بینند — دستیار برای حضور و غیاب لازمش دارد.\n\nنمرهٔ نهایی فقط برای کسی که ارائه را مدیریت می‌کند (ADR-0019)؛ پیش از\nآن این مسیر `OFFERING_MANAGE` می‌خواست و دستیاری که حضور ثبت می‌کرد،\nفهرست کلاس را نداشت.",
         "operationId": "roster_api_v1_teach_offerings__offering_id__students_get",
         "parameters": [
           {
@@ -31441,6 +33062,7 @@
     },
     "/api/v1/teach/quizzes/{quiz_id}/attempts/{attempt_id}/answers/{question_id}": {
       "put": {
+        "description": "تصحیح نخست با `QUIZ_GRADE` (دستیار هم)؛ عوض کردن نمرهٔ موجود با\n`GRADE_OVERRIDE` (فقط استاد) — §6.2، ADR-0019.",
         "operationId": "grade_answer_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__answers__question_id__put",
         "parameters": [
           {
@@ -31494,6 +33116,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
           },
           "404": {
             "content": {

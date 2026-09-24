@@ -79,15 +79,38 @@ class SubscriptionGrantIn(BaseModel):
 class SubscriptionActivateIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    payment_ref: Annotated[str | None, Field(max_length=200)] = None
+    # الزامی از ADR-0019: فعال‌سازی بی‌کد پیگیری، بعداً قابل رسیدگی نیست.
+    payment_ref: Annotated[str, Field(min_length=3, max_length=200)]
+
+
+class SubscriptionRejectIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reason: Annotated[str, Field(min_length=5, max_length=500)]
+
+
+class AdminSubscriptionOut(SubscriptionOut):
+    """یک اشتراک از دید پشتیبانی — با صاحبش، تا فیش به آدم درست برسد."""
+
+    user_id: uuid.UUID
+    user_name: str | None = None
+    username: str | None = None
+    user_mobile: str | None = None
+    """کامل برای مدیر، پوشانده برای پشتیبانی — همان قاعدهٔ `/admin/users`."""
+    note: str | None = None
+    created_at: datetime
+    granted_by_name: str | None = None
+    cancelled_at: datetime | None = None
 
 
 __all__ = [
     "RIAL_PER_TOMAN",
+    "AdminSubscriptionOut",
     "MySubscriptionsOut",
     "PlanOut",
     "SubscriptionActivateIn",
     "SubscriptionGrantIn",
     "SubscriptionOut",
+    "SubscriptionRejectIn",
     "SubscriptionRequestIn",
 ]

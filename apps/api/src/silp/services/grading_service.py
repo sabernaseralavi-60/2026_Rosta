@@ -33,6 +33,7 @@ from silp.core.exceptions import (
     ValidationFailed,
 )
 from silp.core.logging import get_logger
+from silp.core.permissions import Permission
 from silp.domain import audit
 from silp.domain.quiz import (
     QuestionKind,
@@ -175,6 +176,7 @@ class GradingService:
         score: Decimal,
         grader_id: uuid.UUID,
         feedback: str | None = None,
+        may_override: bool = True,
     ) -> QuizAnswer:
         """ثبت یا بازنویسی نمرهٔ یک سؤال — FR-QUIZ-03.
 
@@ -195,6 +197,14 @@ class GradingService:
             raise NotFound("پاسخی برای این سؤال ثبت نشده است.")
 
         previous = answer.manual_score
+        # §6.2: دستیار پاسخ تشریحیِ بی‌نمره را تصحیح می‌کند، ولی نمره‌ای را که
+        # هست — خودکار یا دستی — فقط استاد عوض می‌کند (`GRADE_OVERRIDE`،
+        # ADR-0019). تا امروز هر دارندهٔ `QUIZ_GRADE` هر نمره‌ای را بازنویسی می‌کرد.
+        if not may_override and (previous is not None or answer.auto_score is not None):
+            raise PermissionDenied(
+                "بازنویسی نمره‌ای که ثبت شده با استاد درس است.",
+                permission=Permission.GRADE_OVERRIDE.value,
+            )
         answer.manual_score = quantize(score)
         answer.grader_id = grader_id
         answer.feedback = feedback

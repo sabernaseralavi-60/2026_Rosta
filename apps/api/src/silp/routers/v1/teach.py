@@ -9,14 +9,24 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from silp.core.exceptions import NotFound
-from silp.core.permissions import CurrentUser, Permission
+from silp.core.exceptions import NotFound, PermissionDenied
+from silp.core.permissions import (
+    OFFERING_SCOPED_ROLES,
+    CurrentUser,
+    Permission,
+    Role,
+    RoleGrant,
+    ScopeType,
+)
 from silp.models.education import (
+    ATTENDANCE_STATUSES,
     Course,
     CourseOffering,
     CourseWeek,
@@ -24,6 +34,7 @@ from silp.models.education import (
     Resource,
     Term,
 )
+from silp.models.quiz import Quiz
 from silp.routers.deps import (
     CourseServiceDep,
     CurrentUserDep,
@@ -37,6 +48,7 @@ from silp.routers.deps import (
     require,
 )
 from silp.routers.v1.courses import week_summary_out
+from silp.routers.v1.gamification import learning_out
 from silp.schemas.common import ErrorResponse
 from silp.schemas.education import (
     AnnouncementIn,
@@ -49,7 +61,6 @@ from silp.schemas.education import (
     FinalGradeIn,
     GradingPolicyIn,
     LinkMaterialIn,
-    OfferingSummaryOut,
     PublishWeekIn,
     ResourceIn,
     ResourceOut,
@@ -57,22 +68,66 @@ from silp.schemas.education import (
     WeekIn,
     WeekSummaryOut,
 )
+from silp.schemas.teaching import (
+    AttendanceMarkOut,
+    AttendanceSessionOut,
+    AttendanceSheetOut,
+    AttendanceTallyOut,
+    GradebookCellOut,
+    GradebookOut,
+    GradebookQuizOut,
+    GradebookRowOut,
+    OfferingPermissionsOut,
+    OfferingSettingsIn,
+    StaffRole,
+    TeachOfferingDetailOut,
+    TeachOfferingOut,
+)
+from silp.services import authz
+from silp.services.course_service import CourseService
 from silp.services.directory import display_names, name_of
-from silp.services.teaching_service import AttendanceEntry, ResourceDraft, WeekDraft
+from silp.services.gradebook_service import GradebookService
+from silp.services.teaching_service import (
+    OFFERING_TRANSITIONS,
+    AttendanceEntry,
+    ResourceDraft,
+    TeachingService,
+    WeekDraft,
+)
 
 router = APIRouter(prefix="/teach", tags=["teaching"])
 
 
-@router.get("/offerings", response_model=list[OfferingSummaryOut], summary="ارائه‌های من")
+@router.get("/offerings", response_model=list[TeachOfferingOut], summary="ارائه‌های من")
 async def my_offerings(
     session: SessionDep,
     teaching: TeachingServiceDep,
     courses: CourseServiceDep,
     current: CurrentUserDep,
-) -> list[OfferingSummaryOut]:
-    offerings = await teaching.my_offerings(current.id)
+) -> list[TeachOfferingOut]:
+    """استاد اصلی، و هر ارائه‌ای که کاربر در آن اعطای قلمرودار دارد (ADR-0019)."""
+    grants = await authz.get_grants(session, current.id)
+    scoped = [
+        g.scope_id
+        for g in grants
+        if g.role in OFFERING_SCOPED_ROLES
+        and g.scope_type is ScopeType.OFFERING
+        and g.scope_id is not None
+    ]
+    offerings = await teaching.my_offerings(current.id, scoped_offering_ids=scoped)
     if not offerings:
         return []
+    return await _summaries(session, teaching, courses, offerings, current.id, grants)
+
+
+async def _summaries(
+    session: AsyncSession,
+    teaching: TeachingService,
+    courses: CourseService,
+    offerings: list[CourseOffering],
+    viewer_id: uuid.UUID,
+    grants: tuple[RoleGrant, ...],
+) -> list[TeachOfferingOut]:
     ids = [o.id for o in offerings]
     rows = {
         offering_id: (course, term)
@@ -84,12 +139,13 @@ async def my_offerings(
         )
     }
     counts = await courses.active_student_counts(ids)
-    names = await display_names(session, [current.id])
-    result: list[OfferingSummaryOut] = []
+    pending = await teaching.pending_enrollment_counts(ids)
+    names = await display_names(session, [o.instructor_id for o in offerings])
+    result: list[TeachOfferingOut] = []
     for offering in offerings:
         course, term = rows[offering.id]
         result.append(
-            OfferingSummaryOut(
+            TeachOfferingOut(
                 id=offering.id,
                 course_id=course.id,
                 course_slug=course.slug,
@@ -103,9 +159,130 @@ async def my_offerings(
                 has_enrollment_code=bool(offering.enrollment_code),
                 capacity=offering.capacity,
                 active_students=counts.get(offering.id, 0),
+                staff_role=_staff_role(offering, viewer_id, grants),
+                pending_enrollments=pending.get(offering.id, 0),
             )
         )
     return result
+
+
+def _staff_role(
+    offering: CourseOffering, viewer_id: uuid.UUID, grants: tuple[RoleGrant, ...]
+) -> StaffRole | None:
+    """بالاترین نقش بیننده در همین ارائه — برای رابط، نه برای مجوز."""
+    roles = {g.role for g in grants if g.covers(offering.id)}
+    if Role.ADMIN in roles:
+        return "ADMIN"
+    if Role.COORDINATOR in roles:
+        return "COORDINATOR"
+    scoped = {
+        g.role for g in grants if g.scope_type is ScopeType.OFFERING and g.scope_id == offering.id
+    }
+    if offering.instructor_id == viewer_id or Role.INSTRUCTOR in scoped:
+        return "INSTRUCTOR"
+    if Role.TA in scoped:
+        return "TA"
+    return None
+
+
+async def _detail(
+    session: AsyncSession,
+    teaching: TeachingService,
+    courses: CourseService,
+    offering: CourseOffering,
+    viewer: CurrentUser,
+) -> TeachOfferingDetailOut:
+    grants = await authz.get_grants(session, viewer.id)
+    fresh = CurrentUser(id=viewer.id, session_id=viewer.session_id, grants=grants)
+    (summary,) = await _summaries(session, teaching, courses, [offering], viewer.id, grants)
+    cards = await courses.week_cards(offering.id, viewer.id, include_drafts=True)
+    quiz_count = int(
+        await session.scalar(
+            select(func.count()).where(Quiz.offering_id == offering.id, Quiz.deleted_at.is_(None))
+        )
+        or 0
+    )
+
+    def can(permission: Permission) -> bool:
+        return fresh.has_permission(permission, offering.id)
+
+    return TeachOfferingDetailOut(
+        **summary.model_dump(),
+        enrollment_code=offering.enrollment_code if can(Permission.OFFERING_MANAGE) else None,
+        grading_policy=dict(offering.grading_policy or {}),
+        weeks=[week_summary_out(card) for card in cards],
+        announcements=[
+            AnnouncementOut.model_validate(a) for a in await courses.announcements_of(offering.id)
+        ],
+        quiz_count=quiz_count,
+        allowed_statuses=list(OFFERING_TRANSITIONS.get(offering.status, ())),
+        permissions=OfferingPermissionsOut(
+            manage=can(Permission.OFFERING_MANAGE),
+            edit_weeks=can(Permission.COURSE_WEEK_EDIT),
+            publish_weeks=can(Permission.COURSE_WEEK_PUBLISH),
+            upload_resources=can(Permission.RESOURCE_UPLOAD),
+            record_attendance=can(Permission.ATTENDANCE_RECORD),
+            approve_enrollments=can(Permission.ENROLLMENT_APPROVE),
+            submit_final_grades=can(Permission.GRADE_FINAL_SUBMIT),
+            publish_announcements=can(Permission.ANNOUNCEMENT_PUBLISH),
+            create_quizzes=can(Permission.QUIZ_CREATE),
+            grade_quizzes=can(Permission.QUIZ_GRADE),
+        ),
+    )
+
+
+@router.get(
+    "/offerings/{offering_id}",
+    response_model=TeachOfferingDetailOut,
+    summary="ارائه از دید کادر آموزشی",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def offering_detail(
+    offering_id: uuid.UUID,
+    session: SessionDep,
+    teaching: TeachingServiceDep,
+    courses: CourseServiceDep,
+    viewer: Annotated[
+        CurrentUser,
+        Depends(require(Permission.COURSE_WEEK_VIEW_DRAFT, scope=offering_from_path)),
+    ],
+) -> TeachOfferingDetailOut:
+    """هفته‌ها با پیش‌نویس، کد ثبت‌نام (فقط برای مدیر ارائه)، و آنچه بیننده
+    می‌تواند — دستیار همان صفحه را می‌بیند با دکمه‌های کمتر."""
+    offering = await teaching.offering(offering_id)
+    return await _detail(session, teaching, courses, offering, viewer)
+
+
+@router.patch(
+    "/offerings/{offering_id}",
+    response_model=TeachOfferingDetailOut,
+    summary="تنظیمات ثبت‌نام و وضعیت ارائه",
+    responses={
+        403: {"model": ErrorResponse},
+        409: {"model": ErrorResponse, "description": "OFFERING_TRANSITION_INVALID | …"},
+        422: {"model": ErrorResponse},
+    },
+)
+async def update_offering(
+    offering_id: uuid.UUID,
+    payload: OfferingSettingsIn,
+    session: SessionDep,
+    teaching: TeachingServiceDep,
+    courses: CourseServiceDep,
+    actor: Annotated[
+        CurrentUser, Depends(require(Permission.OFFERING_MANAGE, scope=offering_from_path))
+    ],
+) -> TeachOfferingDetailOut:
+    offering = await teaching.update_settings(
+        offering_id=offering_id,
+        status=payload.status,
+        requires_approval=payload.requires_approval,
+        capacity=payload.capacity,
+        clear_capacity=payload.clear_capacity,
+        enrollment_code=payload.enrollment_code,
+        clear_enrollment_code=payload.clear_enrollment_code,
+    )
+    return await _detail(session, teaching, courses, offering, actor)
 
 
 # ── هفته — FR-EDU-02 ───────────────────────────────────────────────────
@@ -294,11 +471,20 @@ async def copy_content(
     offering_id: uuid.UUID,
     payload: CopyContentIn,
     teaching: TeachingServiceDep,
-    _: Annotated[
+    session: SessionDep,
+    actor: Annotated[
         CurrentUser, Depends(require(Permission.OFFERING_MANAGE, scope=offering_from_path))
     ],
 ) -> CopyResultOut:
-    """هفته‌ها **پیش‌نویس** کپی می‌شوند؛ انتشار تصمیم تازه‌ای است."""
+    """هفته‌ها **پیش‌نویس** کپی می‌شوند؛ انتشار تصمیم تازه‌ای است.
+
+    مبدأ هم قلمرو می‌خواهد (ADR-0019): وگرنه استاد یک ارائه، پیش‌نویس‌های
+    ارائهٔ استاد دیگرِ همان درس را با یک شناسه کپی می‌کرد و می‌خواند.
+    """
+    if not await authz.has_permission(
+        session, actor, Permission.COURSE_WEEK_VIEW_DRAFT, payload.source_offering_id
+    ):
+        raise PermissionDenied("فقط از ارائه‌ای که خودت در آن استاد یا دستیاری می‌توانی کپی کنی.")
     count = await teaching.copy_weeks_from(
         target_offering_id=offering_id, source_offering_id=payload.source_offering_id
     )
@@ -316,20 +502,32 @@ async def roster(
     offering_id: uuid.UUID,
     enrollments: EnrollmentServiceDep,
     session: SessionDep,
-    _: Annotated[
-        CurrentUser, Depends(require(Permission.OFFERING_MANAGE, scope=offering_from_path))
+    viewer: Annotated[
+        CurrentUser,
+        Depends(require(Permission.COURSE_WEEK_VIEW_DRAFT, scope=offering_from_path)),
     ],
     status_filter: Annotated[str | None, Query(alias="status")] = None,
 ) -> list[RosterEntryOut]:
+    """همهٔ کادر ارائه فهرست را می‌بینند — دستیار برای حضور و غیاب لازمش دارد.
+
+    نمرهٔ نهایی فقط برای کسی که ارائه را مدیریت می‌کند (ADR-0019)؛ پیش از
+    آن این مسیر `OFFERING_MANAGE` می‌خواست و دستیاری که حضور ثبت می‌کرد،
+    فهرست کلاس را نداشت.
+    """
     rows = await enrollments.roster(offering_id, status=status_filter)
     names = await display_names(session, [r.student_id for r in rows])
+    grades_visible = await authz.has_permission(
+        session, viewer, Permission.OFFERING_MANAGE, offering_id
+    )
     return [
         RosterEntryOut(
             enrollment_id=row.id,
             student_id=row.student_id,
             student_name=name_of(names, row.student_id),
             status=row.status,
-            final_grade=float(row.final_grade) if row.final_grade is not None else None,
+            final_grade=(
+                float(row.final_grade) if grades_visible and row.final_grade is not None else None
+            ),
             enrolled_at=row.enrolled_at,
         )
         for row in rows
@@ -453,6 +651,138 @@ async def record_attendance(
         recorded_by=actor.id,
     )
     return {"recorded": count}
+
+
+@router.get(
+    "/offerings/{offering_id}/attendance",
+    response_model=list[AttendanceSessionOut],
+    summary="جلسه‌های ثبت‌شده با شمار حضور",
+    responses={403: {"model": ErrorResponse}},
+)
+async def attendance_sessions(
+    offering_id: uuid.UUID,
+    teaching: TeachingServiceDep,
+    _: Annotated[
+        CurrentUser, Depends(require(Permission.ATTENDANCE_RECORD, scope=offering_from_path))
+    ],
+) -> list[AttendanceSessionOut]:
+    """تا امروز حضور فقط نوشته می‌شد؛ هیچ راهی برای دیدن یا اصلاحش نبود."""
+    return [
+        AttendanceSessionOut(
+            held_on=t.session.held_on,
+            week_number=t.session.week_number,
+            topic=t.session.topic,
+            present=t.counts.get("PRESENT", 0),
+            late=t.counts.get("LATE", 0),
+            absent=t.counts.get("ABSENT", 0),
+            excused=t.counts.get("EXCUSED", 0),
+        )
+        for t in await teaching.attendance_sessions(offering_id)
+    ]
+
+
+@router.get(
+    "/offerings/{offering_id}/attendance/{held_on}",
+    response_model=AttendanceSheetOut,
+    summary="حضور یک روز، برای اصلاح",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def attendance_sheet(
+    offering_id: uuid.UUID,
+    held_on: date,
+    teaching: TeachingServiceDep,
+    _: Annotated[
+        CurrentUser, Depends(require(Permission.ATTENDANCE_RECORD, scope=offering_from_path))
+    ],
+) -> AttendanceSheetOut:
+    found = await teaching.attendance_sheet(offering_id, held_on)
+    if found is None:
+        raise NotFound("برای این روز حضوری ثبت نشده است.", code="ATTENDANCE_NOT_RECORDED")
+    class_session, records = found
+    counts = {s: sum(1 for r in records if r.status == s) for s in ATTENDANCE_STATUSES}
+    return AttendanceSheetOut(
+        held_on=class_session.held_on,
+        week_number=class_session.week_number,
+        topic=class_session.topic,
+        present=counts["PRESENT"],
+        late=counts["LATE"],
+        absent=counts["ABSENT"],
+        excused=counts["EXCUSED"],
+        marks=[
+            AttendanceMarkOut(student_id=r.student_id, status=r.status, note=r.note)
+            for r in records
+        ],
+    )
+
+
+@router.get(
+    "/offerings/{offering_id}/gradebook",
+    response_model=GradebookOut,
+    summary="دفتر نمره",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def gradebook(
+    offering_id: uuid.UUID,
+    session: SessionDep,
+    _: Annotated[
+        CurrentUser, Depends(require(Permission.OFFERING_MANAGE, scope=offering_from_path))
+    ],
+) -> GradebookOut:
+    """§3.5 — آزمون‌ها، حضور، نمرهٔ یادگیری و نمرهٔ نهایی در یک پاسخ.
+
+    هیچ چیزی نمی‌نویسد؛ نمرهٔ نهایی با `PATCH /teach/enrollments/{id}/grade`.
+    """
+    book = await GradebookService(session).for_offering(offering_id)
+    names = await display_names(session, [r.enrollment.student_id for r in book.rows])
+    rows = []
+    for row in book.rows:
+        learning = learning_out(offering_id, row.learning) if row.learning is not None else None
+        enrollment = row.enrollment
+        rows.append(
+            GradebookRowOut(
+                enrollment_id=enrollment.id,
+                student_id=enrollment.student_id,
+                student_name=name_of(names, enrollment.student_id),
+                status=enrollment.status,
+                quizzes=[
+                    GradebookCellOut(
+                        quiz_id=c.quiz_id,
+                        score=c.score,
+                        is_provisional=c.is_provisional,
+                        attempts=c.attempts,
+                    )
+                    for c in row.cells
+                ],
+                attendance=AttendanceTallyOut(
+                    present=row.attendance.get("PRESENT", 0),
+                    late=row.attendance.get("LATE", 0),
+                    absent=row.attendance.get("ABSENT", 0),
+                    excused=row.attendance.get("EXCUSED", 0),
+                ),
+                learning_score=learning.score if learning else None,
+                suggested_grade=learning.suggested_grade if learning else None,
+                components=learning.components if learning else [],
+                final_grade=(
+                    float(enrollment.final_grade) if enrollment.final_grade is not None else None
+                ),
+            )
+        )
+    rows.sort(key=lambda r: (r.student_name or "", str(r.student_id)))
+    return GradebookOut(
+        offering_id=offering_id,
+        sessions_held=book.sessions_held,
+        quizzes=[
+            GradebookQuizOut(
+                id=q.id,
+                title_fa=q.title_fa,
+                status=q.status,
+                total_points=q.total_points,
+                closes_at=q.closes_at,
+            )
+            for q in book.quizzes
+        ],
+        rows=rows,
+    )
 
 
 @router.get(

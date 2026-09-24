@@ -11,10 +11,11 @@
 from __future__ import annotations
 
 import uuid
-from dataclasses import dataclass
+from collections.abc import Iterable
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,6 +23,7 @@ from silp.core.exceptions import Conflict, NotFound, ValidationFailed
 from silp.core.logging import get_logger
 from silp.models.education import (
     MAX_WEEK_NUMBER,
+    OFFERING_STATUS_TITLE_FA,
     Announcement,
     AttendanceRecord,
     ClassSession,
@@ -38,6 +40,17 @@ log = get_logger("silp.teaching")
 
 GRADING_POLICY_KEYS = ("quiz", "project", "attendance", "participation")
 GRADING_POLICY_TOTAL = 100
+MIN_ENROLLMENT_CODE = 4
+
+#: گذارهای مجاز وضعیت ارائه — ADR-0019. بایگانی پایان راه است؛ «پایان‌یافته»
+#: هنوز برمی‌گردد چون نمرهٔ دیرهنگام و اعتراض پس از پایان ترم واقعی‌اند.
+OFFERING_TRANSITIONS: dict[str, tuple[str, ...]] = {
+    "DRAFT": ("OPEN",),
+    "OPEN": ("DRAFT", "IN_PROGRESS", "CLOSED"),
+    "IN_PROGRESS": ("OPEN", "CLOSED"),
+    "CLOSED": ("IN_PROGRESS", "ARCHIVED"),
+    "ARCHIVED": (),
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,35 +93,125 @@ class TeachingService:
             raise NotFound("این ارائه پیدا نشد.")
         return offering
 
-    async def my_offerings(self, instructor_id: uuid.UUID) -> list[CourseOffering]:
+    async def my_offerings(
+        self, instructor_id: uuid.UUID, *, scoped_offering_ids: Iterable[uuid.UUID] = ()
+    ) -> list[CourseOffering]:
+        """ارائه‌هایی که کاربر در آن‌ها کادر آموزشی است.
+
+        استاد اصلی از `instructor_id` می‌آید؛ دستیار و استاد دوم از اعطای
+        قلمرودار همان ارائه (ADR-0019). بدون دومی، دستیاری که صف تصحیح را
+        می‌تواند باز کند، فهرست خالی می‌دید و راهی به آن نداشت.
+        """
+        scoped = list(scoped_offering_ids)
+        owned = CourseOffering.instructor_id == instructor_id
         rows = await self.session.scalars(
             select(CourseOffering)
             .where(
-                CourseOffering.instructor_id == instructor_id,
+                or_(owned, CourseOffering.id.in_(scoped)) if scoped else owned,
                 CourseOffering.deleted_at.is_(None),
             )
             .order_by(CourseOffering.created_at.desc())
         )
         return list(rows)
 
-    async def set_status(self, *, offering_id: uuid.UUID, status: str) -> CourseOffering:
-        """گذار وضعیت ارائه. حذف ارائهٔ دارای ثبت‌نام فعال ممنوع است (FR-EDU-01)."""
+    async def update_settings(
+        self,
+        *,
+        offering_id: uuid.UUID,
+        status: str | None = None,
+        requires_approval: bool | None = None,
+        capacity: int | None = None,
+        clear_capacity: bool = False,
+        enrollment_code: str | None = None,
+        clear_enrollment_code: bool = False,
+    ) -> CourseOffering:
+        """تنظیمات ثبت‌نام و وضعیت ارائه — `PATCH /teach/offerings/{id}`.
+
+        فقط فیلد فرستاده‌شده عوض می‌شود؛ پاک کردن ظرفیت و کد پرچم جدا دارد
+        چون `None` در JSON یعنی «نفرستادم»، نه «پاک کن».
+        """
         offering = await self.offering(offering_id)
-        if status == "ARCHIVED":
+        if status is not None and status != offering.status:
+            await self._check_transition(offering, status)
+            offering.status = status
+        if requires_approval is not None:
+            offering.requires_approval = requires_approval
+        if clear_capacity:
+            offering.capacity = None
+        elif capacity is not None:
+            taken = await self._seats_taken(offering_id)
+            if capacity < taken:
+                raise ValidationFailed(f"ظرفیت از تعداد ثبت‌نام‌های فعلی ({taken}) کمتر نمی‌شود.")
+            offering.capacity = capacity
+        if clear_enrollment_code:
+            offering.enrollment_code = None
+        elif enrollment_code is not None:
+            code = enrollment_code.strip()
+            if len(code) < MIN_ENROLLMENT_CODE:
+                raise ValidationFailed(f"کد ثبت‌نام دست‌کم {MIN_ENROLLMENT_CODE} نویسه است.")
+            offering.enrollment_code = code
+        await self.session.commit()
+        await self.session.refresh(offering)
+        log.info("offering_settings_updated", offering_id=str(offering_id), status=offering.status)
+        return offering
+
+    async def _check_transition(self, offering: CourseOffering, target: str) -> None:
+        allowed = OFFERING_TRANSITIONS.get(offering.status, ())
+        if target not in allowed:
+            raise Conflict(
+                f"ارائه از «{OFFERING_STATUS_TITLE_FA.get(offering.status, offering.status)}» "
+                f"به «{OFFERING_STATUS_TITLE_FA.get(target, target)}» نمی‌رود.",
+                code="OFFERING_TRANSITION_INVALID",
+            )
+        if target == "DRAFT":
+            # پیش‌نویس از دید دانشجو پنهان است؛ کسی که ثبت‌نام کرده نباید
+            # یک‌باره درسش را گم کند.
+            taken = await self._seats_taken(offering.id)
+            if taken:
+                raise Conflict(
+                    f"این ارائه {taken} ثبت‌نام دارد و به پیش‌نویس برنمی‌گردد.",
+                    code="OFFERING_HAS_ENROLLMENTS",
+                )
+        if target == "ARCHIVED":
+            # FR-EDU-01 — بایگانی ارائه‌ای که دانشجوی فعال دارد ممنوع است.
             active = int(
                 await self.session.scalar(
                     select(func.count()).where(
-                        Enrollment.offering_id == offering_id,
+                        Enrollment.offering_id == offering.id,
                         Enrollment.status == "ACTIVE",
                     )
                 )
                 or 0
             )
             if active:
-                raise Conflict(f"این ارائه {active} دانشجوی فعال دارد؛ اول درس را ببندید.")
-        offering.status = status
-        await self.session.commit()
-        return offering
+                raise Conflict(
+                    f"این ارائه {active} دانشجوی فعال بی‌نمره دارد؛ اول نمرهٔ نهایی را ثبت کنید.",
+                    code="OFFERING_HAS_ACTIVE_STUDENTS",
+                )
+
+    async def _seats_taken(self, offering_id: uuid.UUID) -> int:
+        return int(
+            await self.session.scalar(
+                select(func.count()).where(
+                    Enrollment.offering_id == offering_id,
+                    Enrollment.status.in_(("PENDING", "ACTIVE", "COMPLETED")),
+                )
+            )
+            or 0
+        )
+
+    async def pending_enrollment_counts(
+        self, offering_ids: Iterable[uuid.UUID]
+    ) -> dict[uuid.UUID, int]:
+        ids = list(offering_ids)
+        if not ids:
+            return {}
+        rows = await self.session.execute(
+            select(Enrollment.offering_id, func.count())
+            .where(Enrollment.offering_id.in_(ids), Enrollment.status == "PENDING")
+            .group_by(Enrollment.offering_id)
+        )
+        return {offering_id: int(count) for offering_id, count in rows.tuples()}
 
     async def set_grading_policy(
         self, *, offering_id: uuid.UUID, policy: dict[str, int]
@@ -478,6 +581,56 @@ class TeachingService:
         log.info("attendance_recorded", offering_id=str(offering_id), count=len(entries))
         return len(entries)
 
+    async def attendance_sessions(self, offering_id: uuid.UUID) -> list[SessionTally]:
+        """جلسه‌های ثبت‌شده، تازه‌ترین اول، با شمارش هر وضعیت — یک کوئری."""
+        await self.offering(offering_id)
+        counts = (
+            select(
+                AttendanceRecord.session_id.label("session_id"),
+                AttendanceRecord.status.label("status"),
+                func.count().label("n"),
+            )
+            .group_by(AttendanceRecord.session_id, AttendanceRecord.status)
+            .subquery()
+        )
+        rows = await self.session.execute(
+            select(ClassSession, counts.c.status, counts.c.n)
+            .outerjoin(counts, counts.c.session_id == ClassSession.id)
+            .where(ClassSession.offering_id == offering_id)
+            .order_by(ClassSession.held_on.desc())
+        )
+        tallies: dict[uuid.UUID, SessionTally] = {}
+        for class_session, status, n in rows.tuples():
+            tally = tallies.setdefault(class_session.id, SessionTally(session=class_session))
+            if status is not None:
+                tally.counts[status] = int(n)
+        return list(tallies.values())
+
+    async def attendance_sheet(
+        self, offering_id: uuid.UUID, held_on: date
+    ) -> tuple[ClassSession, list[AttendanceRecord]] | None:
+        """حضور ثبت‌شدهٔ یک روز — برای اصلاح؛ `None` یعنی آن روز جلسه‌ای نیست."""
+        await self.offering(offering_id)
+        class_session = await self.session.scalar(
+            select(ClassSession).where(
+                ClassSession.offering_id == offering_id, ClassSession.held_on == held_on
+            )
+        )
+        if class_session is None:
+            return None
+        records = list(
+            await self.session.scalars(
+                select(AttendanceRecord).where(AttendanceRecord.session_id == class_session.id)
+            )
+        )
+        return class_session, records
+
+
+@dataclass(slots=True)
+class SessionTally:
+    session: ClassSession
+    counts: dict[str, int] = field(default_factory=dict)
+
 
 def _now() -> datetime:
     return datetime.now(UTC)
@@ -485,8 +638,10 @@ def _now() -> datetime:
 
 __all__ = [
     "GRADING_POLICY_KEYS",
+    "OFFERING_TRANSITIONS",
     "AttendanceEntry",
     "ResourceDraft",
+    "SessionTally",
     "TeachingService",
     "WeekDraft",
 ]

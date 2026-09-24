@@ -2852,6 +2852,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/subscriptions/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * اشتراک‌ها برای پشتیبانی
+         * @description در انتظارها قدیمی‌ترین اول (صف است)؛ بقیه تازه‌ترین اول (تاریخچه است).
+         */
+        get: operations["admin_subscriptions_api_v1_subscriptions_admin_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/subscriptions/grant": {
         parameters: {
             query?: never;
@@ -2866,7 +2886,8 @@ export interface paths {
          * @description §02 — «پرداخت خارج از سامانه انجام می‌شود».
          *
          *     `payment_ref` شمارهٔ فیش یا کد رهگیری است و **باید** پر شود مگر
-         *     اشتراک هدیه باشد؛ بدون آن، بعداً معلوم نیست چرا فعال شده.
+         *     اشتراک هدیه باشد؛ آن‌وقت علتش در `note` می‌آید. بدون هیچ‌کدام، بعداً
+         *     معلوم نیست چرا فعال شده (ADR-0019).
          */
         post: operations["grant_subscription_api_v1_subscriptions_grant_post"];
         delete?: never;
@@ -2882,7 +2903,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** درخواست‌های اشتراک در انتظار تأیید */
+        /**
+         * درخواست‌های اشتراک در انتظار تأیید
+         * @description همان `GET /subscriptions/admin?status=PENDING` — تا ADR-0019 بی‌نام صاحب بود.
+         */
         get: operations["pending_subscriptions_api_v1_subscriptions_pending_get"];
         put?: never;
         post?: never;
@@ -2938,8 +2962,31 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** تأیید پرداخت و فعال‌سازی */
+        /**
+         * تأیید پرداخت و فعال‌سازی
+         * @description دوره از لحظهٔ تأیید شمرده می‌شود، نه از لحظهٔ درخواست (ADR-0019).
+         */
         post: operations["activate_subscription_api_v1_subscriptions__subscription_id__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subscriptions/{subscription_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * رد درخواست اشتراک
+         * @description فیش نامعتبر یا مبلغ ناقص — دلیل در اعلان به کاربر می‌رسد.
+         */
+        post: operations["reject_subscription_api_v1_subscriptions__subscription_id__reject_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3099,7 +3146,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ارائه‌های من */
+        /**
+         * ارائه‌های من
+         * @description استاد اصلی، و هر ارائه‌ای که کاربر در آن اعطای قلمرودار دارد (ADR-0019).
+         */
         get: operations["my_offerings_api_v1_teach_offerings_get"];
         put?: never;
         post?: never;
@@ -3107,6 +3157,28 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * ارائه از دید کادر آموزشی
+         * @description هفته‌ها با پیش‌نویس، کد ثبت‌نام (فقط برای مدیر ارائه)، و آنچه بیننده
+         *     می‌تواند — دستیار همان صفحه را می‌بیند با دکمه‌های کمتر.
+         */
+        get: operations["offering_detail_api_v1_teach_offerings__offering_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** تنظیمات ثبت‌نام و وضعیت ارائه */
+        patch: operations["update_offering_api_v1_teach_offerings__offering_id__patch"];
         trace?: never;
     };
     "/api/v1/teach/offerings/{offering_id}/announcements": {
@@ -3133,13 +3205,34 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * جلسه‌های ثبت‌شده با شمار حضور
+         * @description تا امروز حضور فقط نوشته می‌شد؛ هیچ راهی برای دیدن یا اصلاحش نبود.
+         */
+        get: operations["attendance_sessions_api_v1_teach_offerings__offering_id__attendance_get"];
         put?: never;
         /**
          * ثبت گروهی حضور و غیاب
          * @description FR-EDU-05 — یک درخواست برای کل کلاس، نه یکی به‌ازای هر دانشجو.
          */
         post: operations["record_attendance_api_v1_teach_offerings__offering_id__attendance_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/attendance/{held_on}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** حضور یک روز، برای اصلاح */
+        get: operations["attendance_sheet_api_v1_teach_offerings__offering_id__attendance__held_on__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3158,6 +3251,9 @@ export interface paths {
         /**
          * کپی محتوا از ارائهٔ قبلی
          * @description هفته‌ها **پیش‌نویس** کپی می‌شوند؛ انتشار تصمیم تازه‌ای است.
+         *
+         *     مبدأ هم قلمرو می‌خواهد (ADR-0019): وگرنه استاد یک ارائه، پیش‌نویس‌های
+         *     ارائهٔ استاد دیگرِ همان درس را با یک شناسه کپی می‌کرد و می‌خواند.
          */
         post: operations["copy_content_api_v1_teach_offerings__offering_id__copy_content_post"];
         delete?: never;
@@ -3175,6 +3271,28 @@ export interface paths {
         };
         /** درخواست‌های ثبت‌نام در انتظار */
         get: operations["pending_enrollments_api_v1_teach_offerings__offering_id__enrollment_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teach/offerings/{offering_id}/gradebook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * دفتر نمره
+         * @description §3.5 — آزمون‌ها، حضور، نمرهٔ یادگیری و نمرهٔ نهایی در یک پاسخ.
+         *
+         *     هیچ چیزی نمی‌نویسد؛ نمرهٔ نهایی با `PATCH /teach/enrollments/{id}/grade`.
+         */
+        get: operations["gradebook_api_v1_teach_offerings__offering_id__gradebook_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3246,7 +3364,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** دانشجویان ارائه */
+        /**
+         * دانشجویان ارائه
+         * @description همهٔ کادر ارائه فهرست را می‌بینند — دستیار برای حضور و غیاب لازمش دارد.
+         *
+         *     نمرهٔ نهایی فقط برای کسی که ارائه را مدیریت می‌کند (ADR-0019)؛ پیش از
+         *     آن این مسیر `OFFERING_MANAGE` می‌خواست و دستیاری که حضور ثبت می‌کرد،
+         *     فهرست کلاس را نداشت.
+         */
         get: operations["roster_api_v1_teach_offerings__offering_id__students_get"];
         put?: never;
         post?: never;
@@ -3406,7 +3531,11 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ثبت یا بازنویسی نمرهٔ یک سؤال */
+        /**
+         * ثبت یا بازنویسی نمرهٔ یک سؤال
+         * @description تصحیح نخست با `QUIZ_GRADE` (دستیار هم)؛ عوض کردن نمرهٔ موجود با
+         *     `GRADE_OVERRIDE` (فقط استاد) — §6.2، ADR-0019.
+         */
         put: operations["grade_answer_api_v1_teach_quizzes__quiz_id__attempts__attempt_id__answers__question_id__put"];
         post?: never;
         delete?: never;
@@ -4062,6 +4191,70 @@ export interface components {
             /** Summary */
             summary: string;
         };
+        /**
+         * AdminSubscriptionOut
+         * @description یک اشتراک از دید پشتیبانی — با صاحبش، تا فیش به آدم درست برسد.
+         */
+        AdminSubscriptionOut: {
+            /** Amount Irr */
+            amount_irr?: number | null;
+            /** Cancelled At */
+            cancelled_at?: string | null;
+            /** Course Id */
+            course_id?: string | null;
+            /** Course Title Fa */
+            course_title_fa?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Days Remaining */
+            days_remaining: number;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Granted By Name */
+            granted_by_name?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Note */
+            note?: string | null;
+            /** Payment Ref */
+            payment_ref?: string | null;
+            /** Plan Code */
+            plan_code: string;
+            /** Plan Title Fa */
+            plan_title_fa: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACTIVE" | "EXPIRED" | "CANCELLED";
+            /** Status Fa */
+            status_fa: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Mobile */
+            user_mobile?: string | null;
+            /** User Name */
+            user_name?: string | null;
+            /** Username */
+            username?: string | null;
+        };
         /** AdminUserDetailOut */
         AdminUserDetailOut: {
             /** Can Impersonate */
@@ -4621,6 +4814,116 @@ export interface components {
             topic?: string | null;
             /** Week Number */
             week_number?: number | null;
+        };
+        /** AttendanceMarkOut */
+        AttendanceMarkOut: {
+            /** Note */
+            note?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PRESENT" | "ABSENT" | "LATE" | "EXCUSED";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+        };
+        /**
+         * AttendanceSessionOut
+         * @description یک جلسهٔ ثبت‌شده با شمارش هر وضعیت.
+         */
+        AttendanceSessionOut: {
+            /**
+             * Absent
+             * @default 0
+             */
+            absent: number;
+            /**
+             * Excused
+             * @default 0
+             */
+            excused: number;
+            /**
+             * Held On
+             * Format: date
+             */
+            held_on: string;
+            /**
+             * Late
+             * @default 0
+             */
+            late: number;
+            /**
+             * Present
+             * @default 0
+             */
+            present: number;
+            /** Topic */
+            topic?: string | null;
+            /** Week Number */
+            week_number?: number | null;
+        };
+        /**
+         * AttendanceSheetOut
+         * @description `GET /teach/offerings/{id}/attendance/{held_on}` — برای اصلاح همان روز.
+         */
+        AttendanceSheetOut: {
+            /**
+             * Absent
+             * @default 0
+             */
+            absent: number;
+            /**
+             * Excused
+             * @default 0
+             */
+            excused: number;
+            /**
+             * Held On
+             * Format: date
+             */
+            held_on: string;
+            /**
+             * Late
+             * @default 0
+             */
+            late: number;
+            /** Marks */
+            marks?: components["schemas"]["AttendanceMarkOut"][];
+            /**
+             * Present
+             * @default 0
+             */
+            present: number;
+            /** Topic */
+            topic?: string | null;
+            /** Week Number */
+            week_number?: number | null;
+        };
+        /** AttendanceTallyOut */
+        AttendanceTallyOut: {
+            /**
+             * Absent
+             * @default 0
+             */
+            absent: number;
+            /**
+             * Excused
+             * @default 0
+             */
+            excused: number;
+            /**
+             * Late
+             * @default 0
+             */
+            late: number;
+            /**
+             * Present
+             * @default 0
+             */
+            present: number;
         };
         /** AuditEntryOut */
         AuditEntryOut: {
@@ -5636,6 +5939,93 @@ export interface components {
             feedback?: string | null;
             /** Score */
             score: number | string;
+        };
+        /**
+         * GradebookCellOut
+         * @description بهترین تلاش تصحیح‌شدهٔ یک دانشجو در یک آزمون.
+         */
+        GradebookCellOut: {
+            /**
+             * Attempts
+             * @default 0
+             */
+            attempts: number;
+            /**
+             * Is Provisional
+             * @default false
+             */
+            is_provisional: boolean;
+            /**
+             * Quiz Id
+             * Format: uuid
+             */
+            quiz_id: string;
+            /** Score */
+            score?: string | null;
+        };
+        /** GradebookOut */
+        GradebookOut: {
+            /**
+             * Offering Id
+             * Format: uuid
+             */
+            offering_id: string;
+            /** Quizzes */
+            quizzes?: components["schemas"]["GradebookQuizOut"][];
+            /** Rows */
+            rows?: components["schemas"]["GradebookRowOut"][];
+            /** Sessions Held */
+            sessions_held: number;
+        };
+        /** GradebookQuizOut */
+        GradebookQuizOut: {
+            /**
+             * Closes At
+             * Format: date-time
+             */
+            closes_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Title Fa */
+            title_fa: string;
+            /** Total Points */
+            total_points: string;
+        };
+        /** GradebookRowOut */
+        GradebookRowOut: {
+            attendance: components["schemas"]["AttendanceTallyOut"];
+            /** Components */
+            components?: components["schemas"]["LearningComponentOut"][];
+            /**
+             * Enrollment Id
+             * Format: uuid
+             */
+            enrollment_id: string;
+            /** Final Grade */
+            final_grade?: number | null;
+            /** Learning Score */
+            learning_score?: string | null;
+            /** Quizzes */
+            quizzes?: components["schemas"]["GradebookCellOut"][];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "PENDING" | "ACTIVE" | "DROPPED" | "COMPLETED" | "REJECTED";
+            /**
+             * Student Id
+             * Format: uuid
+             */
+            student_id: string;
+            /** Student Name */
+            student_name?: string | null;
+            /** Suggested Grade */
+            suggested_grade?: string | null;
         };
         /** GradedAnswerOut */
         GradedAnswerOut: {
@@ -6854,6 +7244,32 @@ export interface components {
             /** Weeks */
             weeks?: components["schemas"]["WeekSummaryOut"][];
         };
+        /**
+         * OfferingPermissionsOut
+         * @description آنچه بیننده در این ارائه می‌تواند — آینهٔ `require()` سرور، نه جایگزینش.
+         */
+        OfferingPermissionsOut: {
+            /** Approve Enrollments */
+            approve_enrollments: boolean;
+            /** Create Quizzes */
+            create_quizzes: boolean;
+            /** Edit Weeks */
+            edit_weeks: boolean;
+            /** Grade Quizzes */
+            grade_quizzes: boolean;
+            /** Manage */
+            manage: boolean;
+            /** Publish Announcements */
+            publish_announcements: boolean;
+            /** Publish Weeks */
+            publish_weeks: boolean;
+            /** Record Attendance */
+            record_attendance: boolean;
+            /** Submit Final Grades */
+            submit_final_grades: boolean;
+            /** Upload Resources */
+            upload_resources: boolean;
+        };
         /** OfferingRefOut */
         OfferingRefOut: {
             /**
@@ -6883,6 +7299,30 @@ export interface components {
             term_code: string;
             /** Term Title Fa */
             term_title_fa: string;
+        };
+        /**
+         * OfferingSettingsIn
+         * @description `PATCH /teach/offerings/{id}` — فقط فیلدهای فرستاده‌شده عوض می‌شوند.
+         */
+        OfferingSettingsIn: {
+            /** Capacity */
+            capacity?: number | null;
+            /**
+             * Clear Capacity
+             * @default false
+             */
+            clear_capacity: boolean;
+            /**
+             * Clear Enrollment Code
+             * @default false
+             */
+            clear_enrollment_code: boolean;
+            /** Enrollment Code */
+            enrollment_code?: string | null;
+            /** Requires Approval */
+            requires_approval?: boolean | null;
+            /** Status */
+            status?: ("DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED") | null;
         };
         /** OfferingStatsOut */
         OfferingStatsOut: {
@@ -9399,7 +9839,7 @@ export interface components {
         /** SubscriptionActivateIn */
         SubscriptionActivateIn: {
             /** Payment Ref */
-            payment_ref?: string | null;
+            payment_ref: string;
         };
         /**
          * SubscriptionGrantIn
@@ -9479,6 +9919,11 @@ export interface components {
             scope: "ALL_COURSES" | "SINGLE_COURSE";
             /** Title Fa */
             title_fa: string;
+        };
+        /** SubscriptionRejectIn */
+        SubscriptionRejectIn: {
+            /** Reason */
+            reason: string;
         };
         /** SubscriptionRequestIn */
         SubscriptionRequestIn: {
@@ -9669,6 +10114,150 @@ export interface components {
             needs_attention: components["schemas"]["NeedsAttentionOut"];
             /** Offerings */
             offerings: components["schemas"]["OfferingStatsOut"][];
+        };
+        /**
+         * TeachOfferingDetailOut
+         * @description `GET /teach/offerings/{id}` — هفته‌ها با پیش‌نویس، و کد ثبت‌نام خوانا.
+         */
+        TeachOfferingDetailOut: {
+            /**
+             * Active Students
+             * @default 0
+             */
+            active_students: number;
+            /** Allowed Statuses */
+            allowed_statuses?: ("DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED")[];
+            /** Announcements */
+            announcements?: components["schemas"]["AnnouncementOut"][];
+            /** Capacity */
+            capacity?: number | null;
+            /**
+             * Course Id
+             * Format: uuid
+             */
+            course_id: string;
+            /** Course Slug */
+            course_slug: string;
+            /** Course Title Fa */
+            course_title_fa: string;
+            /** Current Week Number */
+            current_week_number?: number | null;
+            /** Enrollment Code */
+            enrollment_code?: string | null;
+            /** Grading Policy */
+            grading_policy?: {
+                [key: string]: number;
+            };
+            /** Has Enrollment Code */
+            has_enrollment_code: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Instructor Id
+             * Format: uuid
+             */
+            instructor_id: string;
+            /** Instructor Name */
+            instructor_name?: string | null;
+            /** My Status */
+            my_status?: ("PENDING" | "ACTIVE" | "DROPPED" | "COMPLETED" | "REJECTED") | null;
+            /**
+             * Pending Enrollments
+             * @default 0
+             */
+            pending_enrollments: number;
+            permissions: components["schemas"]["OfferingPermissionsOut"];
+            /**
+             * Progress Percent
+             * @default 0
+             */
+            progress_percent: number;
+            /**
+             * Quiz Count
+             * @default 0
+             */
+            quiz_count: number;
+            /** Requires Approval */
+            requires_approval: boolean;
+            /** Staff Role */
+            staff_role?: ("INSTRUCTOR" | "TA" | "COORDINATOR" | "ADMIN") | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED";
+            /** Term Code */
+            term_code: string;
+            /** Term Title Fa */
+            term_title_fa: string;
+            /** Weeks */
+            weeks?: components["schemas"]["WeekSummaryOut"][];
+        };
+        /**
+         * TeachOfferingOut
+         * @description یک ارائه از دید کادر آموزشی — `GET /teach/offerings[/{id}]`.
+         */
+        TeachOfferingOut: {
+            /**
+             * Active Students
+             * @default 0
+             */
+            active_students: number;
+            /** Capacity */
+            capacity?: number | null;
+            /**
+             * Course Id
+             * Format: uuid
+             */
+            course_id: string;
+            /** Course Slug */
+            course_slug: string;
+            /** Course Title Fa */
+            course_title_fa: string;
+            /** Current Week Number */
+            current_week_number?: number | null;
+            /** Has Enrollment Code */
+            has_enrollment_code: boolean;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Instructor Id
+             * Format: uuid
+             */
+            instructor_id: string;
+            /** Instructor Name */
+            instructor_name?: string | null;
+            /** My Status */
+            my_status?: ("PENDING" | "ACTIVE" | "DROPPED" | "COMPLETED" | "REJECTED") | null;
+            /**
+             * Pending Enrollments
+             * @default 0
+             */
+            pending_enrollments: number;
+            /**
+             * Progress Percent
+             * @default 0
+             */
+            progress_percent: number;
+            /** Requires Approval */
+            requires_approval: boolean;
+            /** Staff Role */
+            staff_role?: ("INSTRUCTOR" | "TA" | "COORDINATOR" | "ADMIN") | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "CLOSED" | "ARCHIVED";
+            /** Term Code */
+            term_code: string;
+            /** Term Title Fa */
+            term_title_fa: string;
         };
         /** TeamMemberOut */
         TeamMemberOut: {
@@ -17738,6 +18327,48 @@ export interface operations {
             };
         };
     };
+    admin_subscriptions_api_v1_subscriptions_admin_get: {
+        parameters: {
+            query?: {
+                status?: ("PENDING" | "ACTIVE" | "EXPIRED" | "CANCELLED") | null;
+                user_id?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSubscriptionOut"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     grant_subscription_api_v1_subscriptions_grant_post: {
         parameters: {
             query?: never;
@@ -17778,13 +18409,13 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Unprocessable Entity */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -17804,7 +18435,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SubscriptionOut"][];
+                    "application/json": components["schemas"]["AdminSubscriptionOut"][];
                 };
             };
             /** @description Forbidden */
@@ -17913,6 +18544,68 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reject_subscription_api_v1_subscriptions__subscription_id__reject_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subscription_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscriptionRejectIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description SUBSCRIPTION_NOT_PENDING */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -18208,7 +18901,109 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OfferingSummaryOut"][];
+                    "application/json": components["schemas"]["TeachOfferingOut"][];
+                };
+            };
+        };
+    };
+    offering_detail_api_v1_teach_offerings__offering_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeachOfferingDetailOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_offering_api_v1_teach_offerings__offering_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfferingSettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TeachOfferingDetailOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description OFFERING_TRANSITION_INVALID | … */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -18235,6 +19030,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnnouncementOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    attendance_sessions_api_v1_teach_offerings__offering_id__attendance_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttendanceSessionOut"][];
                 };
             };
             /** @description Forbidden */
@@ -18299,6 +19134,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    attendance_sheet_api_v1_teach_offerings__offering_id__attendance__held_on__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+                held_on: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttendanceSheetOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -18369,6 +19254,55 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    gradebook_api_v1_teach_offerings__offering_id__gradebook_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                offering_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GradebookOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -19111,6 +20045,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GradedAnswerOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description پیدا نشد */

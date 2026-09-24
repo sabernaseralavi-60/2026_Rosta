@@ -312,6 +312,17 @@ class CertificateRevoked:
 
 
 @dataclass(frozen=True, slots=True)
+class SubscriptionActivated:
+    subscription_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class SubscriptionRejected:
+    subscription_id: uuid.UUID
+    reason: str
+
+
+@dataclass(frozen=True, slots=True)
 class RoleGranted:
     user_id: uuid.UUID
     role: str
@@ -405,6 +416,8 @@ __all__ = [
     "ResearchSubmitted",
     "ResourceCompleted",
     "RoleGranted",
+    "SubscriptionActivated",
+    "SubscriptionRejected",
     "SessionsRevoked",
     "SurveyStepCompleted",
     "TopicReviewed",

@@ -13,16 +13,18 @@
 
 from __future__ import annotations
 
+import math
 import uuid
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from silp.core.exceptions import NotFound
+from silp.core.exceptions import NotFound, ValidationFailed
 from silp.core.permissions import CurrentUser, Permission
+from silp.core.security import mask_mobile
 from silp.models.access import (
     PLAN_SCOPE_TITLE_FA,
     SUBSCRIPTION_STATUS_TITLE_FA,
@@ -30,6 +32,7 @@ from silp.models.access import (
     SubscriptionPlan,
 )
 from silp.models.education import Course
+from silp.models.identity import User
 from silp.routers.deps import (
     CurrentUserDep,
     EntitlementServiceDep,
@@ -39,19 +42,25 @@ from silp.routers.deps import (
 )
 from silp.schemas.access import (
     RIAL_PER_TOMAN,
+    AdminSubscriptionOut,
     MySubscriptionsOut,
     PlanOut,
     SubscriptionActivateIn,
     SubscriptionGrantIn,
     SubscriptionOut,
+    SubscriptionRejectIn,
     SubscriptionRequestIn,
+    SubscriptionStatus,
 )
 from silp.schemas.common import ErrorResponse
+from silp.services import authz
+from silp.services.directory import display_names, name_of
 from silp.services.entitlement_service import EntitlementService
 
 router = APIRouter(prefix="/subscriptions", tags=["subscriptions"])
 
 SECONDS_PER_DAY = 86400
+MAX_ADMIN_ROWS = 500
 
 
 def _format_price(price_irr: int) -> str:
@@ -84,7 +93,8 @@ def subscription_out(
     *,
     now: datetime,
 ) -> SubscriptionOut:
-    remaining = max(0, int((subscription.ends_at - now).total_seconds() // SECONDS_PER_DAY))
+    # سقف، نه کف: اشتراک سی‌روزه‌ای که همین حالا فعال شد «۳۰ روز مانده» است، نه ۲۹.
+    remaining = max(0, math.ceil((subscription.ends_at - now).total_seconds() / SECONDS_PER_DAY))
     return SubscriptionOut(
         id=subscription.id,
         plan_code=plan.code,
@@ -214,7 +224,11 @@ async def cancel_subscription(
     response_model=SubscriptionOut,
     status_code=status.HTTP_201_CREATED,
     summary="فعال‌سازی اشتراک برای یک کاربر",
-    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+    responses={
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
 )
 async def grant_subscription(
     payload: SubscriptionGrantIn,
@@ -225,16 +239,22 @@ async def grant_subscription(
     """§02 — «پرداخت خارج از سامانه انجام می‌شود».
 
     `payment_ref` شمارهٔ فیش یا کد رهگیری است و **باید** پر شود مگر
-    اشتراک هدیه باشد؛ بدون آن، بعداً معلوم نیست چرا فعال شده.
+    اشتراک هدیه باشد؛ آن‌وقت علتش در `note` می‌آید. بدون هیچ‌کدام، بعداً
+    معلوم نیست چرا فعال شده (ADR-0019).
     """
+    if not (payload.payment_ref or "").strip() and not (payload.note or "").strip():
+        raise ValidationFailed(
+            "کد پیگیری پرداخت را بنویس؛ اگر هدیه است، علتش را در یادداشت بنویس.",
+            code="PAYMENT_REF_REQUIRED",
+        )
     plan = await subscriptions.plan_by_code(payload.plan_code)
     course_id = await _course_id_of(session, payload.course_slug)
     subscription = await subscriptions.grant(
         user_id=payload.user_id,
         plan_id=plan.id,
-        granted_by=actor.id,
+        granted_by=actor,
         course_id=course_id,
-        payment_ref=payload.payment_ref,
+        payment_ref=(payload.payment_ref or "").strip() or None,
         note=payload.note,
     )
     title = await _course_title(session, course_id)
@@ -245,7 +265,11 @@ async def grant_subscription(
     "/{subscription_id}/activate",
     response_model=SubscriptionOut,
     summary="تأیید پرداخت و فعال‌سازی",
-    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+    responses={
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
 )
 async def activate_subscription(
     subscription_id: uuid.UUID,
@@ -254,10 +278,39 @@ async def activate_subscription(
     session: SessionDep,
     actor: Annotated[CurrentUser, Depends(require(Permission.SUBSCRIPTION_GRANT))],
 ) -> SubscriptionOut:
+    """دوره از لحظهٔ تأیید شمرده می‌شود، نه از لحظهٔ درخواست (ADR-0019)."""
     subscription = await subscriptions.activate(
         subscription_id=subscription_id,
-        granted_by=actor.id,
-        payment_ref=payload.payment_ref,
+        granted_by=actor,
+        payment_ref=payload.payment_ref.strip(),
+    )
+    plan = await session.get(SubscriptionPlan, subscription.plan_id)
+    if plan is None:  # pragma: no cover
+        raise NotFound("طرح این اشتراک پیدا نشد.")
+    title = await _course_title(session, subscription.course_id)
+    return subscription_out(subscription, plan, title, now=datetime.now(UTC))
+
+
+@router.post(
+    "/{subscription_id}/reject",
+    response_model=SubscriptionOut,
+    summary="رد درخواست اشتراک",
+    responses={
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse, "description": "SUBSCRIPTION_NOT_PENDING"},
+    },
+)
+async def reject_subscription(
+    subscription_id: uuid.UUID,
+    payload: SubscriptionRejectIn,
+    subscriptions: SubscriptionServiceDep,
+    session: SessionDep,
+    actor: Annotated[CurrentUser, Depends(require(Permission.SUBSCRIPTION_GRANT))],
+) -> SubscriptionOut:
+    """فیش نامعتبر یا مبلغ ناقص — دلیل در اعلان به کاربر می‌رسد."""
+    subscription = await subscriptions.reject(
+        subscription_id=subscription_id, actor=actor, reason=payload.reason
     )
     plan = await session.get(SubscriptionPlan, subscription.plan_id)
     if plan is None:  # pragma: no cover
@@ -267,15 +320,44 @@ async def activate_subscription(
 
 
 @router.get(
+    "/admin",
+    response_model=list[AdminSubscriptionOut],
+    summary="اشتراک‌ها برای پشتیبانی",
+    responses={403: {"model": ErrorResponse}},
+)
+async def admin_subscriptions(
+    session: SessionDep,
+    actor: Annotated[CurrentUser, Depends(require(Permission.SUBSCRIPTION_VIEW_ALL))],
+    status_filter: Annotated[SubscriptionStatus | None, Query(alias="status")] = None,
+    user_id: uuid.UUID | None = None,
+    limit: Annotated[int, Query(ge=1, le=MAX_ADMIN_ROWS)] = 100,
+) -> list[AdminSubscriptionOut]:
+    """در انتظارها قدیمی‌ترین اول (صف است)؛ بقیه تازه‌ترین اول (تاریخچه است)."""
+    stmt = select(Subscription)
+    if status_filter:
+        stmt = stmt.where(Subscription.status == status_filter)
+    if user_id:
+        stmt = stmt.where(Subscription.user_id == user_id)
+    order = (
+        Subscription.created_at.asc()
+        if status_filter == "PENDING"
+        else Subscription.created_at.desc()
+    )
+    rows = list(await session.scalars(stmt.order_by(order).limit(limit)))
+    return await _admin_rows(session, actor, rows)
+
+
+@router.get(
     "/pending",
-    response_model=list[SubscriptionOut],
+    response_model=list[AdminSubscriptionOut],
     summary="درخواست‌های اشتراک در انتظار تأیید",
     responses={403: {"model": ErrorResponse}},
 )
 async def pending_subscriptions(
     session: SessionDep,
-    _: Annotated[CurrentUser, Depends(require(Permission.SUBSCRIPTION_VIEW_ALL))],
-) -> list[SubscriptionOut]:
+    actor: Annotated[CurrentUser, Depends(require(Permission.SUBSCRIPTION_VIEW_ALL))],
+) -> list[AdminSubscriptionOut]:
+    """همان `GET /subscriptions/admin?status=PENDING` — تا ADR-0019 بی‌نام صاحب بود."""
     rows = list(
         await session.scalars(
             select(Subscription)
@@ -283,22 +365,58 @@ async def pending_subscriptions(
             .order_by(Subscription.created_at)
         )
     )
+    return await _admin_rows(session, actor, rows)
+
+
+async def _admin_rows(
+    session: AsyncSession, actor: CurrentUser, rows: list[Subscription]
+) -> list[AdminSubscriptionOut]:
+    if not rows:
+        return []
     now = datetime.now(UTC)
     plans = {
         plan.id: plan
         for plan in await session.scalars(
-            select(SubscriptionPlan).where(
-                SubscriptionPlan.id.in_([r.plan_id for r in rows] or [uuid.UUID(int=0)])
-            )
+            select(SubscriptionPlan).where(SubscriptionPlan.id.in_({r.plan_id for r in rows}))
         )
     }
-    return [
-        subscription_out(
-            row, plans[row.plan_id], await _course_title(session, row.course_id), now=now
+    course_ids = {r.course_id for r in rows if r.course_id}
+    titles: dict[uuid.UUID, str] = {
+        course.id: course.title_fa
+        for course in await session.scalars(
+            select(Course).where(Course.id.in_(course_ids or {uuid.UUID(int=0)}))
         )
-        for row in rows
-        if row.plan_id in plans
-    ]
+    }
+    user_ids = {r.user_id for r in rows}
+    # `.all()` لازم است: `dict()` روی خود Result آن را نگاشت می‌بیند (`keys()` دارد).
+    rows_ = await session.execute(select(User.id, User.mobile).where(User.id.in_(user_ids)))
+    mobiles: dict[uuid.UUID, str | None] = dict(rows_.tuples().all())
+    names = await display_names(session, [*user_ids, *(r.granted_by for r in rows)])
+    full_contact = await authz.has_permission(session, actor, Permission.PROFILE_VIEW_CONTACT)
+    out: list[AdminSubscriptionOut] = []
+    for row in rows:
+        plan = plans.get(row.plan_id)
+        if plan is None:  # pragma: no cover — کلید خارجی
+            continue
+        base = subscription_out(
+            row, plan, titles.get(row.course_id) if row.course_id else None, now=now
+        )
+        owner = names.get(row.user_id)
+        mobile = mobiles.get(row.user_id)
+        out.append(
+            AdminSubscriptionOut(
+                **base.model_dump(),
+                user_id=row.user_id,
+                user_name=owner.full_name if owner else None,
+                username=owner.username if owner else None,
+                user_mobile=mobile if full_contact else mask_mobile(mobile),
+                note=row.note,
+                created_at=row.created_at,
+                granted_by_name=name_of(names, row.granted_by) if row.granted_by else None,
+                cancelled_at=row.cancelled_at,
+            )
+        )
+    return out
 
 
 # ── کمکی ───────────────────────────────────────────────────────────────
