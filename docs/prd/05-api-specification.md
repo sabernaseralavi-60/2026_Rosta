@@ -249,9 +249,11 @@ Authorization: Bearer <access_token>
 | `GET` | `/taxonomy/assets` | فهرست امکانات |
 | `GET` | `/taxonomy/interests` | فهرست علاقه‌ها |
 | `GET` | `/taxonomy/universities?q=` | جستجوی دانشگاه |
-| `GET` | `/taxonomy/terms` | نیم‌سال‌ها، با علامت جاری |
 
 این مسیرها با `Cache-Control: public, max-age=3600` پاسخ می‌دهند.
+
+`GET /taxonomy/terms` در نسخهٔ پیشین این جدول بود ولی هرگز ساخته نشد و هیچ صفحه‌ای
+آن را نمی‌خواند؛ نیم‌سال‌ها برای کادر در `/admin/terms` است (§5.12، [ADR-0020](../adr/0020-course-term-offering-admin.md)).
 
 ---
 
@@ -781,6 +783,13 @@ Excel دفتر نمره در کلاینت از همین پاسخ ساخته می
 | `POST` | `/admin/impersonation/end` | ثبت پایان جعل هویت با توکن خود پشتیبان |
 | `GET` | `/admin/certificates` | جستجوی گواهی با کد یا کاربر — `certificate.revoke` |
 | `POST` | `/admin/certificates/{id}/revoke` | ابطال با دلیل؛ در لاگ حسابرسی و با اعلان به دارنده |
+| `GET/POST` | `/admin/terms` | نیم‌سال‌ها با شمار ارائه؛ تعریف — `term.manage`؛ کد تکراری ⇒ `409 TERM_CODE_TAKEN` |
+| `PATCH/DELETE` | `/admin/terms/{id}` | ویرایش یا جاری کردن (جاری قبلی خاموش می‌شود)؛ حذف فقط بی ارائه و امتیاز ⇒ وگرنه `409 TERM_IN_USE` |
+| `GET/POST` | `/admin/courses` | همهٔ دروس با غیرفعال‌ها، `source_dir`، شمار ارائه و محتوا و `syllabus_weeks`؛ تعریف درس بی‌پوشه — `course.create` |
+| `PATCH` | `/admin/courses/{id}` | ویرایش درسی که در پنل ساخته شده؛ درس پوشه‌ای ⇒ `409 COURSE_MANAGED_BY_FOLDER` |
+| `GET/POST` | `/admin/offerings` | همهٔ ارائه‌ها (`?term_id=&course_id=&status=`)؛ ساخت و سپردن به استاد با هفته‌ها از `SYLLABUS`، `OFFERING` یا `NONE` — `offering.create` |
+| `PATCH/DELETE` | `/admin/offerings/{id}` | تغییر استاد (هر زمان) یا نیم‌سال (فقط بی‌ثبت‌نام)؛ حذف فقط ارائهٔ بی‌استفاده ⇒ وگرنه `409 OFFERING_IN_USE` |
+| `GET` | `/admin/instructor-candidates?q=` | جستجوی حساب فعال برای سپردن ارائه (حداکثر ۱۰، موبایل پوشانده) — `offering.create` |
 | `GET/POST/PATCH` | `/admin/taxonomy/*` | مدیریت طبقه‌بندی |
 | `GET/PATCH` | `/admin/point-rules` | قواعد امتیاز |
 | `POST` | `/admin/point-rules/recalculate` | بازمحاسبهٔ گذشته‌نگر |
@@ -858,6 +867,17 @@ Excel دفتر نمره در کلاینت از همین پاسخ ساخته می
 | `UPLOAD_INCOMPLETE` | 409 | آپلود این فایل کامل نشده است. |
 | `CONCURRENT_MODIFICATION` | 409 | هم‌زمان کس دیگری همین را تغییر داد. دوباره تلاش کنید. |
 | `DUPLICATE_VOTE` | 409 | شما قبلاً به این ایده رأی داده‌اید. |
+| `TERM_CODE_TAKEN` | 409 | نیم‌سالی با این کد از قبل هست. |
+| `TERM_IN_USE` | 409 | این نیم‌سال ارائه یا امتیاز ثبت‌شده دارد و حذف نمی‌شود. |
+| `TERM_ENDED` | 422 | این نیم‌سال تمام شده است؛ ارائه برای نیم‌سال جاری یا آینده تعریف می‌شود. |
+| `COURSE_CODE_TAKEN` / `COURSE_SLUG_TAKEN` | 409 | درسی با این کد (یا نشانی) از قبل هست. |
+| `COURSE_MANAGED_BY_FOLDER` | 409 | این درس از پوشهٔ Courses همگام می‌شود؛ course.yml همان پوشه را ویرایش کنید. |
+| `COURSE_INACTIVE` | 422 | این درس غیرفعال است؛ اول فعالش کنید. |
+| `INSTRUCTOR_INACTIVE` | 422 | حساب این کاربر فعال نیست و ارائه به او سپرده نمی‌شود. |
+| `SYLLABUS_UNAVAILABLE` | 422 | این درس برنامهٔ درسی در course.yml ندارد. |
+| `OFFERING_EXISTS` | 409 | این استاد در همین نیم‌سال از قبل ارائه‌ای از این درس دارد. |
+| `OFFERING_HAS_ENROLLMENTS` | 409 | این ارائه ثبت‌نام دارد (به پیش‌نویس برنمی‌گردد یا نیم‌سالش عوض نمی‌شود). |
+| `OFFERING_IN_USE` | 409 | این ارائه استفاده شده و حذف نمی‌شود؛ بایگانی‌اش کنید. |
 | `VALIDATION_ERROR` | 422 | اطلاعات واردشده معتبر نیست. |
 | `RATE_LIMITED` | 429 | درخواست‌های شما بیش از حد مجاز است. |
 | `INTERNAL_ERROR` | 500 | خطایی رخ داد. کد پیگیری: {trace_id} |

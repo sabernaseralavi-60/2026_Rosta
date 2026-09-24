@@ -205,7 +205,7 @@ silp.ir
 |------|-------|
 | `/admin` | شاخص‌های کلان سامانه |
 | `/admin/users` | مدیریت کاربران، نقش‌ها، جعل هویت |
-| `/admin/courses` | تعریف درس و نیم‌سال |
+| `/admin/courses` | تعریف نیم‌سال و درس، و ساخت ارائه با استادش — مدیر آموزشی و مدیر (ADR-0020) |
 | `/admin/taxonomy` | مدیریت مهارت‌ها، امکانات، علاقه‌ها، برچسب‌ها |
 | `/admin/point-rules` | قواعد امتیازدهی و بازمحاسبه |
 | `/admin/badges` | تعریف نشان و شرایط |
@@ -216,7 +216,9 @@ silp.ir
 | `/admin/certificates` | جستجوی گواهی با کد و ابطال با دلیل |
 | `/admin/subscriptions` | تأیید پرداخت، رد با دلیل و فعال‌سازی مستقیم اشتراک (ADR-0019) |
 
-**ساخته‌شده در M7 بخش د** (زیر پوستهٔ اپلیکیشن، با ناوبری فرعی): `/admin`، `/admin/users` و `/admin/users/[id]`، `/admin/audit`، `/admin/point-rules`، `/admin/notifications` (صف ارسال و الگوها)، `/admin/certificates`؛ و `/admin/subscriptions` در ADR-0019. `/admin/courses`، `/admin/taxonomy`، `/admin/badges`، `/admin/settings` و `/admin/health` مانده‌اند ([ADR-0017](../adr/0017-public-certificates-admin-and-search.md)).
+**ساخته‌شده در M7 بخش د** (زیر پوستهٔ اپلیکیشن، با ناوبری فرعی): `/admin`، `/admin/users` و `/admin/users/[id]`، `/admin/audit`، `/admin/point-rules`، `/admin/notifications` (صف ارسال و الگوها)، `/admin/certificates`؛ `/admin/subscriptions` در ADR-0019؛ و `/admin/courses` در [ADR-0020](../adr/0020-course-term-offering-admin.md). `/admin/taxonomy`، `/admin/badges`، `/admin/settings` و `/admin/health` مانده‌اند ([ADR-0017](../adr/0017-public-certificates-admin-and-search.md)).
+
+پنل برای مدیر آموزشی هم باز است، ولی هر پیوند ناوبری نقش‌های خودش را دارد: مدیر آموزشی فقط «درس‌ها و ارائه‌ها» را می‌بیند و پیوند «مدیریت» هدر او را مستقیم به همان‌جا می‌برد؛ نشانی‌ای که نقش به آن نمی‌رسد توضیح و راه می‌گیرد، نه ۴۰۳ خام.
 
 ---
 
