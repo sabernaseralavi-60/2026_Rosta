@@ -25,6 +25,8 @@ dependencies = [
   "pyyaml>=6.0.2,<7",
   # M7-17 — معیارهای /metrics و کارگر (NFR-14).
   "prometheus-client>=0.21,<1",
+  # ADR-0029 — اعلان Push وب (VAPID + رمزنگاری RFC 8291).
+  "pywebpush>=2.0,<3",
 ]
 
 [project.optional-dependencies]
@@ -105,7 +107,7 @@ module = ["silp.db.migrations.*"]
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = ["arq.*", "slugify.*"]
+module = ["arq.*", "slugify.*", "pywebpush.*", "py_vapid.*"]
 ignore_missing_imports = true
 
 # ── pytest ─────────────────────────────────────────────────────────────

@@ -25,6 +25,7 @@ PRODUCTION: dict[str, Any] = {
     "email_provider": "disabled",
     "telegram_provider": "disabled",
     "eitaa_provider": "disabled",
+    "push_provider": "disabled",
     "metrics_token": "scrape-secret",
 }
 
@@ -50,3 +51,12 @@ def test_development_otp_never_reaches_production() -> None:
 
 def test_metrics_token_is_optional_outside_production() -> None:
     assert build(environment="development", metrics_token="", dev_fixed_otp="111111")
+
+
+def test_push_needs_real_keys_in_production() -> None:
+    with pytest.raises(ValidationError, match="PUSH_PROVIDER"):
+        build(push_provider="memory")
+    with pytest.raises(ValidationError, match="VAPID"):
+        build(push_provider="webpush")
+    ok = build(push_provider="webpush", vapid_public_key="pub", vapid_private_key="priv")
+    assert ok.push_provider == "webpush"

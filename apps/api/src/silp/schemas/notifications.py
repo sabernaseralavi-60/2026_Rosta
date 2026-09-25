@@ -18,7 +18,7 @@ from silp.models.messaging import Notification
 
 Group = Literal["COURSE", "PROJECT", "SOCIAL", "SYSTEM"]
 Priority = Literal["LOW", "NORMAL", "IMPORTANT", "URGENT"]
-Channel = Literal["IN_APP", "EMAIL", "SMS", "TELEGRAM", "EITAA", "WHATSAPP"]
+Channel = Literal["IN_APP", "EMAIL", "SMS", "PUSH", "TELEGRAM", "EITAA", "WHATSAPP"]
 LinkableChannel = Literal["TELEGRAM", "EITAA"]
 OutboxStatus = Literal["QUEUED", "SENDING", "SENT", "FAILED", "DEAD"]
 
@@ -87,6 +87,8 @@ class ChannelStatusOut(BaseModel):
     address_masked: str | None = None
     link_flow: Literal["DEEP_LINK", "CODE"] | None = None
     pending_link: bool = False
+    devices: int = 0
+    """فقط Push: شمار مرورگرها و دستگاه‌های مشترک."""
 
 
 class QuietHoursOut(BaseModel):
@@ -98,6 +100,25 @@ class PreferencesOut(BaseModel):
     groups: list[GroupPreferenceOut]
     channels: list[ChannelStatusOut]
     quiet_hours: QuietHoursOut
+    push_public_key: str | None = None
+    """کلید عمومی VAPID برای `pushManager.subscribe`؛ خالی یعنی Push خاموش است."""
+
+
+# ── اشتراک Push وب — ADR-0029 ───────────────────────────────────────────
+class PushKeysIn(BaseModel):
+    p256dh: Annotated[str, Field(min_length=1, max_length=256)]
+    auth: Annotated[str, Field(min_length=1, max_length=256)]
+
+
+class PushSubscriptionIn(BaseModel):
+    """`PushSubscription.toJSON()` مرورگر، همان‌طور که هست."""
+
+    endpoint: Annotated[str, Field(min_length=1, max_length=2048)]
+    keys: PushKeysIn
+
+
+class PushDevicesOut(BaseModel):
+    devices: int
 
 
 class PreferencesIn(BaseModel):

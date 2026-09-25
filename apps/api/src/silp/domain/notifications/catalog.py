@@ -22,12 +22,12 @@ from typing import Literal
 
 Group = Literal["COURSE", "PROJECT", "SOCIAL", "SYSTEM"]
 Priority = Literal["LOW", "NORMAL", "IMPORTANT", "URGENT"]
-Channel = Literal["IN_APP", "EMAIL", "SMS", "TELEGRAM", "EITAA", "WHATSAPP"]
+Channel = Literal["IN_APP", "EMAIL", "SMS", "PUSH", "TELEGRAM", "EITAA", "WHATSAPP"]
 
 GROUPS: tuple[Group, ...] = ("COURSE", "PROJECT", "SOCIAL", "SYSTEM")
 PRIORITIES: tuple[Priority, ...] = ("LOW", "NORMAL", "IMPORTANT", "URGENT")
 #: کانال‌های جدول `outbox_messages` — §4.9. `IN_APP` در صف نمی‌رود.
-EXTERNAL_CHANNELS: tuple[Channel, ...] = ("EMAIL", "SMS", "TELEGRAM", "EITAA", "WHATSAPP")
+EXTERNAL_CHANNELS: tuple[Channel, ...] = ("EMAIL", "SMS", "PUSH", "TELEGRAM", "EITAA", "WHATSAPP")
 CHANNELS: tuple[Channel, ...] = ("IN_APP", *EXTERNAL_CHANNELS)
 #: کانال‌هایی که نشانی‌شان را کاربر با پیوند دادن حساب پیام‌رسان می‌سازد.
 LINKABLE_CHANNELS: tuple[Channel, ...] = ("TELEGRAM", "EITAA")
@@ -50,6 +50,7 @@ CHANNEL_TITLE_FA: dict[Channel, str] = {
     "IN_APP": "داخل سامانه",
     "EMAIL": "ایمیل",
     "SMS": "پیامک",
+    "PUSH": "مرورگر و دستگاه",
     "TELEGRAM": "تلگرام",
     "EITAA": "ایتا",
     "WHATSAPP": "واتساپ",

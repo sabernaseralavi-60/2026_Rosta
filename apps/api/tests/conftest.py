@@ -26,6 +26,8 @@ os.environ.setdefault("TELEGRAM_PROVIDER", "memory")
 os.environ.setdefault("TELEGRAM_BOT_USERNAME", "silp_test_bot")
 os.environ.setdefault("TELEGRAM_WEBHOOK_SECRET", "test-telegram-webhook-secret")
 os.environ.setdefault("EITAA_PROVIDER", "memory")
+os.environ.setdefault("PUSH_PROVIDER", "memory")
+os.environ.setdefault("VAPID_PUBLIC_KEY", "BTestPublicKeyOnlyForTests")
 # ساعت آرام خاموش: تست‌ها در هر ساعتی از شبانه‌روز اجرا می‌شوند و پیامی
 # که تا ۸ صبح عقب افتاده، در تست «ارسال نشده» دیده می‌شد. رفتار ساعت آرام
 # خودش تست واحد دارد.
@@ -70,7 +72,7 @@ def channels():  # type: ignore[no-untyped-def]
     """آداپتورهای حافظه‌ای همهٔ کانال‌های بیرونی — همان نمونه‌هایی که صف می‌بیند."""
     from silp.integrations.messaging import memory_sender
 
-    senders = {c: memory_sender(c) for c in ("SMS", "EMAIL", "TELEGRAM", "EITAA")}
+    senders = {c: memory_sender(c) for c in ("SMS", "EMAIL", "PUSH", "TELEGRAM", "EITAA")}
     for sender in senders.values():
         sender.reset()
     yield senders

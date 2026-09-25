@@ -3287,12 +3287,18 @@
               "IN_APP",
               "EMAIL",
               "SMS",
+              "PUSH",
               "TELEGRAM",
               "EITAA",
               "WHATSAPP"
             ],
             "title": "Channel",
             "type": "string"
+          },
+          "devices": {
+            "default": 0,
+            "title": "Devices",
+            "type": "integer"
           },
           "link_flow": {
             "anyOf": [
@@ -6090,6 +6096,7 @@
                 "IN_APP",
                 "EMAIL",
                 "SMS",
+                "PUSH",
                 "TELEGRAM",
                 "EITAA",
                 "WHATSAPP"
@@ -10698,6 +10705,7 @@
               "IN_APP",
               "EMAIL",
               "SMS",
+              "PUSH",
               "TELEGRAM",
               "EITAA",
               "WHATSAPP"
@@ -12675,6 +12683,7 @@
                   "IN_APP",
                   "EMAIL",
                   "SMS",
+                  "PUSH",
                   "TELEGRAM",
                   "EITAA",
                   "WHATSAPP"
@@ -12717,6 +12726,17 @@
             },
             "title": "Groups",
             "type": "array"
+          },
+          "push_public_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Push Public Key"
           },
           "quiet_hours": {
             "$ref": "#/components/schemas/QuietHoursOut"
@@ -14634,6 +14654,61 @@
           }
         },
         "title": "PublishWeekIn",
+        "type": "object"
+      },
+      "PushDevicesOut": {
+        "properties": {
+          "devices": {
+            "title": "Devices",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "devices"
+        ],
+        "title": "PushDevicesOut",
+        "type": "object"
+      },
+      "PushKeysIn": {
+        "properties": {
+          "auth": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Auth",
+            "type": "string"
+          },
+          "p256dh": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "P256Dh",
+            "type": "string"
+          }
+        },
+        "required": [
+          "p256dh",
+          "auth"
+        ],
+        "title": "PushKeysIn",
+        "type": "object"
+      },
+      "PushSubscriptionIn": {
+        "description": "`PushSubscription.toJSON()` مرورگر، همان‌طور که هست.",
+        "properties": {
+          "endpoint": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "keys": {
+            "$ref": "#/components/schemas/PushKeysIn"
+          }
+        },
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "title": "PushSubscriptionIn",
         "type": "object"
       },
       "QuestionIn": {
@@ -19813,6 +19888,7 @@
               "IN_APP",
               "EMAIL",
               "SMS",
+              "PUSH",
               "TELEGRAM",
               "EITAA",
               "WHATSAPP"
@@ -19887,6 +19963,7 @@
               "IN_APP",
               "EMAIL",
               "SMS",
+              "PUSH",
               "TELEGRAM",
               "EITAA",
               "WHATSAPP"
@@ -29729,6 +29806,119 @@
           }
         ],
         "summary": "ذخیرهٔ تنظیمات کانال",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/push/subscriptions": {
+      "delete": {
+        "operationId": "push_unsubscribe_api_v1_notifications_push_subscriptions_delete",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "endpoint",
+            "required": true,
+            "schema": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "title": "Endpoint",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushDevicesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "برداشتن اشتراک Push این مرورگر",
+        "tags": [
+          "notifications"
+        ]
+      },
+      "post": {
+        "operationId": "push_subscribe_api_v1_notifications_push_subscriptions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushSubscriptionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushDevicesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت اشتراک Push این مرورگر",
         "tags": [
           "notifications"
         ]

@@ -5,6 +5,7 @@
 | `notifications` | مرکز اعلان داخلی (FR-MSG-01) |
 | `notification_preferences` | کانال‌های هر دستهٔ اعلان برای هر کاربر (FR-MSG-02) |
 | `user_channels` | شناسهٔ گفت‌وگوی تلگرام و ایتا پس از پیوند — ADR-0013 |
+| `push_subscriptions` | اشتراک Push هر مرورگر و دستگاه — ADR-0029، مهاجرت 0022 |
 | `outbox_messages` | صف ارسال بیرونی با الگوی Outbox (D-08، §7.10) |
 | `message_templates` | متن هر نوع اعلان برای هر کانال (FR-MSG-03) |
 
@@ -161,6 +162,32 @@ class UserChannel(Base):
         return self.verified_at is not None and self.address is not None
 
 
+class PushSubscription(UUIDPrimaryKeyMixin, Base):
+    """اشتراک Push یک مرورگر — ADR-0029. هر کاربر چند دستگاه دارد.
+
+    `endpoint` یکتاست: مرورگری که کاربر دیگری وارد آن می‌شود، همان اشتراک را
+    به مالک تازه منتقل می‌کند، نه اشتراک دوم.
+    """
+
+    __tablename__ = "push_subscriptions"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    endpoint: Mapped[str] = mapped_column(Text, nullable=False)
+    p256dh: Mapped[str] = mapped_column(Text, nullable=False)
+    auth: Mapped[str] = mapped_column(Text, nullable=False)
+    user_agent: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+    __table_args__ = (
+        Index("idx_push_subscriptions_endpoint", "endpoint", unique=True),
+        Index("idx_push_subscriptions_user", "user_id", "created_at"),
+    )
+
+
 class OutboxMessage(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "outbox_messages"
 
@@ -227,5 +254,6 @@ __all__ = [
     "Notification",
     "NotificationPreference",
     "OutboxMessage",
+    "PushSubscription",
     "UserChannel",
 ]

@@ -110,6 +110,20 @@ class Settings(BaseSettings):
     eitaa_provider: Literal["disabled", "console", "memory", "eitaayar"] = "disabled"
     eitaa_api_token: str = ""
     eitaa_api_base: str = "https://eitaayar.ir/api"
+    # ── اعلان Push وب (ADR-0029) ───────────────────────────────────────
+    # سرویس Push مرورگر (FCM برای کروم) از داخل ایران ممکن است در دسترس
+    # نباشد؛ پس کانال اختیاری است و شکستش بقیه را متوقف نمی‌کند (FR-MSG-02).
+    # جفت‌کلید VAPID با `python -m silp.scripts.gen_vapid_keys` ساخته می‌شود.
+    push_provider: Literal["disabled", "console", "memory", "webpush"] = "disabled"
+    vapid_public_key: str = ""
+    vapid_private_key: str = ""
+    vapid_subject: str = "mailto:admin@silp.local"
+    # میزبان‌های مجاز نقطهٔ پایانی اشتراک. سرور به نشانی‌ای که کاربر می‌دهد
+    # POST می‌زند؛ بی فهرست مجاز، این یک SSRF است.
+    push_allowed_hosts: str = (
+        "fcm.googleapis.com,updates.push.services.mozilla.com,"
+        "web.push.apple.com,notify.windows.com"
+    )
     messaging_timeout_seconds: Annotated[float, Field(gt=0, le=60)] = 10.0
 
     # ── صف ارسال (§7.10) ───────────────────────────────────────────────
@@ -211,6 +225,12 @@ class Settings(BaseSettings):
             )
         if self.eitaa_provider == "eitaayar" and not self.eitaa_api_token:
             problems.append("EITAA_API_TOKEN برای ایتایار لازم است.")
+        if self.push_provider in ("console", "memory"):
+            problems.append("PUSH_PROVIDER در تولید باید webpush یا disabled باشد.")
+        if self.push_provider == "webpush" and not (
+            self.vapid_public_key and self.vapid_private_key
+        ):
+            problems.append("VAPID_PUBLIC_KEY و VAPID_PRIVATE_KEY برای webpush لازم‌اند.")
         if not self.metrics_token:
             # /metrics شمار کاربران و عمق صف را نشان می‌دهد (M7-17).
             problems.append("METRICS_TOKEN در تولید لازم است.")

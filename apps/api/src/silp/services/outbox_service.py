@@ -38,7 +38,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.config import Settings, get_settings
@@ -47,16 +47,23 @@ from silp.core.logging import get_logger
 from silp.core.permissions import Role
 from silp.domain.gamification.formulas import LOCAL_TZ
 from silp.domain.notifications import schedule
+from silp.domain.notifications.push import endpoint_of
 from silp.domain.notifications.templating import Rendered, TemplateError, render
 from silp.domain.text import to_persian_digits
 from silp.integrations.messaging import ChannelSender, OutgoingMessage, SendResult, channel_sender
 from silp.models.identity import UserRole
-from silp.models.messaging import DISPATCHABLE_STATUSES, OUTBOX_STATUSES, OutboxMessage
+from silp.models.messaging import (
+    DISPATCHABLE_STATUSES,
+    OUTBOX_STATUSES,
+    OutboxMessage,
+    PushSubscription,
+)
 from silp.services.notification_service import NotificationService
 
 log = get_logger("silp.outbox")
 
 MAX_ERROR_LENGTH = 500
+REVOKED_ERROR = "اشتراک Push لغو شده است."
 SIGNATURE = "— سامانهٔ سابِر"
 
 
@@ -70,6 +77,8 @@ class DispatchStats:
     sent: int = 0
     failed: int = 0
     dead: int = 0
+    #: اشتراک Push لغوشده — جدا از `dead` تا هشدار مدیر را برنینگیزد.
+    revoked: int = 0
 
     def as_dict(self) -> dict[str, int]:
         return {
@@ -77,6 +86,7 @@ class DispatchStats:
             "sent": self.sent,
             "failed": self.failed,
             "dead": self.dead,
+            "revoked": self.revoked,
         }
 
 
@@ -136,7 +146,7 @@ class OutboxService:
 
         await asyncio.gather(*(run(job) for job in jobs))
         await self._record(jobs, stats)
-        if stats.sent or stats.failed or stats.dead:
+        if stats.sent or stats.failed or stats.dead or stats.revoked:
             log.info("outbox_dispatched", **stats.as_dict())
         return stats
 
@@ -169,6 +179,8 @@ class OutboxService:
                     recipient=row.recipient,
                     subject=rendered.subject,
                     body=rendered.body,
+                    link=str((row.payload or {}).get("values", {}).get("link") or "") or None,
+                    priority=row.priority,
                 )
             jobs.append(job)
         await self.session.commit()
@@ -193,6 +205,12 @@ class OutboxService:
                     "last_error": None,
                 }
                 stats.sent += 1
+            elif result.revoked:
+                # اشتراک Push لغو شده — رفت‌وآمد عادی مرورگرهاست، نه خرابی؛ مدیر
+                # را بیدار نمی‌کند (`_alert_admins` این خطا را نمی‌شمارد).
+                values = {"status": "DEAD", "last_error": REVOKED_ERROR}
+                stats.revoked += 1
+                await self._forget_subscription(job)
             elif result.permanent or schedule.is_exhausted(job.attempts):
                 values = {"status": "DEAD", "last_error": _clip(result.error)}
                 stats.dead += 1
@@ -208,6 +226,13 @@ class OutboxService:
         if stats.dead:
             await self._alert_admins(now)
         await self.session.commit()
+
+    async def _forget_subscription(self, job: _Job) -> None:
+        endpoint = endpoint_of(job.message.recipient) if job.message else None
+        if endpoint is not None:
+            await self.session.execute(
+                delete(PushSubscription).where(PushSubscription.endpoint == endpoint)
+            )
 
     def _sender(self, channel: str) -> ChannelSender | None:
         if channel not in self._senders:
@@ -249,6 +274,7 @@ class OutboxService:
             .where(
                 OutboxMessage.status == "DEAD",
                 OutboxMessage.created_at >= now - timedelta(days=1),
+                func.coalesce(OutboxMessage.last_error, "") != REVOKED_ERROR,
             )
         )
 
@@ -329,6 +355,9 @@ def _wrap(channel: str, inner: Rendered, values: Mapping[str, object]) -> Render
     link = str(values.get("link") or "")
     if channel == "SMS":
         return Rendered(subject=None, body=inner.body)
+    if channel == "PUSH":
+        # لینک از `OutgoingMessage.link` می‌رود و با لمس اعلان باز می‌شود؛ در متن نمی‌آید.
+        return Rendered(subject=inner.subject, body=inner.body)
     if channel == "EMAIL":
         name = str(values.get("name") or "").strip()
         parts = [f"سلام {name}،" if name else "سلام،", inner.body]

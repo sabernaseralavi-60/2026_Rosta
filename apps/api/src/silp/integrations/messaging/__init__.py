@@ -4,6 +4,7 @@
 |-------|----------|----------------|
 | `SMS` | `SMS_PROVIDER` | کاوه‌نگار |
 | `EMAIL` | `EMAIL_PROVIDER` | SMTP |
+| `PUSH` | `PUSH_PROVIDER` | Web Push با VAPID — ADR-0029 |
 | `TELEGRAM` | `TELEGRAM_PROVIDER` | Bot API (با پروکسی اختیاری) |
 | `EITAA` | `EITAA_PROVIDER` | ایتایار |
 
@@ -57,6 +58,8 @@ def enabled_channels(settings: Settings) -> tuple[str, ...]:
     enabled = {"SMS"}
     if settings.email_provider != "disabled":
         enabled.add("EMAIL")
+    if settings.push_provider != "disabled":
+        enabled.add("PUSH")
     if settings.telegram_provider != "disabled":
         enabled.add("TELEGRAM")
     if settings.eitaa_provider != "disabled":
@@ -87,6 +90,18 @@ def channel_sender(settings: Settings, channel: str) -> ChannelSender | None:
                     user=settings.smtp_user,
                     password=settings.smtp_password,
                     use_tls=settings.smtp_tls,
+                    timeout=timeout,
+                )
+            return None
+        case "PUSH":
+            if settings.push_provider in ("console", "memory"):
+                return _dev_sender(settings.push_provider, channel)
+            if settings.push_provider == "webpush":
+                from silp.integrations.messaging.webpush import WebPushSender
+
+                return WebPushSender(
+                    private_key=settings.vapid_private_key,
+                    subject=settings.vapid_subject,
                     timeout=timeout,
                 )
             return None

@@ -24,6 +24,9 @@ class OutgoingMessage:
     recipient: str
     subject: str | None
     body: str
+    #: نشانی اقدام (مطلق) — فقط Push از آن استفاده می‌کند تا با یک لمس باز شود.
+    link: str | None = None
+    priority: str = "NORMAL"
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +36,8 @@ class SendResult:
     error: str | None = None
     #: تکرار بی‌فایده است — صف مستقیم `DEAD` می‌کند (§7.10).
     permanent: bool = False
+    #: گیرنده دیگر وجود ندارد (اشتراک Push لغو شده) — صف آن را پاک می‌کند.
+    revoked: bool = False
 
 
 class ChannelSender(Protocol):
@@ -71,10 +76,18 @@ class MemoryChannelSender:
         return SendResult(delivered=True, provider_message_id=f"memory-{len(self.sent)}")
 
     def fail_next(
-        self, times: int = 1, *, permanent: bool = False, error: str = "خطای آزمایشی"
+        self,
+        times: int = 1,
+        *,
+        permanent: bool = False,
+        revoked: bool = False,
+        error: str = "خطای آزمایشی",
     ) -> None:
         self._failures.extend(
-            SendResult(delivered=False, error=error, permanent=permanent) for _ in range(times)
+            SendResult(
+                delivered=False, error=error, permanent=permanent or revoked, revoked=revoked
+            )
+            for _ in range(times)
         )
 
     def reset(self) -> None:

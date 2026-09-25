@@ -1790,6 +1790,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications/push/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ثبت اشتراک Push این مرورگر */
+        post: operations["push_subscribe_api_v1_notifications_push_subscriptions_post"];
+        /** برداشتن اشتراک Push این مرورگر */
+        delete: operations["push_unsubscribe_api_v1_notifications_push_subscriptions_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications/read-all": {
         parameters: {
             query?: never;
@@ -5883,7 +5901,12 @@ export interface components {
              * Channel
              * @enum {string}
              */
-            channel: "IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            channel: "IN_APP" | "EMAIL" | "SMS" | "PUSH" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            /**
+             * Devices
+             * @default 0
+             */
+            devices: number;
             /** Link Flow */
             link_flow?: ("DEEP_LINK" | "CODE") | null;
             /** Linked */
@@ -6872,7 +6895,7 @@ export interface components {
         /** GroupPreferenceOut */
         GroupPreferenceOut: {
             /** Channels */
-            channels: ("IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP")[];
+            channels: ("IN_APP" | "EMAIL" | "SMS" | "PUSH" | "TELEGRAM" | "EITAA" | "WHATSAPP")[];
             /** Description Fa */
             description_fa: string;
             /**
@@ -8575,7 +8598,7 @@ export interface components {
              * Channel
              * @enum {string}
              */
-            channel: "IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            channel: "IN_APP" | "EMAIL" | "SMS" | "PUSH" | "TELEGRAM" | "EITAA" | "WHATSAPP";
             /**
              * Created At
              * Format: date-time
@@ -9208,7 +9231,7 @@ export interface components {
              * @description دسته ⇒ کانال‌ها. «داخل سامانه» همیشه افزوده می‌شود.
              */
             groups: {
-                [key: string]: ("IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP")[];
+                [key: string]: ("IN_APP" | "EMAIL" | "SMS" | "PUSH" | "TELEGRAM" | "EITAA" | "WHATSAPP")[];
             };
         };
         /** PreferencesOut */
@@ -9217,6 +9240,8 @@ export interface components {
             channels: components["schemas"]["ChannelStatusOut"][];
             /** Groups */
             groups: components["schemas"]["GroupPreferenceOut"][];
+            /** Push Public Key */
+            push_public_key?: string | null;
             quiet_hours: components["schemas"]["QuietHoursOut"];
         };
         /** PreferencesStepIn */
@@ -9843,6 +9868,27 @@ export interface components {
         PublishWeekIn: {
             /** Publish At */
             publish_at?: string | null;
+        };
+        /** PushDevicesOut */
+        PushDevicesOut: {
+            /** Devices */
+            devices: number;
+        };
+        /** PushKeysIn */
+        PushKeysIn: {
+            /** Auth */
+            auth: string;
+            /** P256Dh */
+            p256dh: string;
+        };
+        /**
+         * PushSubscriptionIn
+         * @description `PushSubscription.toJSON()` مرورگر، همان‌طور که هست.
+         */
+        PushSubscriptionIn: {
+            /** Endpoint */
+            endpoint: string;
+            keys: components["schemas"]["PushKeysIn"];
         };
         /** QuestionIn */
         QuestionIn: {
@@ -11784,7 +11830,7 @@ export interface components {
              * Channel
              * @enum {string}
              */
-            channel: "IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            channel: "IN_APP" | "EMAIL" | "SMS" | "PUSH" | "TELEGRAM" | "EITAA" | "WHATSAPP";
             /** Code */
             code: string;
             /** Is Active */
@@ -11809,7 +11855,7 @@ export interface components {
              * Channel
              * @enum {string}
              */
-            channel: "IN_APP" | "EMAIL" | "SMS" | "TELEGRAM" | "EITAA" | "WHATSAPP";
+            channel: "IN_APP" | "EMAIL" | "SMS" | "PUSH" | "TELEGRAM" | "EITAA" | "WHATSAPP";
             /** Code */
             code: string;
             /** Subject */
@@ -17533,6 +17579,88 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PreferencesOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    push_subscribe_api_v1_notifications_push_subscriptions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushSubscriptionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushDevicesOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    push_unsubscribe_api_v1_notifications_push_subscriptions_delete: {
+        parameters: {
+            query: {
+                endpoint: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushDevicesOut"];
                 };
             };
             /** @description احراز هویت نشده */

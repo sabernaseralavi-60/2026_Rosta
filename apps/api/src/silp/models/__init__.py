@@ -47,6 +47,7 @@ from silp.models.messaging import (
     Notification,
     NotificationPreference,
     OutboxMessage,
+    PushSubscription,
     UserChannel,
 )
 from silp.models.profile import (
@@ -166,6 +167,7 @@ __all__ = [
     "University",
     "User",
     "UserBadge",
+    "PushSubscription",
     "UserChannel",
     "UserRole",
     "Venture",

@@ -20,6 +20,7 @@ import hmac
 import uuid
 from datetime import UTC, datetime
 from typing import Annotated, Any
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, Depends, Header, Query, Request, Response
 from fastapi.responses import StreamingResponse
@@ -29,6 +30,7 @@ from silp.core.permissions import CurrentUser, Permission
 from silp.core.security import mask_email, mask_mobile
 from silp.db.session import get_session_factory
 from silp.domain.notifications import catalog
+from silp.domain.notifications.push import endpoint_of
 from silp.integrations.messaging import enabled_channels
 from silp.integrations.messaging.bots import parse_telegram_start
 from silp.models.identity import User
@@ -49,6 +51,8 @@ from silp.schemas.notifications import (
     OutboxStatus,
     PreferencesIn,
     PreferencesOut,
+    PushDevicesOut,
+    PushSubscriptionIn,
     QuietHoursOut,
     ReadAllOut,
     RetriedOut,
@@ -62,6 +66,7 @@ from silp.services.channel_link_service import LINK_FLOW, ChannelLinkService
 from silp.services.notification_service import NotificationService
 from silp.services.notification_stream import notification_events
 from silp.services.outbox_service import OutboxService
+from silp.services.push_service import PushService
 from silp.services.template_service import TemplateService
 
 AUTH_ERRORS: dict[int | str, dict[str, Any]] = {
@@ -143,11 +148,14 @@ async def _preferences_out(
     links = await ChannelLinkService(session, settings).links(user_id)
     now = datetime.now(UTC)
 
+    devices = await PushService(session, settings).count(user_id)
     channels: list[ChannelStatusOut] = []
-    for channel in ("SMS", "EMAIL", *catalog.LINKABLE_CHANNELS):
+    for channel in ("SMS", "EMAIL", "PUSH", *catalog.LINKABLE_CHANNELS):
         link = links.get(channel)
         if channel == "SMS":
             linked, masked = bool(user and user.mobile), mask_mobile(user.mobile if user else None)
+        elif channel == "PUSH":
+            linked, masked = devices > 0, None
         elif channel == "EMAIL":
             verified = bool(user and user.email and user.email_verified_at)
             linked, masked = verified, mask_email(user.email) if verified and user else None
@@ -169,6 +177,7 @@ async def _preferences_out(
                     and link.link_expires_at
                     and link.link_expires_at > now
                 ),
+                devices=devices if channel == "PUSH" else 0,
             )
         )
     return PreferencesOut(
@@ -183,6 +192,7 @@ async def _preferences_out(
         ],
         channels=channels,
         quiet_hours=QuietHoursOut(start=settings.quiet_hours_start, end=settings.quiet_hours_end),
+        push_public_key=(settings.vapid_public_key or None) if "PUSH" in enabled else None,
     )
 
 
@@ -208,6 +218,45 @@ async def put_preferences(
     choices = {group: list(channels) for group, channels in body.groups.items()}
     await NotificationService(session, settings).set_preferences(user.id, choices)
     return await _preferences_out(session, settings, user.id)
+
+
+# ── اشتراک Push وب — ADR-0029 ───────────────────────────────────────────
+@router.post(
+    "/push/subscriptions",
+    response_model=PushDevicesOut,
+    summary="ثبت اشتراک Push این مرورگر",
+)
+async def push_subscribe(
+    body: PushSubscriptionIn,
+    request: Request,
+    user: CurrentUserDep,
+    session: SessionDep,
+    settings: SettingsDep,
+) -> PushDevicesOut:
+    devices = await PushService(session, settings).subscribe(
+        user.id,
+        endpoint=body.endpoint,
+        p256dh=body.keys.p256dh,
+        auth=body.keys.auth,
+        user_agent=request.headers.get("user-agent"),
+    )
+    return PushDevicesOut(devices=devices)
+
+
+@router.delete(
+    "/push/subscriptions",
+    response_model=PushDevicesOut,
+    summary="برداشتن اشتراک Push این مرورگر",
+)
+async def push_unsubscribe(
+    endpoint: Annotated[str, Query(min_length=1, max_length=2048)],
+    user: CurrentUserDep,
+    session: SessionDep,
+    settings: SettingsDep,
+) -> PushDevicesOut:
+    return PushDevicesOut(
+        devices=await PushService(session, settings).unsubscribe(user.id, endpoint)
+    )
 
 
 # ── پیوند پیام‌رسان ────────────────────────────────────────────────────
@@ -300,6 +349,9 @@ def _outbox_out(message: OutboxMessage) -> OutboxMessageOut:
         masked = mask_mobile(message.recipient) or ""
     elif message.channel == "EMAIL":
         masked = mask_email(message.recipient) or ""
+    elif message.channel == "PUSH":
+        # اشتراک کلید رمزنگاری دارد؛ فقط میزبان سرویس Push دیده می‌شود.
+        masked = urlsplit(endpoint_of(message.recipient) or "").hostname or "—"
     else:
         masked = _mask_chat(message.recipient) or ""
     return OutboxMessageOut(

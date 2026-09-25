@@ -45,6 +45,7 @@ from silp.core.exceptions import NotFound, ValidationFailed
 from silp.core.logging import get_logger
 from silp.domain.notifications import catalog, schedule
 from silp.domain.notifications.catalog import Channel, Group, Kind, Priority
+from silp.domain.notifications.push import subscription_recipient
 from silp.domain.notifications.templating import TemplateError, render
 from silp.integrations.messaging import enabled_channels
 from silp.models.identity import User
@@ -53,6 +54,7 @@ from silp.models.messaging import (
     Notification,
     NotificationPreference,
     OutboxMessage,
+    PushSubscription,
     UserChannel,
 )
 from silp.models.profile import Profile
@@ -167,21 +169,20 @@ class NotificationService:
         for notification in created:
             info = users[notification.user_id]
             for channel in channels.get(notification.user_id, ()):
-                address = info.address(channel)
-                if address is None:
-                    continue
-                outbox.append(
-                    {
-                        "channel": channel,
-                        "recipient": address,
-                        "template": kind.code,
-                        "payload": {"values": per_user_values[notification.user_id]},
-                        "notification_id": notification.id,
-                        "user_id": notification.user_id,
-                        "priority": level,
-                        "next_attempt_at": self.first_attempt_at(now, level),
-                    }
-                )
+                # Push یک ردیف صف برای هر دستگاه دارد؛ بقیهٔ کانال‌ها یک نشانی.
+                for address in info.addresses(channel):
+                    outbox.append(
+                        {
+                            "channel": channel,
+                            "recipient": address,
+                            "template": kind.code,
+                            "payload": {"values": per_user_values[notification.user_id]},
+                            "notification_id": notification.id,
+                            "user_id": notification.user_id,
+                            "priority": level,
+                            "next_attempt_at": self.first_attempt_at(now, level),
+                        }
+                    )
         if outbox:
             await self.session.execute(insert(OutboxMessage).values(outbox))
 
@@ -311,6 +312,16 @@ class NotificationService:
             ):
                 if link.address:
                     recipients[link.user_id].linked[link.channel] = link.address
+            for subscription in await self.session.scalars(
+                select(PushSubscription)
+                .where(PushSubscription.user_id.in_(list(recipients)))
+                .order_by(PushSubscription.created_at)
+            ):
+                recipients[subscription.user_id].push.append(
+                    subscription_recipient(
+                        subscription.endpoint, subscription.p256dh, subscription.auth
+                    )
+                )
         return recipients
 
     # ── بازنویسی و پس‌گرفتن — ADR-0021 ─────────────────────────────────
@@ -552,20 +563,26 @@ class NotificationService:
 
 
 class _Recipient:
-    __slots__ = ("email", "first_name", "linked", "mobile")
+    __slots__ = ("email", "first_name", "linked", "mobile", "push")
 
     def __init__(self, *, mobile: str | None, email: str | None, first_name: str) -> None:
         self.mobile = mobile
         self.email = email
         self.first_name = first_name
         self.linked: dict[str, str] = {}
+        self.push: list[str] = []
 
-    def address(self, channel: str) -> str | None:
+    def addresses(self, channel: str) -> list[str]:
+        """نشانی‌های گیرنده در یک کانال؛ خالی یعنی کانال برایش کار نمی‌کند."""
+        if channel == "PUSH":
+            return list(self.push)
         if channel == "SMS":
-            return self.mobile
-        if channel == "EMAIL":
-            return self.email
-        return self.linked.get(channel)
+            single = self.mobile
+        elif channel == "EMAIL":
+            single = self.email
+        else:
+            single = self.linked.get(channel)
+        return [single] if single else []
 
 
 def _str(value: object) -> str:
