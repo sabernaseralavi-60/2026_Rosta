@@ -17,6 +17,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.permissions import CurrentUser, Permission
+from silp.domain import peer_evaluations as peer_rules
 from silp.domain import reflections as reflection_rules
 from silp.models.delivery import (
     DELIVERABLE_STATUS_TITLE_FA,
@@ -33,6 +34,7 @@ from silp.routers.deps import (
     CurrentUserDep,
     DeliveryServiceDep,
     FileServiceDep,
+    PeerEvaluationServiceDep,
     ProjectServiceDep,
     ReflectionServiceDep,
     SessionDep,
@@ -51,6 +53,12 @@ from silp.schemas.delivery import (
     MilestoneIn,
     MilestoneOut,
     MilestoneOwnerIn,
+    MyPeerRatingOut,
+    PeerAverageOut,
+    PeerEvaluationsIn,
+    PeerEvaluationStateOut,
+    PeerEvaluationSummaryOut,
+    PeerOut,
     ReflectionIn,
     ReflectionOut,
     ReflectionStateOut,
@@ -62,6 +70,7 @@ from silp.schemas.delivery import (
 from silp.schemas.file import FileOut
 from silp.services.delivery_service import MilestoneDraft
 from silp.services.directory import display_names, name_of
+from silp.services.peer_evaluation_service import PeerEvaluationState
 from silp.services.workspace_service import DEFAULT_MESSAGE_PAGE, TaskDraft
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -707,6 +716,99 @@ async def submit_reflection(
         ),
     )
     return ReflectionOut.model_validate(reflection)
+
+
+# ── ارزیابی همتا — FR-PRJ-08، ADR-0024 برش ب ─────────────────────────────
+def _peer_state_out(state: PeerEvaluationState) -> PeerEvaluationStateOut:
+    return PeerEvaluationStateOut(
+        can_submit=state.can_submit,
+        reason=state.reason,
+        peers=[
+            PeerOut(user_id=peer.user_id, full_name=peer.full_name, is_lead=peer.is_lead)
+            for peer in state.peers
+        ],
+        mine=[MyPeerRatingOut.model_validate(row) for row in state.mine],
+        points=float(state.points) if state.points is not None else None,
+    )
+
+
+@router.get(
+    "/{project_id}/peer-evaluations",
+    response_model=PeerEvaluationStateOut,
+    summary="وضعیت ارزیابی همتای من",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def my_peer_evaluations(
+    project_id: uuid.UUID,
+    current: CurrentUserDep,
+    projects: ProjectServiceDep,
+    peer_evaluations: PeerEvaluationServiceDep,
+) -> PeerEvaluationStateOut:
+    project = await projects.require(project_id)
+    return _peer_state_out(await peer_evaluations.state(project=project, actor=current))
+
+
+@router.put(
+    "/{project_id}/peer-evaluations",
+    response_model=PeerEvaluationStateOut,
+    summary="ثبت ارزیابی همهٔ هم‌تیمی‌ها (یک‌بار، بی‌ویرایش)",
+    responses={
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
+)
+async def submit_peer_evaluations(
+    project_id: uuid.UUID,
+    payload: PeerEvaluationsIn,
+    current: CurrentUserDep,
+    projects: ProjectServiceDep,
+    peer_evaluations: PeerEvaluationServiceDep,
+) -> PeerEvaluationStateOut:
+    project = await projects.require(project_id)
+    state = await peer_evaluations.submit(
+        project=project,
+        actor=current,
+        ratings=[
+            peer_rules.PeerRating(
+                evaluatee_id=item.evaluatee_id,
+                contribution=item.contribution,
+                reliability=item.reliability,
+            )
+            for item in payload.evaluations
+        ],
+    )
+    return _peer_state_out(state)
+
+
+@router.get(
+    "/{project_id}/peer-evaluations/summary",
+    response_model=PeerEvaluationSummaryOut,
+    summary="میانگین ارزیابی همتا — فقط مدیر پروژه",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def peer_evaluation_summary(
+    project_id: uuid.UUID,
+    current: CurrentUserDep,
+    projects: ProjectServiceDep,
+    peer_evaluations: PeerEvaluationServiceDep,
+) -> PeerEvaluationSummaryOut:
+    project = await projects.require(project_id)
+    averages = await peer_evaluations.summary(project=project, actor=current)
+    return PeerEvaluationSummaryOut(
+        min_evaluations=peer_rules.MIN_EVALUATIONS_FOR_AVERAGE,
+        members=[
+            PeerAverageOut(
+                user_id=item.user_id,
+                full_name=item.full_name,
+                evaluations=item.evaluations,
+                contribution_avg=item.contribution_avg,
+                reliability_avg=item.reliability_avg,
+            )
+            for item in averages
+        ],
+    )
 
 
 __all__ = ["deliverable_router", "milestone_router", "milestones_out", "router"]

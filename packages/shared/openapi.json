@@ -8453,6 +8453,36 @@
         "title": "MyApplicationOut",
         "type": "object"
       },
+      "MyPeerRatingOut": {
+        "properties": {
+          "contribution": {
+            "title": "Contribution",
+            "type": "integer"
+          },
+          "evaluatee_id": {
+            "format": "uuid",
+            "title": "Evaluatee Id",
+            "type": "string"
+          },
+          "reliability": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reliability"
+          }
+        },
+        "required": [
+          "evaluatee_id",
+          "contribution"
+        ],
+        "title": "MyPeerRatingOut",
+        "type": "object"
+      },
       "MyStandingOut": {
         "properties": {
           "excluded_reason": {
@@ -11275,6 +11305,216 @@
           "password"
         ],
         "title": "PasswordLoginIn",
+        "type": "object"
+      },
+      "PeerAverageOut": {
+        "properties": {
+          "contribution_avg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contribution Avg"
+          },
+          "evaluations": {
+            "title": "Evaluations",
+            "type": "integer"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "reliability_avg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reliability Avg"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "evaluations"
+        ],
+        "title": "PeerAverageOut",
+        "type": "object"
+      },
+      "PeerEvaluationStateOut": {
+        "description": "`GET /projects/{id}/peer-evaluations` — وضعیت ارزیابی خودِ کاربر.",
+        "properties": {
+          "can_submit": {
+            "title": "Can Submit",
+            "type": "boolean"
+          },
+          "mine": {
+            "items": {
+              "$ref": "#/components/schemas/MyPeerRatingOut"
+            },
+            "title": "Mine",
+            "type": "array"
+          },
+          "peers": {
+            "items": {
+              "$ref": "#/components/schemas/PeerOut"
+            },
+            "title": "Peers",
+            "type": "array"
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "can_submit",
+          "peers",
+          "mine"
+        ],
+        "title": "PeerEvaluationStateOut",
+        "type": "object"
+      },
+      "PeerEvaluationSummaryOut": {
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/PeerAverageOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "min_evaluations": {
+            "title": "Min Evaluations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "min_evaluations",
+          "members"
+        ],
+        "title": "PeerEvaluationSummaryOut",
+        "type": "object"
+      },
+      "PeerEvaluationsIn": {
+        "additionalProperties": false,
+        "properties": {
+          "evaluations": {
+            "items": {
+              "$ref": "#/components/schemas/PeerRatingIn"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Evaluations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "evaluations"
+        ],
+        "title": "PeerEvaluationsIn",
+        "type": "object"
+      },
+      "PeerOut": {
+        "properties": {
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "is_lead": {
+            "default": false,
+            "title": "Is Lead",
+            "type": "boolean"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "PeerOut",
+        "type": "object"
+      },
+      "PeerRatingIn": {
+        "additionalProperties": false,
+        "description": "بازه را سرویس هم می‌سنجد؛ اینجا فقط از پذیرفتن مقدار پوچ جلو می‌گیریم.\n\n`note` عمداً نیست (ADR-0024 بند ۱۰): متنی که هیچ‌کس نمی‌بیند، یا ناشناسی را\nمی‌شکند یا جمع‌آوری بی‌مصرف است. `extra=\"forbid\"` آن را ۴۲۲ می‌کند.",
+        "properties": {
+          "contribution": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Contribution",
+            "type": "integer"
+          },
+          "evaluatee_id": {
+            "format": "uuid",
+            "title": "Evaluatee Id",
+            "type": "string"
+          },
+          "reliability": {
+            "anyOf": [
+              {
+                "maximum": 5.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reliability"
+          }
+        },
+        "required": [
+          "evaluatee_id",
+          "contribution"
+        ],
+        "title": "PeerRatingIn",
         "type": "object"
       },
       "PendingAnswerOut": {
@@ -30696,6 +30936,228 @@
           }
         ],
         "summary": "توقف موقت پروژه",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/peer-evaluations": {
+      "get": {
+        "operationId": "my_peer_evaluations_api_v1_projects__project_id__peer_evaluations_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeerEvaluationStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "وضعیت ارزیابی همتای من",
+        "tags": [
+          "projects"
+        ]
+      },
+      "put": {
+        "operationId": "submit_peer_evaluations_api_v1_projects__project_id__peer_evaluations_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PeerEvaluationsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeerEvaluationStateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "ثبت ارزیابی همهٔ هم‌تیمی‌ها (یک‌بار، بی‌ویرایش)",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/peer-evaluations/summary": {
+      "get": {
+        "operationId": "peer_evaluation_summary_api_v1_projects__project_id__peer_evaluations_summary_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeerEvaluationSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "میانگین ارزیابی همتا — فقط مدیر پروژه",
         "tags": [
           "projects"
         ]

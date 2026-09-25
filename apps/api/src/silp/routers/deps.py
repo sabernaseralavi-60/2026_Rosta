@@ -44,6 +44,7 @@ from silp.services.entitlement_service import EntitlementService
 from silp.services.file_service import FileService
 from silp.services.grading_service import GradingService
 from silp.services.otp_service import OTPService
+from silp.services.peer_evaluation_service import PeerEvaluationService
 from silp.services.profile_service import ProfileService
 from silp.services.progress_service import ProgressService
 from silp.services.project_service import ProjectService
@@ -160,6 +161,10 @@ def get_reflection_service(session: SessionDep) -> ReflectionService:
     return ReflectionService(session)
 
 
+def get_peer_evaluation_service(session: SessionDep) -> PeerEvaluationService:
+    return PeerEvaluationService(session)
+
+
 def get_attempt_service(session: SessionDep) -> AttemptService:
     return AttemptService(session)
 
@@ -193,6 +198,7 @@ TeachingServiceDep = Annotated[TeachingService, Depends(get_teaching_service)]
 SubscriptionServiceDep = Annotated[SubscriptionService, Depends(get_subscription_service)]
 QuizServiceDep = Annotated[QuizService, Depends(get_quiz_service)]
 ReflectionServiceDep = Annotated[ReflectionService, Depends(get_reflection_service)]
+PeerEvaluationServiceDep = Annotated[PeerEvaluationService, Depends(get_peer_evaluation_service)]
 AttemptServiceDep = Annotated[AttemptService, Depends(get_attempt_service)]
 GradingServiceDep = Annotated[GradingService, Depends(get_grading_service)]
 AppealServiceDep = Annotated[AppealService, Depends(get_appeal_service)]
@@ -458,6 +464,7 @@ __all__ = [
     "FileServiceDep",
     "OTPServiceDep",
     "OptionalUserDep",
+    "PeerEvaluationServiceDep",
     "ProfileServiceDep",
     "ProgressServiceDep",
     "ProjectServiceDep",

@@ -2349,6 +2349,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/peer-evaluations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** وضعیت ارزیابی همتای من */
+        get: operations["my_peer_evaluations_api_v1_projects__project_id__peer_evaluations_get"];
+        /** ثبت ارزیابی همهٔ هم‌تیمی‌ها (یک‌بار، بی‌ویرایش) */
+        put: operations["submit_peer_evaluations_api_v1_projects__project_id__peer_evaluations_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/peer-evaluations/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** میانگین ارزیابی همتا — فقط مدیر پروژه */
+        get: operations["peer_evaluation_summary_api_v1_projects__project_id__peer_evaluations_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/publish": {
         parameters: {
             query?: never;
@@ -7520,6 +7555,18 @@ export interface components {
             status_fa: string;
             target: components["schemas"]["TargetOut"];
         };
+        /** MyPeerRatingOut */
+        MyPeerRatingOut: {
+            /** Contribution */
+            contribution: number;
+            /**
+             * Evaluatee Id
+             * Format: uuid
+             */
+            evaluatee_id: string;
+            /** Reliability */
+            reliability?: number | null;
+        };
         /** MyStandingOut */
         MyStandingOut: {
             /** Excluded Reason */
@@ -8518,6 +8565,83 @@ export interface components {
             identifier: string;
             /** Password */
             password: string;
+        };
+        /** PeerAverageOut */
+        PeerAverageOut: {
+            /** Contribution Avg */
+            contribution_avg?: number | null;
+            /** Evaluations */
+            evaluations: number;
+            /** Full Name */
+            full_name?: string | null;
+            /** Reliability Avg */
+            reliability_avg?: number | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /**
+         * PeerEvaluationStateOut
+         * @description `GET /projects/{id}/peer-evaluations` — وضعیت ارزیابی خودِ کاربر.
+         */
+        PeerEvaluationStateOut: {
+            /** Can Submit */
+            can_submit: boolean;
+            /** Mine */
+            mine: components["schemas"]["MyPeerRatingOut"][];
+            /** Peers */
+            peers: components["schemas"]["PeerOut"][];
+            /** Points */
+            points?: number | null;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** PeerEvaluationSummaryOut */
+        PeerEvaluationSummaryOut: {
+            /** Members */
+            members: components["schemas"]["PeerAverageOut"][];
+            /** Min Evaluations */
+            min_evaluations: number;
+        };
+        /** PeerEvaluationsIn */
+        PeerEvaluationsIn: {
+            /** Evaluations */
+            evaluations: components["schemas"]["PeerRatingIn"][];
+        };
+        /** PeerOut */
+        PeerOut: {
+            /** Full Name */
+            full_name?: string | null;
+            /**
+             * Is Lead
+             * @default false
+             */
+            is_lead: boolean;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /**
+         * PeerRatingIn
+         * @description بازه را سرویس هم می‌سنجد؛ اینجا فقط از پذیرفتن مقدار پوچ جلو می‌گیریم.
+         *
+         *     `note` عمداً نیست (ADR-0024 بند ۱۰): متنی که هیچ‌کس نمی‌بیند، یا ناشناسی را
+         *     می‌شکند یا جمع‌آوری بی‌مصرف است. `extra="forbid"` آن را ۴۲۲ می‌کند.
+         */
+        PeerRatingIn: {
+            /** Contribution */
+            contribution: number;
+            /**
+             * Evaluatee Id
+             * Format: uuid
+             */
+            evaluatee_id: string;
+            /** Reliability */
+            reliability?: number | null;
         };
         /** PendingAnswerOut */
         PendingAnswerOut: {
@@ -18277,6 +18401,166 @@ export interface operations {
             };
             /** @description Conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_peer_evaluations_api_v1_projects__project_id__peer_evaluations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PeerEvaluationStateOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_peer_evaluations_api_v1_projects__project_id__peer_evaluations_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PeerEvaluationsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PeerEvaluationStateOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    peer_evaluation_summary_api_v1_projects__project_id__peer_evaluations_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PeerEvaluationSummaryOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

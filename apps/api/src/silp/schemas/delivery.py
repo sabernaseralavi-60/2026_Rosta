@@ -226,6 +226,68 @@ class ReflectionStateOut(BaseModel):
     min_learned_chars: int
 
 
+# ── ارزیابی همتا — ADR-0024 برش ب ──────────────────────────────────────
+class PeerRatingIn(BaseModel):
+    """بازه را سرویس هم می‌سنجد؛ اینجا فقط از پذیرفتن مقدار پوچ جلو می‌گیریم.
+
+    `note` عمداً نیست (ADR-0024 بند ۱۰): متنی که هیچ‌کس نمی‌بیند، یا ناشناسی را
+    می‌شکند یا جمع‌آوری بی‌مصرف است. `extra="forbid"` آن را ۴۲۲ می‌کند.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    evaluatee_id: uuid.UUID
+    contribution: Annotated[int, Field(ge=1, le=5)]
+    reliability: Annotated[int | None, Field(ge=1, le=5)] = None
+
+
+class PeerEvaluationsIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    evaluations: Annotated[list[PeerRatingIn], Field(min_length=1, max_length=50)]
+
+
+class PeerOut(BaseModel):
+    user_id: uuid.UUID
+    full_name: str | None = None
+    is_lead: bool = False
+
+
+class MyPeerRatingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    evaluatee_id: uuid.UUID
+    contribution: int
+    reliability: int | None = None
+
+
+class PeerEvaluationStateOut(BaseModel):
+    """`GET /projects/{id}/peer-evaluations` — وضعیت ارزیابی خودِ کاربر."""
+
+    can_submit: bool
+    reason: str | None = None
+    peers: list[PeerOut]
+    #: ارزیابی‌های ثبت‌شدهٔ خودِ کاربر؛ خالی تا وقتی ثبت نکرده.
+    mine: list[MyPeerRatingOut]
+    #: امتیاز فعلی قاعده؛ `null` اگر مدیر آن را غیرفعال کرده باشد.
+    points: float | None = None
+
+
+class PeerAverageOut(BaseModel):
+    user_id: uuid.UUID
+    full_name: str | None = None
+    #: ارزیابی‌های «دیگران» (بدون نظر خودِ مدیر).
+    evaluations: int
+    #: `null` یعنی ارزیابی کافی نیست تا ناشناسی حفظ شود.
+    contribution_avg: float | None = None
+    reliability_avg: float | None = None
+
+
+class PeerEvaluationSummaryOut(BaseModel):
+    min_evaluations: int
+    members: list[PeerAverageOut]
+
+
 MilestoneOut.model_rebuild()
 
 __all__ = [
@@ -237,6 +299,13 @@ __all__ = [
     "MilestoneIn",
     "MilestoneOut",
     "MilestoneOwnerIn",
+    "MyPeerRatingOut",
+    "PeerAverageOut",
+    "PeerEvaluationStateOut",
+    "PeerEvaluationSummaryOut",
+    "PeerEvaluationsIn",
+    "PeerOut",
+    "PeerRatingIn",
     "ReflectionIn",
     "ReflectionOut",
     "ReflectionStateOut",

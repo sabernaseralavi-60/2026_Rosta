@@ -1160,3 +1160,95 @@ async def test_reflection_and_its_points_survive_the_request(  # type: ignore[no
         )
         await committing_session.execute(delete(Project).where(Project.id == project_id))
         await committing_session.commit()
+
+
+async def test_peer_evaluations_and_their_points_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """ADR-0024 برش ب — همهٔ ردیف‌های ارزیابی و امتیازش باید از اتصال دوم دیده شوند."""
+    from silp.models.delivery import Certificate, PeerEvaluation
+    from silp.models.gamification import PointEntry
+    from silp.models.identity import User
+    from silp.models.project import Project, Team, TeamMember
+    from silp.models.taxonomy import Skill
+
+    skill_id = await committing_session.scalar(select(Skill.id).where(Skill.code == "PYTHON"))
+    created = await committing_client.post(
+        "/api/v1/projects",
+        headers=auth(account),
+        json={
+            "title_fa": "پروژهٔ ارزیابی همتای پایدار",
+            "summary": "پروژه‌ای برای آزمون تثبیت ارزیابی همتا پس از بسته شدن.",
+            "description": "شرح کامل پروژه با جزئیات کافی برای تصمیم دانشجو.",
+            "kind": "D_PERSONAL",
+            "expected_output": "گزارش",
+            "team_size_max": 3,
+            "required_skills": [{"skill_id": str(skill_id), "min_level": 3}],
+        },
+    )
+    assert created.status_code == 201, created.text
+    project_id = uuid.UUID(created.json()["id"])
+
+    # هم‌تیمی دوم: مستقیم در دیتابیس، تا آزمون به چرخهٔ درخواست‌وپذیرش وابسته نباشد.
+    peer = User(mobile=f"0912{uuid.uuid4().int % 10_000_000:07d}")
+    committing_session.add(peer)
+    await committing_session.flush()
+    peer_id = peer.id  # پس از commit ویژگی‌ها منقضی می‌شوند و در نشست async بارگذاری نمی‌شوند.
+    try:
+        milestone = await committing_client.post(
+            f"/api/v1/projects/{project_id}/milestones",
+            headers=auth(account),
+            json={"title_fa": "مرحلهٔ اختیاری", "points": 0, "is_required": False},
+        )
+        assert milestone.status_code == 201, milestone.text
+        for step in ("publish", "start"):
+            response = await committing_client.post(
+                f"/api/v1/projects/{project_id}/{step}", headers=auth(account)
+            )
+            assert response.status_code == 200, response.text
+        team_id = await committing_session.scalar(
+            select(Team.id).where(Team.project_id == project_id)
+        )
+        committing_session.add(TeamMember(team_id=team_id, user_id=peer_id, status="ACTIVE"))
+        await committing_session.commit()
+        response = await committing_client.post(
+            f"/api/v1/projects/{project_id}/complete",
+            headers=auth(account),
+            json={"final_report": "بسته شد تا ارزیابی همتا انجام شود."},
+        )
+        assert response.status_code == 200, response.text
+
+        response = await committing_client.put(
+            f"/api/v1/projects/{project_id}/peer-evaluations",
+            headers=auth(account),
+            json={"evaluations": [{"evaluatee_id": str(peer_id), "contribution": 4}]},
+        )
+        assert response.status_code == 200, response.text
+
+        async with other_connection() as verifier:
+            stored = list(
+                await verifier.scalars(
+                    select(PeerEvaluation.contribution).where(
+                        PeerEvaluation.project_id == project_id,
+                        PeerEvaluation.evaluator_id == account["user_id"],
+                    )
+                )
+            )
+            points = list(
+                await verifier.scalars(
+                    select(PointEntry.amount).where(
+                        PointEntry.user_id == account["user_id"],
+                        PointEntry.rule_code == "PEER_EVAL_COMPLETED",
+                    )
+                )
+            )
+        assert stored == [4], "ارزیابی commit نشده است"
+        assert [int(p) for p in points] == [5], "امتیاز ارزیابی همتا commit نشده است"
+    finally:
+        # بستن پروژه گواهی صادر می‌کند و گواهی به کاربر کلید خارجی دارد.
+        await committing_session.execute(
+            delete(Certificate).where(Certificate.user_id.in_([account["user_id"], peer_id]))
+        )
+        await committing_session.execute(delete(Project).where(Project.id == project_id))
+        await committing_session.execute(delete(User).where(User.id == peer_id))
+        await committing_session.commit()

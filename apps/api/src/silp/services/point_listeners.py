@@ -10,8 +10,8 @@
   پس‌زمینهٔ `release_quiz_points` هم صدا می‌زند.
 
 ایده و کارآفرینی از M7 وصل‌اند؛ پژوهش و `TEAM_FORMED` از M7 بخش ب؛ بازتاب
-از ADR-0024. قواعدی که ماژول منبعشان هنوز ساخته نشده (پرسش‌وپاسخ، ارزیابی
-همتا) در `point_rules` هستند ولی شنونده ندارند.
+و ارزیابی همتا از ADR-0024. قواعدی که ماژول منبعشان هنوز ساخته نشده
+(پرسش‌وپاسخ) در `point_rules` هستند ولی شنونده ندارند.
 """
 
 from __future__ import annotations
@@ -26,6 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from silp.core.logging import get_logger
 from silp.core.permissions import Role
 from silp.domain import ideas as idea_rules
+from silp.domain import peer_evaluations as peer_rules
 from silp.domain import reflections as reflection_rules
 from silp.domain import research as research_rules
 from silp.domain import ventures as venture_rules
@@ -34,6 +35,7 @@ from silp.models.delivery import (
     Deliverable,
     Milestone,
     OpeningApplication,
+    PeerEvaluation,
     ProjectReflection,
     TeamOpening,
 )
@@ -500,6 +502,37 @@ async def on_reflection_submitted(session: AsyncSession, event: events.Reflectio
         Award(
             "REFLECTION_SUBMITTED",
             reflection_rules.POINT_SOURCE_TYPE,
+            project.id,
+            offering_id=project.offering_id,
+        ),
+    )
+
+
+@events.subscribe(events.PeerEvaluationsSubmitted)
+async def on_peer_evaluations_submitted(
+    session: AsyncSession, event: events.PeerEvaluationsSubmitted
+) -> None:
+    """`PEER_EVAL_COMPLETED` — یک‌بار به‌ازای هر (ارزیابی‌کننده، پروژه)، ADR-0024.
+
+    نه به‌ازای هر همتا: قاعدهٔ §9.2 سقف ندارد و به‌ازای همتا، تیم ده‌نفره
+    ۴۵ امتیاز رایگان می‌گرفت. دسته همان `COMMUNITY` جدول است.
+    """
+    project = await session.get(Project, event.project_id)
+    submitted = await session.scalar(
+        select(func.count())
+        .select_from(PeerEvaluation)
+        .where(
+            PeerEvaluation.project_id == event.project_id,
+            PeerEvaluation.evaluator_id == event.evaluator_id,
+        )
+    )
+    if project is None or not submitted:
+        return
+    await PointsService(session).award(
+        event.evaluator_id,
+        Award(
+            "PEER_EVAL_COMPLETED",
+            peer_rules.POINT_SOURCE_TYPE,
             project.id,
             offering_id=project.offering_id,
         ),
