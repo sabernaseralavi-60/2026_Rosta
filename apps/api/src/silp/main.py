@@ -36,6 +36,7 @@ from silp.routers.v1 import (
     notifications,
     projects,
     public,
+    qa,
     quizzes,
     research,
     search,
@@ -144,6 +145,8 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(quizzes.router)
     v1.include_router(quizzes.attempts_router)
     v1.include_router(subscriptions.router)
+    v1.include_router(qa.router)
+    v1.include_router(qa.offering_router)
     # ── امتیاز و داشبورد (M5) ──────────────────────────────────────────
     v1.include_router(gamification.me_router)
     v1.include_router(gamification.leaderboard_router)

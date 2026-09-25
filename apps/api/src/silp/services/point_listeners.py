@@ -9,9 +9,8 @@
   دیتابیس حساب و با `reconcile` هم‌تراز می‌شود. همین تابع‌ها را کار
   پس‌زمینهٔ `release_quiz_points` هم صدا می‌زند.
 
-ایده و کارآفرینی از M7 وصل‌اند؛ پژوهش و `TEAM_FORMED` از M7 بخش ب؛ بازتاب
-و ارزیابی همتا از ADR-0024. قواعدی که ماژول منبعشان هنوز ساخته نشده
-(پرسش‌وپاسخ) در `point_rules` هستند ولی شنونده ندارند.
+ایده و کارآفرینی از M7 وصل‌اند؛ پژوهش و `TEAM_FORMED` از M7 بخش ب؛ بازتاب،
+ارزیابی همتا و پرسش‌وپاسخ از ADR-0024. هر قاعدهٔ `point_rules` یک منبع دارد.
 """
 
 from __future__ import annotations
@@ -27,6 +26,7 @@ from silp.core.logging import get_logger
 from silp.core.permissions import Role
 from silp.domain import ideas as idea_rules
 from silp.domain import peer_evaluations as peer_rules
+from silp.domain import qa as qa_rules
 from silp.domain import reflections as reflection_rules
 from silp.domain import research as research_rules
 from silp.domain import ventures as venture_rules
@@ -50,6 +50,7 @@ from silp.models.education import (
 from silp.models.idea import Idea
 from silp.models.profile import TOTAL_SURVEY_STEPS
 from silp.models.project import Project, ProjectApplication, Team, TeamMember
+from silp.models.qa import QaReply, QaReplyVote, QaThread
 from silp.models.quiz import Quiz, QuizAttempt
 from silp.models.research import ResearchOutput, ResearchSubmission, ResearchTopic
 from silp.models.venture import Venture, VentureMetric, VentureStageChange
@@ -537,6 +538,80 @@ async def on_peer_evaluations_submitted(
             offering_id=project.offering_id,
         ),
     )
+
+
+# ── پرسش‌وپاسخ — §9.2 `COMMUNITY`، ADR-0024 برش ج ──────────────────────
+async def qa_desired(session: AsyncSession, reply: QaReply, thread: QaThread) -> list[Award]:
+    """قاعده‌هایی که پاسخ **الان** باید داشته باشد — تابع وضعیت، نه رویداد.
+
+    فقط پاسخِ زندهٔ یک **دانشجوی همان ارائه** امتیاز می‌گیرد (مثل
+    `RESOURCE_COMPLETED`): پاسخ استاد و دستیار و کسی که ثبت‌نامش را رها کرده نه.
+    آستانهٔ رأی را فقط **دانشجوی ثبت‌نام‌شدهٔ دیگر** پر می‌کند — رأی نویسنده
+    ممنوع است و رأی استاد و دستیار به `helpful_count` می‌رود ولی به این شمارش
+    نه؛ دو دستیار نباید بی‌نظر استاد امتیاز بسازند.
+    """
+    if reply.deleted_at is not None or thread.deleted_at is not None or reply.is_official:
+        return []
+    if not await LearningPoints(session).is_enrolled(reply.author_id, thread.offering_id):
+        return []
+    student_votes = (
+        await session.scalar(
+            select(func.count())
+            .select_from(QaReplyVote)
+            .join(
+                Enrollment,
+                (Enrollment.student_id == QaReplyVote.user_id)
+                & (Enrollment.offering_id == thread.offering_id)
+                & (Enrollment.status.in_(ENROLLED_STATUSES)),
+            )
+            .where(QaReplyVote.reply_id == reply.id, QaReplyVote.user_id != reply.author_id)
+        )
+        or 0
+    )
+    endorsed = reply.endorsed_at is not None and reply.endorsed_by != reply.author_id
+    return [
+        Award(rule, qa_rules.POINT_SOURCE_TYPE, reply.id, offering_id=thread.offering_id)
+        for rule in qa_rules.rules_earned(endorsed=endorsed, student_votes=student_votes)
+    ]
+
+
+async def reconcile_qa_reply(
+    session: AsyncSession, reply_id: uuid.UUID, *, may_reverse: bool
+) -> None:
+    """`may_reverse=False` فقط می‌افزاید — رأیِ تازه هیچ‌چیز را برنمی‌گرداند (بند ۱۷).
+
+    بدون `universe`، `reconcile` فقط کلیدهای `desired` را می‌بیند: ردیف فعال
+    آن‌ها را راضی می‌کند، ردیف نداشته را ثبت می‌کند (با `revision` درست پس از
+    معکوس‌شدن قبلی) و به چیز دیگری دست نمی‌زند.
+    """
+    reply = await session.get(QaReply, reply_id)
+    thread = await session.get(QaThread, reply.thread_id) if reply is not None else None
+    if reply is None or thread is None:
+        return
+    await PointsService(session).reconcile(
+        reply.author_id,
+        desired=await qa_desired(session, reply, thread),
+        universe=[(rule, qa_rules.POINT_SOURCE_TYPE, reply.id) for rule in qa_rules.RULES]
+        if may_reverse
+        else [],
+        reason="وضعیت پاسخ در پرسش‌وپاسخ عوض شد",
+    )
+
+
+@events.subscribe(events.QaReplyVoted)
+async def on_qa_reply_voted(session: AsyncSession, event: events.QaReplyVoted) -> None:
+    await reconcile_qa_reply(session, event.reply_id, may_reverse=False)
+
+
+@events.subscribe(events.QaReplyEndorsed)
+async def on_qa_reply_endorsed(session: AsyncSession, event: events.QaReplyEndorsed) -> None:
+    """تأیید ⇒ ۱۰ + ۲۰؛ برداشتن تأیید ⇒ ۲۰ برمی‌گردد و ۱۰ می‌ماند اگر ≥۳ رأی هست."""
+    await reconcile_qa_reply(session, event.reply_id, may_reverse=True)
+
+
+@events.subscribe(events.QaReplyRemoved)
+async def on_qa_reply_removed(session: AsyncSession, event: events.QaReplyRemoved) -> None:
+    await reconcile_qa_reply(session, event.reply_id, may_reverse=True)
 
 
 @events.subscribe(events.SurveyStepCompleted)

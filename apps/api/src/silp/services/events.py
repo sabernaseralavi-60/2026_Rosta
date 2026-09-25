@@ -133,6 +133,33 @@ class PeerEvaluationsSubmitted:
     evaluator_id: uuid.UUID
 
 
+# ── ADR-0024 برش ج — پرسش‌وپاسخ درس ─────────────────────────────────────
+@dataclass(frozen=True, slots=True)
+class QaReplyPosted:
+    reply_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class QaReplyVoted:
+    """رأی «مفید» تازه. پس‌گرفتن رأی رویداد ندارد: امتیاز را برنمی‌گرداند."""
+
+    reply_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class QaReplyEndorsed:
+    """تأیید استاد گذاشته **یا برداشته** شد؛ شنونده وضعیت را از ردیف می‌خواند."""
+
+    reply_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
+class QaReplyRemoved:
+    """پاسخ حذف شد (خودش، استاد، یا با حذف پرسش) — امتیازش برمی‌گردد."""
+
+    reply_id: uuid.UUID
+
+
 @dataclass(frozen=True, slots=True)
 class SurveyStepCompleted:
     user_id: uuid.UUID
@@ -455,6 +482,10 @@ __all__ = [
     "ProjectCompleted",
     "ProjectStalled",
     "PeerEvaluationsSubmitted",
+    "QaReplyEndorsed",
+    "QaReplyPosted",
+    "QaReplyRemoved",
+    "QaReplyVoted",
     "QuizGraded",
     "QuizPublished",
     "QuizResultsPublished",

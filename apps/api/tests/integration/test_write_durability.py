@@ -1252,3 +1252,141 @@ async def test_peer_evaluations_and_their_points_survive_the_request(  # type: i
         await committing_session.execute(delete(Project).where(Project.id == project_id))
         await committing_session.execute(delete(User).where(User.id == peer_id))
         await committing_session.commit()
+
+
+async def test_qa_threads_replies_votes_and_endorsement_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """ADR-0024 برش ج — پرسش، پاسخ، رأی، تأیید، امتیاز و اعلان از اتصال دوم دیده شوند."""
+    from datetime import date
+
+    from silp.core.config import get_settings
+    from silp.core.security import create_access_token
+    from silp.models.education import Course, CourseOffering, Enrollment, Term
+    from silp.models.gamification import PointEntry
+    from silp.models.identity import User
+    from silp.models.messaging import Notification
+    from silp.models.qa import QaReply, QaThread
+
+    marker = uuid.uuid4().hex[:8]
+    term = Term(
+        code=f"T-{marker}",
+        title_fa="نیم‌سال پایداری",
+        starts_on=date(2026, 9, 23),
+        ends_on=date(2027, 2, 4),
+    )
+    course = Course(
+        code=f"C-{marker}",
+        slug=f"course-{marker}",
+        title_fa="درس پایداری پرسش‌وپاسخ",
+        description="درس آزمایشی.",
+        degree_level="MASTER",
+        is_public=True,
+        default_access_tier="SUBSCRIBER",
+    )
+    asker = User(mobile=f"0912{uuid.uuid4().int % 10_000_000:07d}")
+    answerer = User(mobile=f"0912{uuid.uuid4().int % 10_000_000:07d}")
+    committing_session.add_all([term, course, asker, answerer])
+    await committing_session.flush()
+    offering = CourseOffering(
+        course_id=course.id,
+        term_id=term.id,
+        instructor_id=account["user_id"],  # نقش استاد از همین ستون مشتق می‌شود (§6.1)
+        status="OPEN",
+    )
+    committing_session.add(offering)
+    await committing_session.flush()
+    asker_id, answerer_id, offering_id = asker.id, answerer.id, offering.id
+    course_id, term_id = course.id, term.id
+    for student_id in (asker_id, answerer_id):
+        committing_session.add(
+            Enrollment(offering_id=offering_id, student_id=student_id, status="ACTIVE")
+        )
+    await committing_session.commit()
+
+    def student_headers(user_id: uuid.UUID) -> dict[str, str]:
+        token, _ = create_access_token(
+            get_settings(), user_id=user_id, roles=[], session_id=uuid.uuid4()
+        )
+        return {"Authorization": f"Bearer {token}"}
+
+    try:
+        asked = await committing_client.post(
+            f"/api/v1/offerings/{offering_id}/qa/threads",
+            headers=student_headers(asker_id),
+            json={
+                "title": "پرسش برای آزمون پایداری",
+                "body": "این پرسش باید پس از پایان درخواست هم در دیتابیس باشد.",
+            },
+        )
+        assert asked.status_code == 201, asked.text
+        thread_id = uuid.UUID(asked.json()["id"])
+
+        answered = await committing_client.post(
+            f"/api/v1/qa/threads/{thread_id}/replies",
+            headers=student_headers(answerer_id),
+            json={"body": "پاسخ آزمایشی که باید تأیید و ثبت شود."},
+        )
+        assert answered.status_code == 201, answered.text
+        reply_id = uuid.UUID(answered.json()["id"])
+
+        voted = await committing_client.post(
+            f"/api/v1/qa/replies/{reply_id}/vote", headers=student_headers(asker_id)
+        )
+        assert voted.status_code == 200, voted.text
+
+        endorsed = await committing_client.post(
+            f"/api/v1/qa/replies/{reply_id}/endorse", headers=auth(account)
+        )
+        assert endorsed.status_code == 200, endorsed.text
+
+        async with other_connection() as verifier:
+            thread = await verifier.get(QaThread, thread_id)
+            reply = await verifier.get(QaReply, reply_id)
+            points = sorted(
+                (rule, int(amount))
+                for rule, amount in (
+                    await verifier.execute(
+                        select(PointEntry.rule_code, PointEntry.amount).where(
+                            PointEntry.user_id == answerer_id, PointEntry.source_id == reply_id
+                        )
+                    )
+                ).tuples()
+            )
+            asker_kinds = list(
+                await verifier.scalars(
+                    select(Notification.kind).where(Notification.user_id == asker_id)
+                )
+            )
+            answerer_kinds = list(
+                await verifier.scalars(
+                    select(Notification.kind).where(Notification.user_id == answerer_id)
+                )
+            )
+        assert thread is not None, "پرسش commit نشده است"
+        assert reply is not None, "پاسخ commit نشده است"
+        assert reply.helpful_count == 1, "شمارندهٔ تریگر commit نشده است"
+        assert reply.endorsed_by == account["user_id"] and reply.endorsed_at is not None
+        assert points == [
+            ("QA_ANSWER_HELPFUL", 10),
+            ("QA_ANSWER_OFFICIAL_MATCH", 20),
+        ], "امتیاز پرسش‌وپاسخ commit نشده است"
+        assert "QA_REPLY_POSTED" in asker_kinds, "اعلان پاسخ commit نشده است"
+        assert "QA_REPLY_ENDORSED" in answerer_kinds, "اعلان تأیید commit نشده است"
+    finally:
+        # پرسش‌ها به کاربر کلید خارجی بی‌آبشار دارند و امتیازها به ارائه؛ پس ترتیب:
+        # پرسش‌ها، ثبت‌نام‌ها، کاربرها (امتیاز آبشاری می‌رود)، ارائه، درس، نیم‌سال.
+        await committing_session.rollback()
+        await committing_session.execute(
+            delete(QaThread).where(QaThread.offering_id == offering_id)
+        )
+        await committing_session.execute(
+            delete(Enrollment).where(Enrollment.offering_id == offering_id)
+        )
+        await committing_session.execute(delete(User).where(User.id.in_([asker_id, answerer_id])))
+        await committing_session.execute(
+            delete(CourseOffering).where(CourseOffering.id == offering_id)
+        )
+        await committing_session.execute(delete(Course).where(Course.id == course_id))
+        await committing_session.execute(delete(Term).where(Term.id == term_id))
+        await committing_session.commit()

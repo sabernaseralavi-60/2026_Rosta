@@ -40,7 +40,7 @@ GROUP_TITLE_FA: dict[Group, str] = {
 }
 
 GROUP_DESCRIPTION_FA: dict[Group, str] = {
-    "COURSE": "هفتهٔ تازه، آزمون، نتیجه و اعلان‌های استاد",
+    "COURSE": "هفتهٔ تازه، آزمون، نتیجه، اعلان‌های استاد و پاسخ به پرسش‌هایت",
     "PROJECT": "درخواست پیوستن، دعوت و آگهی تیم، تحویل‌دادنی، مهلت مرحله، کسب‌وکار و پژوهش",
     "SOCIAL": "نشان‌های تازه و ایده‌های تو",
     "SYSTEM": "امنیت حساب، خوش‌آمد و خلاصهٔ هفتگی",
@@ -132,6 +132,21 @@ _KINDS: tuple[Kind, ...] = (
         "اعلان استاد",
         ("course", "title", "excerpt"),
         allow_sms=True,
+    ),
+    # ── پرسش‌وپاسخ درس — ADR-0024 ─────────────────────────────────────
+    Kind(
+        "QA_REPLY_POSTED",
+        "COURSE",
+        "NORMAL",
+        "پاسخ تازه به پرسش تو",
+        ("course", "thread", "replier", "excerpt"),
+    ),
+    Kind(
+        "QA_REPLY_ENDORSED",
+        "COURSE",
+        "NORMAL",
+        "تأیید استاد بر پاسخ تو",
+        ("course", "thread", "reward"),
     ),
     # ── سپردن ارائه — ADR-0021 ────────────────────────────────────────
     Kind(

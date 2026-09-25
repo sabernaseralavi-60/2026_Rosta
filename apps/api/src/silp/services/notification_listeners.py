@@ -54,6 +54,7 @@ from silp.models.education import (
 from silp.models.gamification import Badge, PointEntry
 from silp.models.idea import Idea, IdeaComment
 from silp.models.project import Project, ProjectApplication, Team, TeamInvitation
+from silp.models.qa import QaReply, QaThread
 from silp.models.quiz import GradeAppeal, Quiz, QuizAttempt
 from silp.models.research import (
     ResearchOutput,
@@ -515,6 +516,64 @@ async def on_project_completed(session: AsyncSession, event: events.ProjectCompl
         {"project": project.title_fa, "reward": reward},
         action_url=f"/projects/{project.id}/workspace",
         dedup_key=f"REFLECTION_REQUESTED:{project.id}",
+    )
+
+
+# ── پرسش‌وپاسخ درس — ADR-0024 برش ج ─────────────────────────────────────
+def _qa_url(thread: QaThread) -> str:
+    return f"/courses/{thread.offering_id}/qa?thread={thread.id}"
+
+
+@events.subscribe(events.QaReplyPosted)
+async def on_qa_reply_posted(session: AsyncSession, event: events.QaReplyPosted) -> None:
+    """«پاسخ تازه به پرسشت» — به پرسنده، نه به خودِ پاسخ‌دهنده."""
+    reply = await session.get(QaReply, event.reply_id)
+    thread = await session.get(QaThread, reply.thread_id) if reply is not None else None
+    if reply is None or thread is None or thread.author_id == reply.author_id:
+        return
+    await NotificationService(session).notify(
+        "QA_REPLY_POSTED",
+        [thread.author_id],
+        {
+            "course": await course_title(session, thread.offering_id),
+            "thread": excerpt(thread.title, 80),
+            "replier": await _name(session, reply.author_id),
+            "excerpt": excerpt(reply.body, 120),
+        },
+        action_url=_qa_url(thread),
+        dedup_key=f"QA_REPLY_POSTED:{reply.id}",
+    )
+
+
+@events.subscribe(events.QaReplyEndorsed)
+async def on_qa_reply_endorsed(session: AsyncSession, event: events.QaReplyEndorsed) -> None:
+    """«استاد پاسخت را تأیید کرد» — فقط هنگام گذاشتن تأیید، و یک‌بار برای هر پاسخ.
+
+    برداشتن تأیید اعلان ندارد؛ تأیید دوباره هم تکرار نمی‌شود (`dedup_key`).
+    امتیاز را شنوندهٔ امتیاز همین لحظه ثبت کرد (پیش از اعلان اجرا می‌شود)، پس
+    جمع خالص دفتر همان است که پرسنده در حسابش می‌بیند.
+    """
+    reply = await session.get(QaReply, event.reply_id)
+    thread = await session.get(QaThread, reply.thread_id) if reply is not None else None
+    if reply is None or thread is None or reply.endorsed_at is None:
+        return
+    earned = await session.scalar(
+        select(func.coalesce(func.sum(PointEntry.amount), 0)).where(
+            PointEntry.user_id == reply.author_id,
+            PointEntry.source_type == "QA_REPLY",
+            PointEntry.source_id == reply.id,
+        )
+    )
+    await NotificationService(session).notify(
+        "QA_REPLY_ENDORSED",
+        [reply.author_id],
+        {
+            "course": await course_title(session, thread.offering_id),
+            "thread": excerpt(thread.title, 80),
+            "reward": f"{fa_number(earned)} امتیاز جامعه گرفتی." if earned and earned > 0 else "",
+        },
+        action_url=_qa_url(thread),
+        dedup_key=f"QA_REPLY_ENDORSED:{reply.id}",
     )
 
 

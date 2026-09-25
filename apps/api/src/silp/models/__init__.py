@@ -68,6 +68,7 @@ from silp.models.project import (
     TeamInvitation,
     TeamMember,
 )
+from silp.models.qa import QaReply, QaReplyVote, QaThread
 from silp.models.quiz import (
     GradeAppeal,
     QuestionBankItem,
@@ -136,6 +137,9 @@ __all__ = [
     "ProjectRequiredSkill",
     "ProjectRole",
     "ProjectTask",
+    "QaReply",
+    "QaReplyVote",
+    "QaThread",
     "QuestionBankItem",
     "Quiz",
     "QuizAnswer",
