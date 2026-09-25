@@ -383,6 +383,63 @@ class QuestionStatsOut(BaseModel):
     note_fa: str | None = None
 
 
+class OptionStatOut(BaseModel):
+    """توزیع یک گزینه — ADR-0028. فقط برای استاد؛ `is_correct` کلید را لو می‌دهد."""
+
+    option_id: str
+    text: str
+    is_correct: bool
+    chosen: int
+    # سهم از همهٔ تلاش‌ها (۰ تا ۱).
+    share: float
+    # سهم در ۲۷٪ بالا و پایین؛ زیر ده تلاش null.
+    top_share: float | None = None
+    bottom_share: float | None = None
+    note_fa: str | None = None
+
+
+class ItemAnalysisOut(BaseModel):
+    """تحلیل پیشرفتهٔ یک سؤال: همان آمار M4-13 + همبستگی با بقیه + گزینه‌ها."""
+
+    question_id: uuid.UUID
+    body: str
+    kind: QuestionKindOut
+    points: Decimal
+    answered: int
+    difficulty: Decimal | None = None
+    discrimination: Decimal | None = None
+    # همبستگی پیرسون با نمرهٔ بقیهٔ آزمون (−۱ تا ۱)؛ زیر ده تلاش null.
+    item_rest: float | None = None
+    note_fa: str | None = None
+    options: list[OptionStatOut] = Field(default_factory=list)
+
+
+class ScoreSummaryOut(BaseModel):
+    n: int
+    mean_percent: float
+    median_percent: float
+    sd_percent: float | None = None
+    min_percent: float
+    max_percent: float
+    # ۱۰ سطل ۱۰٪ی از صفر تا صد.
+    histogram: list[int]
+
+
+class ReliabilityOut(BaseModel):
+    alpha: float
+    sem_percent: float
+    label_fa: str
+    advice_fa: str | None = None
+
+
+class QuizAnalyticsOut(BaseModel):
+    """تحلیل کل آزمون — ADR-0028."""
+
+    summary: ScoreSummaryOut | None = None
+    reliability: ReliabilityOut | None = None
+    items: list[ItemAnalysisOut]
+
+
 class AttemptSummaryOut(BaseModel):
     """یک تلاش در فهرست استاد."""
 
@@ -415,19 +472,24 @@ __all__ = [
     "GradingQueueOut",
     "IntegrityEventIn",
     "IntegrityEventOut",
+    "ItemAnalysisOut",
+    "OptionStatOut",
     "PendingAnswerOut",
     "PickRandomIn",
     "QuestionIn",
     "QuestionOut",
     "QuestionReviewOut",
     "QuestionStatsOut",
+    "QuizAnalyticsOut",
     "QuizDetailOut",
     "QuizIn",
     "QuizSummaryOut",
+    "ReliabilityOut",
     "ReorderIn",
     "ResultQuestionOut",
     "SaveAnswerIn",
     "SaveAnswerOut",
+    "ScoreSummaryOut",
     "SubmitIn",
     "SubmitOut",
     "SyncAnswerIn",

@@ -52,14 +52,19 @@ from silp.schemas.quiz import (
     GradeAnswerIn,
     GradedAnswerOut,
     GradingQueueOut,
+    ItemAnalysisOut,
+    OptionStatOut,
     PendingAnswerOut,
     PickRandomIn,
     QuestionIn,
     QuestionOut,
     QuestionStatsOut,
+    QuizAnalyticsOut,
     QuizDetailOut,
     QuizIn,
+    ReliabilityOut,
     ReorderIn,
+    ScoreSummaryOut,
 )
 from silp.services import authz
 from silp.services.directory import display_names
@@ -645,6 +650,71 @@ async def question_stats(
         )
         for s in rows
     ]
+
+
+@router.get(
+    "/quizzes/{quiz_id}/analytics",
+    response_model=QuizAnalyticsOut,
+    responses=NOT_FOUND,
+    summary="تحلیل پیشرفتهٔ آزمون: توزیع نمره، پایایی، توزیع گزینه‌ها",
+)
+async def quiz_analytics(
+    quiz_id: uuid.UUID,
+    grading: GradingServiceDep,
+    _: Annotated[
+        CurrentUser, Depends(require(Permission.QUIZ_VIEW_OTHERS_RESULT, scope=offering_of_quiz))
+    ],
+) -> QuizAnalyticsOut:
+    report = await grading.quiz_analytics(quiz_id)
+    summary, rel = report.summary, report.reliability
+    return QuizAnalyticsOut(
+        summary=None
+        if summary is None
+        else ScoreSummaryOut(
+            n=summary.n,
+            mean_percent=round(summary.mean_percent, 1),
+            median_percent=round(summary.median_percent, 1),
+            sd_percent=None if summary.sd_percent is None else round(summary.sd_percent, 1),
+            min_percent=round(summary.min_percent, 1),
+            max_percent=round(summary.max_percent, 1),
+            histogram=list(summary.histogram),
+        ),
+        reliability=None
+        if rel is None
+        else ReliabilityOut(
+            alpha=round(rel.alpha, 2),
+            sem_percent=round(rel.sem_percent, 1),
+            label_fa=rel.label_fa,
+            advice_fa=rel.advice_fa,
+        ),
+        items=[
+            ItemAnalysisOut(
+                question_id=item.stats.question_id,
+                body=item.stats.body,
+                kind=item.stats.kind,
+                points=item.stats.points,
+                answered=item.stats.answered,
+                difficulty=item.stats.difficulty,
+                discrimination=item.stats.discrimination,
+                item_rest=None if item.item_rest is None else round(item.item_rest, 2),
+                note_fa=_stats_note(item.stats.difficulty, item.stats.discrimination),
+                options=[
+                    OptionStatOut(
+                        option_id=o.option_id,
+                        text=o.text,
+                        is_correct=o.is_correct,
+                        chosen=o.chosen,
+                        share=round(o.share, 3),
+                        top_share=None if o.top_share is None else round(o.top_share, 3),
+                        bottom_share=None if o.bottom_share is None else round(o.bottom_share, 3),
+                        note_fa=o.note_fa,
+                    )
+                    for o in item.options
+                ],
+            )
+            for item in report.items
+        ],
+    )
 
 
 # ── اعتراض — M4-12 ─────────────────────────────────────────────────────

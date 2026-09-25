@@ -7001,6 +7001,104 @@
         "title": "InviteIn",
         "type": "object"
       },
+      "ItemAnalysisOut": {
+        "description": "تحلیل پیشرفتهٔ یک سؤال: همان آمار M4-13 + همبستگی با بقیه + گزینه‌ها.",
+        "properties": {
+          "answered": {
+            "title": "Answered",
+            "type": "integer"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "discrimination": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discrimination"
+          },
+          "item_rest": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Rest"
+          },
+          "kind": {
+            "enum": [
+              "SINGLE_CHOICE",
+              "MULTI_CHOICE",
+              "TRUE_FALSE",
+              "SHORT_ANSWER",
+              "NUMERIC",
+              "ESSAY",
+              "MATCHING"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "note_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note Fa"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/OptionStatOut"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "points": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Points",
+            "type": "string"
+          },
+          "question_id": {
+            "format": "uuid",
+            "title": "Question Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question_id",
+          "body",
+          "kind",
+          "points",
+          "answered"
+        ],
+        "title": "ItemAnalysisOut",
+        "type": "object"
+      },
       "LeaderRowOut": {
         "properties": {
           "is_me": {
@@ -10520,6 +10618,73 @@
           "description"
         ],
         "title": "OpeningUpdateIn",
+        "type": "object"
+      },
+      "OptionStatOut": {
+        "description": "توزیع یک گزینه — ADR-0028. فقط برای استاد؛ `is_correct` کلید را لو می‌دهد.",
+        "properties": {
+          "bottom_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bottom Share"
+          },
+          "chosen": {
+            "title": "Chosen",
+            "type": "integer"
+          },
+          "is_correct": {
+            "title": "Is Correct",
+            "type": "boolean"
+          },
+          "note_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note Fa"
+          },
+          "option_id": {
+            "title": "Option Id",
+            "type": "string"
+          },
+          "share": {
+            "title": "Share",
+            "type": "number"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "top_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top Share"
+          }
+        },
+        "required": [
+          "option_id",
+          "text",
+          "is_correct",
+          "chosen",
+          "share"
+        ],
+        "title": "OptionStatOut",
         "type": "object"
       },
       "OutboxMessageOut": {
@@ -14788,6 +14953,43 @@
         "title": "QuietHoursOut",
         "type": "object"
       },
+      "QuizAnalyticsOut": {
+        "description": "تحلیل کل آزمون — ADR-0028.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ItemAnalysisOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "reliability": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReliabilityOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScoreSummaryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "QuizAnalyticsOut",
+        "type": "object"
+      },
       "QuizDetailOut": {
         "description": "آزمون از دید استاد — با سؤال‌ها و کلید پاسخ.",
         "properties": {
@@ -15634,6 +15836,40 @@
           "refresh_token"
         ],
         "title": "RefreshIn",
+        "type": "object"
+      },
+      "ReliabilityOut": {
+        "properties": {
+          "advice_fa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Advice Fa"
+          },
+          "alpha": {
+            "title": "Alpha",
+            "type": "number"
+          },
+          "label_fa": {
+            "title": "Label Fa",
+            "type": "string"
+          },
+          "sem_percent": {
+            "title": "Sem Percent",
+            "type": "number"
+          }
+        },
+        "required": [
+          "alpha",
+          "sem_percent",
+          "label_fa"
+        ],
+        "title": "ReliabilityOut",
         "type": "object"
       },
       "RemoveMemberIn": {
@@ -16952,6 +17188,58 @@
           "seconds_remaining"
         ],
         "title": "SaveAnswerOut",
+        "type": "object"
+      },
+      "ScoreSummaryOut": {
+        "properties": {
+          "histogram": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Histogram",
+            "type": "array"
+          },
+          "max_percent": {
+            "title": "Max Percent",
+            "type": "number"
+          },
+          "mean_percent": {
+            "title": "Mean Percent",
+            "type": "number"
+          },
+          "median_percent": {
+            "title": "Median Percent",
+            "type": "number"
+          },
+          "min_percent": {
+            "title": "Min Percent",
+            "type": "number"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "sd_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sd Percent"
+          }
+        },
+        "required": [
+          "n",
+          "mean_percent",
+          "median_percent",
+          "min_percent",
+          "max_percent",
+          "histogram"
+        ],
+        "title": "ScoreSummaryOut",
         "type": "object"
       },
       "SearchContextOut": {
@@ -38366,6 +38654,64 @@
           }
         ],
         "summary": "ویرایش آزمون",
+        "tags": [
+          "teaching"
+        ]
+      }
+    },
+    "/api/v1/teach/quizzes/{quiz_id}/analytics": {
+      "get": {
+        "operationId": "quiz_analytics_api_v1_teach_quizzes__quiz_id__analytics_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "quiz_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Quiz Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizAnalyticsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "پیدا نشد"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "تحلیل پیشرفتهٔ آزمون: توزیع نمره، پایایی، توزیع گزینه‌ها",
         "tags": [
           "teaching"
         ]

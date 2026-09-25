@@ -36,11 +36,14 @@ from silp.core.logging import get_logger
 from silp.core.permissions import Permission
 from silp.domain import audit
 from silp.domain.quiz import (
+    InvalidQuestionPayload,
     QuestionKind,
+    analytics,
     parse_question,
     quantize,
     review_payload,
 )
+from silp.domain.quiz.grading import selected_ids
 from silp.models.quiz import Quiz, QuizAnswer, QuizAttempt, QuizQuestion
 from silp.services import events
 from silp.services.audit_service import AuditService
@@ -106,6 +109,27 @@ class QuestionStats:
     answered: int
     difficulty: Decimal | None
     discrimination: Decimal | None
+
+
+@dataclass(frozen=True, slots=True)
+class ItemAnalysis:
+    """تحلیل پیشرفتهٔ یک سؤال — ADR-0028."""
+
+    stats: QuestionStats
+    #: همبستگی سؤال با نمرهٔ بقیهٔ آزمون؛ `None` زیر ده تلاش یا برای سؤالِ
+    #: غیرمشترک بین تلاش‌ها (انتخاب تصادفی از بانک).
+    item_rest: float | None
+    #: فقط برای سؤال چندگزینه‌ای؛ برای بقیه خالی.
+    options: list[analytics.OptionStat]
+
+
+@dataclass(frozen=True, slots=True)
+class QuizAnalytics:
+    """تحلیل کل آزمون — ADR-0028."""
+
+    summary: analytics.ScoreSummary | None
+    reliability: analytics.Reliability | None
+    items: list[ItemAnalysis]
 
 
 class GradingService:
@@ -453,6 +477,130 @@ class GradingService:
             )
         return stats
 
+    # ── تحلیل پیشرفتهٔ آزمون — ADR-0028 ────────────────────────────────
+    async def quiz_analytics(self, quiz_id: uuid.UUID) -> QuizAnalytics:
+        """توزیع نمره، پایایی، همبستگی سؤال با بقیه، و توزیع گزینه‌ها.
+
+        هر تلاشِ `GRADED` یک ردیف است (همان قاعدهٔ `question_stats`). سؤالی
+        که در بعضی تلاش‌ها نیامده (انتخاب تصادفی از بانک) از پایایی و
+        همبستگی بیرون می‌ماند؛ در غیر این صورت «نیامده» با «صفر گرفته» یکی
+        می‌شد.
+        """
+        stats = await self.question_stats(quiz_id)
+        if not stats:
+            return QuizAnalytics(summary=None, reliability=None, items=[])
+
+        questions = {
+            q.id: q
+            for q in await self.session.scalars(
+                select(QuizQuestion).where(QuizQuestion.quiz_id == quiz_id)
+            )
+        }
+        attempts = list(
+            await self.session.scalars(
+                select(QuizAttempt).where(
+                    QuizAttempt.quiz_id == quiz_id,
+                    QuizAttempt.status == "GRADED",
+                    QuizAttempt.total_score.is_not(None),
+                )
+            )
+        )
+        scores = await self._scores_by_question(quiz_id)
+        responses = await self._responses_by_question(quiz_id)
+
+        # سؤال‌های هر تلاش: `question_order` خالی یعنی همهٔ سؤال‌ها.
+        included: dict[uuid.UUID, set[uuid.UUID]] = {
+            a.id: set(a.question_order) if a.question_order else set(questions) for a in attempts
+        }
+        totals = {a.id: float(a.total_score or 0) for a in attempts}
+
+        percents: list[float] = []
+        for attempt in attempts:
+            maximum = sum(
+                float(questions[q].points) for q in included[attempt.id] if q in questions
+            )
+            if maximum > 0:
+                percents.append(100.0 * totals[attempt.id] / maximum)
+
+        common = [
+            stat.question_id
+            for stat in stats
+            if stat.points > 0 and all(stat.question_id in included[a.id] for a in attempts)
+        ]
+        matrix = [[float(scores.get(q, {}).get(a.id) or 0) for q in common] for a in attempts]
+        row_totals = [sum(row) for row in matrix]
+        max_common = sum(float(questions[q].points) for q in common)
+
+        items: list[ItemAnalysis] = []
+        for stat in stats:
+            item_rest = None
+            if stat.question_id in common:
+                column = common.index(stat.question_id)
+                item_rest = analytics.item_rest_correlation(
+                    [row[column] for row in matrix], row_totals
+                )
+            items.append(
+                ItemAnalysis(
+                    stats=stat,
+                    item_rest=item_rest,
+                    options=self._option_stats(
+                        questions[stat.question_id], attempts, included, responses, totals
+                    ),
+                )
+            )
+
+        return QuizAnalytics(
+            summary=analytics.summarize_scores(percents),
+            reliability=analytics.reliability(matrix, max_common) if len(common) >= 2 else None,
+            items=items,
+        )
+
+    @staticmethod
+    def _option_stats(
+        question: QuizQuestion,
+        attempts: list[QuizAttempt],
+        included: dict[uuid.UUID, set[uuid.UUID]],
+        responses: dict[uuid.UUID, dict[uuid.UUID, dict[str, Any] | None]],
+        totals: dict[uuid.UUID, float],
+    ) -> list[analytics.OptionStat]:
+        if question.kind not in (QuestionKind.SINGLE_CHOICE, QuestionKind.MULTI_CHOICE):
+            return []
+        try:
+            parsed = parse_question(
+                question_id=str(question.id),
+                kind=question.kind,
+                points=question.points,
+                payload=question.payload,
+            )
+        except InvalidQuestionPayload:
+            return []
+        per_attempt = responses.get(question.id, {})
+        selections = {
+            str(a.id): sorted(selected_ids(per_attempt.get(a.id) or {}))
+            for a in attempts
+            if question.id in included[a.id]
+        }
+        return analytics.option_stats(
+            options=[(o.id, o.text, o.id in parsed.correct_options) for o in parsed.options],
+            selections=selections,
+            totals={str(a_id): totals[a_id] for a_id in totals},
+        )
+
+    async def _responses_by_question(
+        self, quiz_id: uuid.UUID
+    ) -> dict[uuid.UUID, dict[uuid.UUID, dict[str, Any] | None]]:
+        rows = list(
+            await self.session.execute(
+                select(QuizAnswer.question_id, QuizAnswer.attempt_id, QuizAnswer.response)
+                .join(QuizAttempt, QuizAttempt.id == QuizAnswer.attempt_id)
+                .where(QuizAttempt.quiz_id == quiz_id, QuizAttempt.status == "GRADED")
+            )
+        )
+        result: dict[uuid.UUID, dict[uuid.UUID, dict[str, Any] | None]] = {}
+        for question_id, attempt_id, response in rows:
+            result.setdefault(question_id, {})[attempt_id] = response
+        return result
+
     async def _scores_by_question(
         self, quiz_id: uuid.UUID
     ) -> dict[uuid.UUID, dict[uuid.UUID, Decimal | None]]:
@@ -590,8 +738,10 @@ __all__ = [
     "AttemptResult",
     "GradingQueue",
     "GradingService",
+    "ItemAnalysis",
     "PendingAnswer",
     "QuestionStats",
+    "QuizAnalytics",
     "ResultQuestion",
     "results_visible",
 ]

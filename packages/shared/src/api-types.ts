@@ -3900,6 +3900,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teach/quizzes/{quiz_id}/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** تحلیل پیشرفتهٔ آزمون: توزیع نمره، پایایی، توزیع گزینه‌ها */
+        get: operations["quiz_analytics_api_v1_teach_quizzes__quiz_id__analytics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teach/quizzes/{quiz_id}/appeals": {
         parameters: {
             query?: never;
@@ -7184,6 +7201,38 @@ export interface components {
             /** Username */
             username: string;
         };
+        /**
+         * ItemAnalysisOut
+         * @description تحلیل پیشرفتهٔ یک سؤال: همان آمار M4-13 + همبستگی با بقیه + گزینه‌ها.
+         */
+        ItemAnalysisOut: {
+            /** Answered */
+            answered: number;
+            /** Body */
+            body: string;
+            /** Difficulty */
+            difficulty?: string | null;
+            /** Discrimination */
+            discrimination?: string | null;
+            /** Item Rest */
+            item_rest?: number | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SINGLE_CHOICE" | "MULTI_CHOICE" | "TRUE_FALSE" | "SHORT_ANSWER" | "NUMERIC" | "ESSAY" | "MATCHING";
+            /** Note Fa */
+            note_fa?: string | null;
+            /** Options */
+            options?: components["schemas"]["OptionStatOut"][];
+            /** Points */
+            points: string;
+            /**
+             * Question Id
+             * Format: uuid
+             */
+            question_id: string;
+        };
         /** LeaderRowOut */
         LeaderRowOut: {
             /**
@@ -8495,6 +8544,28 @@ export interface components {
             role_id?: string | null;
             /** Title */
             title: string;
+        };
+        /**
+         * OptionStatOut
+         * @description توزیع یک گزینه — ADR-0028. فقط برای استاد؛ `is_correct` کلید را لو می‌دهد.
+         */
+        OptionStatOut: {
+            /** Bottom Share */
+            bottom_share?: number | null;
+            /** Chosen */
+            chosen: number;
+            /** Is Correct */
+            is_correct: boolean;
+            /** Note Fa */
+            note_fa?: string | null;
+            /** Option Id */
+            option_id: string;
+            /** Share */
+            share: number;
+            /** Text */
+            text: string;
+            /** Top Share */
+            top_share?: number | null;
         };
         /** OutboxMessageOut */
         OutboxMessageOut: {
@@ -9882,6 +9953,16 @@ export interface components {
             start: number;
         };
         /**
+         * QuizAnalyticsOut
+         * @description تحلیل کل آزمون — ADR-0028.
+         */
+        QuizAnalyticsOut: {
+            /** Items */
+            items: components["schemas"]["ItemAnalysisOut"][];
+            reliability?: components["schemas"]["ReliabilityOut"] | null;
+            summary?: components["schemas"]["ScoreSummaryOut"] | null;
+        };
+        /**
          * QuizDetailOut
          * @description آزمون از دید استاد — با سؤال‌ها و کلید پاسخ.
          */
@@ -10203,6 +10284,17 @@ export interface components {
         RefreshIn: {
             /** Refresh Token */
             refresh_token: string;
+        };
+        /** ReliabilityOut */
+        ReliabilityOut: {
+            /** Advice Fa */
+            advice_fa?: string | null;
+            /** Alpha */
+            alpha: number;
+            /** Label Fa */
+            label_fa: string;
+            /** Sem Percent */
+            sem_percent: number;
         };
         /** RemoveMemberIn */
         RemoveMemberIn: {
@@ -10699,6 +10791,23 @@ export interface components {
             saved_at: string;
             /** Seconds Remaining */
             seconds_remaining: number;
+        };
+        /** ScoreSummaryOut */
+        ScoreSummaryOut: {
+            /** Histogram */
+            histogram: number[];
+            /** Max Percent */
+            max_percent: number;
+            /** Mean Percent */
+            mean_percent: number;
+            /** Median Percent */
+            median_percent: number;
+            /** Min Percent */
+            min_percent: number;
+            /** N */
+            n: number;
+            /** Sd Percent */
+            sd_percent?: number | null;
         };
         /** SearchContextOut */
         SearchContextOut: {
@@ -23217,6 +23326,46 @@ export interface operations {
             };
             /** @description وضعیت اجازه نمی‌دهد */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quiz_analytics_api_v1_teach_quizzes__quiz_id__analytics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizAnalyticsOut"];
+                };
+            };
+            /** @description پیدا نشد */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 from typing import Any
 
 import pytest
@@ -965,6 +966,138 @@ async def test_question_stats_report_difficulty_and_hold_back_discrimination(
     assert by_body["آسان"]["discrimination"] is None
     # جملهٔ فارسی هم می‌آید — عدد خالی برای استاد یعنی هیچ.
     assert by_body["سخت"]["note_fa"]
+
+
+# ── تحلیل پیشرفته — ADR-0028 ───────────────────────────────────────────
+async def _graded_class(db_session: Any, scene: dict[str, Any], questions: list[str]) -> None:
+    """دوازده تلاش تصحیح‌شده، مستقیم در دیتابیس (ورود OTP بیش از ۱۰ نفر را نمی‌دهد).
+
+    سؤال ۱: همه جز دو نفر ته‌جدول درست؛ سؤال ۲: شش نفر اول درست؛ سؤال ۳
+    (معکوس): فقط شش نفر ته‌جدول درست — یعنی سؤالی که قوی‌ها را غلط می‌کند.
+    """
+    from silp.models.identity import User
+    from silp.models.quiz import QuizAnswer, QuizAttempt
+
+    correct_when = [
+        lambda i: i < 10,
+        lambda i: i < 6,
+        lambda i: i >= 6,
+    ]
+    now = datetime.now(UTC)
+    for i in range(12):
+        user = User(mobile=f"0912{uuid.uuid4().int % 10_000_000:07d}")
+        db_session.add(user)
+        await db_session.flush()
+        hits = [rule(i) for rule in correct_when]
+        attempt = QuizAttempt(
+            quiz_id=uuid.UUID(scene["quiz_id"]),
+            student_id=user.id,
+            attempt_no=1,
+            status="GRADED",
+            started_at=now - timedelta(minutes=20),
+            expires_at=now - timedelta(minutes=5),
+            submitted_at=now - timedelta(minutes=10),
+            auto_score=Decimal(sum(hits)),
+            total_score=Decimal(sum(hits)),
+        )
+        db_session.add(attempt)
+        await db_session.flush()
+        for question_id, hit in zip(questions, hits, strict=True):
+            db_session.add(
+                QuizAnswer(
+                    attempt_id=attempt.id,
+                    question_id=uuid.UUID(question_id),
+                    response={"selected": ["b" if hit else "a"]},
+                    auto_score=Decimal(1 if hit else 0),
+                )
+            )
+    await db_session.flush()
+
+
+async def test_quiz_analytics_with_a_small_class_gives_counts_but_no_reliability(
+    client: Any, db_session: Any
+) -> None:
+    """یک تلاش: توزیع گزینه هست، پایایی و همبستگی نیست — نویز شکل شاخص ندارد."""
+    scene = await _scene(client, db_session)
+    first = await _add_question(client, scene, kind="SINGLE_CHOICE", payload=SINGLE_PAYLOAD)
+    second = await _add_question(client, scene, kind="SINGLE_CHOICE", payload=SINGLE_PAYLOAD)
+    await _publish(client, scene)
+    started = await _start(client, scene)
+    await _answer(client, scene, started, first, {"selected": ["b"]})
+    await _answer(client, scene, started, second, {"selected": ["a"]})
+    await client.post(
+        f"/api/v1/attempts/{started['attempt_id']}/submit",
+        headers=auth(scene["student_token"]),
+        json={"confirm_unanswered": 0},
+    )
+
+    response = await client.get(
+        f"/api/v1/teach/quizzes/{scene['quiz_id']}/analytics",
+        headers=auth(scene["instructor_token"]),
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["summary"]["n"] == 1
+    assert body["summary"]["mean_percent"] == 50.0
+    assert body["summary"]["sd_percent"] is None
+    assert body["reliability"] is None
+    by_id = {item["question_id"]: item for item in body["items"]}
+    assert by_id[first]["item_rest"] is None
+    options = {o["option_id"]: o for o in by_id[first]["options"]}
+    assert options["b"]["is_correct"] is True
+    assert options["b"]["chosen"] == 1
+    assert options["a"]["chosen"] == 0
+    # زیر ده تلاش سهم گروه‌ها و جمله نمی‌آید.
+    assert options["a"]["top_share"] is None
+    assert options["a"]["note_fa"] is None
+
+
+async def test_quiz_analytics_with_twelve_attempts_reports_reliability_and_flags(
+    client: Any, db_session: Any
+) -> None:
+    scene = await _scene(client, db_session)
+    questions = [
+        await _add_question(
+            client, scene, kind="SINGLE_CHOICE", payload=SINGLE_PAYLOAD, body=f"سؤال {n}"
+        )
+        for n in (1, 2, 3)
+    ]
+    await _publish(client, scene)
+    await _graded_class(db_session, scene, questions)
+
+    response = await client.get(
+        f"/api/v1/teach/quizzes/{scene['quiz_id']}/analytics",
+        headers=auth(scene["instructor_token"]),
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["summary"]["n"] == 12
+    assert sum(body["summary"]["histogram"]) == 12
+    assert body["reliability"] is not None
+    assert body["reliability"]["label_fa"]
+    by_id = {item["question_id"]: item for item in body["items"]}
+    # سؤال معکوس: هرچه بقیهٔ آزمون را بهتر زده‌ای، این را بدتر.
+    assert by_id[questions[2]]["item_rest"] < 0
+    first = {o["option_id"]: o for o in by_id[questions[0]]["options"]}
+    assert first["a"]["chosen"] == 2
+    assert first["b"]["chosen"] == 10
+    assert first["a"]["top_share"] is not None
+
+
+async def test_quiz_analytics_is_not_visible_to_students(client: Any, db_session: Any) -> None:
+    """کلید پاسخ در `is_correct` است؛ دانشجو نباید ببیند."""
+    scene = await _scene(client, db_session)
+    await _add_question(client, scene, kind="SINGLE_CHOICE", payload=SINGLE_PAYLOAD)
+    await _publish(client, scene)
+
+    response = await client.get(
+        f"/api/v1/teach/quizzes/{scene['quiz_id']}/analytics",
+        headers=auth(scene["student_token"]),
+    )
+
+    assert response.status_code in (403, 404), response.text
 
 
 async def test_instructor_sees_the_attempt_list_with_names(client: Any, db_session: Any) -> None:

@@ -72,7 +72,7 @@ def grade_answer(question: Question, response: Mapping[str, Any] | None) -> Grad
 
 
 def _grade_single_choice(question: Question, response: Mapping[str, Any]) -> GradedAnswer:
-    selected = _selected_ids(response)
+    selected = selected_ids(response)
     # انتخاب دو گزینه در سؤال تک‌پاسخی غلط است، نه «نیمه‌درست».
     correct = len(selected) == 1 and selected == set(question.correct_options)
     return _all_or_nothing(question, correct)
@@ -96,7 +96,7 @@ def _all_or_nothing(question: Question, correct: bool) -> GradedAnswer:
 
 
 def _grade_multi_choice(question: Question, response: Mapping[str, Any]) -> GradedAnswer:
-    selected = _selected_ids(response)
+    selected = selected_ids(response)
     if not selected:
         return GradedAnswer(score=ZERO, is_correct=False)
 
@@ -120,7 +120,7 @@ def _grade_multi_choice(question: Question, response: Mapping[str, Any]) -> Grad
     return GradedAnswer(score=score, is_correct=None)
 
 
-def _selected_ids(response: Mapping[str, Any]) -> set[str]:
+def selected_ids(response: Mapping[str, Any]) -> set[str]:
     raw = response.get("selected")
     if isinstance(raw, str):
         return {raw}
@@ -252,5 +252,6 @@ __all__ = [
     "grade_attempt",
     "needs_manual_grading",
     "quantize",
+    "selected_ids",
     "total_auto_score",
 ]
