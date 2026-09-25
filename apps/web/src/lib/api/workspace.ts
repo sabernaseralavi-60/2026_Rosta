@@ -519,3 +519,71 @@ export function submitReflection(projectId: string, input: ReflectionInput, acce
     body: input,
   });
 }
+
+// ── ارزیابی همتا — FR-PRJ-08، ADR-0024 برش ب ──────────────────────────
+export interface Peer {
+  user_id: string;
+  full_name: string | null;
+  is_lead: boolean;
+}
+
+export interface PeerRatingRecord {
+  evaluatee_id: string;
+  contribution: number;
+  reliability: number | null;
+}
+
+export interface PeerEvaluationState {
+  can_submit: boolean;
+  reason: string | null;
+  peers: Peer[];
+  /** ارزیابی‌های ثبت‌شدهٔ خودِ کاربر؛ خالی تا وقتی ثبت نکرده. */
+  mine: PeerRatingRecord[];
+  /** امتیاز فعلی قاعده؛ `null` اگر مدیر غیرفعالش کرده. */
+  points: number | null;
+}
+
+export interface PeerAverage {
+  user_id: string;
+  full_name: string | null;
+  /** ارزیابی‌های «دیگران» — نظر خودِ مدیر در آن نیست. */
+  evaluations: number;
+  /** `null` یعنی ارزیابی برای حفظ ناشناسی کافی نیست. */
+  contribution_avg: number | null;
+  reliability_avg: number | null;
+}
+
+export interface PeerEvaluationSummary {
+  min_evaluations: number;
+  members: PeerAverage[];
+}
+
+export interface PeerRatingInput {
+  evaluatee_id: string;
+  contribution: number;
+  reliability?: number | null;
+}
+
+export function fetchPeerEvaluations(projectId: string, accessToken: string) {
+  return apiFetch<PeerEvaluationState>(`/projects/${projectId}/peer-evaluations`, {
+    accessToken,
+  });
+}
+
+export function submitPeerEvaluations(
+  projectId: string,
+  evaluations: PeerRatingInput[],
+  accessToken: string,
+) {
+  return apiFetch<PeerEvaluationState>(`/projects/${projectId}/peer-evaluations`, {
+    method: 'PUT',
+    accessToken,
+    body: { evaluations },
+  });
+}
+
+export function fetchPeerEvaluationSummary(projectId: string, accessToken: string) {
+  return apiFetch<PeerEvaluationSummary>(`/projects/${projectId}/peer-evaluations/summary`, {
+    accessToken,
+  });
+}

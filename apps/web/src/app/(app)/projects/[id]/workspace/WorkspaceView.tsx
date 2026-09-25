@@ -31,6 +31,7 @@ import { MetricsView } from '@/components/domain/MetricsView';
 
 import { ActivityTab, DiscussionTab } from './DiscussionTab';
 import { MilestonesTab } from './MilestonesTab';
+import { PeerEvaluationCard } from './PeerEvaluationCard';
 import { ReflectionCard } from './ReflectionCard';
 import { TasksTab } from './TasksTab';
 import { TeamTab } from './TeamTab';
@@ -204,6 +205,10 @@ export function WorkspaceView({ id }: { id: string }) {
 
       {project.status === 'COMPLETED' && isMember && (
         <ReflectionCard projectId={id} accessToken={accessToken!} />
+      )}
+
+      {project.status === 'COMPLETED' && isMember && (
+        <PeerEvaluationCard projectId={id} accessToken={accessToken!} isLead={isLead} />
       )}
 
       {error && (
