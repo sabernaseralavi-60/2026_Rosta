@@ -4059,6 +4059,104 @@
         "title": "CompleteProjectIn",
         "type": "object"
       },
+      "ComposedMemberOut": {
+        "properties": {
+          "covers": {
+            "items": {
+              "$ref": "#/components/schemas/CoveredSkillOut"
+            },
+            "title": "Covers",
+            "type": "array"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/TeammateUserOut"
+          },
+          "weekly_hours": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Hours"
+          }
+        },
+        "required": [
+          "user",
+          "covers",
+          "reason"
+        ],
+        "title": "ComposedMemberOut",
+        "type": "object"
+      },
+      "CompositionOut": {
+        "properties": {
+          "coverage_percent": {
+            "title": "Coverage Percent",
+            "type": "number"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/ComposedMemberOut"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "uncovered": {
+            "items": {
+              "$ref": "#/components/schemas/GapOut"
+            },
+            "title": "Uncovered",
+            "type": "array"
+          }
+        },
+        "required": [
+          "members",
+          "coverage_percent",
+          "uncovered"
+        ],
+        "title": "CompositionOut",
+        "type": "object"
+      },
+      "CompositionSuggestionOut": {
+        "properties": {
+          "compositions": {
+            "items": {
+              "$ref": "#/components/schemas/CompositionOut"
+            },
+            "title": "Compositions",
+            "type": "array"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/GapOut"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "project": {
+            "$ref": "#/components/schemas/ProjectBriefOut"
+          },
+          "seats": {
+            "title": "Seats",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project",
+          "gaps",
+          "seats",
+          "compositions"
+        ],
+        "title": "CompositionSuggestionOut",
+        "type": "object"
+      },
       "ContributionDimensionOut": {
         "properties": {
           "dimension": {
@@ -4886,6 +4984,29 @@
           }
         },
         "title": "CourseUpdateIn",
+        "type": "object"
+      },
+      "CoveredSkillOut": {
+        "properties": {
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "title_fa",
+          "level",
+          "verified"
+        ],
+        "title": "CoveredSkillOut",
         "type": "object"
       },
       "CriterionOut": {
@@ -39786,6 +39907,87 @@
           }
         ],
         "summary": "پس گرفتن درخواست",
+        "tags": [
+          "teams"
+        ]
+      }
+    },
+    "/api/v1/teams/compose": {
+      "get": {
+        "description": "FR-TEAM-04، ADR-0027 — فقط‌خواندنی؛ مدیر تیم (`project.application.decide`).",
+        "operationId": "compose_team_api_v1_teams_compose_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "seats",
+            "required": false,
+            "schema": {
+              "default": 3,
+              "maximum": 5,
+              "minimum": 1,
+              "title": "Seats",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompositionSuggestionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "پیشنهاد خودکار ترکیب تیم",
         "tags": [
           "teams"
         ]

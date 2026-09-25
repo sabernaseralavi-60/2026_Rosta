@@ -4283,6 +4283,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teams/compose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * پیشنهاد خودکار ترکیب تیم
+         * @description FR-TEAM-04، ADR-0027 — فقط‌خواندنی؛ مدیر تیم (`project.application.decide`).
+         */
+        get: operations["compose_team_api_v1_teams_compose_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teams/managed": {
         parameters: {
             query?: never;
@@ -6121,6 +6141,35 @@ export interface components {
             /** Final Report */
             final_report: string;
         };
+        /** ComposedMemberOut */
+        ComposedMemberOut: {
+            /** Covers */
+            covers: components["schemas"]["CoveredSkillOut"][];
+            /** Reason */
+            reason: string;
+            user: components["schemas"]["TeammateUserOut"];
+            /** Weekly Hours */
+            weekly_hours?: number | null;
+        };
+        /** CompositionOut */
+        CompositionOut: {
+            /** Coverage Percent */
+            coverage_percent: number;
+            /** Members */
+            members: components["schemas"]["ComposedMemberOut"][];
+            /** Uncovered */
+            uncovered: components["schemas"]["GapOut"][];
+        };
+        /** CompositionSuggestionOut */
+        CompositionSuggestionOut: {
+            /** Compositions */
+            compositions: components["schemas"]["CompositionOut"][];
+            /** Gaps */
+            gaps: components["schemas"]["GapOut"][];
+            project: components["schemas"]["ProjectBriefOut"];
+            /** Seats */
+            seats: number;
+        };
         /** ContributionDimensionOut */
         ContributionDimensionOut: {
             /** Dimension */
@@ -6376,6 +6425,15 @@ export interface components {
             title_fa?: string | null;
             /** Topics */
             topics?: string[] | null;
+        };
+        /** CoveredSkillOut */
+        CoveredSkillOut: {
+            /** Level */
+            level: number;
+            /** Title Fa */
+            title_fa: string;
+            /** Verified */
+            verified: boolean;
         };
         /** CriterionOut */
         CriterionOut: {
@@ -24170,6 +24228,56 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compose_team_api_v1_teams_compose_get: {
+        parameters: {
+            query: {
+                project_id: string;
+                seats?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompositionSuggestionOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
             /** @description Validation Error */
             422: {

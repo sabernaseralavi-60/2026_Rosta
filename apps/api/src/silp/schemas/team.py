@@ -80,6 +80,35 @@ class TeamSearchOut(BaseModel):
     context: SearchContextOut
 
 
+# ── پیشنهاد ترکیب تیم — FR-TEAM-04، ADR-0027 ───────────────────────────
+class CoveredSkillOut(BaseModel):
+    title_fa: str
+    level: int
+    verified: bool
+
+
+class ComposedMemberOut(BaseModel):
+    user: TeammateUserOut
+    weekly_hours: int | None = None
+    #: مهارت‌هایی که این عضو **تازه** به تیم می‌آورد (نه آنچه پیش‌تر پوشانده شده).
+    covers: list[CoveredSkillOut]
+    reason: str
+
+
+class CompositionOut(BaseModel):
+    members: list[ComposedMemberOut]
+    coverage_percent: float
+    uncovered: list[GapOut]
+
+
+class CompositionSuggestionOut(BaseModel):
+    project: ProjectBriefOut
+    gaps: list[GapOut]
+    seats: int
+    #: بهترین اول؛ خالی اگر کمبودی نیست یا هیچ نیمرخ عمومی‌ای چیزی نمی‌پوشاند.
+    compositions: list[CompositionOut]
+
+
 class ManagedTeamOut(BaseModel):
     """تیمی که کاربر می‌تواند برایش آگهی بدهد یا دعوت بفرستد."""
 

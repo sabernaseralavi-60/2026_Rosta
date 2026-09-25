@@ -22,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.exceptions import NotFound, PermissionDenied
 from silp.core.permissions import CurrentUser, Permission
+from silp.domain import team_composition as composer
 from silp.domain import teams as rules
 from silp.models.education import Enrollment
 from silp.models.identity import User
@@ -78,6 +79,46 @@ class SearchContext:
     can_invite: bool = False
 
 
+@dataclass(slots=True)
+class ComposedMember:
+    user_id: uuid.UUID
+    username: str | None
+    display_name: str
+    university: str | None
+    weekly_hours: int | None
+    covers: list[rules.CoveredSkill]
+    reason: str
+
+
+@dataclass(slots=True)
+class ComposedTeam:
+    members: list[ComposedMember]
+    coverage_percent: float
+    uncovered: list[rules.Need]
+
+
+@dataclass(slots=True)
+class ComposedSuggestion:
+    project: Project
+    gaps: list[rules.Need]
+    compositions: list[ComposedTeam]
+
+
+def _to_candidate(
+    profile: Profile, own: list[SkillOut], history: tuple[int, int], shares_course: bool
+) -> rules.Candidate:
+    completed, dropped = history
+    return rules.Candidate(
+        user_id=profile.user_id,
+        skills={s.skill_id: s.level for s in own},
+        verified_skills=frozenset(s.skill_id for s in own if s.verified),
+        weekly_hours=profile.weekly_hours,
+        completed_projects=completed,
+        dropped_projects=dropped,
+        shares_course=shares_course,
+    )
+
+
 class TeamSearchService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -126,16 +167,7 @@ class TeamSearchService:
         for profile, username in rows:
             uid = profile.user_id
             own = skills.get(uid, [])
-            completed, dropped = history.get(uid, (0, 0))
-            candidate = rules.Candidate(
-                user_id=uid,
-                skills={s.skill_id: s.level for s in own},
-                verified_skills=frozenset(s.skill_id for s in own if s.verified),
-                weekly_hours=profile.weekly_hours,
-                completed_projects=completed,
-                dropped_projects=dropped,
-                shares_course=uid in sharing,
-            )
+            candidate = _to_candidate(profile, own, history.get(uid, (0, 0)), uid in sharing)
             match = Match(
                 user_id=uid,
                 username=username,
@@ -172,6 +204,64 @@ class TeamSearchService:
                 )
             )
         return matches, context
+
+    async def compose(
+        self, *, actor: CurrentUser, project_id: uuid.UUID, seats: int
+    ) -> ComposedSuggestion:
+        """FR-TEAM-04، ADR-0027 — فقط‌خواندنی؛ همان قلمرو و سقف نامزدهای `search`."""
+        if not await authz.has_permission(self.session, actor, Permission.TEAM_SEARCH):
+            raise PermissionDenied(permission=Permission.TEAM_SEARCH.value)
+        titles = await self._skill_titles()
+        context = await self._project_context(project_id, actor, titles)
+        project = context.project
+        assert project is not None
+        if not context.can_invite:
+            raise PermissionDenied(permission=Permission.PROJECT_APPLICATION_DECIDE.value)
+
+        excluded = {actor.id, *await self._active_member_ids(project.id)}
+        rows = list(
+            (await self.session.execute(self._candidates(SearchFilters(), excluded))).tuples().all()
+        )
+        user_ids = [profile.user_id for profile, _ in rows]
+        skills = await self._skills_of(user_ids)
+        sharing = await self._sharing_course(
+            user_ids,
+            {project.offering_id} if project.offering_id is not None else set(),
+        )
+        history = await self._project_history(user_ids)
+        by_id = {profile.user_id: (profile, username) for profile, username in rows}
+        pool = [
+            _to_candidate(profile, skills.get(uid, []), history.get(uid, (0, 0)), uid in sharing)
+            for uid, (profile, _) in by_id.items()
+        ]
+
+        def member_of(pick: composer.Pick) -> ComposedMember:
+            profile, username = by_id[pick.user_id]
+            university = profile.university
+            return ComposedMember(
+                user_id=pick.user_id,
+                username=username,
+                display_name=profile.public_name,
+                university=university.title_fa if university else None,
+                weekly_hours=profile.weekly_hours,
+                covers=list(pick.covers),
+                reason=pick.reason,
+            )
+
+        compositions = [
+            ComposedTeam(
+                members=[member_of(pick) for pick in composition.picks],
+                coverage_percent=composition.coverage_percent,
+                uncovered=list(composition.uncovered),
+            )
+            for composition in composer.suggest_compositions(
+                pool,
+                context.gaps,
+                seats=seats,
+                commitment_hpw=project.time_commitment_hpw,
+            )
+        ]
+        return ComposedSuggestion(project=project, gaps=context.gaps, compositions=compositions)
 
     # ── کوئری نامزدها ──────────────────────────────────────────────────
     def _candidates(
@@ -368,4 +458,13 @@ class TeamSearchService:
         return {uid: (int(c), int(d)) for uid, c, d in rows}
 
 
-__all__ = ["Match", "SearchContext", "SearchFilters", "SkillOut", "TeamSearchService"]
+__all__ = [
+    "ComposedMember",
+    "ComposedSuggestion",
+    "ComposedTeam",
+    "Match",
+    "SearchContext",
+    "SearchFilters",
+    "SkillOut",
+    "TeamSearchService",
+]

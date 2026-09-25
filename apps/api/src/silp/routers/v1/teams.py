@@ -18,7 +18,8 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import or_, select
 
 from silp.core.permissions import CurrentUser, Permission
-from silp.domain.teams import stronger_reason
+from silp.domain.team_composition import MAX_SEATS
+from silp.domain.teams import Need, stronger_reason
 from silp.models.delivery import OpeningApplication, TeamOpening
 from silp.models.education import CourseOffering
 from silp.models.profile import Profile
@@ -28,6 +29,10 @@ from silp.routers.deps import CurrentUserDep, OptionalUserDep, SessionDep
 from silp.schemas.common import ErrorResponse, Page, PageParams
 from silp.schemas.team import (
     ApplyIn,
+    ComposedMemberOut,
+    CompositionOut,
+    CompositionSuggestionOut,
+    CoveredSkillOut,
     DecideIn,
     GapOut,
     ManagedTeamOut,
@@ -174,6 +179,55 @@ async def search_teammates(
             can_invite=context.can_invite,
             my_profile_is_public=bool(profile and profile.is_public),
         ),
+    )
+
+
+@router.get(
+    "/compose",
+    response_model=CompositionSuggestionOut,
+    summary="پیشنهاد خودکار ترکیب تیم",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def compose_team(
+    current: CurrentUserDep,
+    service: SearchServiceDep,
+    project_id: uuid.UUID,
+    seats: Annotated[int, Query(ge=1, le=MAX_SEATS)] = 3,
+) -> CompositionSuggestionOut:
+    """FR-TEAM-04، ADR-0027 — فقط‌خواندنی؛ مدیر تیم (`project.application.decide`)."""
+    suggestion = await service.compose(actor=current, project_id=project_id, seats=seats)
+
+    def gap(need: Need) -> GapOut:
+        return GapOut(title_fa=need.title_fa, min_level=need.min_level)
+
+    return CompositionSuggestionOut(
+        project=ProjectBriefOut(id=suggestion.project.id, title=suggestion.project.title_fa),
+        gaps=[gap(n) for n in suggestion.gaps],
+        seats=seats,
+        compositions=[
+            CompositionOut(
+                members=[
+                    ComposedMemberOut(
+                        user=TeammateUserOut(
+                            id=m.user_id,
+                            username=m.username,
+                            display_name=m.display_name,
+                            university=m.university,
+                        ),
+                        weekly_hours=m.weekly_hours,
+                        covers=[
+                            CoveredSkillOut(title_fa=c.title_fa, level=c.level, verified=c.verified)
+                            for c in m.covers
+                        ],
+                        reason=m.reason,
+                    )
+                    for m in team.members
+                ],
+                coverage_percent=team.coverage_percent,
+                uncovered=[gap(n) for n in team.uncovered],
+            )
+            for team in suggestion.compositions
+        ],
     )
 
 
