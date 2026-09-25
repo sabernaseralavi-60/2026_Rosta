@@ -1489,6 +1489,26 @@ export interface paths {
         patch: operations["update_profile_api_v1_me_profile_patch"];
         trace?: never;
     };
+    "/api/v1/me/revenue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * گزارش درآمد ماهانه و سهم من از فروش تأییدشده
+         * @description FR-VEN-03 — فقط ثبت و گزارش؛ پرداخت بیرون از سامانه است (ADR-0025).
+         */
+        get: operations["my_revenue_api_v1_me_revenue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/survey": {
         parameters: {
             query?: never;
@@ -7392,6 +7412,11 @@ export interface components {
                 [key: string]: number;
             };
             /**
+             * Share Rial
+             * @default 0
+             */
+            share_rial: number;
+            /**
              * User Id
              * Format: uuid
              */
@@ -7505,6 +7530,10 @@ export interface components {
             reviewed_at?: string | null;
             /** Reviewed By Name */
             reviewed_by_name?: string | null;
+            /** Share Percent */
+            share_percent?: number | null;
+            /** Share Rial */
+            share_rial?: number | null;
             /**
              * Status
              * @enum {string}
@@ -10222,6 +10251,62 @@ export interface components {
             /** Retried */
             retried: number;
         };
+        /** RevenueLineOut */
+        RevenueLineOut: {
+            /**
+             * Metric Id
+             * Format: uuid
+             */
+            metric_id: string;
+            /** Note */
+            note?: string | null;
+            /**
+             * Occurred On
+             * Format: date
+             */
+            occurred_on: string;
+            /**
+             * Project Id
+             * Format: uuid
+             */
+            project_id: string;
+            /** Project Title */
+            project_title: string;
+            /** Share Percent */
+            share_percent: number;
+            /** Share Rial */
+            share_rial: number;
+            /** Value */
+            value: number;
+        };
+        /** RevenueMonthOut */
+        RevenueMonthOut: {
+            /** Lines */
+            lines: components["schemas"]["RevenueLineOut"][];
+            /** Month */
+            month: number;
+            /** Sales Rial */
+            sales_rial: number;
+            /** Share Rial */
+            share_rial: number;
+            /** Title */
+            title: string;
+            /** Year */
+            year: number;
+        };
+        /** RevenueReportOut */
+        RevenueReportOut: {
+            /** Months */
+            months: components["schemas"]["RevenueMonthOut"][];
+            /** Pending Count */
+            pending_count: number;
+            /** Pending Sales Rial */
+            pending_sales_rial: number;
+            /** Total Sales Rial */
+            total_sales_rial: number;
+            /** Total Share Rial */
+            total_share_rial: number;
+        };
         /** ReverseEntryIn */
         ReverseEntryIn: {
             /** Reason */
@@ -12289,6 +12374,13 @@ export interface components {
             metric_titles?: {
                 [key: string]: string;
             };
+            /** Share Percent */
+            share_percent?: number | null;
+            /**
+             * Share Total Rial
+             * @default 0
+             */
+            share_total_rial: number;
             totals: components["schemas"]["MetricTotalsOut"];
         };
     };
@@ -16402,6 +16494,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_revenue_api_v1_me_revenue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevenueReportOut"];
+                };
+            };
+            /** @description احراز هویت نشده */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };

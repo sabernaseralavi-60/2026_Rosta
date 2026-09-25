@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.exceptions import NotFound
 from silp.core.permissions import CurrentUser
-from silp.domain.ventures import stage_title
+from silp.domain.ventures import share_percent_of, stage_title
 from silp.models.identity import User
 from silp.models.project import Project, ProjectRole, TeamInvitation
 from silp.models.venture import (
@@ -45,6 +45,9 @@ from silp.schemas.venture import (
     MetricTotalsOut,
     ReadinessOut,
     RemoveMemberIn,
+    RevenueLineOut,
+    RevenueMonthOut,
+    RevenueReportOut,
     StageChangeIn,
     StageChangeOut,
     VentureDetailOut,
@@ -61,6 +64,11 @@ from silp.services.venture_service import VentureDraft, VentureService
 router = APIRouter(prefix="/ventures", tags=["ventures"])
 metrics_router = APIRouter(prefix="/metrics", tags=["ventures"])
 project_metrics_router = APIRouter(prefix="/projects", tags=["ventures"])
+revenue_router = APIRouter(
+    prefix="/me",
+    tags=["ventures"],
+    responses={401: {"model": ErrorResponse, "description": "احراز هویت نشده"}},
+)
 invitations_router = APIRouter(tags=["teams"])
 
 
@@ -249,6 +257,8 @@ async def _metric_out(
                 review_note=row.review_note,
                 can_review=row.status == "PENDING" and await metrics.can_review(row, viewer),
                 is_mine=row.user_id == viewer.id,
+                share_percent=float(row.share_percent) if row.share_percent is not None else None,
+                share_rial=row.share_rial,
                 created_at=row.created_at,
             )
         )
@@ -264,16 +274,25 @@ async def _metrics_page(
     rows = await metrics.list_for(owner, status=status_filter)
     overall, by_member = await metrics.totals(owner)
     names = await display_names(metrics.session, list(by_member))
+    shares = await metrics.member_shares(owner.project) if owner.project is not None else {}
     return MetricsOut(
         items=await _metric_out(metrics, rows, viewer),
         totals=MetricTotalsOut(verified=overall.verified, pending=overall.pending),
         by_member=[
             MemberTotalsOut(
-                user_id=uid, name=name_of(names, uid), verified=t.verified, pending=t.pending
+                user_id=uid,
+                name=name_of(names, uid),
+                verified=t.verified,
+                pending=t.pending,
+                share_rial=shares.get(uid, 0),
             )
             for uid, t in by_member.items()
         ],
         metric_titles=dict(METRIC_TITLE_FA),
+        share_percent=(
+            float(share_percent_of(owner.project.rewards)) if owner.project is not None else None
+        ),
+        share_total_rial=sum(shares.values()),
     )
 
 
@@ -570,6 +589,46 @@ async def invite_to_project(
         role_id=payload.role_id,
     )
     return (await _invitations_out(invitations, [invitation]))[0]
+
+
+# ── گزارش درآمد شخصی ───────────────────────────────────────────────────
+@revenue_router.get(
+    "/revenue",
+    response_model=RevenueReportOut,
+    summary="گزارش درآمد ماهانه و سهم من از فروش تأییدشده",
+)
+async def my_revenue(metrics: MetricServiceDep, current: CurrentUserDep) -> RevenueReportOut:
+    """FR-VEN-03 — فقط ثبت و گزارش؛ پرداخت بیرون از سامانه است (ADR-0025)."""
+    report = await metrics.revenue_report(current.id)
+    return RevenueReportOut(
+        months=[
+            RevenueMonthOut(
+                year=m.year,
+                month=m.month,
+                title=m.title,
+                sales_rial=m.sales_rial,
+                share_rial=m.share_rial,
+                lines=[
+                    RevenueLineOut(
+                        metric_id=line.metric_id,
+                        project_id=line.project_id,
+                        project_title=line.project_title,
+                        occurred_on=line.occurred_on,
+                        value=line.value,
+                        share_percent=float(line.share_percent),
+                        share_rial=line.share_rial,
+                        note=line.note,
+                    )
+                    for line in m.lines
+                ],
+            )
+            for m in report.months
+        ],
+        total_sales_rial=report.total_sales_rial,
+        total_share_rial=report.total_share_rial,
+        pending_sales_rial=report.pending_sales_rial,
+        pending_count=report.pending_count,
+    )
 
 
 # ── بررسی شاخص ─────────────────────────────────────────────────────────

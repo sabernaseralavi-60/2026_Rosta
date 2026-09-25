@@ -148,12 +148,16 @@ class MetricOut(BaseModel):
     review_note: str | None = None
     can_review: bool = False
     is_mine: bool = False
+    # فقط فروش تأییدشدهٔ پروژه؛ عکسی از لحظهٔ تأیید (ADR-0025).
+    share_percent: float | None = None
+    share_rial: int | None = None
     created_at: datetime
 
 
 class MemberTotalsOut(MetricTotalsOut):
     user_id: uuid.UUID
     name: str | None = None
+    share_rial: int = 0
 
 
 class MetricsOut(BaseModel):
@@ -161,6 +165,38 @@ class MetricsOut(BaseModel):
     totals: MetricTotalsOut
     by_member: list[MemberTotalsOut] = Field(default_factory=list)
     metric_titles: dict[str, str] = Field(default_factory=dict)
+    # درصد سهم فروشنده در پروژه (فقط پروژه؛ کسب‌وکار سهم ندارد) و جمع سهم‌ها.
+    share_percent: float | None = None
+    share_total_rial: int = 0
+
+
+# ── گزارش درآمد شخصی — FR-VEN-03، ADR-0025 ─────────────────────────────
+class RevenueLineOut(BaseModel):
+    metric_id: uuid.UUID
+    project_id: uuid.UUID
+    project_title: str
+    occurred_on: date
+    value: int
+    share_percent: float
+    share_rial: int
+    note: str | None = None
+
+
+class RevenueMonthOut(BaseModel):
+    year: int
+    month: int
+    title: str
+    sales_rial: int
+    share_rial: int
+    lines: list[RevenueLineOut]
+
+
+class RevenueReportOut(BaseModel):
+    months: list[RevenueMonthOut]
+    total_sales_rial: int
+    total_share_rial: int
+    pending_sales_rial: int
+    pending_count: int
 
 
 class MetricReviewIn(BaseModel):

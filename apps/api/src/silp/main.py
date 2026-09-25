@@ -161,6 +161,7 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(ventures.router)
     v1.include_router(ventures.metrics_router)
     v1.include_router(ventures.project_metrics_router)
+    v1.include_router(ventures.revenue_router)
     v1.include_router(ventures.invitations_router)
     # ── پژوهش و تیم (M7 بخش ب) ────────────────────────────────────────
     v1.include_router(research.router)

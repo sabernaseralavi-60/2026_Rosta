@@ -7657,6 +7657,11 @@
             "title": "Pending",
             "type": "object"
           },
+          "share_rial": {
+            "default": 0,
+            "title": "Share Rial",
+            "type": "integer"
+          },
           "user_id": {
             "format": "uuid",
             "title": "User Id",
@@ -7976,6 +7981,28 @@
               }
             ],
             "title": "Reviewed By Name"
+          },
+          "share_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Percent"
+          },
+          "share_rial": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Rial"
           },
           "status": {
             "enum": [
@@ -15808,6 +15835,140 @@
         "title": "RetriedOut",
         "type": "object"
       },
+      "RevenueLineOut": {
+        "properties": {
+          "metric_id": {
+            "format": "uuid",
+            "title": "Metric Id",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "occurred_on": {
+            "format": "date",
+            "title": "Occurred On",
+            "type": "string"
+          },
+          "project_id": {
+            "format": "uuid",
+            "title": "Project Id",
+            "type": "string"
+          },
+          "project_title": {
+            "title": "Project Title",
+            "type": "string"
+          },
+          "share_percent": {
+            "title": "Share Percent",
+            "type": "number"
+          },
+          "share_rial": {
+            "title": "Share Rial",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "metric_id",
+          "project_id",
+          "project_title",
+          "occurred_on",
+          "value",
+          "share_percent",
+          "share_rial"
+        ],
+        "title": "RevenueLineOut",
+        "type": "object"
+      },
+      "RevenueMonthOut": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/RevenueLineOut"
+            },
+            "title": "Lines",
+            "type": "array"
+          },
+          "month": {
+            "title": "Month",
+            "type": "integer"
+          },
+          "sales_rial": {
+            "title": "Sales Rial",
+            "type": "integer"
+          },
+          "share_rial": {
+            "title": "Share Rial",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "year",
+          "month",
+          "title",
+          "sales_rial",
+          "share_rial",
+          "lines"
+        ],
+        "title": "RevenueMonthOut",
+        "type": "object"
+      },
+      "RevenueReportOut": {
+        "properties": {
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/RevenueMonthOut"
+            },
+            "title": "Months",
+            "type": "array"
+          },
+          "pending_count": {
+            "title": "Pending Count",
+            "type": "integer"
+          },
+          "pending_sales_rial": {
+            "title": "Pending Sales Rial",
+            "type": "integer"
+          },
+          "total_sales_rial": {
+            "title": "Total Sales Rial",
+            "type": "integer"
+          },
+          "total_share_rial": {
+            "title": "Total Share Rial",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "months",
+          "total_sales_rial",
+          "total_share_rial",
+          "pending_sales_rial",
+          "pending_count"
+        ],
+        "title": "RevenueReportOut",
+        "type": "object"
+      },
       "ReverseEntryIn": {
         "properties": {
           "reason": {
@@ -21334,6 +21495,22 @@
             },
             "title": "Metric Titles",
             "type": "object"
+          },
+          "share_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Percent"
+          },
+          "share_total_rial": {
+            "default": 0,
+            "title": "Share Total Rial",
+            "type": "integer"
           },
           "totals": {
             "$ref": "#/components/schemas/MetricTotalsOut"
@@ -27788,6 +27965,43 @@
         "summary": "به‌روزرسانی اطلاعات پایه",
         "tags": [
           "me"
+        ]
+      }
+    },
+    "/api/v1/me/revenue": {
+      "get": {
+        "description": "FR-VEN-03 — فقط ثبت و گزارش؛ پرداخت بیرون از سامانه است (ADR-0025).",
+        "operationId": "my_revenue_api_v1_me_revenue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevenueReportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "احراز هویت نشده"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "گزارش درآمد ماهانه و سهم من از فروش تأییدشده",
+        "tags": [
+          "ventures"
         ]
       }
     },

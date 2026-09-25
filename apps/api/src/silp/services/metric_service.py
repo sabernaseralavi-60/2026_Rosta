@@ -21,6 +21,7 @@ import uuid
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,7 +35,10 @@ from silp.core.exceptions import (
     ValidationFailed,
 )
 from silp.core.permissions import CurrentUser, Permission
+from silp.domain.calendar import MONTHS_FA, to_jalali
 from silp.domain.gamification.formulas import LOCAL_TZ
+from silp.domain.text import to_persian_digits
+from silp.domain.ventures import share_of, share_percent_of
 from silp.models.file import File
 from silp.models.project import Project
 from silp.models.venture import METRIC_KINDS, NOTE_MAX, Venture, VentureMetric
@@ -50,6 +54,8 @@ MAX_SALES_RIAL = 1_000_000_000_000
 REVIEW_DECISIONS = ("VERIFIED", "REJECTED")
 ACTIVE_PROJECT_STATUSES = ("OPEN", "IN_PROGRESS")
 QUEUE_LIMIT = 200
+#: گزارش درآمد شخصی — سقف امن؛ یک دانشجو در یک ترم به صدها فروش نمی‌رسد.
+REVENUE_ROW_LIMIT = 1000
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,6 +77,45 @@ class MetricTotals:
 
     verified: dict[str, int] = field(default_factory=dict)
     pending: dict[str, int] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class RevenueLine:
+    """یک فروش تأییدشدهٔ پروژه و سهمی که هنگام تأیید از آن ثبت شد."""
+
+    metric_id: uuid.UUID
+    project_id: uuid.UUID
+    project_title: str
+    occurred_on: date
+    value: int
+    share_percent: Decimal
+    share_rial: int
+    note: str | None
+
+
+@dataclass(slots=True)
+class RevenueMonth:
+    year: int
+    month: int
+    sales_rial: int = 0
+    share_rial: int = 0
+    lines: list[RevenueLine] = field(default_factory=list)
+
+    @property
+    def title(self) -> str:
+        return f"{MONTHS_FA[self.month - 1]} {to_persian_digits(self.year)}"
+
+
+@dataclass(slots=True)
+class RevenueReport:
+    """گزارش درآمد شخصی — FR-VEN-03. فقط ثبت و گزارش؛ پرداخت بیرون از سامانه است."""
+
+    months: list[RevenueMonth] = field(default_factory=list)
+    total_sales_rial: int = 0
+    total_share_rial: int = 0
+    #: ثبت‌شده و هنوز بی‌بررسی — سهمش وقتی روشن می‌شود که تأیید شود.
+    pending_sales_rial: int = 0
+    pending_count: int = 0
 
 
 def _now() -> datetime:
@@ -200,6 +245,62 @@ class MetricService:
                 values[metric] = values.get(metric, 0) + amount
         return overall, dict(by_member)
 
+    async def member_shares(self, project: Project) -> dict[uuid.UUID, int]:
+        """جمع سهم تأییدشدهٔ هر عضو در یک پروژه (ADR-0025 بند ۶)."""
+        rows = await self.session.execute(
+            select(VentureMetric.user_id, func.sum(VentureMetric.share_rial))
+            .where(
+                VentureMetric.project_id == project.id,
+                VentureMetric.status == "VERIFIED",
+                VentureMetric.share_rial.is_not(None),
+            )
+            .group_by(VentureMetric.user_id)
+        )
+        return {user_id: int(total or 0) for user_id, total in rows}
+
+    async def revenue_report(self, user_id: uuid.UUID) -> RevenueReport:
+        """فروش‌های پروژه‌ای یک فروشنده به تفکیک ماه شمسی (روز فروش، نه روز تأیید)."""
+        rows = await self.session.execute(
+            select(VentureMetric, Project.title_fa)
+            .join(Project, Project.id == VentureMetric.project_id)
+            .where(
+                VentureMetric.user_id == user_id,
+                VentureMetric.metric == "SALES_AMOUNT",
+                VentureMetric.status.in_(("VERIFIED", "PENDING")),
+            )
+            .order_by(VentureMetric.occurred_on.desc(), VentureMetric.created_at.desc())
+            .limit(REVENUE_ROW_LIMIT)
+        )
+        report = RevenueReport()
+        by_month: dict[tuple[int, int], RevenueMonth] = {}
+        for row, title in rows:
+            if row.status == "PENDING":
+                report.pending_sales_rial += row.value
+                report.pending_count += 1
+                continue
+            assert row.project_id is not None
+            year, month, _ = to_jalali(row.occurred_on)
+            bucket = by_month.setdefault((year, month), RevenueMonth(year=year, month=month))
+            share = row.share_rial or 0
+            bucket.sales_rial += row.value
+            bucket.share_rial += share
+            bucket.lines.append(
+                RevenueLine(
+                    metric_id=row.id,
+                    project_id=row.project_id,
+                    project_title=title,
+                    occurred_on=row.occurred_on,
+                    value=row.value,
+                    share_percent=row.share_percent or Decimal(0),
+                    share_rial=share,
+                    note=row.note,
+                )
+            )
+            report.total_sales_rial += row.value
+            report.total_share_rial += share
+        report.months = [by_month[key] for key in sorted(by_month, reverse=True)]
+        return report
+
     async def can_view(self, owner: MetricOwner, actor: CurrentUser) -> bool:
         if owner.venture is not None:
             return await self.ventures.is_member(
@@ -288,12 +389,26 @@ class MetricService:
         row.reviewed_by = actor.id
         row.reviewed_at = _now()
         row.review_note = cleaned
+        if decision == "VERIFIED":
+            await self._snapshot_share(row)
         await events.publish(self.session, events.MetricReviewed(metric_id=row.id))
         await self.session.commit()
         await self.session.refresh(row)
         return row
 
     # ── درونی ──────────────────────────────────────────────────────────
+    async def _snapshot_share(self, row: VentureMetric) -> None:
+        """سهم فروشنده را هنگام تأیید ثابت می‌کند (ADR-0025 بند ۳).
+
+        فقط فروش پروژه؛ فروش کسب‌وکار توافق درصدی ندارد.
+        """
+        if row.metric != "SALES_AMOUNT" or row.project_id is None:
+            return
+        project = await self.session.get(Project, row.project_id)
+        percent = share_percent_of(project.rewards if project else None)
+        row.share_percent = percent
+        row.share_rial = share_of(row.value, percent)
+
     @staticmethod
     def _owner_clause(owner: MetricOwner):  # type: ignore[no-untyped-def]
         if owner.venture is not None:
@@ -324,4 +439,11 @@ class MetricService:
             raise UploadIncomplete
 
 
-__all__ = ["MetricOwner", "MetricService", "MetricTotals"]
+__all__ = [
+    "MetricOwner",
+    "MetricService",
+    "MetricTotals",
+    "RevenueLine",
+    "RevenueMonth",
+    "RevenueReport",
+]

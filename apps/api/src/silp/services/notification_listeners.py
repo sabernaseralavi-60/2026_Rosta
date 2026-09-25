@@ -715,6 +715,9 @@ async def on_metric_reviewed(session: AsyncSession, event: events.MetricReviewed
             )
         )
         detail = f"{fa_number(earned)} امتیاز کارآفرینی گرفتی." if earned else ""
+        if row.share_rial:
+            share = f"سهمت از این فروش {format_number_fa(row.share_rial)} ریال است."
+            detail = f"{detail} {share}".strip()
         decision = "تأیید شد"
     else:
         detail = excerpt(row.review_note or "", 200)

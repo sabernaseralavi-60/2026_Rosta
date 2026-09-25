@@ -21,7 +21,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_FLOOR, ROUND_HALF_UP, Decimal
 
 from silp.domain.text import format_number_fa, to_persian_digits
 from silp.models.venture import GROWTH_STAGES, STAGE_TITLE_FA
@@ -180,6 +180,30 @@ def metric_multiplier(metric: str, value: int, *, per_row_cap: int | None) -> De
     return Decimal(min(value, limit))
 
 
+def share_percent_of(rewards: object) -> Decimal:
+    """درصد سهم فروشندهٔ پروژه از `rewards` — نبود یا نامعتبر یعنی صفر (ADR-0025).
+
+    `bool` عدد نیست (در پایتون زیرکلاس `int` است)؛ رشته هم پذیرفته نمی‌شود چون
+    جِی‌سان عددی را ویرایشگر نوشته و «"15"» یعنی فرم را غلط پر کرده‌اند.
+    """
+    if not isinstance(rewards, dict):
+        return Decimal(0)
+    raw = rewards.get("revenue_share_percent")
+    if isinstance(raw, bool) or not isinstance(raw, int | float):
+        return Decimal(0)
+    percent = Decimal(str(raw))
+    if not percent.is_finite() or not 0 <= percent <= 100:
+        return Decimal(0)
+    return percent.quantize(Decimal("0.01"), rounding=ROUND_FLOOR)
+
+
+def share_of(value: int, percent: Decimal) -> int:
+    """ریالِ سهم — گرد به پایین تا جمع سهم‌ها هرگز از فروش بیشتر نشود."""
+    if value <= 0 or percent <= 0:
+        return 0
+    return int(Decimal(value) * percent / Decimal(100))
+
+
 def stage_title(stage: str) -> str:
     return STAGE_TITLE_FA.get(stage, stage)
 
@@ -196,6 +220,8 @@ __all__ = [
     "metric_multiplier",
     "next_growth_stage",
     "readiness",
+    "share_of",
+    "share_percent_of",
     "stage_number",
     "stage_title",
 ]
