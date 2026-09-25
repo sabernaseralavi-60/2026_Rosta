@@ -482,3 +482,40 @@ export interface Activity {
 export function fetchActivity(projectId: string, accessToken: string) {
   return apiFetch<Activity[]>(`/projects/${projectId}/activity`, { accessToken });
 }
+
+// ── بازتاب پایان پروژه — FR-PRJ-08، ADR-0024 ───────────────────────────
+export interface Reflection {
+  learned: string;
+  challenges: string | null;
+  would_do_differently: string | null;
+  satisfaction: number | null;
+  created_at: string;
+}
+
+export interface ReflectionState {
+  can_submit: boolean;
+  reason: string | null;
+  reflection: Reflection | null;
+  /** امتیاز فعلی قاعده؛ `null` اگر مدیر غیرفعالش کرده. */
+  points: number | null;
+  min_learned_chars: number;
+}
+
+export interface ReflectionInput {
+  learned: string;
+  challenges?: string | null;
+  would_do_differently?: string | null;
+  satisfaction?: number | null;
+}
+
+export function fetchReflection(projectId: string, accessToken: string) {
+  return apiFetch<ReflectionState>(`/projects/${projectId}/reflection`, { accessToken });
+}
+
+export function submitReflection(projectId: string, input: ReflectionInput, accessToken: string) {
+  return apiFetch<Reflection>(`/projects/${projectId}/reflection`, {
+    method: 'POST',
+    accessToken,
+    body: input,
+  });
+}

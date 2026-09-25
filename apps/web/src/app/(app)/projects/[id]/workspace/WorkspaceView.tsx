@@ -31,6 +31,7 @@ import { MetricsView } from '@/components/domain/MetricsView';
 
 import { ActivityTab, DiscussionTab } from './DiscussionTab';
 import { MilestonesTab } from './MilestonesTab';
+import { ReflectionCard } from './ReflectionCard';
 import { TasksTab } from './TasksTab';
 import { TeamTab } from './TeamTab';
 
@@ -200,6 +201,10 @@ export function WorkspaceView({ id }: { id: string }) {
       </header>
 
       {isLead && <LeadActions project={project} accessToken={accessToken!} onChanged={load} />}
+
+      {project.status === 'COMPLETED' && isMember && (
+        <ReflectionCard projectId={id} accessToken={accessToken!} />
+      )}
 
       {error && (
         <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
