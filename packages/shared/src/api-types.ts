@@ -2225,6 +2225,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/contribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** سهم هر عضو از کار ثبت‌شده — مدیر و ناظر همه، عضو فقط خودش */
+        get: operations["team_contribution_api_v1_projects__project_id__contribution_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/discussion": {
         parameters: {
             query?: never;
@@ -6103,6 +6120,65 @@ export interface components {
         CompleteProjectIn: {
             /** Final Report */
             final_report: string;
+        };
+        /** ContributionDimensionOut */
+        ContributionDimensionOut: {
+            /** Dimension */
+            dimension: string;
+            /** Team Total */
+            team_total?: number | null;
+            /** Title */
+            title: string;
+            /** Weight */
+            weight: number;
+        };
+        /** ContributionMemberOut */
+        ContributionMemberOut: {
+            /** Full Name */
+            full_name?: string | null;
+            /** Is Lead */
+            is_lead: boolean;
+            /** Is Silent */
+            is_silent: boolean;
+            /**
+             * Joined At
+             * Format: date-time
+             */
+            joined_at: string;
+            /** Left At */
+            left_at?: string | null;
+            /** Share Percent */
+            share_percent?: number | null;
+            /** Signals */
+            signals: components["schemas"]["ContributionSignalOut"][];
+            /** Status */
+            status: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+        };
+        /** ContributionOut */
+        ContributionOut: {
+            /** Dimensions */
+            dimensions: components["schemas"]["ContributionDimensionOut"][];
+            /** Members */
+            members: components["schemas"]["ContributionMemberOut"][];
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "TEAM" | "SELF";
+        };
+        /** ContributionSignalOut */
+        ContributionSignalOut: {
+            /** Count */
+            count: number;
+            /** Dimension */
+            dimension: string;
+            /** Share Percent */
+            share_percent?: number | null;
         };
         /** CopyContentIn */
         CopyContentIn: {
@@ -18367,6 +18443,64 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectDetailOut"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    team_contribution_api_v1_projects__project_id__contribution_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContributionOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Conflict */

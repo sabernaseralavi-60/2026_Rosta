@@ -17,6 +17,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.permissions import CurrentUser, Permission
+from silp.domain import contribution as contribution_rules
 from silp.domain import peer_evaluations as peer_rules
 from silp.domain import reflections as reflection_rules
 from silp.models.delivery import (
@@ -31,6 +32,7 @@ from silp.models.delivery import (
 )
 from silp.models.file import File
 from silp.routers.deps import (
+    ContributionServiceDep,
     CurrentUserDep,
     DeliveryServiceDep,
     FileServiceDep,
@@ -46,6 +48,10 @@ from silp.routers.deps import (
 )
 from silp.schemas.common import ErrorResponse
 from silp.schemas.delivery import (
+    ContributionDimensionOut,
+    ContributionMemberOut,
+    ContributionOut,
+    ContributionSignalOut,
     DeliverableIn,
     DeliverableOut,
     MessageIn,
@@ -807,6 +813,58 @@ async def peer_evaluation_summary(
                 reliability_avg=item.reliability_avg,
             )
             for item in averages
+        ],
+    )
+
+
+# ── تحلیل مشارکت تیمی — FR-PRJ-08، ADR-0026 ────────────────────────────
+@router.get(
+    "/{project_id}/contribution",
+    response_model=ContributionOut,
+    summary="سهم هر عضو از کار ثبت‌شده — مدیر و ناظر همه، عضو فقط خودش",
+    responses={
+        403: {"model": ErrorResponse},
+        404: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+    },
+)
+async def team_contribution(
+    project_id: uuid.UUID,
+    current: CurrentUserDep,
+    projects: ProjectServiceDep,
+    contributions: ContributionServiceDep,
+) -> ContributionOut:
+    project = await projects.require(project_id)
+    report = await contributions.report(project=project, actor=current)
+    return ContributionOut(
+        scope=report.scope,
+        dimensions=[
+            ContributionDimensionOut(
+                dimension=d,
+                title=contribution_rules.DIMENSION_TITLE_FA[d],
+                weight=round(report.effective_weights.get(d, 0.0), 4),
+                team_total=report.team_totals.get(d) if report.team_totals else None,
+            )
+            for d in contribution_rules.DIMENSIONS
+        ],
+        members=[
+            ContributionMemberOut(
+                user_id=m.user_id,
+                full_name=m.full_name,
+                status=m.status,
+                is_lead=m.is_lead,
+                joined_at=m.joined_at,
+                left_at=m.left_at,
+                share_percent=m.share.share_percent,
+                is_silent=m.share.is_silent,
+                signals=[
+                    ContributionSignalOut(
+                        dimension=s.dimension, count=s.count, share_percent=s.share_percent
+                    )
+                    for s in m.share.signals
+                ],
+            )
+            for m in report.members
         ],
     )
 

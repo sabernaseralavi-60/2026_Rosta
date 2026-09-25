@@ -288,10 +288,52 @@ class PeerEvaluationSummaryOut(BaseModel):
     members: list[PeerAverageOut]
 
 
+class ContributionSignalOut(BaseModel):
+    dimension: str
+    #: شمار خام — مدیر عدد را قضاوت می‌کند، نه فقط درصد.
+    count: int
+    #: `null` وقتی کل تیم در این بُعد صفر است.
+    share_percent: float | None = None
+
+
+class ContributionMemberOut(BaseModel):
+    user_id: uuid.UUID
+    full_name: str | None = None
+    status: str
+    is_lead: bool
+    joined_at: datetime
+    left_at: datetime | None = None
+    #: `null` وقتی هیچ بُعدی در کل تیم داده ندارد.
+    share_percent: float | None = None
+    #: عضو فعالی که در هیچ بُعد چیزی ثبت نکرده — واقعیت است، نه اتهام.
+    is_silent: bool
+    signals: list[ContributionSignalOut]
+
+
+class ContributionDimensionOut(BaseModel):
+    dimension: str
+    title: str
+    #: وزن مؤثر پس از حذف بُعدهای کل‌تیم‌صفر؛ `0` یعنی بُعد دادهٔ کل‌تیم ندارد.
+    weight: float
+    #: `null` برای عضو عادی (`scope = SELF`).
+    team_total: int | None = None
+
+
+class ContributionOut(BaseModel):
+    #: `TEAM` (مدیر، ناظر) همهٔ اعضا؛ `SELF` (عضو عادی) فقط ردیف خودش.
+    scope: Literal["TEAM", "SELF"]
+    dimensions: list[ContributionDimensionOut]
+    members: list[ContributionMemberOut]
+
+
 MilestoneOut.model_rebuild()
 
 __all__ = [
     "ActivityOut",
+    "ContributionDimensionOut",
+    "ContributionMemberOut",
+    "ContributionOut",
+    "ContributionSignalOut",
     "DeliverableIn",
     "DeliverableOut",
     "MessageIn",

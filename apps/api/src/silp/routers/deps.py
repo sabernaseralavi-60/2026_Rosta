@@ -37,6 +37,7 @@ from silp.services.application_service import ApplicationService
 from silp.services.attempt_service import AttemptService
 from silp.services.audit_service import AuditService
 from silp.services.auth_service import AuthService
+from silp.services.contribution_service import ContributionService
 from silp.services.course_service import CourseService
 from silp.services.delivery_service import DeliveryService
 from silp.services.enrollment_service import EnrollmentService
@@ -165,6 +166,10 @@ def get_peer_evaluation_service(session: SessionDep) -> PeerEvaluationService:
     return PeerEvaluationService(session)
 
 
+def get_contribution_service(session: SessionDep) -> ContributionService:
+    return ContributionService(session)
+
+
 def get_attempt_service(session: SessionDep) -> AttemptService:
     return AttemptService(session)
 
@@ -199,6 +204,7 @@ SubscriptionServiceDep = Annotated[SubscriptionService, Depends(get_subscription
 QuizServiceDep = Annotated[QuizService, Depends(get_quiz_service)]
 ReflectionServiceDep = Annotated[ReflectionService, Depends(get_reflection_service)]
 PeerEvaluationServiceDep = Annotated[PeerEvaluationService, Depends(get_peer_evaluation_service)]
+ContributionServiceDep = Annotated[ContributionService, Depends(get_contribution_service)]
 AttemptServiceDep = Annotated[AttemptService, Depends(get_attempt_service)]
 GradingServiceDep = Annotated[GradingService, Depends(get_grading_service)]
 AppealServiceDep = Annotated[AppealService, Depends(get_appeal_service)]
@@ -456,6 +462,7 @@ __all__ = [
     "ApplicationServiceDep",
     "AuthServiceDep",
     "ClientIPDep",
+    "ContributionServiceDep",
     "CourseServiceDep",
     "CurrentUserDep",
     "DeliveryServiceDep",
