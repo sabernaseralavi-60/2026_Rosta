@@ -661,5 +661,7 @@ axe روی هر دو صفحه در روشن، تیره و موبایل پاک.
 این قواعد در `point_rules` هستند ولی ماژولی که رویدادشان را بسازد هنوز
 نیست؛ با همان ماژول‌ها در M7 وصل می‌شوند و تا آن زمان نشان‌هایشان قفل
 می‌ماند. ایده و کارآفرینی در بخش الف، و پژوهش (`RESEARCH_L*`، `OUTPUT_*`،
-`TOPIC_PROPOSED`) و `TEAM_FORMED` در بخش ب وصل شدند. آنچه مانده: پرسش‌وپاسخ
-(`QA_*`)، `PEER_EVAL_COMPLETED` و `REFLECTION_SUBMITTED`.
+`TOPIC_PROPOSED`) و `TEAM_FORMED` در بخش ب وصل شدند. `REFLECTION_SUBMITTED` با
+[ADR-0024](../adr/0024-community-and-reflection-point-sources.md) برش الف وصل شد
+(`POST /projects/{id}/reflection`، فضای کاری). آنچه مانده: `PEER_EVAL_COMPLETED`
+(برش ب) و پرسش‌وپاسخ `QA_*` (برش ج).

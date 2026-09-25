@@ -1768,6 +1768,11 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
                                (app_settings و qa_threads/qa_replies با ماژول‌هایشان)
 0017_subscription_notices ◄── پس از ۰۰۱۶ (§13.6، ADR-0019)
                                سه الگوی پیام فعال شدن و رد اشتراک؛ جدولی عوض نمی‌شود
+0018_teach_notices_and_edits ◄── پس از ۰۰۱۷ (ADR-0020/0021)
+                               announcements.edited_at، الگوی سپردن ارائه
+0019_reflection_notice ◄── پس از ۰۰۱۸ (ADR-0024 برش الف)
+                               الگوی «بازتابت را بنویس»؛ جدولی عوض نمی‌شود
+                               (project_reflections از ۰۰۱۱ بود)
 
 دادهٔ مرجع (§14) در همان مهاجرت هر ماژول کاشته شد؛ مهاجرت جدای «دادهٔ مرجع»
 که نسخهٔ نخست این فهرست داشت، ساخته نشد.

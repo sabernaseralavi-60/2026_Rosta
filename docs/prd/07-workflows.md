@@ -644,7 +644,7 @@ WHERE due_on < CURRENT_DATE
 | `DeliverableSubmitted` | PRJ | اعلان به بازبین، به‌روزرسانی `last_activity_at` |
 | `DeliverableReviewed` | PRJ | امتیاز، اعلان، بررسی تکمیل مرحله |
 | `MilestoneApproved` | PRJ | امتیاز، بررسی تکمیل پروژه |
-| `ProjectCompleted` | PRJ | گواهی برای هر عضو فعال (صادرکننده: `completed_by`)، امتیاز نهایی، درخواست بازتاب (فاز ۲) |
+| `ProjectCompleted` | PRJ | گواهی برای هر عضو فعال (صادرکننده: `completed_by`)، امتیاز نهایی، درخواست بازتاب (اعلان `REFLECTION_REQUESTED` به هر عضو فعال؛ ADR-0024) |
 | `IdeaVoted` | IDEA | به‌روزرسانی شمارنده، امتیاز به نویسنده |
 | `IdeaPromoted` | IDEA | امتیاز، اعلان، دعوت به تیم |
 | `VentureStageAdvanced` | VEN | امتیاز `STARTUP`، اعلان |

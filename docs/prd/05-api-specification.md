@@ -493,7 +493,8 @@ Authorization: Bearer <access_token>
 | `DELETE` | `/projects/{id}/discussion/{message_id}` | نویسنده / مدیر | حذف پیام |
 | `GET` | `/projects/{id}/activity` | عضو | جریان فعالیت پروژه |
 | `POST` | `/projects/{id}/complete` | مدیر پروژه | بستن پروژه |
-| `POST` | `/projects/{id}/reflection` | عضو | ثبت بازتاب |
+| `GET` | `/projects/{id}/reflection` | عضو فعال | وضعیت بازتاب خودم: می‌شود نوشت؟ امتیاز، حداقل نویسه، و متن ثبت‌شده. خصوصی؛ غیرعضو ۴۰۳ (ADR-0024) |
+| `POST` | `/projects/{id}/reflection` | عضو فعال | ثبت بازتاب — فقط پروژهٔ `COMPLETED`، یک‌بار و بی‌ویرایش؛ پیش از بسته شدن یا تکراری ۴۰۹، «چه آموختم» زیر ۳۰ نویسه ۴۲۲. امتیاز `REFLECTION_SUBMITTED` |
 | `POST` | `/recommendations/{project_id}/feedback` | دانشجو | بازخورد پیشنهاد |
 
 **`GET /projects` — پارامترها**
