@@ -23,6 +23,8 @@ import {
 import { useSession } from '@/lib/auth/use-session';
 import { toPersianDigits } from '@/lib/format/digits';
 
+import { CompositionPanel } from './CompositionPanel';
+
 /**
  * `/teams/find` — جستجوی هم‌تیمی، FR-TEAM-01، §8.14.
  *
@@ -206,6 +208,10 @@ export function FindTeammatesView() {
             </ul>
           )}
         </Card>
+      )}
+
+      {result?.context.project && result.context.can_invite && accessToken && (
+        <CompositionPanel projectId={result.context.project.id} accessToken={accessToken} />
       )}
 
       {error && (

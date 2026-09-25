@@ -77,6 +77,35 @@ export function searchTeammates(accessToken: string, filters: SearchFilters) {
   return apiFetch<TeamSearch>(`/teams/search${query(filters)}`, { accessToken });
 }
 
+// ── پیشنهاد ترکیب تیم — FR-TEAM-04، ADR-0027 ─────────────────────────
+export interface ComposedMember {
+  user: Teammate['user'];
+  weekly_hours: number | null;
+  /** مهارت‌هایی که این عضو تازه به تیم می‌آورد. */
+  covers: { title_fa: string; level: number; verified: boolean }[];
+  reason: string;
+}
+
+export interface Composition {
+  members: ComposedMember[];
+  coverage_percent: number;
+  uncovered: { title_fa: string; min_level: number }[];
+}
+
+export interface CompositionSuggestion {
+  project: { id: string; title: string };
+  gaps: { title_fa: string; min_level: number }[];
+  seats: number;
+  compositions: Composition[];
+}
+
+export function composeTeam(accessToken: string, projectId: string, seats: number) {
+  return apiFetch<CompositionSuggestion>(
+    `/teams/compose${query({ project_id: projectId, seats })}`,
+    { accessToken },
+  );
+}
+
 export function fetchManagedTeams(accessToken: string) {
   return apiFetch<ManagedTeam[]>('/teams/managed', { accessToken });
 }
