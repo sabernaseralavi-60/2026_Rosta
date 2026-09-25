@@ -664,5 +664,6 @@ axe روی هر دو صفحه در روشن، تیره و موبایل پاک.
 `TOPIC_PROPOSED`) و `TEAM_FORMED` در بخش ب وصل شدند. `REFLECTION_SUBMITTED` با
 [ADR-0024](../adr/0024-community-and-reflection-point-sources.md) برش الف وصل شد
 (`POST /projects/{id}/reflection`، فضای کاری)، و `PEER_EVAL_COMPLETED` با برش ب
-(`PUT /projects/{id}/peer-evaluations`، بی‌مهاجرت). آنچه مانده: پرسش‌وپاسخ `QA_*`
-(برش ج).
+(`PUT /projects/{id}/peer-evaluations`، بی‌مهاجرت)، و پرسش‌وپاسخ `QA_ANSWER_HELPFUL` و
+`QA_ANSWER_OFFICIAL_MATCH` با برش ج (مهاجرت ۰۰۲۰؛ `/offerings/{id}/qa/threads`، `/qa/…`).
+نشان «یاریگر» (`HELPER`) دیگر قفل نمی‌ماند. **هر قاعدهٔ `point_rules` اکنون یک منبع دارد.**

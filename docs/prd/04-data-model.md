@@ -1686,7 +1686,8 @@ CREATE TABLE qa_threads (              -- FR-EDU-07
   title      TEXT NOT NULL,
   body       TEXT NOT NULL,
   is_resolved BOOLEAN NOT NULL DEFAULT false,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at TIMESTAMPTZ                         -- نظارت؛ ADR-0024 (نسخهٔ نخست §4.10 نداشت)
 );
 
 CREATE TABLE qa_replies (
@@ -1694,9 +1695,21 @@ CREATE TABLE qa_replies (
   thread_id  UUID NOT NULL REFERENCES qa_threads(id) ON DELETE CASCADE,
   author_id  UUID NOT NULL REFERENCES users(id),
   body       TEXT NOT NULL,
-  is_official BOOLEAN NOT NULL DEFAULT false,   -- پاسخ استاد
-  helpful_count INT NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  is_official BOOLEAN NOT NULL DEFAULT false,   -- پاسخ را خودِ استاد نوشته (سرور می‌گذارد)
+  helpful_count INT NOT NULL DEFAULT 0,         -- تریگر روی qa_reply_votes
+  endorsed_by UUID REFERENCES users(id),        -- «تأیید استاد» بر پاسخِ دانشجو؛ مفهومی جدا از is_official
+  endorsed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at TIMESTAMPTZ,
+  CHECK ((endorsed_by IS NULL) = (endorsed_at IS NULL)),
+  CHECK (NOT (is_official AND endorsed_by IS NOT NULL))
+);
+
+CREATE TABLE qa_reply_votes (           -- رأی «مفید»؛ ADR-0024
+  reply_id   UUID NOT NULL REFERENCES qa_replies(id) ON DELETE CASCADE,
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (reply_id, user_id)
 );
 
 CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
@@ -1765,7 +1778,7 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
                                milestones.workflow_stage/owner_id، deliverables.evidence
 0016_admin            ◄────── پس از ۰۰۱۵ (M7 بخش د، ADR-0017)
                                audit_logs + تریگر فقط‌افزودنی، ابطال و یکتایی certificates
-                               (app_settings و qa_threads/qa_replies با ماژول‌هایشان)
+                               (app_settings با ماژولش؛ qa_* در ۰۰۲۰)
 0017_subscription_notices ◄── پس از ۰۰۱۶ (§13.6، ADR-0019)
                                سه الگوی پیام فعال شدن و رد اشتراک؛ جدولی عوض نمی‌شود
 0018_teach_notices_and_edits ◄── پس از ۰۰۱۷ (ADR-0020/0021)
@@ -1773,6 +1786,9 @@ CREATE TABLE recommendation_feedback (  -- FR-PRJ-03
 0019_reflection_notice ◄── پس از ۰۰۱۸ (ADR-0024 برش الف)
                                الگوی «بازتابت را بنویس»؛ جدولی عوض نمی‌شود
                                (project_reflections از ۰۰۱۱ بود)
+0020_course_qa ◄────── پس از ۰۰۱۹ (ADR-0024 برش ج)
+                               qa_threads، qa_replies (+ deleted_at، endorsed_*)، qa_reply_votes
+                               با تریگر helpful_count، و دو الگوی اعلان
 
 دادهٔ مرجع (§14) در همان مهاجرت هر ماژول کاشته شد؛ مهاجرت جدای «دادهٔ مرجع»
 که نسخهٔ نخست این فهرست داشت، ساخته نشد.

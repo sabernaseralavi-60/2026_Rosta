@@ -271,6 +271,15 @@ Authorization: Bearer <access_token>
 | `GET` | `/offerings/{id}/weeks/{n}` | ثبت‌نام‌شده | محتوای هفته |
 | `GET` | `/offerings/{id}/grades` | ثبت‌نام‌شده | کارنامهٔ من |
 | `GET` | `/offerings/{id}/announcements` | ثبت‌نام‌شده | اعلانات |
+| `GET` | `/offerings/{id}/qa/threads` | ثبت‌نام‌شده / کادر | پرسش‌های درس، بی‌پاسخ اول؛ فیلتر `filter=all\|unanswered\|unresolved\|mine` و `week_number` (ADR-0024 برش ج) |
+| `POST` | `/offerings/{id}/qa/threads` | ثبت‌نام‌شده / کادر | پرسیدن (`title`، `body`، `week_number?`، `is_anonymous`)؛ بیرونی ۴۰۴ |
+| `GET` | `/qa/threads/{id}` | همان | پرسش با پاسخ‌ها (رسمی، تأییدشده، پررأی بالاتر)؛ نام پرسندهٔ ناشناس فقط برای خودش و استاد ارائه |
+| `PATCH` | `/qa/threads/{id}` | پرسنده / استاد | `is_resolved` — به امتیاز ربطی ندارد |
+| `DELETE` | `/qa/threads/{id}` | پرسنده / استاد | پرسنده تا پیش از اولین پاسخِ دیگران (وگرنه ۴۰۹)؛ استاد همیشه؛ امتیاز پاسخ‌ها برمی‌گردد |
+| `POST` | `/qa/threads/{id}/replies` | همان | پاسخ؛ `is_official` را سرور می‌گذارد (استاد آری، دستیار نه)؛ بدنهٔ حاوی فیلد اضافه ۴۲۲ |
+| `DELETE` | `/qa/replies/{id}` | نویسنده / استاد | حذف نرم؛ امتیازش با `reconcile` برمی‌گردد |
+| `POST`/`DELETE` | `/qa/replies/{id}/vote` | ثبت‌نام‌شده / کادر | رأی «مفید» و پس‌گرفتنش؛ به پاسخ خودت و رأی دوباره ۴۰۹ (`DUPLICATE_VOTE`)؛ پس‌گرفتن امتیازِ رسیده را برنمی‌گرداند |
+| `POST`/`DELETE` | `/qa/replies/{id}/endorse` | فقط استاد ارائه | تأیید و برداشتن؛ دستیار و دانشجو ۴۰۳؛ پاسخ رسمی یا پاسخ خودت ۴۰۹؛ برداشتن امتیاز ۲۰ (و ۱۰ اگر آستانهٔ رأی هم پر نیست) را برمی‌گرداند |
 | `POST` | `/resources/{id}/progress` | ثبت‌نام‌شده | ثبت پیشرفت مطالعه |
 | `GET` | `/resources/{id}/download` | ثبت‌نام‌شده | URL دانلود موقت |
 | `GET` | `/offerings/mine` | STUDENT | دروس من با نوار پیشرفت |

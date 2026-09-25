@@ -561,7 +561,7 @@ async def next_sequence(session, *, insert_stmt, max_retries: int = 3):
 | `ideas.comment_count` | تریگر روی `idea_comments` | همان |
 | `quizzes.total_points` | تریگر روی `quiz_questions` | نمایش در فهرست آزمون‌ها |
 | `project_roles.filled` | **لایهٔ سرویس، نه تریگر** | منطق پیچیده‌تر است (وضعیت عضو، نقش خالی) |
-| `qa_replies.helpful_count` | تریگر | — |
+| `qa_replies.helpful_count` | تریگر روی `qa_reply_votes` (افزایشی، مثل `ideas.vote_count`) | همان |
 
 ```sql
 CREATE OR REPLACE FUNCTION bump_idea_votes() RETURNS TRIGGER AS $$
@@ -646,6 +646,10 @@ WHERE due_on < CURRENT_DATE
 | `MilestoneApproved` | PRJ | امتیاز، بررسی تکمیل پروژه |
 | `ProjectCompleted` | PRJ | گواهی برای هر عضو فعال (صادرکننده: `completed_by`)، امتیاز نهایی، درخواست بازتاب (اعلان `REFLECTION_REQUESTED` به هر عضو فعال؛ ADR-0024) |
 | `IdeaVoted` | IDEA | به‌روزرسانی شمارنده، امتیاز به نویسنده |
+| `QaReplyPosted` | EDU | اعلان `QA_REPLY_POSTED` به پرسنده (نه پاسخ‌دهنده) — ADR-0024 |
+| `QaReplyVoted` | EDU | `QA_ANSWER_HELPFUL` وقتی ≥۳ رأی دانشجوی دیگر (فقط می‌افزاید) |
+| `QaReplyEndorsed` | EDU | گذاشتن یا برداشتن تأیید: `reconcile` امتیاز (۱۰ + ۲۰ / برگشت ۲۰)؛ اعلان `QA_REPLY_ENDORSED` فقط هنگام گذاشتن، یک‌بار برای هر پاسخ |
+| `QaReplyRemoved` | EDU | حذف پاسخ یا پرسش: امتیاز هر دو قاعده برمی‌گردد |
 | `IdeaPromoted` | IDEA | امتیاز، اعلان، دعوت به تیم |
 | `VentureStageAdvanced` | VEN | امتیاز `STARTUP`، اعلان |
 | `MetricVerified` | VEN | امتیاز `STARTUP` بر اساس مقدار |
