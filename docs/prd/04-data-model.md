@@ -1244,11 +1244,19 @@ CREATE TABLE venture_metrics (          -- FR-VEN-02/03
   reviewed_by UUID REFERENCES users(id),
   reviewed_at TIMESTAMPTZ,
   review_note TEXT,
+  -- مهاجرت 0021 (ADR-0025): عکس سهم فروشنده هنگام تأیید — فقط فروش تأییدشدهٔ پروژه.
+  share_percent NUMERIC(5,2),
+  share_rial    BIGINT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   -- دقیقاً یکی: شاخص پروژهٔ یک کسب‌وکار از راه projects.venture_id به آن می‌رسد.
   CONSTRAINT owner CHECK ((venture_id IS NOT NULL)::int + (project_id IS NOT NULL)::int = 1),
   CONSTRAINT reviewed_matches_status CHECK ((status = 'PENDING') = (reviewed_at IS NULL)),
-  CONSTRAINT not_self_reviewed CHECK (reviewed_by IS NULL OR reviewed_by <> user_id)
+  CONSTRAINT not_self_reviewed CHECK (reviewed_by IS NULL OR reviewed_by <> user_id),
+  CONSTRAINT share_pair CHECK ((share_percent IS NULL) = (share_rial IS NULL)),
+  CONSTRAINT share_percent_range CHECK (share_percent IS NULL OR share_percent BETWEEN 0 AND 100),
+  CONSTRAINT share_rial_range CHECK (share_rial IS NULL OR (share_rial >= 0 AND share_rial <= value)),
+  CONSTRAINT share_only_verified_project_sales CHECK (share_rial IS NULL OR
+    (status = 'VERIFIED' AND metric = 'SALES_AMOUNT' AND project_id IS NOT NULL))
 );
 CREATE INDEX idx_venture_metrics_lookup ON venture_metrics(venture_id, metric, occurred_on);
 CREATE INDEX idx_venture_metrics_project ON venture_metrics(project_id, metric, occurred_on);

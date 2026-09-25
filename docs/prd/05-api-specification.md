@@ -580,7 +580,8 @@ Authorization: Bearer <access_token>
 | `GET/PATCH/DELETE` | `/ventures/{id}` | جزئیات، ویرایش، حذف (فقط مرحلهٔ `IDEA`) — `readiness` و `totals` فقط برای اعضا و مدیران |
 | `POST` | `/ventures/{id}/stage` | `ADVANCE`، `PAUSE`، `RESUME`، `CLOSE`؛ کمبود معیار ⇒ `409 STAGE_CRITERIA_NOT_MET` با `details.missing` |
 | `GET/POST` | `/ventures/{id}/metrics` | فهرست با جمع کل و جمع هر عضو، و ثبت فعالیت یا فروش (عضو) |
-| `GET/POST` | `/projects/{id}/metrics` | همان، برای پروژهٔ عملیاتی نوع A (FR-VEN-02) |
+| `GET/POST` | `/projects/{id}/metrics` | همان، برای پروژهٔ عملیاتی نوع A (FR-VEN-02)؛ `share_percent` (درصد فعلی پروژه)، `share_total_rial`، `by_member[].share_rial` و `items[].share_*` (عکس لحظهٔ تأیید) هم می‌آید (ADR-0025) |
+| `GET` | `/me/revenue` | گزارش درآمد شخصی (FR-VEN-03): ماه‌های شمسی با فروش و سهم تأییدشدهٔ من، ردیف‌ها به تفکیک پروژه، و جمع «در انتظار». فقط ثبت و گزارش؛ پرداخت بیرون از سامانه است |
 | `GET` | `/metrics/review-queue` | شاخص‌های در انتظاری که کاربر حق تأییدشان را دارد |
 | `POST` | `/metrics/{id}/review` | `VERIFIED` یا `REJECTED` (رد با یادداشت) — نه برای ثبت خودِ کاربر |
 | `DELETE` | `/metrics/{id}` | حذف ثبت در انتظار (ثبت‌کننده) |
