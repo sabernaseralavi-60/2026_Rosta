@@ -224,6 +224,13 @@ _KINDS: tuple[Kind, ...] = (
         "بی‌تحرکی پروژه",
         ("project", "days"),
     ),
+    Kind(
+        "REFLECTION_REQUESTED",
+        "PROJECT",
+        "NORMAL",
+        "درخواست بازتاب پایان پروژه",
+        ("project", "reward"),
+    ),
     # ── تیم و کارآفرینی (M7) ───────────────────────────────────────────
     Kind(
         "TEAM_INVITATION",

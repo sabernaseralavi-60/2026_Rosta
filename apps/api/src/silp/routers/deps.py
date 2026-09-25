@@ -48,6 +48,7 @@ from silp.services.profile_service import ProfileService
 from silp.services.progress_service import ProgressService
 from silp.services.project_service import ProjectService
 from silp.services.quiz_service import QuizService
+from silp.services.reflection_service import ReflectionService
 from silp.services.subscription_service import SubscriptionService
 from silp.services.teaching_service import TeachingService
 from silp.services.token_service import TokenService
@@ -155,6 +156,10 @@ def get_quiz_service(session: SessionDep) -> QuizService:
     return QuizService(session)
 
 
+def get_reflection_service(session: SessionDep) -> ReflectionService:
+    return ReflectionService(session)
+
+
 def get_attempt_service(session: SessionDep) -> AttemptService:
     return AttemptService(session)
 
@@ -187,6 +192,7 @@ ProgressServiceDep = Annotated[ProgressService, Depends(get_progress_service)]
 TeachingServiceDep = Annotated[TeachingService, Depends(get_teaching_service)]
 SubscriptionServiceDep = Annotated[SubscriptionService, Depends(get_subscription_service)]
 QuizServiceDep = Annotated[QuizService, Depends(get_quiz_service)]
+ReflectionServiceDep = Annotated[ReflectionService, Depends(get_reflection_service)]
 AttemptServiceDep = Annotated[AttemptService, Depends(get_attempt_service)]
 GradingServiceDep = Annotated[GradingService, Depends(get_grading_service)]
 AppealServiceDep = Annotated[AppealService, Depends(get_appeal_service)]
@@ -455,6 +461,7 @@ __all__ = [
     "ProfileServiceDep",
     "ProgressServiceDep",
     "ProjectServiceDep",
+    "ReflectionServiceDep",
     "RoleGrant",
     "SessionDep",
     "SettingsDep",

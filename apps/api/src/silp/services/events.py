@@ -118,6 +118,14 @@ class ProjectCompleted:
 
 
 @dataclass(frozen=True, slots=True)
+class ReflectionSubmitted:
+    """ADR-0024 — عضو فعال تیم بازتاب پروژهٔ بسته‌شده را نوشت (یک‌بار، بی‌ویرایش)."""
+
+    project_id: uuid.UUID
+    user_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
 class SurveyStepCompleted:
     user_id: uuid.UUID
     completed_steps: int
@@ -441,6 +449,7 @@ __all__ = [
     "QuizGraded",
     "QuizPublished",
     "QuizResultsPublished",
+    "ReflectionSubmitted",
     "ResearchReviewed",
     "ResearchSubmitted",
     "ResourceCompleted",

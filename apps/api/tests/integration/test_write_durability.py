@@ -1081,3 +1081,82 @@ async def test_project_linked_to_an_offering_survives_the_request(  # type: igno
             await committing_session.execute(delete(Term).where(Term.id == ids["term"]))
         await committing_session.execute(delete(User).where(User.id == account["user_id"]))
         await committing_session.commit()
+
+
+async def test_reflection_and_its_points_survive_the_request(  # type: ignore[no-untyped-def]
+    committing_client, committing_session, account
+) -> None:
+    """ADR-0024 — بازتاب، امتیازش و اعلان درخواستش باید از اتصال دوم دیده شوند."""
+    from silp.models.delivery import Certificate, ProjectReflection
+    from silp.models.gamification import PointEntry
+    from silp.models.messaging import Notification
+    from silp.models.project import Project
+    from silp.models.taxonomy import Skill
+
+    skill_id = await committing_session.scalar(select(Skill.id).where(Skill.code == "PYTHON"))
+    created = await committing_client.post(
+        "/api/v1/projects",
+        headers=auth(account),
+        json={
+            "title_fa": "پروژهٔ بازتاب پایدار",
+            "summary": "پروژه‌ای برای آزمون تثبیت بازتاب پس از بسته شدن.",
+            "description": "شرح کامل پروژه با جزئیات کافی برای تصمیم دانشجو.",
+            "kind": "D_PERSONAL",
+            "expected_output": "گزارش",
+            "required_skills": [{"skill_id": str(skill_id), "min_level": 3}],
+        },
+    )
+    assert created.status_code == 201, created.text
+    project_id = uuid.UUID(created.json()["id"])
+
+    try:
+        milestone = await committing_client.post(
+            f"/api/v1/projects/{project_id}/milestones",
+            headers=auth(account),
+            json={"title_fa": "مرحلهٔ اختیاری", "points": 0, "is_required": False},
+        )
+        assert milestone.status_code == 201, milestone.text
+        for step in ("publish", "start"):
+            response = await committing_client.post(
+                f"/api/v1/projects/{project_id}/{step}", headers=auth(account)
+            )
+            assert response.status_code == 200, response.text
+        response = await committing_client.post(
+            f"/api/v1/projects/{project_id}/complete",
+            headers=auth(account),
+            json={"final_report": "بسته شد تا بازتاب نوشته شود."},
+        )
+        assert response.status_code == 200, response.text
+
+        response = await committing_client.post(
+            f"/api/v1/projects/{project_id}/reflection",
+            headers=auth(account),
+            json={"learned": "یاد گرفتم پیش از شروع، خروجی نهایی را دقیق تعریف کنم."},
+        )
+        assert response.status_code == 201, response.text
+
+        async with other_connection() as verifier:
+            stored = await verifier.get(ProjectReflection, (project_id, account["user_id"]))
+            points = list(
+                await verifier.scalars(
+                    select(PointEntry.amount).where(
+                        PointEntry.user_id == account["user_id"],
+                        PointEntry.rule_code == "REFLECTION_SUBMITTED",
+                    )
+                )
+            )
+            kinds = list(
+                await verifier.scalars(
+                    select(Notification.kind).where(Notification.user_id == account["user_id"])
+                )
+            )
+        assert stored is not None, "بازتاب commit نشده است"
+        assert [int(p) for p in points] == [15], "امتیاز بازتاب commit نشده است"
+        assert "REFLECTION_REQUESTED" in kinds, "اعلان درخواست بازتاب commit نشده است"
+    finally:
+        # بستن پروژه گواهی صادر می‌کند و گواهی به کاربر کلید خارجی دارد.
+        await committing_session.execute(
+            delete(Certificate).where(Certificate.user_id == account["user_id"])
+        )
+        await committing_session.execute(delete(Project).where(Project.id == project_id))
+        await committing_session.commit()

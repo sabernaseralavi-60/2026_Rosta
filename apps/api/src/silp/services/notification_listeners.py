@@ -68,6 +68,8 @@ from silp.services.grading_service import results_visible
 from silp.services.notification_service import NotificationService
 from silp.services.opening_service import OpeningService
 from silp.services.point_listeners import active_member_ids, venture_member_ids
+from silp.services.points_service import PointsService
+from silp.services.reflection_service import RULE_CODE as REFLECTION_RULE
 
 #: وقتی نام کاربر هنوز ثبت نشده (پیش از ورود اولیه).
 UNKNOWN_NAME = "یک کاربر"
@@ -487,6 +489,32 @@ async def on_project_stalled(session: AsyncSession, event: events.ProjectStalled
         recipients,
         {"project": project.title_fa, "days": to_persian_digits(event.days_inactive)},
         action_url=f"/projects/{project.id}/workspace",
+    )
+
+
+@events.subscribe(events.ProjectCompleted)
+async def on_project_completed(session: AsyncSession, event: events.ProjectCompleted) -> None:
+    """ADR-0024 — «درخواست بازتاب از اعضا» (§7.13). بدون این، فرم را کسی پیدا نمی‌کند.
+
+    همهٔ اعضای فعال، مدیری که پروژه را بست هم: بازتاب او هم لازم است. متن
+    امتیاز را از خودِ قاعده می‌خواند (مدیر عوضش می‌کند) و اگر قاعده غیرفعال
+    است چیزی نمی‌گوید.
+    """
+    project = await session.get(Project, event.project_id)
+    if project is None or project.status != "COMPLETED":
+        return
+    rule = await PointsService(session).rule(REFLECTION_RULE)
+    reward = (
+        f"{fa_number(rule.base_points)} امتیاز یادگیری هم دارد."
+        if rule is not None and rule.is_active
+        else ""
+    )
+    await NotificationService(session).notify(
+        "REFLECTION_REQUESTED",
+        await active_member_ids(session, project.id),
+        {"project": project.title_fa, "reward": reward},
+        action_url=f"/projects/{project.id}/workspace",
+        dedup_key=f"REFLECTION_REQUESTED:{project.id}",
     )
 
 

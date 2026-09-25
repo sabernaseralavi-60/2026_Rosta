@@ -9,9 +9,9 @@
   دیتابیس حساب و با `reconcile` هم‌تراز می‌شود. همین تابع‌ها را کار
   پس‌زمینهٔ `release_quiz_points` هم صدا می‌زند.
 
-ایده و کارآفرینی از M7 وصل‌اند؛ پژوهش و `TEAM_FORMED` از M7 بخش ب.
-قواعدی که ماژول منبعشان هنوز ساخته نشده (پرسش‌وپاسخ، ارزیابی همتا، بازتاب)
-در `point_rules` هستند ولی شنونده ندارند.
+ایده و کارآفرینی از M7 وصل‌اند؛ پژوهش و `TEAM_FORMED` از M7 بخش ب؛ بازتاب
+از ADR-0024. قواعدی که ماژول منبعشان هنوز ساخته نشده (پرسش‌وپاسخ، ارزیابی
+همتا) در `point_rules` هستند ولی شنونده ندارند.
 """
 
 from __future__ import annotations
@@ -26,10 +26,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from silp.core.logging import get_logger
 from silp.core.permissions import Role
 from silp.domain import ideas as idea_rules
+from silp.domain import reflections as reflection_rules
 from silp.domain import research as research_rules
 from silp.domain import ventures as venture_rules
 from silp.domain.gamification import formulas
-from silp.models.delivery import Deliverable, Milestone, OpeningApplication, TeamOpening
+from silp.models.delivery import (
+    Deliverable,
+    Milestone,
+    OpeningApplication,
+    ProjectReflection,
+    TeamOpening,
+)
 from silp.models.education import (
     AttendanceRecord,
     ClassSession,
@@ -475,6 +482,28 @@ async def on_project_completed(session: AsyncSession, event: events.ProjectCompl
     )
     for member_id in await active_member_ids(session, project.id):
         await points.award(member_id, award)
+
+
+@events.subscribe(events.ReflectionSubmitted)
+async def on_reflection_submitted(session: AsyncSession, event: events.ReflectionSubmitted) -> None:
+    """`REFLECTION_SUBMITTED` — یک‌بار به‌ازای هر (عضو، پروژه)، ADR-0024.
+
+    دسته همان `LEARNING` جدول §9.2 است؛ نگاشت `project.kind` فقط برای مرحله و
+    تکمیل پروژه است. منبع خودِ پروژه است: بازتاب یک ردیف با کلید مرکب دارد.
+    """
+    project = await session.get(Project, event.project_id)
+    reflection = await session.get(ProjectReflection, (event.project_id, event.user_id))
+    if project is None or reflection is None:
+        return
+    await PointsService(session).award(
+        event.user_id,
+        Award(
+            "REFLECTION_SUBMITTED",
+            reflection_rules.POINT_SOURCE_TYPE,
+            project.id,
+            offering_id=project.offering_id,
+        ),
+    )
 
 
 @events.subscribe(events.SurveyStepCompleted)

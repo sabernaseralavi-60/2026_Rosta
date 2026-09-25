@@ -17,6 +17,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.permissions import CurrentUser, Permission
+from silp.domain import reflections as reflection_rules
 from silp.models.delivery import (
     DELIVERABLE_STATUS_TITLE_FA,
     MILESTONE_STATUS_TITLE_FA,
@@ -33,6 +34,7 @@ from silp.routers.deps import (
     DeliveryServiceDep,
     FileServiceDep,
     ProjectServiceDep,
+    ReflectionServiceDep,
     SessionDep,
     WorkspaceServiceDep,
     project_from_path,
@@ -49,6 +51,9 @@ from silp.schemas.delivery import (
     MilestoneIn,
     MilestoneOut,
     MilestoneOwnerIn,
+    ReflectionIn,
+    ReflectionOut,
+    ReflectionStateOut,
     ReviewIn,
     ReviewOut,
     TaskIn,
@@ -644,6 +649,64 @@ async def delete_message(
 ) -> None:
     project = await projects.require(project_id)
     await workspace.delete_message(project=project, actor=current, message_id=message_id)
+
+
+# ── بازتاب پایان پروژه — FR-PRJ-08، ADR-0024 ────────────────────────────
+@router.get(
+    "/{project_id}/reflection",
+    response_model=ReflectionStateOut,
+    summary="وضعیت بازتاب من",
+    responses={403: {"model": ErrorResponse}, 404: {"model": ErrorResponse}},
+)
+async def my_reflection(
+    project_id: uuid.UUID,
+    current: CurrentUserDep,
+    projects: ProjectServiceDep,
+    reflections: ReflectionServiceDep,
+) -> ReflectionStateOut:
+    project = await projects.require(project_id)
+    state = await reflections.state(project=project, actor=current)
+    return ReflectionStateOut(
+        can_submit=state.can_submit,
+        reason=state.reason,
+        reflection=(
+            ReflectionOut.model_validate(state.reflection) if state.reflection is not None else None
+        ),
+        points=float(state.points) if state.points is not None else None,
+        min_learned_chars=reflection_rules.MIN_LEARNED_CHARS,
+    )
+
+
+@router.post(
+    "/{project_id}/reflection",
+    response_model=ReflectionOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="ثبت بازتاب (یک‌بار، بی‌ویرایش)",
+    responses={
+        403: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+        422: {"model": ErrorResponse},
+    },
+)
+async def submit_reflection(
+    project_id: uuid.UUID,
+    payload: ReflectionIn,
+    current: CurrentUserDep,
+    projects: ProjectServiceDep,
+    reflections: ReflectionServiceDep,
+) -> ReflectionOut:
+    project = await projects.require(project_id)
+    reflection = await reflections.submit(
+        project=project,
+        actor=current,
+        draft=reflection_rules.ReflectionDraft(
+            learned=payload.learned,
+            challenges=payload.challenges,
+            would_do_differently=payload.would_do_differently,
+            satisfaction=payload.satisfaction,
+        ),
+    )
+    return ReflectionOut.model_validate(reflection)
 
 
 __all__ = ["deliverable_router", "milestone_router", "milestones_out", "router"]

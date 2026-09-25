@@ -193,6 +193,39 @@ class ActivityOut(BaseModel):
     created_at: datetime
 
 
+# ── بازتاب پایان پروژه — ADR-0024 ──────────────────────────────────────
+class ReflectionIn(BaseModel):
+    """حداقل نویسه در سرویس سنجیده می‌شود (پس از `strip`) تا عدد در یک جا بماند."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    learned: Annotated[str, Field(min_length=1, max_length=4000)]
+    challenges: Annotated[str | None, Field(max_length=4000)] = None
+    would_do_differently: Annotated[str | None, Field(max_length=4000)] = None
+    satisfaction: Annotated[int | None, Field(ge=1, le=5)] = None
+
+
+class ReflectionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    learned: str
+    challenges: str | None = None
+    would_do_differently: str | None = None
+    satisfaction: int | None = None
+    created_at: datetime
+
+
+class ReflectionStateOut(BaseModel):
+    """`GET /projects/{id}/reflection` — وضعیت بازتاب خودِ کاربر."""
+
+    can_submit: bool
+    reason: str | None = None
+    reflection: ReflectionOut | None = None
+    #: امتیاز فعلی قاعده؛ `null` اگر مدیر آن را غیرفعال کرده باشد.
+    points: float | None = None
+    min_learned_chars: int
+
+
 MilestoneOut.model_rebuild()
 
 __all__ = [
@@ -204,6 +237,9 @@ __all__ = [
     "MilestoneIn",
     "MilestoneOut",
     "MilestoneOwnerIn",
+    "ReflectionIn",
+    "ReflectionOut",
+    "ReflectionStateOut",
     "ReviewIn",
     "ReviewOut",
     "TaskIn",

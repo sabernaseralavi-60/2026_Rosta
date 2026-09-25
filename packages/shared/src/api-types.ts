@@ -2369,6 +2369,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/reflection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** وضعیت بازتاب من */
+        get: operations["my_reflection_api_v1_projects__project_id__reflection_get"];
+        put?: never;
+        /** ثبت بازتاب (یک‌بار، بی‌ویرایش) */
+        post: operations["submit_reflection_api_v1_projects__project_id__reflection_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/resume": {
         parameters: {
             query?: never;
@@ -9725,6 +9743,51 @@ export interface components {
             items: components["schemas"]["RecommendationItemOut"][];
             /** Profile Completeness */
             profile_completeness: number;
+        };
+        /**
+         * ReflectionIn
+         * @description حداقل نویسه در سرویس سنجیده می‌شود (پس از `strip`) تا عدد در یک جا بماند.
+         */
+        ReflectionIn: {
+            /** Challenges */
+            challenges?: string | null;
+            /** Learned */
+            learned: string;
+            /** Satisfaction */
+            satisfaction?: number | null;
+            /** Would Do Differently */
+            would_do_differently?: string | null;
+        };
+        /** ReflectionOut */
+        ReflectionOut: {
+            /** Challenges */
+            challenges?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Learned */
+            learned: string;
+            /** Satisfaction */
+            satisfaction?: number | null;
+            /** Would Do Differently */
+            would_do_differently?: string | null;
+        };
+        /**
+         * ReflectionStateOut
+         * @description `GET /projects/{id}/reflection` — وضعیت بازتاب خودِ کاربر.
+         */
+        ReflectionStateOut: {
+            /** Can Submit */
+            can_submit: boolean;
+            /** Min Learned Chars */
+            min_learned_chars: number;
+            /** Points */
+            points?: number | null;
+            /** Reason */
+            reason?: string | null;
+            reflection?: components["schemas"]["ReflectionOut"] | null;
         };
         /** RefreshIn */
         RefreshIn: {
@@ -18277,6 +18340,108 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_reflection_api_v1_projects__project_id__reflection_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReflectionStateOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_reflection_api_v1_projects__project_id__reflection_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReflectionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReflectionOut"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
