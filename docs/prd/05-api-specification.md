@@ -396,6 +396,7 @@ Authorization: Bearer <access_token>
 | `PUT` | `/teach/quizzes/{id}/attempts/{aid}/answers/{qid}` | ثبت یا بازنویسی نمره |
 | `POST` | `/teach/quizzes/{id}/attempts/{aid}/finalize` · `/void` | پایان تصحیح، ابطال |
 | `GET` | `/teach/quizzes/{id}/question-stats` | ضریب دشواری و تمیز |
+| `GET` | `/teach/quizzes/{id}/analytics` | توزیع نمره، پایایی، همبستگی و توزیع گزینه‌ها (ADR-0028) |
 | `GET` | `/teach/quizzes/{id}/appeals` | اعتراض‌های باز |
 | `POST` | `/teach/appeals/{id}/resolve` | رسیدگی |
 | `GET` | `/teach/quizzes/{id}/attempts/{aid}/result` | نتیجهٔ یک دانشجو از دید استاد |
