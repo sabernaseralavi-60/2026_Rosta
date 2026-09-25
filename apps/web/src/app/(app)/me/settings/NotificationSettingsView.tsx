@@ -23,6 +23,8 @@ import {
 import { useSession } from '@/lib/auth/use-session';
 import { toLatinDigits, toPersianDigits } from '@/lib/format/digits';
 
+import { PushCard } from './PushCard';
+
 /**
  * تنظیمات اعلان — FR-MSG-02، M6-09.
  *
@@ -138,15 +140,25 @@ export function NotificationSettingsView() {
           کانال‌ها
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          {selectable.map((status) => (
-            <ChannelCard
-              key={status.channel}
-              status={status}
-              token={accessToken}
-              onChange={apply}
-              reload={reload}
-            />
-          ))}
+          {selectable.map((status) =>
+            status.channel === 'PUSH' ? (
+              <PushCard
+                key={status.channel}
+                status={status}
+                publicKey={prefs.push_public_key}
+                token={accessToken}
+                reload={reload}
+              />
+            ) : (
+              <ChannelCard
+                key={status.channel}
+                status={status}
+                token={accessToken}
+                onChange={apply}
+                reload={reload}
+              />
+            ),
+          )}
         </div>
       </section>
 
@@ -179,9 +191,11 @@ export function NotificationSettingsView() {
                     hint={
                       canSelect(status)
                         ? undefined
-                        : status.requires_link
-                          ? 'اول وصلش کن'
-                          : 'نشانی نداری'
+                        : status.channel === 'PUSH'
+                          ? 'اول روشنش کن'
+                          : status.requires_link
+                            ? 'اول وصلش کن'
+                            : 'نشانی نداری'
                     }
                     onChange={() => {
                       setSaved(false);

@@ -47,6 +47,7 @@ const CHANNEL_LABELS: Record<string, string> = {
   IN_APP: 'داخل سامانه',
   EMAIL: 'ایمیل',
   SMS: 'پیامک',
+  PUSH: 'مرورگر و دستگاه',
   TELEGRAM: 'تلگرام',
   EITAA: 'ایتا',
   WHATSAPP: 'واتساپ',
@@ -183,7 +184,7 @@ function OutboxPanel() {
             }}
           >
             <option value="">همه</option>
-            {['SMS', 'EMAIL', 'TELEGRAM', 'EITAA'].map((value) => (
+            {['SMS', 'EMAIL', 'PUSH', 'TELEGRAM', 'EITAA'].map((value) => (
               <option key={value} value={value}>
                 {CHANNEL_LABELS[value]}
               </option>

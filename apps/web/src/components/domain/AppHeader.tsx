@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button';
 import { adminHome, canSeeAdmin } from '@/lib/api/admin';
 import { canSeeTeach } from '@/lib/api/teach';
 import { logout } from '@/lib/api/auth';
+import { releasePush } from '@/lib/push/client';
 import {
   clearSession,
   IMPERSONATION_REFRESH,
@@ -88,6 +89,8 @@ export function AppHeader() {
       return;
     }
     if (session) {
+      // اشتراک Push این مرورگر با کاربر نمی‌ماند (ADR-0029)؛ رایانهٔ مشترک.
+      await releasePush(session.accessToken).catch(() => undefined);
       // خروج سمت سرور ممکن است شکست بخورد؛ نشست محلی در هر حال پاک می‌شود.
       await logout(session.refreshToken).catch(() => undefined);
     }

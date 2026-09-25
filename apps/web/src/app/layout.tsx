@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
+import { PwaRegister } from '@/components/domain/PwaRegister';
 import { SESSION_HINT_SCRIPT } from '@/lib/auth/session';
 
 import '@/styles/globals.css';
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
   description: 'اکوسیستمی که دانشجو را از مصرف‌کنندهٔ دانش به تولیدکنندهٔ ارزش تبدیل می‌کند.',
   applicationName: 'SILP',
   robots: { index: true, follow: true },
+  // ADR-0029 — مانیفست از `app/manifest.ts` خودکار پیوند می‌شود.
+  icons: { icon: '/icons/icon-192.png', apple: '/icons/apple-touch-icon.png' },
+  appleWebApp: { capable: true, title: 'سیلپ', statusBarStyle: 'default' },
 };
 
 export const viewport: Viewport = {
@@ -50,6 +54,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           پرش به محتوای اصلی
         </a>
         {children}
+        <PwaRegister />
       </body>
     </html>
   );

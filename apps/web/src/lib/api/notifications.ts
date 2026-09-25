@@ -12,7 +12,8 @@ import { apiFetch } from './client';
 
 export type NotificationGroup = 'COURSE' | 'PROJECT' | 'SOCIAL' | 'SYSTEM';
 export type NotificationPriority = 'LOW' | 'NORMAL' | 'IMPORTANT' | 'URGENT';
-export type NotificationChannel = 'IN_APP' | 'EMAIL' | 'SMS' | 'TELEGRAM' | 'EITAA' | 'WHATSAPP';
+export type NotificationChannel =
+  'IN_APP' | 'EMAIL' | 'SMS' | 'PUSH' | 'TELEGRAM' | 'EITAA' | 'WHATSAPP';
 export type LinkableChannel = 'TELEGRAM' | 'EITAA';
 
 export const GROUP_LABELS: Record<NotificationGroup, string> = {
@@ -66,12 +67,16 @@ export interface ChannelStatus {
   address_masked: string | null;
   link_flow: 'DEEP_LINK' | 'CODE' | null;
   pending_link: boolean;
+  /** فقط Push: شمار مرورگرها و دستگاه‌های مشترک. */
+  devices: number;
 }
 
 export interface NotificationPreferences {
   groups: GroupPreference[];
   channels: ChannelStatus[];
   quiet_hours: { start: number; end: number };
+  /** کلید عمومی VAPID؛ `null` یعنی Push در سرور خاموش است. */
+  push_public_key: string | null;
 }
 
 export interface ChannelLink {

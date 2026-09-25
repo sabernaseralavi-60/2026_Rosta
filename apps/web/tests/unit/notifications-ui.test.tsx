@@ -123,6 +123,7 @@ function status(overrides: Partial<ChannelStatus> = {}): ChannelStatus {
     address_masked: null,
     link_flow: 'DEEP_LINK',
     pending_link: false,
+    devices: 0,
     ...overrides,
   };
 }
