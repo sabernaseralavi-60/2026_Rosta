@@ -188,14 +188,20 @@ export interface Metric {
   review_note: string | null;
   can_review: boolean;
   is_mine: boolean;
+  /** فقط فروش تأییدشدهٔ پروژه — عکسی از لحظهٔ تأیید (ADR-0025). */
+  share_percent: number | null;
+  share_rial: number | null;
   created_at: string;
 }
 
 export interface MetricsPage {
   items: Metric[];
   totals: MetricTotals;
-  by_member: (MetricTotals & { user_id: string; name: string | null })[];
+  by_member: (MetricTotals & { user_id: string; name: string | null; share_rial: number })[];
   metric_titles: Record<MetricKind, string>;
+  /** درصد فعلی پروژه؛ `null` برای کسب‌وکار (سهم ندارد). */
+  share_percent: number | null;
+  share_total_rial: number;
 }
 
 export interface MetricInput {
@@ -295,4 +301,38 @@ export function declineInvitation(accessToken: string, id: string) {
 
 export function cancelInvitation(accessToken: string, id: string) {
   return apiFetch<void>(`/invitations/${id}`, { method: 'DELETE', accessToken });
+}
+
+// ── گزارش درآمد شخصی — FR-VEN-03، ADR-0025 ──────────────────────────────
+export interface RevenueLine {
+  metric_id: string;
+  project_id: string;
+  project_title: string;
+  occurred_on: string;
+  value: number;
+  share_percent: number;
+  share_rial: number;
+  note: string | null;
+}
+
+export interface RevenueMonth {
+  year: number;
+  month: number;
+  /** «مهر ۱۴۰۵» — از سرور. */
+  title: string;
+  sales_rial: number;
+  share_rial: number;
+  lines: RevenueLine[];
+}
+
+export interface RevenueReport {
+  months: RevenueMonth[];
+  total_sales_rial: number;
+  total_share_rial: number;
+  pending_sales_rial: number;
+  pending_count: number;
+}
+
+export function fetchRevenue(accessToken: string) {
+  return apiFetch<RevenueReport>('/me/revenue', { accessToken });
 }

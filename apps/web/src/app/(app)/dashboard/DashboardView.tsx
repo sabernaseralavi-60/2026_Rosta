@@ -81,12 +81,20 @@ export function DashboardView() {
           <h2 id="points-title" className="text-[19px] font-semibold">
             امتیاز و سطح
           </h2>
-          <Link
-            href="/me/points"
-            className="text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
-          >
-            دفتر امتیاز
-          </Link>
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <Link
+              href="/me/points"
+              className="text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
+            >
+              دفتر امتیاز
+            </Link>
+            <Link
+              href="/me/revenue"
+              className="text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
+            >
+              درآمد و سهم من
+            </Link>
+          </div>
         </div>
         <Card className="flex flex-col gap-5">
           <div className="flex flex-wrap items-end justify-between gap-4">

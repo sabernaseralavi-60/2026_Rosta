@@ -87,6 +87,12 @@ export const COMMANDS: Command[] = [
     keywords: 'پروفایل حریم خصوصی',
   },
   { id: 'points', label: 'دفتر امتیاز', href: '/me/points', keywords: 'امتیاز سطح' },
+  {
+    id: 'revenue',
+    label: 'درآمد و سهم من',
+    href: '/me/revenue',
+    keywords: 'درآمد سهم فروش پول ریال کارآفرینی',
+  },
   { id: 'leaderboard', label: 'رتبه‌بندی', href: '/leaderboard', keywords: 'رتبه جدول' },
   { id: 'settings', label: 'تنظیمات اعلان', href: '/me/settings', keywords: 'پیامک ایمیل تلگرام' },
   {

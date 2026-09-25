@@ -126,6 +126,16 @@ export function MetricsView({
           {page.by_member.length > 1 && (
             <Card className="flex flex-col gap-3">
               <CardTitle as="h2">عملکرد هر عضو (تأییدشده)</CardTitle>
+              {page.share_percent !== null && (
+                <CardDescription>
+                  سهم فروشنده در این پروژه {formatNumber(page.share_percent)}٪ از فروش تأییدشدهٔ
+                  خودش است؛ هر کس سهم خودش را در{' '}
+                  <Link href="/me/revenue" className="text-[var(--fg-brand)] hover:underline">
+                    درآمد و سهم من
+                  </Link>{' '}
+                  می‌بیند.
+                </CardDescription>
+              )}
               <div className="flex flex-col gap-2">
                 {page.by_member.map((member) => (
                   <div
@@ -141,6 +151,12 @@ export function MetricsView({
                         </span>
                       </span>
                     ))}
+                    {member.share_rial > 0 && (
+                      <span className="text-[var(--fg-secondary)]">
+                        سهم فروشنده:{' '}
+                        <span className="tabular-nums">{formatRial(member.share_rial)}</span>
+                      </span>
+                    )}
                     {Object.keys(member.verified).length === 0 && (
                       <span className="text-[var(--fg-tertiary)]">هنوز چیزی تأیید نشده</span>
                     )}
@@ -318,6 +334,12 @@ function MetricRow({
         {item.user_name ?? 'عضو'} · {formatDateShort(item.occurred_on)}
         {item.reviewed_by_name && ` · بررسی: ${item.reviewed_by_name}`}
       </p>
+      {item.share_rial !== null && item.share_percent !== null && (
+        <p className="text-[13.5px] text-[var(--fg-secondary)]">
+          سهم فروشنده ({formatNumber(item.share_percent)}٪):{' '}
+          <span className="tabular-nums">{formatRial(item.share_rial)}</span>
+        </p>
+      )}
       {item.note && <p className="text-[14px] leading-[1.9]">{item.note}</p>}
       {item.review_note && (
         <p className="text-[13.5px] text-[var(--fg-secondary)]">
