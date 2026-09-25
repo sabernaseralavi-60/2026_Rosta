@@ -725,7 +725,18 @@ export interface GradingQueue {
   pending: PendingAnswer[];
 }
 
-export interface QuestionStats {
+export interface OptionStat {
+  option_id: string;
+  text: string;
+  is_correct: boolean;
+  chosen: number;
+  share: number;
+  top_share: number | null;
+  bottom_share: number | null;
+  note_fa: string | null;
+}
+
+export interface ItemAnalysis {
   question_id: string;
   body: string;
   kind: QuestionKind;
@@ -733,7 +744,32 @@ export interface QuestionStats {
   answered: number;
   difficulty: string | null;
   discrimination: string | null;
+  item_rest: number | null;
   note_fa: string | null;
+  options: OptionStat[];
+}
+
+export interface ScoreSummary {
+  n: number;
+  mean_percent: number;
+  median_percent: number;
+  sd_percent: number | null;
+  min_percent: number;
+  max_percent: number;
+  histogram: number[];
+}
+
+export interface Reliability {
+  alpha: number;
+  sem_percent: number;
+  label_fa: string;
+  advice_fa: string | null;
+}
+
+export interface QuizAnalytics {
+  summary: ScoreSummary | null;
+  reliability: Reliability | null;
+  items: ItemAnalysis[];
 }
 
 export function fetchAttempts(quizId: string, token: string) {
@@ -782,8 +818,8 @@ export function fetchStaffResult(quizId: string, attemptId: string, token: strin
   });
 }
 
-export function fetchQuestionStats(quizId: string, token: string) {
-  return apiFetch<QuestionStats[]>(`/teach/quizzes/${quizId}/question-stats`, {
+export function fetchQuizAnalytics(quizId: string, token: string) {
+  return apiFetch<QuizAnalytics>(`/teach/quizzes/${quizId}/analytics`, {
     accessToken: token,
   });
 }
