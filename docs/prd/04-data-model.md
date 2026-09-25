@@ -1621,10 +1621,23 @@ CREATE TABLE user_channels (           -- پیوند تلگرام و ایتا (A
 CREATE UNIQUE INDEX idx_user_channels_address ON user_channels(channel, address)
   WHERE verified_at IS NOT NULL;      -- یک گفت‌وگو، یک حساب
 
+CREATE TABLE push_subscriptions (      -- اشتراک Push هر مرورگر (ADR-0029)
+  id         UUID PRIMARY KEY DEFAULT uuidv7(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  endpoint   TEXT NOT NULL CHECK (endpoint LIKE 'https://%'),
+  p256dh     TEXT NOT NULL,
+  auth       TEXT NOT NULL,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX idx_push_subscriptions_endpoint ON push_subscriptions(endpoint);
+                                       -- یک مرورگر، یک مالک؛ ثبت دوباره مالک را عوض می‌کند
+CREATE INDEX idx_push_subscriptions_user ON push_subscriptions(user_id, created_at);
+
 CREATE TABLE outbox_messages (         -- D-08، D-23
   id          UUID PRIMARY KEY DEFAULT uuidv7(),
-  channel     TEXT NOT NULL CHECK (channel IN ('EMAIL','SMS','TELEGRAM','EITAA','WHATSAPP')),
-  recipient   TEXT NOT NULL,
+  channel     TEXT NOT NULL CHECK (channel IN ('EMAIL','SMS','PUSH','TELEGRAM','EITAA','WHATSAPP')),
+  recipient   TEXT NOT NULL,            -- برای PUSH: JSON اشتراک مرورگر (ADR-0029)
   template    TEXT NOT NULL,           -- کد نوع اعلان؛ متن هنگام ارسال ساخته می‌شود
   payload     JSONB NOT NULL,          -- {"values": {...}} متغیرهای الگو
   notification_id UUID REFERENCES notifications(id) ON DELETE SET NULL,

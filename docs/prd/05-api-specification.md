@@ -730,6 +730,8 @@ Authorization: Bearer <access_token>
 | `POST` | `/notifications/channels/{telegram\|eitaa}/link` | شروع پیوند: پیوند عمیق تلگرام، یا فرستادن کد به ایتا |
 | `POST` | `/notifications/channels/eitaa/confirm` | تأیید کد ایتا |
 | `DELETE` | `/notifications/channels/{channel}` | قطع پیوند |
+| `POST` | `/notifications/push/subscriptions` | ثبت اشتراک Push این مرورگر (`PushSubscription.toJSON()`)؛ نقطهٔ پایانی فقط از میزبان‌های `PUSH_ALLOWED_HOSTS`؛ خروجی شمار دستگاه‌ها |
+| `DELETE` | `/notifications/push/subscriptions?endpoint=` | برداشتن اشتراک این مرورگر؛ اشتراک دیگران بی‌صدا نادیده گرفته می‌شود |
 | `GET` | `/notifications/stream` | **SSE** برای اعلان بی‌درنگ |
 | `POST` | `/integrations/telegram/webhook` | وب‌هوک ربات؛ هدر `X-Telegram-Bot-Api-Secret-Token` |
 

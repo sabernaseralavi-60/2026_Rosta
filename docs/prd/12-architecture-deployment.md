@@ -460,6 +460,12 @@ TELEGRAM_BOT_TOKEN=
 EITAA_API_TOKEN=
 WHATSAPP_API_URL=
 
+# ── اعلان Push وب (ADR-0029) ──
+PUSH_PROVIDER=disabled        # disabled | webpush — در تولید console و memory ممنوع است
+VAPID_PUBLIC_KEY=             # python -m silp.scripts.gen_vapid_keys
+VAPID_PRIVATE_KEY=
+VAPID_SUBJECT=mailto:admin@silp.ir
+
 # ── رصد ──
 SENTRY_DSN=
 OTEL_EXPORTER_OTLP_ENDPOINT=
