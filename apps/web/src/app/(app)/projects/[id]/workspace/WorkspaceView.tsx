@@ -391,7 +391,7 @@ function LeadActions({
 
   return (
     <Card className="flex flex-col gap-2">
-      <CardTitle>مدیریت پروژه</CardTitle>
+      <CardTitle as="h2">مدیریت پروژه</CardTitle>
       <div className="flex flex-wrap gap-2">
         {actions.map((action) => (
           <Button

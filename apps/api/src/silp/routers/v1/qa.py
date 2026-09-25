@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query, status
 
@@ -33,7 +33,7 @@ router = APIRouter(prefix="/qa", tags=["qa"])
 offering_router = APIRouter(prefix="/offerings/{offering_id}/qa", tags=["qa"])
 
 EXCERPT_LENGTH = 200
-_NOT_FOUND = {404: {"model": ErrorResponse}}
+_NOT_FOUND: dict[int | str, dict[str, Any]] = {404: {"model": ErrorResponse}}
 
 
 def get_qa_service(session: SessionDep) -> QaService:
