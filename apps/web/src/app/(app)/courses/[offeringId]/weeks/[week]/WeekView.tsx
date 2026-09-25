@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 import { MaterialRow } from '@/components/domain/MaterialRow';
+import { QaBoard } from '@/components/domain/qa/QaBoard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardDescription, CardTitle } from '@/components/ui/Card';
@@ -155,6 +156,18 @@ export function WeekView({ offeringId, weekNumber }: { offeringId: string; weekN
           </ul>
         </section>
       )}
+
+      <section className="flex flex-col gap-3" aria-labelledby="week-qa-title">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 id="week-qa-title" className="text-[19px] font-semibold text-[var(--fg-primary)]">
+            پرسش‌وپاسخ این هفته
+          </h2>
+          <Link href={`/courses/${offeringId}/qa`} className="text-[13.5px] text-[var(--fg-brand)]">
+            همهٔ پرسش‌های درس
+          </Link>
+        </div>
+        <QaBoard offeringId={offeringId} weekNumber={weekNumber} />
+      </section>
     </div>
   );
 }

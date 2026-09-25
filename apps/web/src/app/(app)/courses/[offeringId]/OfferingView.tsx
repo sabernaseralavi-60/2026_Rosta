@@ -160,6 +160,12 @@ export function OfferingView({ offeringId }: { offeringId: string }) {
               آزمون‌های این درس
             </Link>
             <Link
+              href={`/courses/${offering.id}/qa`}
+              className="text-[13.5px] text-[var(--fg-brand)]"
+            >
+              پرسش‌وپاسخ
+            </Link>
+            <Link
               href={`/library/${offering.course_slug}`}
               className="text-[13.5px] text-[var(--fg-brand)]"
             >
