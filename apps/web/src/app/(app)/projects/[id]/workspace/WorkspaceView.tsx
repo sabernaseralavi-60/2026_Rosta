@@ -30,6 +30,7 @@ import { toPersianDigits } from '@/lib/format/digits';
 import { MetricsView } from '@/components/domain/MetricsView';
 
 import { ActivityTab, DiscussionTab } from './DiscussionTab';
+import { ContributionTab } from './ContributionTab';
 import { MilestonesTab } from './MilestonesTab';
 import { PeerEvaluationCard } from './PeerEvaluationCard';
 import { ReflectionCard } from './ReflectionCard';
@@ -48,7 +49,8 @@ import { TeamTab } from './TeamTab';
  * نقش تصمیم نمی‌گیرد (§6.4).
  */
 
-type TabKey = 'milestones' | 'team' | 'tasks' | 'discussion' | 'activity' | 'metrics';
+type TabKey =
+  'milestones' | 'team' | 'tasks' | 'discussion' | 'activity' | 'metrics' | 'contribution';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'milestones', label: 'مراحل' },
@@ -60,6 +62,9 @@ const TABS: { key: TabKey; label: string }[] = [
 
 /** FR-VEN-02 — پروژهٔ کارآفرینی تماس، جلسه و فروش هر عضو را ثبت می‌کند. */
 const VENTURE_TAB: { key: TabKey; label: string } = { key: 'metrics', label: 'فروش و فعالیت' };
+
+/** FR-PRJ-08، ADR-0026 — پیش از شروع پروژه تیمی نیست که سهمی داشته باشد. */
+const CONTRIBUTION_TAB: { key: TabKey; label: string } = { key: 'contribution', label: 'مشارکت' };
 
 const STATUS_TONES: Record<string, 'neutral' | 'success' | 'info' | 'warning'> = {
   DRAFT: 'neutral',
@@ -170,6 +175,12 @@ export function WorkspaceView({ id }: { id: string }) {
       (member) => member.user_id === currentUserId && member.status === 'ACTIVE',
     ) === true;
 
+  const tabs = [
+    ...TABS,
+    ...(project.kind === 'A_VENTURE' ? [VENTURE_TAB] : []),
+    ...(project.status === 'DRAFT' || project.status === 'OPEN' ? [] : [CONTRIBUTION_TAB]),
+  ];
+
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-3">
@@ -222,7 +233,7 @@ export function WorkspaceView({ id }: { id: string }) {
         aria-label="بخش‌های فضای کاری"
         className="flex flex-wrap gap-1 border-b border-[var(--border-subtle)]"
       >
-        {(project?.kind === 'A_VENTURE' ? [...TABS, VENTURE_TAB] : TABS).map((item) => (
+        {tabs.map((item) => (
           <button
             key={item.key}
             role="tab"
@@ -284,6 +295,14 @@ export function WorkspaceView({ id }: { id: string }) {
         )}
         {tab === 'activity' && <ActivityTab activity={activity} />}
         {tab === 'metrics' && <MetricsView owner={{ kind: 'project', id }} embedded />}
+        {tab === 'contribution' && (
+          <ContributionTab
+            projectId={id}
+            accessToken={accessToken!}
+            isLead={isLead}
+            projectStatus={project.status}
+          />
+        )}
       </div>
     </div>
   );

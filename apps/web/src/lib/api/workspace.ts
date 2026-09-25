@@ -587,3 +587,47 @@ export function fetchPeerEvaluationSummary(projectId: string, accessToken: strin
     accessToken,
   });
 }
+
+// ── تحلیل مشارکت تیمی — FR-PRJ-08، ADR-0026 ───────────────────────────
+export interface ContributionSignal {
+  dimension: string;
+  /** شمار خام — مدیر عدد را قضاوت می‌کند، نه فقط درصد. */
+  count: number;
+  /** `null` وقتی کل تیم در این بُعد صفر است. */
+  share_percent: number | null;
+}
+
+export interface ContributionMember {
+  user_id: string;
+  full_name: string | null;
+  /** `ACTIVE` | `LEFT` | `REMOVED` */
+  status: string;
+  is_lead: boolean;
+  joined_at: string;
+  left_at: string | null;
+  /** `null` وقتی هیچ بُعدی در کل تیم داده ندارد. */
+  share_percent: number | null;
+  /** عضو فعالی که در هیچ بُعد چیزی ثبت نکرده — واقعیت است، نه اتهام. */
+  is_silent: boolean;
+  signals: ContributionSignal[];
+}
+
+export interface ContributionDimension {
+  dimension: string;
+  title: string;
+  /** وزن مؤثر؛ `0` یعنی بُعد در کل تیم داده ندارد و کنار گذاشته شده. */
+  weight: number;
+  /** `null` برای عضو عادی. */
+  team_total: number | null;
+}
+
+export interface Contribution {
+  /** `TEAM` همهٔ اعضا (مدیر و ناظر)؛ `SELF` فقط ردیف خودِ کاربر. */
+  scope: 'TEAM' | 'SELF';
+  dimensions: ContributionDimension[];
+  members: ContributionMember[];
+}
+
+export function fetchContribution(projectId: string, accessToken: string) {
+  return apiFetch<Contribution>(`/projects/${projectId}/contribution`, { accessToken });
+}
