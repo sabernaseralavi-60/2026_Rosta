@@ -615,6 +615,7 @@ Authorization: Bearer <access_token>
 | `POST` | `/ideas/{id}/archive` | بایگانی با دلیل (`idea.moderate`) |
 | `POST` | `/ideas/{id}/promote` | ارتقا (`idea.promote`) — `PROJECT` با `project_kind`، یا `VENTURE` (نه برای ایدهٔ ناشناس) |
 | `GET` | `/teams/search` | جستجوی هم‌تیمی — فقط نیمرخ عمومی (`team.search`) |
+| `GET` | `/teams/compose` | پیشنهاد خودکار ترکیب تیم (FR-TEAM-04) — `project_id`، `seats=1..5`؛ فقط‌خواندنی؛ مدیر تیم (`project.application.decide`)، عضو عادی ⇒ ۴۰۳، بیرونی ⇒ ۴۰۴ |
 | `GET` | `/teams/managed` | پروژه‌ها و کسب‌وکارهایی که می‌توانم برایشان آگهی بدهم یا دعوت بفرستم |
 | `GET/POST` | `/teams/openings` | آگهی‌های باز (`q`، `skill_id`، `kind`، `mine`) و ثبت برای پروژه یا کسب‌وکار (دقیقاً یکی) |
 | `GET/PATCH` | `/teams/openings/{id}` | جزئیات (درخواست‌ها فقط برای مدیران)؛ ویرایش آگهی باز |
@@ -642,6 +643,23 @@ Authorization: Bearer <access_token>
       "assets": ["لپ‌تاپ","دوربین"],
       "complement_score": 92.0,
       "complement_reason": "مهارت GIS را دارد که هیچ‌کس در تیم ندارد" } ] }
+```
+
+**`GET /teams/compose` — پیشنهاد ترکیب** ([ADR-0027](../adr/0027-team-composition-suggestion.md))
+
+پوشش وزنی حریصانه روی کمبودهای تیم؛ تا سه ترکیب متمایز، بهترین اول. هر عضو فقط
+مهارت‌هایی را دارد که **تازه** به تیم می‌آورد. تیمِ بی‌کمبود یا نبودِ نیمرخ عمومیِ
+پوشاننده ⇒ `compositions: []`.
+```jsonc
+{ "project": { "id": "…", "title": "…" },
+  "gaps": [ { "title_fa": "GIS", "min_level": 3 } ], "seats": 3,
+  "compositions": [
+    { "coverage_percent": 83.3,
+      "members": [ { "user": { "username": "ali-m", "display_name": "علی م.", "university": "…" },
+                     "weekly_hours": 10,
+                     "covers": [ { "title_fa": "GIS", "level": 4, "verified": true } ],
+                     "reason": "GIS را می‌آورد که تا اینجا در تیم نیست." } ],
+      "uncovered": [ { "title_fa": "پایتون", "min_level": 3 } ] } ] }
 ```
 
 **`GET /leaderboard`**
