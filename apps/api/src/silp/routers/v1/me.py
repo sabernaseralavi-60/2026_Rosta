@@ -93,6 +93,7 @@ async def get_me(
 
     return MeOut(
         id=user.id,
+        person_code=user.person_code,
         mobile=mask_mobile(user.mobile),
         email=mask_email(user.email),
         email_verified=user.email_verified_at is not None,

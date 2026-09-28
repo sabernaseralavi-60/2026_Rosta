@@ -3,6 +3,7 @@
 from silp.db.base import Base
 from silp.models.access import MaterialAccessEvent, Subscription, SubscriptionPlan
 from silp.models.admin import AuditLog
+from silp.models.content import ContentItem
 from silp.models.delivery import (
     Certificate,
     Deliverable,
@@ -34,6 +35,7 @@ from silp.models.education import (
 from silp.models.file import File
 from silp.models.gamification import Badge, PointEntry, PointRule, UserBadge
 from silp.models.idea import Idea, IdeaComment, IdeaVote
+from silp.models.intake import IntakeRequest
 from silp.models.identity import (
     NULL_SCOPE,
     OTPChallenge,
@@ -98,6 +100,7 @@ __all__ = [
     "Base",
     "Certificate",
     "ClassSession",
+    "ContentItem",
     "Course",
     "CourseMaterial",
     "CourseOffering",
@@ -110,6 +113,7 @@ __all__ = [
     "Idea",
     "IdeaComment",
     "IdeaVote",
+    "IntakeRequest",
     "Interest",
     "MaterialAccessEvent",
     "MessageTemplate",

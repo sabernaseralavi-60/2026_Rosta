@@ -51,6 +51,11 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     mobile: Mapped[str | None] = mapped_column(Text, unique=True)
     email: Mapped[str | None] = mapped_column(CITEXT, unique=True)
     username: Mapped[str | None] = mapped_column(Text, unique=True)
+    # کد شخصی دائمی (`P-00128`): با تغییر نقش عوض نمی‌شود. دیتابیس می‌سازدش
+    # (`next_person_code()`)، پس درج مستقیم SQL و seed هم کد می‌گیرند — ADR-0030.
+    person_code: Mapped[str] = mapped_column(
+        Text, unique=True, nullable=False, server_default=text("next_person_code()")
+    )
     # NULL یعنی کاربر فقط با OTP وارد می‌شود و رمزی تعریف نکرده است.
     password_hash: Mapped[str | None] = mapped_column(Text)
 
@@ -74,6 +79,7 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     __table_args__ = (
         CheckConstraint(_in_list("status", USER_STATUSES), name="status_valid"),
         CheckConstraint("mobile IS NOT NULL OR email IS NOT NULL", name="contact_required"),
+        CheckConstraint("person_code ~ '^P-[0-9]{5,}$'", name="person_code_format"),
         # شمارهٔ موبایل ایرانی، نرمال‌شده — FR-AUTH-01
         CheckConstraint(r"mobile IS NULL OR mobile ~ '^09\d{9}$'", name="mobile_format"),
         Index("idx_users_status", "status", postgresql_where=text("deleted_at IS NULL")),

@@ -3951,6 +3951,157 @@
         "title": "CityWorkflowOut",
         "type": "object"
       },
+      "CollaborationIn": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "experience": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Experience"
+          },
+          "hours_per_week": {
+            "anyOf": [
+              {
+                "enum": [
+                  "LT2",
+                  "2_5",
+                  "5_10",
+                  "GT10"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hours Per Week"
+          },
+          "interests": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interests"
+          },
+          "intro": {
+            "maxLength": 4000,
+            "minLength": 5,
+            "title": "Intro",
+            "type": "string"
+          },
+          "mobile": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mobile"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Name",
+            "type": "string"
+          },
+          "organization": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization"
+          },
+          "portfolio_url": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portfolio Url"
+          },
+          "skills": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skills"
+          },
+          "specialty": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialty"
+          },
+          "ways": {
+            "default": [],
+            "items": {
+              "maxLength": 60,
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Ways",
+            "type": "array"
+          },
+          "website": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Website",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "intro"
+        ],
+        "title": "CollaborationIn",
+        "type": "object"
+      },
       "CommentIn": {
         "additionalProperties": false,
         "properties": {
@@ -4161,6 +4312,255 @@
           "compositions"
         ],
         "title": "CompositionSuggestionOut",
+        "type": "object"
+      },
+      "ContentCardOut": {
+        "properties": {
+          "access": {
+            "title": "Access",
+            "type": "string"
+          },
+          "access_fa": {
+            "title": "Access Fa",
+            "type": "string"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "locked": {
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "reading_minutes": {
+            "title": "Reading Minutes",
+            "type": "integer"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "slug",
+          "kind",
+          "kind_fa",
+          "title_fa",
+          "summary",
+          "cover",
+          "access",
+          "access_fa",
+          "topics",
+          "reading_minutes",
+          "published_at",
+          "locked"
+        ],
+        "title": "ContentCardOut",
+        "type": "object"
+      },
+      "ContentDetailOut": {
+        "properties": {
+          "access": {
+            "title": "Access",
+            "type": "string"
+          },
+          "access_fa": {
+            "title": "Access Fa",
+            "type": "string"
+          },
+          "body_md": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body Md"
+          },
+          "course_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Course Slug"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "kind_fa": {
+            "title": "Kind Fa",
+            "type": "string"
+          },
+          "locked": {
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "reading_minutes": {
+            "title": "Reading Minutes",
+            "type": "integer"
+          },
+          "related": {
+            "items": {
+              "$ref": "#/components/schemas/ContentCardOut"
+            },
+            "title": "Related",
+            "type": "array"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Skills",
+            "type": "array"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title_fa": {
+            "title": "Title Fa",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "slug",
+          "kind",
+          "kind_fa",
+          "title_fa",
+          "summary",
+          "cover",
+          "access",
+          "access_fa",
+          "topics",
+          "reading_minutes",
+          "published_at",
+          "locked",
+          "skills",
+          "course_slug",
+          "body_md",
+          "related"
+        ],
+        "title": "ContentDetailOut",
+        "type": "object"
+      },
+      "ContentListOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ContentCardOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/FacetOut"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
+          "topics": {
+            "items": {
+              "$ref": "#/components/schemas/FacetOut"
+            },
+            "title": "Topics",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "kinds",
+          "topics"
+        ],
+        "title": "ContentListOut",
         "type": "object"
       },
       "ContributionDimensionOut": {
@@ -5598,6 +5998,29 @@
         "title": "EvidenceFieldOut",
         "type": "object"
       },
+      "FacetOut": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label",
+          "count"
+        ],
+        "title": "FacetOut",
+        "type": "object"
+      },
       "FileOut": {
         "properties": {
           "content_type": {
@@ -6684,6 +7107,181 @@
           "active_offerings"
         ],
         "title": "InstructorCandidateOut",
+        "type": "object"
+      },
+      "IntakeIn": {
+        "properties": {
+          "budget": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "expected_result": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Result"
+          },
+          "has_data": {
+            "anyOf": [
+              {
+                "enum": [
+                  "YES",
+                  "NO",
+                  "UNSURE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Data"
+          },
+          "mobile": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mobile"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Name",
+            "type": "string"
+          },
+          "need_type": {
+            "enum": [
+              "Commercial",
+              "Research",
+              "Education",
+              "Consulting",
+              "Collaboration",
+              "Other"
+            ],
+            "title": "Need Type",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "organization": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization"
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sector"
+          },
+          "services": {
+            "default": [],
+            "items": {
+              "enum": [
+                "Website / Web App",
+                "AI",
+                "Data Analysis",
+                "Automation",
+                "Content",
+                "Research",
+                "Engineering",
+                "GIS",
+                "Consulting",
+                "Training",
+                "Other"
+              ],
+              "type": "string"
+            },
+            "maxItems": 11,
+            "title": "Services",
+            "type": "array"
+          },
+          "summary": {
+            "maxLength": 4000,
+            "minLength": 5,
+            "title": "Summary",
+            "type": "string"
+          },
+          "timeline": {
+            "anyOf": [
+              {
+                "maxLength": 60,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timeline"
+          },
+          "website": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Website",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "need_type",
+          "summary"
+        ],
+        "title": "IntakeIn",
         "type": "object"
       },
       "IntegrityEventIn": {
@@ -7904,6 +8502,10 @@
           "onboarding": {
             "$ref": "#/components/schemas/OnboardingOut"
           },
+          "person_code": {
+            "title": "Person Code",
+            "type": "string"
+          },
           "points": {
             "anyOf": [
               {
@@ -7950,6 +8552,7 @@
         },
         "required": [
           "id",
+          "person_code",
           "roles",
           "onboarding"
         ],
@@ -18038,121 +18641,6 @@
         "title": "StudentDashboardOut",
         "type": "object"
       },
-      "SubmissionOut": {
-        "properties": {
-          "evidence": {
-            "additionalProperties": true,
-            "title": "Evidence",
-            "type": "object"
-          },
-          "feedback": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Feedback"
-          },
-          "files": {
-            "items": {
-              "$ref": "#/components/schemas/FileRefOut"
-            },
-            "title": "Files",
-            "type": "array"
-          },
-          "id": {
-            "format": "uuid",
-            "title": "Id",
-            "type": "string"
-          },
-          "level": {
-            "title": "Level",
-            "type": "integer"
-          },
-          "links": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Links",
-            "type": "array"
-          },
-          "reviewed_at": {
-            "anyOf": [
-              {
-                "format": "date-time",
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reviewed At"
-          },
-          "reviewer": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/PersonOut"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "status": {
-            "enum": [
-              "SUBMITTED",
-              "APPROVED",
-              "CHANGES_REQUESTED"
-            ],
-            "title": "Status",
-            "type": "string"
-          },
-          "status_fa": {
-            "title": "Status Fa",
-            "type": "string"
-          },
-          "submitted_at": {
-            "format": "date-time",
-            "title": "Submitted At",
-            "type": "string"
-          },
-          "summary": {
-            "title": "Summary",
-            "type": "string"
-          },
-          "topic_title": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Topic Title"
-          },
-          "version": {
-            "title": "Version",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "id",
-          "level",
-          "version",
-          "status",
-          "status_fa",
-          "summary",
-          "links",
-          "evidence",
-          "submitted_at"
-        ],
-        "title": "SubmissionOut",
-        "type": "object"
-      },
       "SubmissionReviewIn": {
         "additionalProperties": false,
         "properties": {
@@ -21936,6 +22424,35 @@
         "title": "LevelOut",
         "type": "object"
       },
+      "silp__schemas__intake__SubmissionOut": {
+        "properties": {
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "person_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Code"
+          },
+          "tracking_code": {
+            "title": "Tracking Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tracking_code",
+          "message"
+        ],
+        "title": "SubmissionOut",
+        "type": "object"
+      },
       "silp__schemas__quiz__SubmitIn": {
         "properties": {
           "confirm_unanswered": {
@@ -22056,7 +22573,7 @@
           },
           "submissions": {
             "items": {
-              "$ref": "#/components/schemas/SubmissionOut"
+              "$ref": "#/components/schemas/silp__schemas__research__SubmissionOut"
             },
             "title": "Submissions",
             "type": "array"
@@ -22091,6 +22608,121 @@
           "min_attachments"
         ],
         "title": "LevelOut",
+        "type": "object"
+      },
+      "silp__schemas__research__SubmissionOut": {
+        "properties": {
+          "evidence": {
+            "additionalProperties": true,
+            "title": "Evidence",
+            "type": "object"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/FileRefOut"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "links": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PersonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "SUBMITTED",
+              "APPROVED",
+              "CHANGES_REQUESTED"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_fa": {
+            "title": "Status Fa",
+            "type": "string"
+          },
+          "submitted_at": {
+            "format": "date-time",
+            "title": "Submitted At",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "topic_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic Title"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "level",
+          "version",
+          "status",
+          "status_fa",
+          "summary",
+          "links",
+          "evidence",
+          "submitted_at"
+        ],
+        "title": "SubmissionOut",
         "type": "object"
       },
       "silp__schemas__research__SubmitIn": {
@@ -33678,6 +34310,298 @@
         ]
       }
     },
+    "/api/v1/public/collaboration": {
+      "post": {
+        "operationId": "submit_collaboration_api_v1_public_collaboration_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CollaborationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/silp__schemas__intake__SubmissionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "summary": "درخواست همکاری",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/content": {
+      "get": {
+        "operationId": "list_content_api_v1_public_content_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Z_]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "topic",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Topic"
+            }
+          },
+          {
+            "in": "query",
+            "name": "course",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Course"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "minLength": 2,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 10000,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentListOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "فهرست محتوای منتشرشده",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/content/{slug}": {
+      "get": {
+        "operationId": "get_content_api_v1_public_content__slug__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Slug",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "یک محتوا",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/intake": {
+      "post": {
+        "operationId": "submit_intake_api_v1_public_intake_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/silp__schemas__intake__SubmissionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "summary": "ثبت مسئله یا نیاز",
+        "tags": [
+          "public"
+        ]
+      }
+    },
     "/api/v1/public/stats": {
       "get": {
         "operationId": "public_stats_api_v1_public_stats_get",
@@ -35050,7 +35974,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionOut"
+                  "$ref": "#/components/schemas/silp__schemas__research__SubmissionOut"
                 }
               }
             },
@@ -35712,7 +36636,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SubmissionOut"
+                  "$ref": "#/components/schemas/silp__schemas__research__SubmissionOut"
                 }
               }
             },

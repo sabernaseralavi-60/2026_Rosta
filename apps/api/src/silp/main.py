@@ -28,10 +28,12 @@ from silp.routers.v1 import (
     auth,
     certificates,
     city,
+    content,
     courses,
     files,
     gamification,
     ideas,
+    intake,
     me,
     notifications,
     projects,
@@ -172,6 +174,8 @@ def _register_routers(app: FastAPI) -> None:
     # ── عمومی، گواهی، مدیریت و جستجو (M7 بخش د) ────────────────────────
     v1.include_router(public.router)
     v1.include_router(public.profiles_router)
+    v1.include_router(content.router)
+    v1.include_router(intake.router)
     v1.include_router(certificates.public_router)
     v1.include_router(certificates.me_router)
     v1.include_router(certificates.admin_router)

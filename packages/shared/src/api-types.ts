@@ -2639,6 +2639,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/collaboration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** درخواست همکاری */
+        post: operations["submit_collaboration_api_v1_public_collaboration_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** فهرست محتوای منتشرشده */
+        get: operations["list_content_api_v1_public_content_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/content/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** یک محتوا */
+        get: operations["get_content_api_v1_public_content__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/intake": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ثبت مسئله یا نیاز */
+        post: operations["submit_intake_api_v1_public_intake_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/stats": {
         parameters: {
             query?: never;
@@ -6136,6 +6204,41 @@ export interface components {
             /** Verdicts */
             verdicts: components["schemas"]["CityOptionOut"][];
         };
+        /** CollaborationIn */
+        CollaborationIn: {
+            /** Email */
+            email?: string | null;
+            /** Experience */
+            experience?: string | null;
+            /** Hours Per Week */
+            hours_per_week?: ("LT2" | "2_5" | "5_10" | "GT10") | null;
+            /** Interests */
+            interests?: string | null;
+            /** Intro */
+            intro: string;
+            /** Mobile */
+            mobile?: string | null;
+            /** Name */
+            name: string;
+            /** Organization */
+            organization?: string | null;
+            /** Portfolio Url */
+            portfolio_url?: string | null;
+            /** Skills */
+            skills?: string | null;
+            /** Specialty */
+            specialty?: string | null;
+            /**
+             * Ways
+             * @default []
+             */
+            ways: string[];
+            /**
+             * Website
+             * @default
+             */
+            website: string;
+        };
         /** CommentIn */
         CommentIn: {
             /** Body */
@@ -6209,6 +6312,79 @@ export interface components {
             project: components["schemas"]["ProjectBriefOut"];
             /** Seats */
             seats: number;
+        };
+        /** ContentCardOut */
+        ContentCardOut: {
+            /** Access */
+            access: string;
+            /** Access Fa */
+            access_fa: string;
+            /** Cover */
+            cover: string | null;
+            /** Kind */
+            kind: string;
+            /** Kind Fa */
+            kind_fa: string;
+            /** Locked */
+            locked: boolean;
+            /** Published At */
+            published_at: string | null;
+            /** Reading Minutes */
+            reading_minutes: number;
+            /** Slug */
+            slug: string;
+            /** Summary */
+            summary: string;
+            /** Title Fa */
+            title_fa: string;
+            /** Topics */
+            topics: string[];
+        };
+        /** ContentDetailOut */
+        ContentDetailOut: {
+            /** Access */
+            access: string;
+            /** Access Fa */
+            access_fa: string;
+            /** Body Md */
+            body_md: string | null;
+            /** Course Slug */
+            course_slug: string | null;
+            /** Cover */
+            cover: string | null;
+            /** Kind */
+            kind: string;
+            /** Kind Fa */
+            kind_fa: string;
+            /** Locked */
+            locked: boolean;
+            /** Published At */
+            published_at: string | null;
+            /** Reading Minutes */
+            reading_minutes: number;
+            /** Related */
+            related: components["schemas"]["ContentCardOut"][];
+            /** Skills */
+            skills: string[];
+            /** Slug */
+            slug: string;
+            /** Summary */
+            summary: string;
+            /** Title Fa */
+            title_fa: string;
+            /** Topics */
+            topics: string[];
+        };
+        /** ContentListOut */
+        ContentListOut: {
+            /** Items */
+            items: components["schemas"]["ContentCardOut"][];
+            /** Kinds */
+            kinds: components["schemas"]["FacetOut"][];
+            /** Topics */
+            topics: components["schemas"]["FacetOut"][];
+            /** Total */
+            total: number;
         };
         /** ContributionDimensionOut */
         ContributionDimensionOut: {
@@ -6688,6 +6864,15 @@ export interface components {
             /** Min Value */
             min_value?: number | null;
         };
+        /** FacetOut */
+        FacetOut: {
+            /** Count */
+            count: number;
+            /** Label */
+            label: string;
+            /** Value */
+            value: string;
+        };
         /** FileOut */
         FileOut: {
             /** Content Type */
@@ -7099,6 +7284,46 @@ export interface components {
             name: string | null;
             /** Username */
             username: string | null;
+        };
+        /** IntakeIn */
+        IntakeIn: {
+            /** Budget */
+            budget?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Expected Result */
+            expected_result?: string | null;
+            /** Has Data */
+            has_data?: ("YES" | "NO" | "UNSURE") | null;
+            /** Mobile */
+            mobile?: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Need Type
+             * @enum {string}
+             */
+            need_type: "Commercial" | "Research" | "Education" | "Consulting" | "Collaboration" | "Other";
+            /** Notes */
+            notes?: string | null;
+            /** Organization */
+            organization?: string | null;
+            /** Sector */
+            sector?: string | null;
+            /**
+             * Services
+             * @default []
+             */
+            services: ("Website / Web App" | "AI" | "Data Analysis" | "Automation" | "Content" | "Research" | "Engineering" | "GIS" | "Consulting" | "Training" | "Other")[];
+            /** Summary */
+            summary: string;
+            /** Timeline */
+            timeline?: string | null;
+            /**
+             * Website
+             * @default
+             */
+            website: string;
         };
         /** IntegrityEventIn */
         IntegrityEventIn: {
@@ -7566,6 +7791,8 @@ export interface components {
              */
             mobile_verified: boolean;
             onboarding: components["schemas"]["OnboardingOut"];
+            /** Person Code */
+            person_code: string;
             points?: components["schemas"]["MePointsOut"] | null;
             profile?: components["schemas"]["ProfileOut"] | null;
             /** Roles */
@@ -11142,47 +11369,6 @@ export interface components {
             /** Upcoming */
             upcoming: components["schemas"]["UpcomingEventOut"][];
         };
-        /** SubmissionOut */
-        SubmissionOut: {
-            /** Evidence */
-            evidence: {
-                [key: string]: unknown;
-            };
-            /** Feedback */
-            feedback?: string | null;
-            /** Files */
-            files?: components["schemas"]["FileRefOut"][];
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Level */
-            level: number;
-            /** Links */
-            links: string[];
-            /** Reviewed At */
-            reviewed_at?: string | null;
-            reviewer?: components["schemas"]["PersonOut"] | null;
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "SUBMITTED" | "APPROVED" | "CHANGES_REQUESTED";
-            /** Status Fa */
-            status_fa: string;
-            /**
-             * Submitted At
-             * Format: date-time
-             */
-            submitted_at: string;
-            /** Summary */
-            summary: string;
-            /** Topic Title */
-            topic_title?: string | null;
-            /** Version */
-            version: number;
-        };
         /** SubmissionReviewIn */
         SubmissionReviewIn: {
             /**
@@ -12593,6 +12779,15 @@ export interface components {
             /** To Next */
             to_next: string;
         };
+        /** SubmissionOut */
+        silp__schemas__intake__SubmissionOut: {
+            /** Message */
+            message: string;
+            /** Person Code */
+            person_code?: string | null;
+            /** Tracking Code */
+            tracking_code: string;
+        };
         /** SubmitIn */
         silp__schemas__quiz__SubmitIn: {
             /**
@@ -12632,13 +12827,54 @@ export interface components {
             /** Steps */
             steps: string[];
             /** Submissions */
-            submissions?: components["schemas"]["SubmissionOut"][];
+            submissions?: components["schemas"]["silp__schemas__research__SubmissionOut"][];
             /** Template Columns */
             template_columns: string[];
             /** Template Title Fa */
             template_title_fa: string;
             /** Title Fa */
             title_fa: string;
+        };
+        /** SubmissionOut */
+        silp__schemas__research__SubmissionOut: {
+            /** Evidence */
+            evidence: {
+                [key: string]: unknown;
+            };
+            /** Feedback */
+            feedback?: string | null;
+            /** Files */
+            files?: components["schemas"]["FileRefOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Level */
+            level: number;
+            /** Links */
+            links: string[];
+            /** Reviewed At */
+            reviewed_at?: string | null;
+            reviewer?: components["schemas"]["PersonOut"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "SUBMITTED" | "APPROVED" | "CHANGES_REQUESTED";
+            /** Status Fa */
+            status_fa: string;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            /** Summary */
+            summary: string;
+            /** Topic Title */
+            topic_title?: string | null;
+            /** Version */
+            version: number;
         };
         /** SubmitIn */
         silp__schemas__research__SubmitIn: {
@@ -20080,6 +20316,166 @@ export interface operations {
             };
         };
     };
+    submit_collaboration_api_v1_public_collaboration_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CollaborationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["silp__schemas__intake__SubmissionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_content_api_v1_public_content_get: {
+        parameters: {
+            query?: {
+                kind?: string | null;
+                topic?: string | null;
+                course?: string | null;
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentListOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_content_api_v1_public_content__slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentDetailOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_intake_api_v1_public_intake_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IntakeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["silp__schemas__intake__SubmissionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     public_stats_api_v1_public_stats_get: {
         parameters: {
             query?: never;
@@ -21048,7 +21444,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SubmissionOut"];
+                    "application/json": components["schemas"]["silp__schemas__research__SubmissionOut"];
                 };
             };
             /** @description Forbidden */
@@ -21437,7 +21833,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SubmissionOut"];
+                    "application/json": components["schemas"]["silp__schemas__research__SubmissionOut"];
                 };
             };
             /** @description سطح قفل، تأییدشده یا در انتظار بررسی */
