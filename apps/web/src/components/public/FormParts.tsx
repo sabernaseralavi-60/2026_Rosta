@@ -161,6 +161,12 @@ export function SuccessCard({
           ورود و ثبت‌نام
         </Link>
         <Link
+          href="/track"
+          className="inline-flex h-11 items-center rounded-[var(--radius-md)] border border-[var(--border-default)] px-6 text-[15px] font-medium hover:bg-[var(--bg-sunken)]"
+        >
+          پیگیری با کد
+        </Link>
+        <Link
           href="/"
           className="inline-flex h-11 items-center rounded-[var(--radius-md)] border border-[var(--border-default)] px-6 text-[15px] font-medium hover:bg-[var(--bg-sunken)]"
         >

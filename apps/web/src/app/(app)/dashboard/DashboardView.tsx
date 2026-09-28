@@ -94,6 +94,12 @@ export function DashboardView() {
             >
               درآمد و سهم من
             </Link>
+            <Link
+              href="/me/requests"
+              className="text-[13.5px] font-medium text-[var(--fg-brand)] hover:underline"
+            >
+              درخواست‌های من
+            </Link>
           </div>
         </div>
         <Card className="flex flex-col gap-5">

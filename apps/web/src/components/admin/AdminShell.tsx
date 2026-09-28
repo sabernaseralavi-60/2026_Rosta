@@ -25,6 +25,8 @@ const COURSES = ['ADMIN', 'COORDINATOR'];
 
 const LINKS: { href: string; label: string; roles: string[] }[] = [
   { href: '/admin', label: 'شاخص‌های کلان', roles: OPERATIONS },
+  { href: '/admin/owner', label: 'داشبورد مالک', roles: ADMIN_ONLY },
+  { href: '/admin/inbox', label: 'صندوق درخواست‌ها', roles: ADMIN_ONLY },
   { href: '/admin/courses', label: 'درس‌ها و ارائه‌ها', roles: COURSES },
   { href: '/admin/users', label: 'کاربران و نقش‌ها', roles: OPERATIONS },
   { href: '/admin/audit', label: 'لاگ حسابرسی', roles: OPERATIONS },

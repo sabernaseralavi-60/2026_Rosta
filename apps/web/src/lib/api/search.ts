@@ -93,6 +93,12 @@ export const COMMANDS: Command[] = [
     href: '/me/revenue',
     keywords: 'درآمد سهم فروش پول ریال کارآفرینی',
   },
+  {
+    id: 'my-requests',
+    label: 'درخواست‌های من',
+    href: '/me/requests',
+    keywords: 'مسئله نیاز همکاری پیگیری وضعیت درخواست',
+  },
   { id: 'leaderboard', label: 'رتبه‌بندی', href: '/leaderboard', keywords: 'رتبه جدول' },
   { id: 'settings', label: 'تنظیمات اعلان', href: '/me/settings', keywords: 'پیامک ایمیل تلگرام' },
   {
