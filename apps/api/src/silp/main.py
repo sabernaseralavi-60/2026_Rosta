@@ -33,6 +33,7 @@ from silp.routers.v1 import (
     files,
     gamification,
     ideas,
+    inbox,
     intake,
     me,
     notifications,
@@ -177,6 +178,9 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(public.profiles_router)
     v1.include_router(content.router)
     v1.include_router(intake.router)
+    v1.include_router(inbox.admin_router)
+    v1.include_router(inbox.me_router)
+    v1.include_router(inbox.public_router)
     v1.include_router(vault.router)
     v1.include_router(certificates.public_router)
     v1.include_router(certificates.me_router)

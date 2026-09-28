@@ -148,6 +148,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/intake": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** صندوق درخواست‌های ورودی */
+        get: operations["list_intake_api_v1_admin_intake_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/intake/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** یک درخواست */
+        get: operations["get_intake_api_v1_admin_intake__request_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** رسیدگی */
+        patch: operations["update_intake_api_v1_admin_intake__request_id__patch"];
+        trace?: never;
+    };
     "/api/v1/admin/message-templates": {
         parameters: {
             query?: never;
@@ -297,6 +332,23 @@ export interface paths {
         put?: never;
         /** تلاش دوباره */
         post: operations["retry_message_api_v1_admin_outbox__message_id__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/owner/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** داشبورد مالک */
+        get: operations["overview_api_v1_admin_owner_overview_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1487,6 +1539,23 @@ export interface paths {
          * @description `PATCH` جزئی — فیلدهای نفرستاده دست‌نخورده می‌مانند (§5.3).
          */
         patch: operations["update_profile_api_v1_me_profile_patch"];
+        trace?: never;
+    };
+    "/api/v1/me/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** درخواست‌های من */
+        get: operations["my_requests_api_v1_me_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/me/revenue": {
@@ -2738,6 +2807,23 @@ export interface paths {
         get: operations["public_stories_api_v1_public_stories_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/track": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** پیگیری با کد و راه تماس */
+        post: operations["track_api_v1_public_track_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6863,6 +6949,28 @@ export interface components {
         ErrorResponse: {
             error: components["schemas"]["ErrorDetail"];
         };
+        /**
+         * EventOut
+         * @description یک قدم رسیدگی. مشتری هم همین را می‌بیند؛ پس هیچ یادداشت خصوصی‌ای اینجا نیست.
+         */
+        EventOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** From Status */
+            from_status: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Public Note */
+            public_note: string | null;
+            /** To Status */
+            to_status: string;
+        };
         /** EvidenceFieldOut */
         EvidenceFieldOut: {
             /** Hint Fa */
@@ -7285,6 +7393,121 @@ export interface components {
             user_name: string | null;
             /** Username */
             username: string | null;
+        };
+        /** InboxDetailOut */
+        InboxDetailOut: {
+            /** Contact Email */
+            contact_email: string | null;
+            /** Contact Mobile */
+            contact_mobile: string | null;
+            /** Contact Name */
+            contact_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Events */
+            events: components["schemas"]["EventOut"][];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Need Type */
+            need_type: string | null;
+            /** Organization */
+            organization: string | null;
+            /** Owner Note */
+            owner_note: string | null;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /** Person Code */
+            person_code: string | null;
+            /** Services */
+            services: string[];
+            /** Stale */
+            stale: boolean;
+            /** Status */
+            status: string;
+            /** Summary */
+            summary: string;
+            /** Tracking Code */
+            tracking_code: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** InboxItemOut */
+        InboxItemOut: {
+            /** Contact Email */
+            contact_email: string | null;
+            /** Contact Mobile */
+            contact_mobile: string | null;
+            /** Contact Name */
+            contact_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Need Type */
+            need_type: string | null;
+            /** Organization */
+            organization: string | null;
+            /** Person Code */
+            person_code: string | null;
+            /** Services */
+            services: string[];
+            /** Stale */
+            stale: boolean;
+            /** Status */
+            status: string;
+            /** Summary */
+            summary: string;
+            /** Tracking Code */
+            tracking_code: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** InboxPageOut */
+        InboxPageOut: {
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /** Items */
+            items: components["schemas"]["InboxItemOut"][];
+            /** Total */
+            total: number;
+        };
+        /**
+         * InboxUpdateIn
+         * @description تغییر وضعیت و/یا یادداشت‌ها. رشتهٔ خالی یادداشت را پاک می‌کند؛ نبودن کلید = دست‌نخورده.
+         */
+        InboxUpdateIn: {
+            /** Owner Note */
+            owner_note?: string | null;
+            /** Public Note */
+            public_note?: string | null;
+            /** Status */
+            status?: ("NEW" | "IN_REVIEW" | "ACCEPTED" | "DECLINED" | "ARCHIVED") | null;
         };
         /** InstructorCandidateOut */
         InstructorCandidateOut: {
@@ -8155,6 +8378,33 @@ export interface components {
             evaluatee_id: string;
             /** Reliability */
             reliability?: number | null;
+        };
+        /** MyRequestOut */
+        MyRequestOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Events */
+            events: components["schemas"]["EventOut"][];
+            /** Kind */
+            kind: string;
+            /** Need Type */
+            need_type: string | null;
+            /** Services */
+            services: string[];
+            /** Status */
+            status: string;
+            /** Summary */
+            summary: string;
+            /** Tracking Code */
+            tracking_code: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** MyStandingOut */
         MyStandingOut: {
@@ -9088,6 +9338,42 @@ export interface components {
             verified_quartile?: ("Q1" | "Q2" | "Q3" | "Q4" | "NA") | null;
             /** Verified Stage */
             verified_stage?: ("SUBMITTED" | "ACCEPTED" | "PUBLISHED") | null;
+        };
+        /**
+         * OverviewOut
+         * @description داشبورد مالک — فقط آنچه از داده‌های واقعی می‌آید؛ آمار ساختگی نیست.
+         */
+        OverviewOut: {
+            /** Clients Accepted */
+            clients_accepted: number;
+            /** Collaborators Accepted */
+            collaborators_accepted: number;
+            /** Content */
+            content: {
+                [key: string]: number;
+            };
+            /** Courses Total */
+            courses_total: number;
+            /** Enrollments Active */
+            enrollments_active: number;
+            /** Follow Up */
+            follow_up: components["schemas"]["InboxItemOut"][];
+            /** Intake */
+            intake: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** New 7D */
+            new_7d: number;
+            /** Oldest New Days */
+            oldest_new_days: number | null;
+            /** Stale */
+            stale: number;
+            /** Students Active 7D */
+            students_active_7d: number;
+            /** Students Total */
+            students_total: number;
         };
         /** Page[CourseSummaryOut] */
         Page_CourseSummaryOut_: {
@@ -10639,6 +10925,42 @@ export interface components {
             thread_id: string;
             /** Voted By Me */
             voted_by_me: boolean;
+        };
+        /**
+         * RequestTrackIn
+         * @description پیگیری بی‌ورود: کد **و** راه تماسی که هنگام ثبت داده شد.
+         */
+        RequestTrackIn: {
+            /** Contact */
+            contact: string;
+            /** Tracking Code */
+            tracking_code: string;
+        };
+        /**
+         * RequestTrackOut
+         * @description مشتریِ بی‌ورود هیچ متنی از درخواستش را پس نمی‌گیرد: کد و راه تماس شاید لو رفته باشد.
+         */
+        RequestTrackOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Events */
+            events: components["schemas"]["EventOut"][];
+            /** Kind */
+            kind: string;
+            /** Need Type */
+            need_type: string | null;
+            /** Status */
+            status: string;
+            /** Tracking Code */
+            tracking_code: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** ResolveIn */
         ResolveIn: {
@@ -13471,6 +13793,188 @@ export interface operations {
             };
         };
     };
+    list_intake_api_v1_admin_intake_get: {
+        parameters: {
+            query?: {
+                kind?: string | null;
+                status?: string | null;
+                q?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxPageOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_intake_api_v1_admin_intake__request_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxDetailOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_intake_api_v1_admin_intake__request_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InboxUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InboxDetailOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     templates_api_v1_admin_message_templates_get: {
         parameters: {
             query?: never;
@@ -14001,6 +14505,53 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overview_api_v1_admin_owner_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -17088,6 +17639,53 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_requests_api_v1_me_requests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyRequestOut"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -20581,6 +21179,66 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StoryOut"][];
+                };
+            };
+        };
+    };
+    track_api_v1_public_track_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestTrackIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestTrackOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

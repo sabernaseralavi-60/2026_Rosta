@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 from typing import Any
 
-from sqlalchemy import CheckConstraint, ForeignKey, Index, Text, text
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Text, text
 from sqlalchemy.dialects.postgresql import ARRAY, CITEXT, JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -46,6 +47,8 @@ class IntakeRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     payload: Mapped[dict[str, Any]] = mapped_column(
         JSONB, nullable=False, server_default=text("'{}'::jsonb")
     )
+    #: یادداشت خصوصی مالک؛ به مشتری نمی‌رسد (ADR-0032).
+    owner_note: Mapped[str | None] = mapped_column(Text)
 
     __table_args__ = (
         CheckConstraint(_in_list("kind", INTAKE_KINDS), name="kind_valid"),
@@ -57,7 +60,38 @@ class IntakeRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             r"contact_mobile IS NULL OR contact_mobile ~ '^09\d{9}$'", name="mobile_format"
         ),
         CheckConstraint("length(summary) BETWEEN 5 AND 4000", name="summary_length"),
+        CheckConstraint(
+            "owner_note IS NULL OR length(owner_note) <= 4000", name="owner_note_length"
+        ),
         Index("idx_intake_requests_inbox", "kind", "status", text("created_at DESC")),
         Index("idx_intake_requests_user", "user_id"),
         Index("idx_intake_requests_mobile", "contact_mobile"),
+    )
+
+
+class IntakeEvent(UUIDPrimaryKeyMixin, Base):
+    """یک قدم در تاریخچهٔ رسیدگی. `public_note` تنها بخشی است که مشتری می‌بیند."""
+
+    __tablename__ = "intake_events"
+
+    request_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("intake_requests.id", ondelete="CASCADE"), nullable=False
+    )
+    actor_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
+    from_status: Mapped[str | None] = mapped_column(Text)
+    to_status: Mapped[str] = mapped_column(Text, nullable=False)
+    public_note: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=text("now()")
+    )
+
+    __table_args__ = (
+        CheckConstraint(_in_list("to_status", INTAKE_STATUSES), name="to_status_valid"),
+        CheckConstraint(
+            "public_note IS NULL OR length(public_note) BETWEEN 1 AND 1000",
+            name="public_note_length",
+        ),
+        Index("idx_intake_events_request", "request_id", "id"),
     )

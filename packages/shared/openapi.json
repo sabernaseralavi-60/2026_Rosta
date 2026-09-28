@@ -5936,6 +5936,56 @@
         "title": "ErrorResponse",
         "type": "object"
       },
+      "EventOut": {
+        "description": "یک قدم رسیدگی. مشتری هم همین را می‌بیند؛ پس هیچ یادداشت خصوصی‌ای اینجا نیست.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "from_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Status"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "public_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Note"
+          },
+          "to_status": {
+            "title": "To Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "from_status",
+          "to_status",
+          "public_note",
+          "created_at"
+        ],
+        "title": "EventOut",
+        "type": "object"
+      },
       "EvidenceFieldOut": {
         "properties": {
           "hint_fa": {
@@ -7052,6 +7102,358 @@
           "roles"
         ],
         "title": "ImpersonationOut",
+        "type": "object"
+      },
+      "InboxDetailOut": {
+        "properties": {
+          "contact_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "contact_mobile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Mobile"
+          },
+          "contact_name": {
+            "title": "Contact Name",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "need_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Need Type"
+          },
+          "organization": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization"
+          },
+          "owner_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Note"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "person_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Code"
+          },
+          "services": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Services",
+            "type": "array"
+          },
+          "stale": {
+            "title": "Stale",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "tracking_code": {
+            "title": "Tracking Code",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "tracking_code",
+          "status",
+          "contact_name",
+          "contact_mobile",
+          "contact_email",
+          "organization",
+          "need_type",
+          "services",
+          "summary",
+          "person_code",
+          "created_at",
+          "updated_at",
+          "stale",
+          "payload",
+          "owner_note",
+          "events"
+        ],
+        "title": "InboxDetailOut",
+        "type": "object"
+      },
+      "InboxItemOut": {
+        "properties": {
+          "contact_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "contact_mobile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Mobile"
+          },
+          "contact_name": {
+            "title": "Contact Name",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "need_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Need Type"
+          },
+          "organization": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization"
+          },
+          "person_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Code"
+          },
+          "services": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Services",
+            "type": "array"
+          },
+          "stale": {
+            "title": "Stale",
+            "type": "boolean"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "tracking_code": {
+            "title": "Tracking Code",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "tracking_code",
+          "status",
+          "contact_name",
+          "contact_mobile",
+          "contact_email",
+          "organization",
+          "need_type",
+          "services",
+          "summary",
+          "person_code",
+          "created_at",
+          "updated_at",
+          "stale"
+        ],
+        "title": "InboxItemOut",
+        "type": "object"
+      },
+      "InboxPageOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InboxItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "counts"
+        ],
+        "title": "InboxPageOut",
+        "type": "object"
+      },
+      "InboxUpdateIn": {
+        "description": "تغییر وضعیت و/یا یادداشت‌ها. رشتهٔ خالی یادداشت را پاک می‌کند؛ نبودن کلید = دست‌نخورده.",
+        "properties": {
+          "owner_note": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Note"
+          },
+          "public_note": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Note"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "NEW",
+                  "IN_REVIEW",
+                  "ACCEPTED",
+                  "DECLINED",
+                  "ARCHIVED"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "title": "InboxUpdateIn",
         "type": "object"
       },
       "InstructorCandidateOut": {
@@ -9510,6 +9912,74 @@
           "contribution"
         ],
         "title": "MyPeerRatingOut",
+        "type": "object"
+      },
+      "MyRequestOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "need_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Need Type"
+          },
+          "services": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Services",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "tracking_code": {
+            "title": "Tracking Code",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tracking_code",
+          "kind",
+          "status",
+          "need_type",
+          "services",
+          "summary",
+          "created_at",
+          "updated_at",
+          "events"
+        ],
+        "title": "MyRequestOut",
         "type": "object"
       },
       "MyStandingOut": {
@@ -12163,6 +12633,94 @@
           "owner"
         ],
         "title": "OutputReviewItemOut",
+        "type": "object"
+      },
+      "OverviewOut": {
+        "description": "داشبورد مالک — فقط آنچه از داده‌های واقعی می‌آید؛ آمار ساختگی نیست.",
+        "properties": {
+          "clients_accepted": {
+            "title": "Clients Accepted",
+            "type": "integer"
+          },
+          "collaborators_accepted": {
+            "title": "Collaborators Accepted",
+            "type": "integer"
+          },
+          "content": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Content",
+            "type": "object"
+          },
+          "courses_total": {
+            "title": "Courses Total",
+            "type": "integer"
+          },
+          "enrollments_active": {
+            "title": "Enrollments Active",
+            "type": "integer"
+          },
+          "follow_up": {
+            "items": {
+              "$ref": "#/components/schemas/InboxItemOut"
+            },
+            "title": "Follow Up",
+            "type": "array"
+          },
+          "intake": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "title": "Intake",
+            "type": "object"
+          },
+          "new_7d": {
+            "title": "New 7D",
+            "type": "integer"
+          },
+          "oldest_new_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oldest New Days"
+          },
+          "stale": {
+            "title": "Stale",
+            "type": "integer"
+          },
+          "students_active_7d": {
+            "title": "Students Active 7D",
+            "type": "integer"
+          },
+          "students_total": {
+            "title": "Students Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "intake",
+          "new_7d",
+          "stale",
+          "oldest_new_days",
+          "students_total",
+          "students_active_7d",
+          "enrollments_active",
+          "courses_total",
+          "content",
+          "clients_accepted",
+          "collaborators_accepted",
+          "follow_up"
+        ],
+        "title": "OverviewOut",
         "type": "object"
       },
       "Page_CourseSummaryOut_": {
@@ -16684,6 +17242,84 @@
           "created_at"
         ],
         "title": "ReplyOut",
+        "type": "object"
+      },
+      "RequestTrackIn": {
+        "description": "پیگیری بی‌ورود: کد **و** راه تماسی که هنگام ثبت داده شد.",
+        "properties": {
+          "contact": {
+            "maxLength": 200,
+            "minLength": 5,
+            "title": "Contact",
+            "type": "string"
+          },
+          "tracking_code": {
+            "pattern": "^[QC]-\\d{1,9}$",
+            "title": "Tracking Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tracking_code",
+          "contact"
+        ],
+        "title": "RequestTrackIn",
+        "type": "object"
+      },
+      "RequestTrackOut": {
+        "description": "مشتریِ بی‌ورود هیچ متنی از درخواستش را پس نمی‌گیرد: کد و راه تماس شاید لو رفته باشد.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "need_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Need Type"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tracking_code": {
+            "title": "Tracking Code",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tracking_code",
+          "kind",
+          "status",
+          "need_type",
+          "created_at",
+          "updated_at",
+          "events"
+        ],
+        "title": "RequestTrackOut",
         "type": "object"
       },
       "ResolveIn": {
@@ -23886,6 +24522,314 @@
         ]
       }
     },
+    "/api/v1/admin/intake": {
+      "get": {
+        "operationId": "list_intake_api_v1_admin_intake_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(INTAKE|COLLABORATION)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(NEW|IN_REVIEW|ACCEPTED|DECLINED|ARCHIVED)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "minLength": 2,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 100000,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxPageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "صندوق درخواست‌های ورودی",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/intake/{request_id}": {
+      "get": {
+        "operationId": "get_intake_api_v1_admin_intake__request_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "یک درخواست",
+        "tags": [
+          "admin"
+        ]
+      },
+      "patch": {
+        "operationId": "update_intake_api_v1_admin_intake__request_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxUpdateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboxDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "رسیدگی",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/v1/admin/message-templates": {
       "get": {
         "operationId": "templates_api_v1_admin_message_templates_get",
@@ -24728,6 +25672,62 @@
           }
         ],
         "summary": "تلاش دوباره",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/owner/overview": {
+      "get": {
+        "operationId": "overview_api_v1_admin_owner_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "داشبورد مالک",
         "tags": [
           "admin"
         ]
@@ -29381,6 +30381,66 @@
           }
         ],
         "summary": "به‌روزرسانی اطلاعات پایه",
+        "tags": [
+          "me"
+        ]
+      }
+    },
+    "/api/v1/me/requests": {
+      "get": {
+        "operationId": "my_requests_api_v1_me_requests_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MyRequestOut"
+                  },
+                  "title": "Response My Requests Api V1 Me Requests Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "درخواست‌های من",
         "tags": [
           "me"
         ]
@@ -34771,6 +35831,77 @@
           }
         },
         "summary": "داستان‌های واقعی صفحهٔ اصلی",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/track": {
+      "post": {
+        "operationId": "track_api_v1_public_track_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestTrackIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestTrackOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "پیگیری با کد و راه تماس",
         "tags": [
           "public"
         ]
