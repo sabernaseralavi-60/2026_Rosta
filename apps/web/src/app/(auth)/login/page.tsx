@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { LoginForm } from './LoginForm';
 
@@ -25,6 +26,13 @@ export default function LoginPage() {
       </div>
 
       <LoginForm />
+
+      <p className="text-center text-[13.5px] text-[var(--fg-secondary)]">
+        دانشجوی یکی از درس‌هایی؟{' '}
+        <Link href="/student" className="underline">
+          با شمارهٔ دانشجویی فعال کن یا با رمز وارد شو
+        </Link>
+      </p>
     </section>
   );
 }

@@ -52,6 +52,7 @@ from silp.services.progress_service import ProgressService
 from silp.services.project_service import ProjectService
 from silp.services.quiz_service import QuizService
 from silp.services.reflection_service import ReflectionService
+from silp.services.roster_service import RosterService
 from silp.services.subscription_service import SubscriptionService
 from silp.services.teaching_service import TeachingService
 from silp.services.token_service import TokenService
@@ -147,6 +148,10 @@ def get_enrollment_service(session: SessionDep) -> EnrollmentService:
     return EnrollmentService(session)
 
 
+def get_roster_service(session: SessionDep, settings: SettingsDep) -> RosterService:
+    return RosterService(session, settings)
+
+
 def get_progress_service(session: SessionDep) -> ProgressService:
     return ProgressService(session)
 
@@ -198,6 +203,7 @@ DeliveryServiceDep = Annotated[DeliveryService, Depends(get_delivery_service)]
 WorkspaceServiceDep = Annotated[WorkspaceService, Depends(get_workspace_service)]
 CourseServiceDep = Annotated[CourseService, Depends(get_course_service)]
 EnrollmentServiceDep = Annotated[EnrollmentService, Depends(get_enrollment_service)]
+RosterServiceDep = Annotated[RosterService, Depends(get_roster_service)]
 EntitlementServiceDep = Annotated[EntitlementService, Depends(get_entitlement_service)]
 ProgressServiceDep = Annotated[ProgressService, Depends(get_progress_service)]
 TeachingServiceDep = Annotated[TeachingService, Depends(get_teaching_service)]

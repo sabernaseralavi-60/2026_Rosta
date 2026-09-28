@@ -166,6 +166,21 @@ class AuthService:
             ip_address=ip_address,
         )
 
+    async def issue_login(
+        self,
+        user: User,
+        *,
+        is_new_user: bool,
+        user_agent: str | None = None,
+        ip_address: str | None = None,
+    ) -> AuthenticatedUser:
+        """صدور توکن برای کاربری که هویتش را مسیر دیگری (فهرست درس) ثابت کرده است."""
+        if user.status != "ACTIVE":
+            raise AccountSuspended
+        return await self._complete_login(
+            user, is_new_user=is_new_user, user_agent=user_agent, ip_address=ip_address
+        )
+
     # ── داخلی ──────────────────────────────────────────────────────────
     async def _find_by_identifier(self, normalized: str) -> User | None:
         column = User.mobile if normalized.startswith("09") else User.email

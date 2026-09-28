@@ -430,6 +430,41 @@ class OTPRateLimited(RateLimited):
     message = "برای این شماره به‌تازگی کد فرستاده شده است. کمی صبر کنید."
 
 
+# ── فهرست دانشجویان درس — ADR-0035 ─────────────────────────────────────
+class RosterNotFound(NotFound):
+    """پیام یکسان برای «شماره در فهرست نیست» و «قالب شماره نادرست است»."""
+
+    code = "ROSTER_NOT_FOUND"
+    message = "این شمارهٔ دانشجویی در فهرست درس‌ها پیدا نشد. اگر مطمئنید درست است، به استاد بگویید."
+
+
+class RosterClaimClosed(Conflict):
+    code = "ROSTER_CLAIM_CLOSED"
+    message = "این درخواست منقضی شده یا بسته است. از اول شروع کنید."
+
+
+class RosterNoEmail(Conflict):
+    code = "ROSTER_NO_EMAIL"
+    message = "برای شما ایمیلی در فهرست ثبت نشده. به استاد بگویید ایمیل شما را به فهرست اضافه کند."
+
+
+class RosterAccountConflict(Conflict):
+    code = "ROSTER_ACCOUNT_CONFLICT"
+    message = "این موبایل یا ایمیل برای حساب دیگری ثبت شده است. با همان حساب وارد شوید."
+
+
+class WeakPassword(ValidationFailed):
+    code = "WEAK_PASSWORD"
+    message = "رمز پذیرفته نشد."
+
+
+class EmailUnavailable(SILPError):
+    status_code = 503
+    code = "EMAIL_UNAVAILABLE"
+    message = "ارسال ایمیل الان ممکن نیست. کمی بعد دوباره تلاش کنید."
+    log_level = "warning"
+
+
 # ── ۵۰۰ ────────────────────────────────────────────────────────────────
 class InternalError(SILPError):
     status_code = 500

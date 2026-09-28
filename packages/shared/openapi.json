@@ -18393,6 +18393,132 @@
         "title": "RoleOptionOut",
         "type": "object"
       },
+      "RosterCompleteIn": {
+        "properties": {
+          "claim_id": {
+            "format": "uuid",
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "code": {
+            "maxLength": 10,
+            "minLength": 4,
+            "title": "Code",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "code",
+          "password"
+        ],
+        "title": "RosterCompleteIn",
+        "type": "object"
+      },
+      "RosterCompleteOut": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "courses": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Courses",
+            "type": "array"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "is_new_user": {
+            "title": "Is New User",
+            "type": "boolean"
+          },
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          },
+          "token_type": {
+            "default": "Bearer",
+            "title": "Token Type",
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/AuthUserOut"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "expires_in",
+          "user",
+          "is_new_user",
+          "courses"
+        ],
+        "title": "RosterCompleteOut",
+        "type": "object"
+      },
+      "RosterConfirmIn": {
+        "properties": {
+          "accept": {
+            "title": "Accept",
+            "type": "boolean"
+          },
+          "claim_id": {
+            "format": "uuid",
+            "title": "Claim Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "accept"
+        ],
+        "title": "RosterConfirmIn",
+        "type": "object"
+      },
+      "RosterConfirmOut": {
+        "properties": {
+          "cancelled": {
+            "title": "Cancelled",
+            "type": "boolean"
+          },
+          "expires_in": {
+            "default": 0,
+            "title": "Expires In",
+            "type": "integer"
+          },
+          "masked_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Masked Email"
+          },
+          "resend_after": {
+            "default": 0,
+            "title": "Resend After",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cancelled"
+        ],
+        "title": "RosterConfirmOut",
+        "type": "object"
+      },
       "RosterEntryOut": {
         "properties": {
           "enrolled_at": {
@@ -18456,6 +18582,52 @@
           "enrolled_at"
         ],
         "title": "RosterEntryOut",
+        "type": "object"
+      },
+      "RosterLookupIn": {
+        "properties": {
+          "mobile": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Mobile",
+            "type": "string"
+          },
+          "student_no": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Student No",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mobile",
+          "student_no"
+        ],
+        "title": "RosterLookupIn",
+        "type": "object"
+      },
+      "RosterLookupOut": {
+        "properties": {
+          "claim_id": {
+            "format": "uuid",
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "has_email": {
+            "title": "Has Email",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "claim_id",
+          "display_name",
+          "has_email"
+        ],
+        "title": "RosterLookupOut",
         "type": "object"
       },
       "SaveAnswerIn": {
@@ -35797,6 +35969,219 @@
           }
         },
         "summary": "ثبت مسئله یا نیاز",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/roster/complete": {
+      "post": {
+        "operationId": "complete_api_v1_public_roster_complete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RosterCompleteIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterCompleteOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "summary": "کد ایمیل + رمز تازه ⇒ حساب، ثبت‌نام در درس‌ها و توکن",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/roster/confirm": {
+      "post": {
+        "operationId": "confirm_api_v1_public_roster_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RosterConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterConfirmOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "summary": "تأیید «من همین‌ام» و ارسال کد به ایمیل ثبت‌شده",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/roster/lookup": {
+      "post": {
+        "operationId": "lookup_api_v1_public_roster_lookup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RosterLookupIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterLookupOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "summary": "پیدا کردن ردیف دانشجو با موبایل و شمارهٔ دانشجویی",
         "tags": [
           "public"
         ]

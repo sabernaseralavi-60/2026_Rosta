@@ -42,6 +42,7 @@ from silp.routers.v1 import (
     qa,
     quizzes,
     research,
+    roster,
     search,
     subscriptions,
     taxonomy,
@@ -178,6 +179,7 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(public.profiles_router)
     v1.include_router(content.router)
     v1.include_router(intake.router)
+    v1.include_router(roster.router)
     v1.include_router(inbox.admin_router)
     v1.include_router(inbox.me_router)
     v1.include_router(inbox.public_router)

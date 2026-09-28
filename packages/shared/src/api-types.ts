@@ -2776,6 +2776,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/roster/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** کد ایمیل + رمز تازه ⇒ حساب، ثبت‌نام در درس‌ها و توکن */
+        post: operations["complete_api_v1_public_roster_complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/roster/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** تأیید «من همین‌ام» و ارسال کد به ایمیل ثبت‌شده */
+        post: operations["confirm_api_v1_public_roster_confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/roster/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** پیدا کردن ردیف دانشجو با موبایل و شمارهٔ دانشجویی */
+        post: operations["lookup_api_v1_public_roster_lookup_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/stats": {
         parameters: {
             query?: never;
@@ -11353,6 +11404,64 @@ export interface components {
             /** Title Fa */
             title_fa: string;
         };
+        /** RosterCompleteIn */
+        RosterCompleteIn: {
+            /**
+             * Claim Id
+             * Format: uuid
+             */
+            claim_id: string;
+            /** Code */
+            code: string;
+            /** Password */
+            password: string;
+        };
+        /** RosterCompleteOut */
+        RosterCompleteOut: {
+            /** Access Token */
+            access_token: string;
+            /** Courses */
+            courses: string[];
+            /** Expires In */
+            expires_in: number;
+            /** Is New User */
+            is_new_user: boolean;
+            /** Refresh Token */
+            refresh_token: string;
+            /**
+             * Token Type
+             * @default Bearer
+             */
+            token_type: string;
+            user: components["schemas"]["AuthUserOut"];
+        };
+        /** RosterConfirmIn */
+        RosterConfirmIn: {
+            /** Accept */
+            accept: boolean;
+            /**
+             * Claim Id
+             * Format: uuid
+             */
+            claim_id: string;
+        };
+        /** RosterConfirmOut */
+        RosterConfirmOut: {
+            /** Cancelled */
+            cancelled: boolean;
+            /**
+             * Expires In
+             * @default 0
+             */
+            expires_in: number;
+            /** Masked Email */
+            masked_email?: string | null;
+            /**
+             * Resend After
+             * @default 0
+             */
+            resend_after: number;
+        };
         /** RosterEntryOut */
         RosterEntryOut: {
             /**
@@ -11384,6 +11493,25 @@ export interface components {
             student_id: string;
             /** Student Name */
             student_name?: string | null;
+        };
+        /** RosterLookupIn */
+        RosterLookupIn: {
+            /** Mobile */
+            mobile: string;
+            /** Student No */
+            student_no: string;
+        };
+        /** RosterLookupOut */
+        RosterLookupOut: {
+            /**
+             * Claim Id
+             * Format: uuid
+             */
+            claim_id: string;
+            /** Display Name */
+            display_name: string;
+            /** Has Email */
+            has_email: boolean;
         };
         /** SaveAnswerIn */
         SaveAnswerIn: {
@@ -21131,6 +21259,186 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["silp__schemas__intake__SubmissionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    complete_api_v1_public_roster_complete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RosterCompleteIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RosterCompleteOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    confirm_api_v1_public_roster_confirm_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RosterConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RosterConfirmOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    lookup_api_v1_public_roster_lookup_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RosterLookupIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RosterLookupOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Validation Error */

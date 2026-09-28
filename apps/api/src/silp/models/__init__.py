@@ -88,6 +88,7 @@ from silp.models.research import (
     ResearchTopic,
     ResearchTrack,
 )
+from silp.models.roster import RosterClaim, RosterEntry
 from silp.models.taxonomy import Asset, Interest, Skill, University
 from silp.models.venture import Venture, VentureMetric, VentureStageChange
 
@@ -156,6 +157,8 @@ __all__ = [
     "QuizQuestion",
     "RecommendationFeedback",
     "RefreshToken",
+    "RosterClaim",
+    "RosterEntry",
     "ResearchOutput",
     "ResearchSubmission",
     "ResearchSubmissionFile",
