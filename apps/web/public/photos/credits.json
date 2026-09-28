@@ -1,0 +1,50 @@
+{
+  "hero": {
+    "title": "2020-01-02 Iran, Kerman, Dasht-e Lut DSC 9870 DxO 1-1.jpg",
+    "artist": "Lrkrol",
+    "license": "CC BY 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:2020-01-02_Iran,_Kerman,_Dasht-e_Lut_DSC_9870_DxO_1-1.jpg",
+    "width": 1920,
+    "height": 1275
+  },
+  "learn": {
+    "title": "Mezquita de Nasirolmolk, Shiraz, Irán, 2016-09-24, DD 66-68 HDR.jpg",
+    "artist": "Diego Delso",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Mezquita_de_Nasirolmolk,_Shiraz,_Ir%C3%A1n,_2016-09-24,_DD_66-68_HDR.jpg",
+    "width": 1920,
+    "height": 1288
+  },
+  "research": {
+    "title": "View of interchange from Reunion Tower August 2015 02.jpg",
+    "artist": "Michael Barera",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:View_of_interchange_from_Reunion_Tower_August_2015_02.jpg",
+    "width": 1920,
+    "height": 1280
+  },
+  "solve": {
+    "title": "Puente de la Constitución de 1812, Cádiz, España, 2015-12-08, DD 21-24 HDR.JPG",
+    "artist": "Diego Delso",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Puente_de_la_Constituci%C3%B3n_de_1812,_C%C3%A1diz,_Espa%C3%B1a,_2015-12-08,_DD_21-24_HDR.JPG",
+    "width": 1920,
+    "height": 1280
+  },
+  "collab": {
+    "title": "Mezquita de Nasirolmolk, Shiraz, Irán, 2016-09-24, DD 57-59 HDR.jpg",
+    "artist": "Diego Delso",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Mezquita_de_Nasirolmolk,_Shiraz,_Ir%C3%A1n,_2016-09-24,_DD_57-59_HDR.jpg",
+    "width": 1920,
+    "height": 1183
+  },
+  "agri": {
+    "title": "Shafiabad (Shahdad), Kerman Province, Iran (42737967331).jpg",
+    "artist": "Ninara from Helsinki, Finland",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Shafiabad_(Shahdad),_Kerman_Province,_Iran_(42737967331).jpg",
+    "width": 1920,
+    "height": 1385
+  }
+}

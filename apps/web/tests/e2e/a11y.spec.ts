@@ -22,6 +22,10 @@ const API = process.env.E2E_API_URL ?? 'http://localhost:8000/api/v1';
 
 const GUEST_PAGES = [
   '/',
+  '/content',
+  '/intake',
+  '/collaborate',
+  '/credits',
   '/login',
   '/verify',
   '/projects',

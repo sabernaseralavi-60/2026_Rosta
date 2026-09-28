@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { MathBlock, MathInline } from './math';
+
 /**
  * Markdown → React برای راهنمای کاربری — M7-19.
  *
@@ -25,7 +27,9 @@ export function headingId(text: string): string {
 
 // ── درون‌خطی ─────────────────────────────────────────────────────────────
 
-const INLINE = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
+// فرمول درون‌خطی `$…$`: بعد از `$` باز و پیش از `$` بسته فاصله نمی‌آید و بعد از `$`
+// بسته رقم نیست؛ پس «۵ تا ۶ $» یا «$5» در متن معمولی فرمول حساب نمی‌شود.
+const INLINE = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\)|\$(?!\s)[^$\n]+?(?<!\s)\$(?!\d))/g;
 
 function inline(text: string, resolve: LinkResolver, keyPrefix: string): ReactNode[] {
   const parts = text.split(INLINE).filter((part) => part !== '');
@@ -33,6 +37,9 @@ function inline(text: string, resolve: LinkResolver, keyPrefix: string): ReactNo
     const key = `${keyPrefix}-${index}`;
     if (part.startsWith('**') && part.endsWith('**')) {
       return <strong key={key}>{inline(part.slice(2, -2), resolve, key)}</strong>;
+    }
+    if (part.length > 2 && part.startsWith('$') && part.endsWith('$')) {
+      return <MathInline key={key} source={part.slice(1, -1)} />;
     }
     if (part.startsWith('`') && part.endsWith('`')) {
       return (
@@ -82,6 +89,7 @@ type Block =
   | { kind: 'list'; ordered: boolean; items: ListItem[] }
   | { kind: 'quote'; text: string }
   | { kind: 'code'; text: string }
+  | { kind: 'math'; text: string }
   | { kind: 'table'; header: string[]; rows: string[][] }
   | { kind: 'rule' };
 
@@ -121,6 +129,29 @@ export function parse(markdown: string): Block[] {
 
     if (/^---+\s*$/.test(line)) {
       blocks.push({ kind: 'rule' });
+      i += 1;
+      continue;
+    }
+
+    // فرمول بلوکی: `$$ … $$` در یک سطر، یا از یک سطر `$$` تا سطر `$$` بعدی.
+    if (line.trim().startsWith('$$')) {
+      const single = /^\$\$(.+)\$\$$/.exec(line.trim());
+      if (single) {
+        blocks.push({ kind: 'math', text: single[1] ?? '' });
+        i += 1;
+        continue;
+      }
+      const body: string[] = [];
+      const opening = line.trim().slice(2);
+      if (opening) body.push(opening);
+      i += 1;
+      while (i < lines.length && !(lines[i] ?? '').trim().endsWith('$$')) {
+        body.push(lines[i] ?? '');
+        i += 1;
+      }
+      const closing = (lines[i] ?? '').trim().replace(/\$\$$/, '');
+      if (closing) body.push(closing);
+      blocks.push({ kind: 'math', text: body.join('\n') });
       i += 1;
       continue;
     }
@@ -190,7 +221,7 @@ export function parse(markdown: string): Block[] {
     while (
       i < lines.length &&
       (lines[i] ?? '').trim() &&
-      !/^(#{1,3}\s|\||>|```|---+\s*$)/.test(lines[i] ?? '') &&
+      !/^(#{1,3}\s|\||>|```|\$\$|---+\s*$)/.test(lines[i] ?? '') &&
       !LIST_ITEM.exec(lines[i] ?? '')
     ) {
       body.push((lines[i] ?? '').trim());
@@ -269,6 +300,8 @@ export function render(markdown: string, resolve: LinkResolver): ReactNode[] {
             <code>{block.text}</code>
           </pre>
         );
+      case 'math':
+        return <MathBlock key={key} source={block.text} />;
       case 'table':
         return (
           <div key={key} className="overflow-x-auto">

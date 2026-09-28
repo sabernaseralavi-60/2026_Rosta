@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { PublicHeader } from '@/components/public/PublicHeader';
 
 /**
- * ناحیهٔ عمومی — §3.2: صفحهٔ اصلی، نیمرخ عمومی و راستی‌آزمایی گواهی.
+ * ناحیهٔ عمومی — §3.2: صفحهٔ اصلی، مطالب، نیمرخ عمومی و راستی‌آزمایی گواهی.
  * بی‌ورود، رندر سمت سرور، بدون Providerهای امتیاز و اعلان.
  */
 export default function PublicLayout({ children }: { children: ReactNode }) {
@@ -14,17 +14,47 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <main id="main" className="flex-1">
         {children}
       </main>
-      <footer className="border-t border-[var(--border-subtle)] py-8">
-        <div className="page flex flex-wrap items-center justify-between gap-4 text-[13px] text-[var(--fg-tertiary)]">
-          <span>سامانهٔ نوآوری و یادگیری صابر — از مصرف‌کنندهٔ دانش، به تولیدکنندهٔ ارزش</span>
-          <nav aria-label="پیوندهای پانویس" className="flex gap-4">
-            <Link href="/projects" className="hover:text-[var(--fg-brand)]">
-              پروژه‌ها
+      <footer className="mt-8 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+        <div className="page grid gap-8 py-10 text-[14px] md:grid-cols-[1.4fr_1fr_1fr]">
+          <div className="flex flex-col gap-2">
+            <span className="text-[18px] font-bold text-[var(--fg-brand)]">سیلپ</span>
+            <p className="max-w-[44ch] leading-[1.9] text-[var(--fg-secondary)]">
+              آموزش، پژوهش، همکاری و توسعهٔ راه‌حل‌های واقعی؛ از ایده تا اجرا.
+            </p>
+          </div>
+          <nav aria-label="مسیرها" className="flex flex-col gap-2">
+            <span className="font-semibold">مسیرها</span>
+            <Link
+              href="/content"
+              className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
+            >
+              یادگیری و مطالب
             </Link>
-            <Link href="/help" className="hover:text-[var(--fg-brand)]">
+            <Link
+              href="/intake"
+              className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
+            >
+              طرح مسئله / نیاز
+            </Link>
+            <Link
+              href="/collaborate"
+              className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
+            >
+              همکاری با ما
+            </Link>
+          </nav>
+          <nav aria-label="سامانه" className="flex flex-col gap-2">
+            <span className="font-semibold">سامانه</span>
+            <Link href="/help" className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]">
               راهنما
             </Link>
-            <Link href="/login" className="hover:text-[var(--fg-brand)]">
+            <Link
+              href="/credits"
+              className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
+            >
+              منبع عکس‌ها
+            </Link>
+            <Link href="/login" className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]">
               ورود و ثبت‌نام
             </Link>
           </nav>
