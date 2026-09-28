@@ -36,7 +36,6 @@ from silp.models.education import (
 from silp.models.file import File
 from silp.models.gamification import Badge, PointEntry, PointRule, UserBadge
 from silp.models.idea import Idea, IdeaComment, IdeaVote
-from silp.models.intake import IntakeEvent, IntakeRequest
 from silp.models.identity import (
     NULL_SCOPE,
     OTPChallenge,
@@ -45,6 +44,7 @@ from silp.models.identity import (
     User,
     UserRole,
 )
+from silp.models.intake import IntakeEvent, IntakeRequest, Prospect
 from silp.models.messaging import (
     MessageTemplate,
     Notification,
@@ -117,6 +117,7 @@ __all__ = [
     "IdeaVote",
     "IntakeEvent",
     "IntakeRequest",
+    "Prospect",
     "Interest",
     "MaterialAccessEvent",
     "MessageTemplate",

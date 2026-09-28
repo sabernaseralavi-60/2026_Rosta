@@ -17,18 +17,24 @@ from fastapi import APIRouter, Response, status
 from silp.routers.deps import ClientIPDep, SessionDep
 from silp.schemas.common import ErrorResponse
 from silp.schemas.intake import CollaborationIn, IntakeIn, SubmissionOut
-from silp.services.intake_service import DECOY_CODE, IntakeService
+from silp.services.intake_service import DECOY_CODE, IntakeService, Submission
 
 router = APIRouter(prefix="/public", tags=["public"])
 
 _RESPONSES: dict[int | str, dict[str, Any]] = {429: {"model": ErrorResponse}}
 
 
-def _out(code: str, person_code: str | None, *, collaboration: bool) -> SubmissionOut:
+def _out(submission: Submission | None, *, collaboration: bool) -> SubmissionOut:
     what = "درخواست همکاری شما" if collaboration else "مسئلهٔ شما"
+    code = (
+        submission.request.tracking_code
+        if submission
+        else ("C-0000" if collaboration else DECOY_CODE)
+    )
     return SubmissionOut(
         tracking_code=code,
-        person_code=person_code,
+        person_code=submission.person_code if submission else None,
+        account_linked=submission.account_linked if submission else False,
         message=f"{what} ثبت شد. کد پیگیری: {code}. به‌زودی با شما تماس می‌گیریم.",
     )
 
@@ -43,9 +49,9 @@ def _out(code: str, person_code: str | None, *, collaboration: bool) -> Submissi
 async def submit_intake(
     payload: IntakeIn, session: SessionDep, ip: ClientIPDep, response: Response
 ) -> SubmissionOut:
-    request, person_code = await IntakeService(session).submit_intake(payload, ip=ip)
+    submission = await IntakeService(session).submit_intake(payload, ip=ip)
     response.headers["Cache-Control"] = "no-store"
-    return _out(request.tracking_code if request else DECOY_CODE, person_code, collaboration=False)
+    return _out(submission, collaboration=False)
 
 
 @router.post(
@@ -58,9 +64,9 @@ async def submit_intake(
 async def submit_collaboration(
     payload: CollaborationIn, session: SessionDep, ip: ClientIPDep, response: Response
 ) -> SubmissionOut:
-    request, person_code = await IntakeService(session).submit_collaboration(payload, ip=ip)
+    submission = await IntakeService(session).submit_collaboration(payload, ip=ip)
     response.headers["Cache-Control"] = "no-store"
-    return _out(request.tracking_code if request else "C-0000", person_code, collaboration=True)
+    return _out(submission, collaboration=True)
 
 
 __all__ = ["router"]

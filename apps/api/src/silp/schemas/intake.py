@@ -110,6 +110,8 @@ class CollaborationIn(_Contact):
 
 class SubmissionOut(BaseModel):
     tracking_code: str
-    #: اگر شمارهٔ تماس با یک کاربر موجود یکی بود، کد شخصی همان فرد.
+    #: کد شخصی صاحب درخواست: کاربرِ وصل‌شده، وگرنه کد شخصِ بی‌حساب (ADR-0034).
     person_code: str | None = None
+    #: درست فقط وقتی شمارهٔ تأییدشدهٔ یک حساب با تماس یکی بود.
+    account_linked: bool = False
     message: str

@@ -8033,6 +8033,11 @@ export interface components {
             onboarding: components["schemas"]["OnboardingOut"];
             /** Person Code */
             person_code: string;
+            /**
+             * Person Code Aliases
+             * @default []
+             */
+            person_code_aliases: string[];
             points?: components["schemas"]["MePointsOut"] | null;
             profile?: components["schemas"]["ProfileOut"] | null;
             /** Roles */
@@ -13172,6 +13177,11 @@ export interface components {
         };
         /** SubmissionOut */
         silp__schemas__intake__SubmissionOut: {
+            /**
+             * Account Linked
+             * @default false
+             */
+            account_linked: boolean;
             /** Message */
             message: string;
             /** Person Code */

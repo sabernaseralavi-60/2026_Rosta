@@ -10,7 +10,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core import ratelimit
@@ -26,6 +26,7 @@ from silp.domain.identity.normalize import (
 )
 from silp.domain.identity.onboarding import Onboarding, ProfileSnapshot, resolve
 from silp.models.identity import OTPChallenge, User
+from silp.models.intake import Prospect
 from silp.models.profile import Profile
 from silp.services import authz, events
 from silp.services.otp_service import ChallengeIssued, OTPService, Purpose
@@ -209,6 +210,24 @@ class AuthService:
             user.mobile_verified_at = now
         elif challenge.channel == "EMAIL" and user.email_verified_at is None:
             user.email_verified_at = now
+        await self._claim_prospects(user, challenge, now)
+
+    async def _claim_prospects(self, user: User, challenge: OTPChallenge, now: datetime) -> None:
+        """شخصِ بی‌حسابِ همین راه تماس از این پس مال این کاربر است (ADR-0034).
+
+        فقط پس از OTP: تایپ‌کردن شمارهٔ دیگران مالکیت نمی‌آورد. کد شخصی خود کاربر
+        عوض نمی‌شود؛ کد قدیمی «نام دوم» او می‌ماند.
+        """
+        is_sms = challenge.channel == "SMS"
+        column = Prospect.mobile if is_sms else Prospect.email
+        value = user.mobile if is_sms else user.email
+        if not value:
+            return
+        await self.session.execute(
+            update(Prospect)
+            .where(Prospect.user_id.is_(None), column == value)
+            .values(user_id=user.id, claimed_at=now)
+        )
 
     async def _complete_login(
         self,

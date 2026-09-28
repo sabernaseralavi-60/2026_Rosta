@@ -8908,6 +8908,14 @@
             "title": "Person Code",
             "type": "string"
           },
+          "person_code_aliases": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Person Code Aliases",
+            "type": "array"
+          },
           "points": {
             "anyOf": [
               {
@@ -23189,6 +23197,11 @@
       },
       "silp__schemas__intake__SubmissionOut": {
         "properties": {
+          "account_linked": {
+            "default": false,
+            "title": "Account Linked",
+            "type": "boolean"
+          },
           "message": {
             "title": "Message",
             "type": "string"

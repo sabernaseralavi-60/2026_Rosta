@@ -76,7 +76,8 @@ async def test_anonymous_visitor_can_submit_a_problem(client, db_session) -> Non
     assert response.status_code == 201, response.text
     body = response.json()
     assert re.fullmatch(r"Q-\d+", body["tracking_code"])
-    assert body["person_code"] is None
+    assert re.fullmatch(r"P-\d{5,}", body["person_code"])  # کد شخصِ بی‌حساب — ADR-0034
+    assert body["account_linked"] is False
     assert body["tracking_code"] in body["message"]
     assert response.headers["cache-control"] == "no-store"
 
@@ -122,7 +123,8 @@ async def test_an_unverified_number_is_never_linked(client, db_session) -> None:
 
     response = await client.post("/api/v1/public/intake", json=_intake(mobile=VERIFIED))
     assert response.status_code == 201
-    assert response.json()["person_code"] is None
+    assert response.json()["account_linked"] is False
+    assert response.json()["person_code"] != (await me(client, token))["person_code"]
 
 
 @pytest.mark.parametrize(

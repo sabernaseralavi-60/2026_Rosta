@@ -135,7 +135,10 @@ export interface CollaborationPayload extends Contact {
 
 export interface Submission {
   tracking_code: string;
+  /** کد شخصی صاحب درخواست: حساب وصل‌شده، وگرنه کد شخصِ بی‌حساب (ADR-0034). */
   person_code: string | null;
+  /** درست فقط وقتی شمارهٔ تأییدشدهٔ یک حساب با تماس یکی بود. */
+  account_linked: boolean;
   message: string;
 }
 

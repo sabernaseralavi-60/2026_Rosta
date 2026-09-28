@@ -119,6 +119,8 @@ class MeOut(BaseModel):
     id: uuid.UUID
     person_code: str
     """ADR-0030 — کد شخصی دائمی؛ با تغییر نقش عوض نمی‌شود."""
+    person_code_aliases: list[str] = []
+    """ADR-0034 — کدهایی که پیش از ساختن حساب داشتید و هنوز معتبرند."""
     mobile: str | None = None
     email: str | None = None
     email_verified: bool = False

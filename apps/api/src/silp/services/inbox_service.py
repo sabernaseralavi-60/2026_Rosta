@@ -21,7 +21,7 @@ from silp.domain import audit
 from silp.models.content import ContentItem
 from silp.models.education import Course, Enrollment
 from silp.models.identity import User, UserRole
-from silp.models.intake import INTAKE_STATUSES, IntakeEvent, IntakeRequest
+from silp.models.intake import INTAKE_STATUSES, IntakeEvent, IntakeRequest, Prospect
 from silp.schemas.inbox import InboxUpdateIn
 from silp.services import events
 from silp.services.audit_service import AuditService
@@ -97,8 +97,9 @@ class InboxService:
             or 0
         )
         rows = await self.session.execute(
-            select(IntakeRequest, User.person_code)
+            select(IntakeRequest, func.coalesce(User.person_code, Prospect.person_code))
             .outerjoin(User, User.id == IntakeRequest.user_id)
+            .outerjoin(Prospect, Prospect.id == IntakeRequest.prospect_id)
             .where(*conditions)
             .order_by(IntakeRequest.created_at.desc(), IntakeRequest.id.desc())
             .limit(limit)
@@ -110,8 +111,9 @@ class InboxService:
     async def get(self, request_id: uuid.UUID) -> tuple[Row, list[IntakeEvent]]:
         row = (
             await self.session.execute(
-                select(IntakeRequest, User.person_code)
+                select(IntakeRequest, func.coalesce(User.person_code, Prospect.person_code))
                 .outerjoin(User, User.id == IntakeRequest.user_id)
+                .outerjoin(Prospect, Prospect.id == IntakeRequest.prospect_id)
                 .where(IntakeRequest.id == request_id)
             )
         ).first()
@@ -209,8 +211,9 @@ class InboxService:
         follow_up_rows = (
             (
                 await self.session.execute(
-                    select(IntakeRequest, User.person_code)
+                    select(IntakeRequest, func.coalesce(User.person_code, Prospect.person_code))
                     .outerjoin(User, User.id == IntakeRequest.user_id)
+                    .outerjoin(Prospect, Prospect.id == IntakeRequest.prospect_id)
                     .where(*stale_where)
                     .order_by(IntakeRequest.updated_at, IntakeRequest.id)
                     .limit(FOLLOW_UP_LIMIT)

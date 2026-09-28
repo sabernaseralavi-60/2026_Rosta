@@ -21,6 +21,43 @@ def _in_list(column: str, values: tuple[str, ...]) -> str:
     return f"{column} IN ({', '.join(repr(v) for v in values)})"
 
 
+class Prospect(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+    """شخصِ بی‌حساب: صاحب یک راه تماس که درخواست گذاشته — ADR-0034.
+
+    کد `P-…` از همان دنبالهٔ کاربران می‌آید. `user_id` وقتی پر می‌شود که صاحب همین
+    شماره (یا ایمیل) با OTP وارد شود؛ آن‌گاه کد قدیمی «نام دوم» کاربر است.
+    """
+
+    __tablename__ = "prospects"
+
+    person_code: Mapped[str] = mapped_column(
+        Text, unique=True, nullable=False, server_default=text("next_person_code()")
+    )
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    mobile: Mapped[str | None] = mapped_column(Text)
+    email: Mapped[str | None] = mapped_column(CITEXT)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (
+        CheckConstraint("person_code ~ '^P-[0-9]{5,}$'", name="person_code_format"),
+        CheckConstraint("mobile IS NOT NULL OR email IS NOT NULL", name="contact_required"),
+        CheckConstraint(r"mobile IS NULL OR mobile ~ '^09\d{9}$'", name="mobile_format"),
+        Index(
+            "uq_prospects_mobile",
+            "mobile",
+            unique=True,
+            postgresql_where=text("mobile IS NOT NULL"),
+        ),
+        Index(
+            "uq_prospects_email", "email", unique=True, postgresql_where=text("email IS NOT NULL")
+        ),
+        Index("idx_prospects_user", "user_id"),
+    )
+
+
 class IntakeRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     """یک «مسئله / نیاز» یا «درخواست همکاری» از بازدیدکننده.
 
@@ -34,6 +71,10 @@ class IntakeRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     status: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'NEW'"))
     user_id: Mapped[uuid.UUID | None] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
+    #: شخصِ بی‌حسابِ صاحب این درخواست (کد `P-…` او)؛ با `user_id` هم‌زمان پر نمی‌شود.
+    prospect_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("prospects.id", ondelete="SET NULL")
     )
     contact_name: Mapped[str] = mapped_column(Text, nullable=False)
     contact_mobile: Mapped[str | None] = mapped_column(Text)
@@ -66,6 +107,7 @@ class IntakeRequest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         Index("idx_intake_requests_inbox", "kind", "status", text("created_at DESC")),
         Index("idx_intake_requests_user", "user_id"),
         Index("idx_intake_requests_mobile", "contact_mobile"),
+        Index("idx_intake_requests_prospect", "prospect_id"),
     )
 
 

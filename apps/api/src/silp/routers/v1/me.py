@@ -14,6 +14,7 @@ from __future__ import annotations
 import uuid
 
 from fastapi import APIRouter
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from silp.core.exceptions import NotFound
@@ -21,6 +22,7 @@ from silp.core.security import mask_email, mask_mobile
 from silp.domain import public_profile
 from silp.domain.recommendation import service as recommendation
 from silp.models.identity import User
+from silp.models.intake import Prospect
 from silp.models.profile import DEGREE_TITLE_FA, TOTAL_SURVEY_STEPS, Profile
 from silp.routers.deps import AuthServiceDep, CurrentUserDep, ProfileServiceDep, SessionDep
 from silp.routers.v1.projects import project_summary_of
@@ -94,6 +96,13 @@ async def get_me(
     return MeOut(
         id=user.id,
         person_code=user.person_code,
+        person_code_aliases=list(
+            await session.scalars(
+                select(Prospect.person_code)
+                .where(Prospect.user_id == user.id)
+                .order_by(Prospect.claimed_at)
+            )
+        ),
         mobile=mask_mobile(user.mobile),
         email=mask_email(user.email),
         email_verified=user.email_verified_at is not None,

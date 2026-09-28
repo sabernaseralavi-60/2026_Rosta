@@ -26,7 +26,7 @@ from silp.core.permissions import Role
 from silp.models.content import ContentItem
 from silp.models.education import Course, CourseOffering, Enrollment, Term
 from silp.models.identity import User, UserRole
-from silp.models.intake import IntakeRequest
+from silp.models.intake import IntakeRequest, Prospect
 from silp.models.profile import Profile
 from silp.models.project import Project
 
@@ -152,8 +152,9 @@ async def inbox(session: AsyncSession) -> list[Mirror]:
     """درخواست‌های ورودی (مسئله / همکاری) — چشم مالک روی `00_Inbox`."""
     rows = (
         await session.execute(
-            select(IntakeRequest, User.person_code)
+            select(IntakeRequest, func.coalesce(User.person_code, Prospect.person_code))
             .outerjoin(User, User.id == IntakeRequest.user_id)
+            .outerjoin(Prospect, Prospect.id == IntakeRequest.prospect_id)
             .order_by(IntakeRequest.created_at.desc())
         )
     ).all()

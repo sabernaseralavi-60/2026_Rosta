@@ -143,9 +143,14 @@ export function SuccessCard({
       <p className="rounded-[var(--radius-md)] bg-[var(--bg-sunken)] px-5 py-3 text-[15px]">
         کد پیگیری: <b dir="ltr">{result.tracking_code}</b>
       </p>
-      {result.person_code ? (
+      {result.person_code && result.account_linked ? (
         <p className="text-[14px] leading-[1.9] text-[var(--fg-secondary)]">
           این درخواست به حساب شما با کد شخصی <b dir="ltr">{result.person_code}</b> وصل شد.
+        </p>
+      ) : result.person_code ? (
+        <p className="text-[14px] leading-[1.9] text-[var(--fg-secondary)]">
+          کد شخصی شما: <b dir="ltr">{result.person_code}</b>. اگر بعداً با همین شماره (یا ایمیل)
+          حساب رایگان بسازید، این کد و درخواست‌هایتان به حساب شما وصل می‌شود.
         </p>
       ) : (
         <p className="text-[14px] leading-[1.9] text-[var(--fg-secondary)]">
