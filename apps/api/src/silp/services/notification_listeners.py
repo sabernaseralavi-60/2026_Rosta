@@ -53,6 +53,7 @@ from silp.models.education import (
 )
 from silp.models.gamification import Badge, PointEntry
 from silp.models.idea import Idea, IdeaComment
+from silp.models.intake import IntakeEvent, IntakeRequest
 from silp.models.project import Project, ProjectApplication, Team, TeamInvitation
 from silp.models.qa import QaReply, QaThread
 from silp.models.quiz import GradeAppeal, Quiz, QuizAttempt
@@ -66,6 +67,7 @@ from silp.models.venture import METRIC_TITLE_FA, Venture, VentureMetric, Venture
 from silp.services import events
 from silp.services.directory import display_names, name_of
 from silp.services.grading_service import results_visible
+from silp.services.intake_service import IntakeService
 from silp.services.notification_service import NotificationService
 from silp.services.opening_service import OpeningService
 from silp.services.point_listeners import active_member_ids, venture_member_ids
@@ -1080,6 +1082,63 @@ async def on_subscription_rejected(
         {"plan": plan.title_fa if plan else "", "reason": event.reason},
         action_url="/pricing",
         dedup_key=f"SUBSCRIPTION_REJECTED:{subscription.id}",
+    )
+
+
+#: وضعیت‌هایی که مشتری برایشان اعلان می‌گیرد. برگشتن به «ثبت‌شده» و بایگانی کار
+#: داخلی مالک است؛ اعلانش «درخواست شما بایگانی شد» می‌شد بی‌آنکه چیزی از او بخواهد.
+INTAKE_NOTIFIED_STATUS_FA = {
+    "IN_REVIEW": "در حال بررسی",
+    "ACCEPTED": "پذیرفته‌شده",
+    "DECLINED": "پذیرفته‌نشده",
+}
+
+
+@events.subscribe(events.IntakeHandled)
+async def on_intake_handled(session: AsyncSession, event: events.IntakeHandled) -> None:
+    """ADR-0033 — مشتریِ دارای حساب از تغییر وضعیت و پیام مالک خبر می‌گیرد.
+
+    گیرنده همان کسی است که `/me/requests` درخواست را به او نشان می‌دهد: `user_id`
+    ذخیره‌شده، وگرنه کاربری با موبایل/ایمیل **تأییدشدهٔ** برابر. مشتری بی‌حساب گیرنده
+    ندارد؛ برای او فقط `/track` می‌ماند (ADR-0032).
+
+    متن فقط از وضعیت و `public_note` ساخته می‌شود؛ `owner_note` و راه تماس هرگز به
+    این تابع نمی‌رسند.
+    """
+    request = await session.get(IntakeRequest, event.request_id)
+    intake_event = await session.get(IntakeEvent, event.event_id)
+    if request is None or intake_event is None:
+        return
+    recipient = request.user_id
+    if recipient is None:
+        user = await IntakeService(session).match_user(
+            request.contact_mobile, request.contact_email
+        )
+        recipient = user.id if user else None
+    if recipient is None or recipient == event.actor_id:
+        return
+
+    note = intake_event.public_note or ""
+    status = INTAKE_NOTIFIED_STATUS_FA.get(intake_event.to_status)
+    changed = intake_event.to_status != intake_event.from_status
+    if changed and status:
+        kind = "INTAKE_STATUS_CHANGED"
+        values = {
+            "code": request.tracking_code,
+            "status": status,
+            "note": f" توضیح: «{note}»" if note else "",
+        }
+    elif note:
+        kind = "INTAKE_MESSAGE"
+        values = {"code": request.tracking_code, "note": note}
+    else:
+        return
+    await NotificationService(session).notify(
+        kind,
+        [recipient],
+        values,
+        action_url="/me/requests",
+        dedup_key=f"INTAKE:{intake_event.id}",
     )
 
 

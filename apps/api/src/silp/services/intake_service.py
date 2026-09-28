@@ -103,7 +103,7 @@ class IntakeService:
             return None, None
         await self._enforce_limits(data.mobile or data.email or "", ip)
 
-        user = await self._match_user(data.mobile, data.email)
+        user = await self.match_user(data.mobile, data.email)
         number = int(await self.session.scalar(text("SELECT nextval('intake_code_seq')")) or 0)
         request = IntakeRequest(
             kind=kind,
@@ -129,7 +129,7 @@ class IntakeService:
             if not result.allowed:
                 raise RateLimited(retry_after=result.retry_after)
 
-    async def _match_user(self, mobile: str | None, email: str | None) -> User | None:
+    async def match_user(self, mobile: str | None, email: str | None) -> User | None:
         conditions = []
         if mobile:
             conditions.append((User.mobile == mobile) & User.mobile_verified_at.is_not(None))

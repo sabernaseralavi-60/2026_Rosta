@@ -401,6 +401,15 @@ class RoleGranted:
 
 
 @dataclass(frozen=True, slots=True)
+class IntakeHandled:
+    """ADR-0033 — مالک وضعیت یک درخواست را عوض کرد یا پیامی عمومی برای مشتری گذاشت."""
+
+    request_id: uuid.UUID
+    event_id: uuid.UUID
+    actor_id: uuid.UUID
+
+
+@dataclass(frozen=True, slots=True)
 class ImpersonationStarted:
     """§6.5 — «کاربر هدف اعلان دریافت می‌کند»."""
 
@@ -471,6 +480,7 @@ __all__ = [
     "IdeaVoted",
     "IdeaWithdrawn",
     "ImpersonationStarted",
+    "IntakeHandled",
     "InvitationAccepted",
     "InvitationSent",
     "MetricReviewed",

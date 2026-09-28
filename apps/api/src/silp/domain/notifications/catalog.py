@@ -437,6 +437,15 @@ _KINDS: tuple[Kind, ...] = (
         "تأیید نشدن درخواست اشتراک",
         ("plan", "reason"),
     ),
+    # ── درخواست‌های ورودی — ADR-0033 ───────────────────────────────────
+    Kind(
+        "INTAKE_STATUS_CHANGED",
+        "SYSTEM",
+        "NORMAL",
+        "تغییر وضعیت درخواست شما",
+        ("code", "status", "note"),
+    ),
+    Kind("INTAKE_MESSAGE", "SYSTEM", "NORMAL", "پیام دربارهٔ درخواست شما", ("code", "note")),
 )
 
 KINDS: dict[str, Kind] = {kind.code: kind for kind in _KINDS}

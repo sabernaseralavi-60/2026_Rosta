@@ -23,6 +23,7 @@ from silp.models.education import Course, Enrollment
 from silp.models.identity import User, UserRole
 from silp.models.intake import INTAKE_STATUSES, IntakeEvent, IntakeRequest
 from silp.schemas.inbox import InboxUpdateIn
+from silp.services import events
 from silp.services.audit_service import AuditService
 
 STALE_AFTER = timedelta(days=3)
@@ -144,16 +145,16 @@ class InboxService:
         if data.owner_note is not None:
             request.owner_note = data.owner_note or None
         note = (data.public_note or "").strip() or None
+        handled: IntakeEvent | None = None
         if changed_status or note:
-            self.session.add(
-                IntakeEvent(
-                    request_id=request.id,
-                    actor_id=actor.id,
-                    from_status=previous,
-                    to_status=request.status,
-                    public_note=note,
-                )
+            handled = IntakeEvent(
+                request_id=request.id,
+                actor_id=actor.id,
+                from_status=previous,
+                to_status=request.status,
+                public_note=note,
             )
+            self.session.add(handled)
         # یادداشتِ عمومی که وضعیت را عوض نکرده هم «رسیدگی» است: بی‌این خط هیچ ستونی عوض
         # نمی‌شد، UPDATE نمی‌رفت و تریگر ساعت پیگیری را از نو نمی‌شمرد.
         request.updated_at = datetime.now(UTC)
@@ -171,6 +172,11 @@ class InboxService:
             },
         )
         await self.session.flush()
+        if handled is not None:
+            await events.publish(
+                self.session,
+                events.IntakeHandled(request_id=request.id, event_id=handled.id, actor_id=actor.id),
+            )
         return await self.get(request.id)
 
     # ── داشبورد مالک ───────────────────────────────────────────────────
