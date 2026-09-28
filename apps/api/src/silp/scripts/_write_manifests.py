@@ -26,7 +26,7 @@ def w(number: int, title: str, *objectives: str, description: str | None = None)
     )
 
 
-BOOK_AUTHORS = ["سید صابر ناصرعلوی", "اکرم مظاهری"]
+BOOK_AUTHORS = ["مؤلف", "اکرم مظاهری"]
 
 SUMO_BOOK_DESCRIPTION = (
     "کتاب «مهندسی شبیه‌سازی ترافیک با SUMO» — از ساخت شبکه با netconvert و netedit "

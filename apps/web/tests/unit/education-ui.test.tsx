@@ -23,7 +23,7 @@ function material(overrides: Partial<Material> = {}): Material {
     kind_fa: 'کتاب',
     title_fa: 'مهندسی شبیه‌سازی ترافیک با SUMO',
     description: null,
-    authors: ['سید صابر ناصرعلوی'],
+    authors: ['مؤلف'],
     edition: null,
     language: 'fa',
     size_bytes: null,

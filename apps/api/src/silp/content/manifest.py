@@ -27,7 +27,7 @@
       - file: SUMO.docx
         kind: BOOK
         title_fa: مهندسی شبیه‌سازی ترافیک با SUMO
-        authors: [سید صابر ناصرعلوی, اکرم مظاهری]
+        authors: [مؤلف, اکرم مظاهری]
         access_tier: SUBSCRIBER
         weeks: [3, 4]
         section: فصل ۱ تا ۴

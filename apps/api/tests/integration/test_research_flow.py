@@ -304,7 +304,7 @@ async def test_idle_reservation_is_warned_then_released(client, db_session) -> N
 PAPER = {
     "kind": "JOURNAL",
     "title": "Pedestrian safety at unsignalized intersections",
-    "authors": "S. Karimi, S. Naseralavi",
+    "authors": "S. Karimi, S. Ahmadi",
     "venue": "Accident Analysis & Prevention",
     "quartile": "Q1",
     "status": "DRAFT",
