@@ -51,3 +51,8 @@ Courses/**
 # نسخهٔ جاری و قبلی استقرار (deploy.sh)، و رازهای Prometheus و Alertmanager
 .deploy/
 infra/monitoring/secrets/
+
+# داده شخصی دانشجویان: هرگز وارد مخزن نمی‌شود
+students/
+*.xlsx
+*.xls
