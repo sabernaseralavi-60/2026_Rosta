@@ -43,6 +43,10 @@ COURSE_UPDATED: Final = "COURSE_UPDATED"
 OFFERING_CREATED: Final = "OFFERING_CREATED"
 OFFERING_UPDATED: Final = "OFFERING_UPDATED"
 OFFERING_DELETED: Final = "OFFERING_DELETED"
+# ── محتوا و درِ ورودی — ADR-0030/0031 ───────────────────────────────────
+# انتشار از بیرون سرور (توکن برنامه‌ای) و دست‌زدن مالک به درخواست‌های مردم.
+CONTENT_PUBLISHED: Final = "CONTENT_PUBLISHED"
+INTAKE_UPDATED: Final = "INTAKE_UPDATED"
 
 ACTION_TITLE_FA: dict[str, str] = {
     ROLE_GRANTED: "اعطای نقش",
@@ -71,6 +75,8 @@ ACTION_TITLE_FA: dict[str, str] = {
     OFFERING_CREATED: "تعریف ارائه و سپردن به استاد",
     OFFERING_UPDATED: "تغییر استاد یا نیم‌سال ارائه",
     OFFERING_DELETED: "حذف ارائهٔ بی‌استفاده",
+    CONTENT_PUBLISHED: "انتشار محتوا از Vault",
+    INTAKE_UPDATED: "رسیدگی به درخواست ورودی",
 }
 
 ENTITY_TITLE_FA: dict[str, str] = {
@@ -88,6 +94,8 @@ ENTITY_TITLE_FA: dict[str, str] = {
     "COURSE": "درس",
     "OFFERING": "ارائهٔ درس",
     "REQUEST": "درخواست",
+    "CONTENT": "محتوا",
+    "INTAKE_REQUEST": "درخواست ورودی",
 }
 
 
@@ -100,6 +108,7 @@ __all__ = [
     "APPEAL_RESOLVED",
     "ATTEMPT_VOIDED",
     "CERTIFICATE_REVOKED",
+    "CONTENT_PUBLISHED",
     "COURSE_CREATED",
     "COURSE_UPDATED",
     "ENTITY_TITLE_FA",
@@ -108,6 +117,7 @@ __all__ = [
     "IMPERSONATED_REQUEST",
     "IMPERSONATION_ENDED",
     "IMPERSONATION_STARTED",
+    "INTAKE_UPDATED",
     "MESSAGE_TEMPLATE_UPDATED",
     "OFFERING_CREATED",
     "OFFERING_DELETED",

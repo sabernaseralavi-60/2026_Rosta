@@ -3,6 +3,7 @@
 from silp.db.base import Base
 from silp.models.access import MaterialAccessEvent, Subscription, SubscriptionPlan
 from silp.models.admin import AuditLog
+from silp.models.api_token import ApiToken
 from silp.models.content import ContentItem
 from silp.models.delivery import (
     Certificate,
@@ -97,6 +98,7 @@ __all__ = [
     "Asset",
     "Badge",
     "AttendanceRecord",
+    "ApiToken",
     "Base",
     "Certificate",
     "ClassSession",

@@ -32,6 +32,7 @@ from silp.integrations.storage import StorageBackend
 from silp.integrations.storage import get_storage as storage_for
 from silp.models.identity import User
 from silp.services import authz
+from silp.services.api_token_service import ApiTokenService
 from silp.services.appeal_service import AppealService
 from silp.services.application_service import ApplicationService
 from silp.services.attempt_service import AttemptService
@@ -338,6 +339,26 @@ def require(
         scope_id = await scope(request, session) if scope else None
         if not await authz.has_permission(session, user, permission, scope_id):
             raise PermissionDenied(permission=permission.value)
+        return user
+
+    return dependency
+
+
+def require_token(scope: str, permission: Permission) -> Callable[..., Awaitable[CurrentUser]]:
+    """توکن برنامه‌ای (PAT) با دامنهٔ `scope`، و صاحبش همین لحظه `permission` را دارد — ADR-0031.
+
+    JWT نشست را نمی‌پذیرد و برعکس: ابزار خودکار و مرورگر دو مسیر جدا دارند تا
+    توکن دزدیده‌شدهٔ یک ابزار به نشست وب گره نخورد. لاگ حسابرسی ندارد؛
+    مسیرِ نویسنده خودش `stage` می‌زند.
+    """
+
+    async def dependency(credentials: CredentialsDep, session: SessionDep) -> CurrentUser:
+        if credentials is None or not credentials.credentials:
+            raise Unauthenticated
+        _, user = await ApiTokenService(session).authenticate(credentials.credentials, scope=scope)
+        if not user.has_permission(permission):
+            raise PermissionDenied(permission=permission.value)
+        bind_user(user.id)
         return user
 
     return dependency

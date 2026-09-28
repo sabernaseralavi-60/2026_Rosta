@@ -121,6 +121,9 @@ class Permission(StrEnum):
     MATERIAL_VIEW_ALL = "course.material.view_all"
     SUBSCRIPTION_GRANT = "subscription.grant"
     SUBSCRIPTION_VIEW_ALL = "subscription.view_all"
+    # ── محتوا و درِ ورودی (ADR-0030/0031) ──────────────────────────────
+    CONTENT_PUBLISH = "content.publish"
+    INTAKE_MANAGE = "intake.manage"
 
     # ── آزمون (M4) ─────────────────────────────────────────────────────
     QUIZ_CREATE = "quiz.create"
@@ -235,6 +238,9 @@ PERMISSION_MATRIX: dict[Permission, frozenset[Role]] = {
     ),
     Permission.SUBSCRIPTION_GRANT: frozenset({Role.SUPPORT, Role.ADMIN}),
     Permission.SUBSCRIPTION_VIEW_ALL: frozenset({Role.SUPPORT, Role.ADMIN}),
+    # مالک سایت = ADMIN؛ انتشار محتوا و صندوق درخواست‌ها (شمارهٔ تماس بازدیدکننده) دست او است.
+    Permission.CONTENT_PUBLISH: frozenset({Role.ADMIN}),
+    Permission.INTAKE_MANAGE: frozenset({Role.ADMIN}),
     # آزمون
     Permission.QUIZ_CREATE: frozenset({Role.TA, Role.INSTRUCTOR, Role.ADMIN}),
     Permission.QUIZ_GRADE: frozenset({Role.TA, Role.INSTRUCTOR, Role.ADMIN}),

@@ -47,6 +47,7 @@ from silp.routers.v1 import (
     teach,
     teach_quiz,
     teams,
+    vault,
     ventures,
     workspace,
 )
@@ -176,6 +177,7 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(public.profiles_router)
     v1.include_router(content.router)
     v1.include_router(intake.router)
+    v1.include_router(vault.router)
     v1.include_router(certificates.public_router)
     v1.include_router(certificates.me_router)
     v1.include_router(certificates.admin_router)

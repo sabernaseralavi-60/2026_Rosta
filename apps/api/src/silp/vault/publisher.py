@@ -17,7 +17,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePath, PurePosixPath
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,24 +40,51 @@ class PublishReport:
         return not self.errors
 
 
-def scan(vault: Path) -> tuple[list[Note], dict[str, str]]:
-    """همهٔ `.md`های `12_Content` (به‌جز فایل‌های پنهان و «_…»)."""
-    root = vault / CONTENT_DIR
+def _ignored(relative_to_content: PurePath) -> bool:
+    """فایل‌ها و پوشه‌های شروع‌شده با «.» یا «_» (قالب‌ها، پنهان‌ها) منتشر نمی‌شوند."""
+    return any(part.startswith((".", "_")) for part in relative_to_content.parts)
+
+
+def parse_files(files: Iterable[tuple[str, str]]) -> tuple[list[Note], dict[str, str]]:
+    """`(مسیر نسبت به Vault، متن خام)` ← یادداشت‌ها و خطاها. به دیسک دست نمی‌زند."""
     notes: list[Note] = []
     errors: dict[str, str] = {}
-    if not root.is_dir():
-        return notes, {CONTENT_DIR: "پوشهٔ 12_Content در Vault نیست؛ اول `vault init` را اجرا کنید."}
-    for path in sorted(root.rglob("*.md")):
-        relative = path.relative_to(vault).as_posix()
-        if any(part.startswith((".", "_")) for part in path.relative_to(root).parts):
+    for relative, raw in files:
+        if _ignored(PurePosixPath(relative).relative_to(CONTENT_DIR)):
             continue
         try:
-            notes.append(parse_note(path.read_text(encoding="utf-8"), source_path=relative))
+            notes.append(parse_note(raw, source_path=relative))
         except NoteError as exc:
             errors[relative] = str(exc)
-        except UnicodeDecodeError:
-            errors[relative] = "فایل UTF-8 نیست."
     return notes, errors
+
+
+def collect(vault: Path) -> tuple[list[tuple[str, str]], dict[str, str]]:
+    """`(مسیر، متن)`ِ همهٔ `.md`های `12_Content` و خطای فایل‌های نخواندنی.
+
+    پوشهٔ محتوا نبود ← خطا زیر کلید `12_Content` (فراخوان نباید چیزی آرشیو کند).
+    """
+    root = vault / CONTENT_DIR
+    if not root.is_dir():
+        return [], {CONTENT_DIR: "پوشهٔ 12_Content در Vault نیست؛ اول `vault init` را اجرا کنید."}
+    files: list[tuple[str, str]] = []
+    unreadable: dict[str, str] = {}
+    for path in sorted(root.rglob("*.md")):
+        relative = path.relative_to(vault).as_posix()
+        if _ignored(path.relative_to(root)):
+            continue
+        try:
+            files.append((relative, path.read_text(encoding="utf-8")))
+        except UnicodeDecodeError:
+            unreadable[relative] = "فایل UTF-8 نیست."
+    return files, unreadable
+
+
+def scan(vault: Path) -> tuple[list[Note], dict[str, str]]:
+    """همهٔ `.md`های `12_Content` (به‌جز فایل‌های پنهان و «_…»)."""
+    files, unreadable = collect(vault)
+    notes, errors = parse_files(files)
+    return notes, {**errors, **unreadable}
 
 
 async def publish_notes(
@@ -153,4 +180,4 @@ async def publish_vault(
     return await publish_notes(session, notes, seen_errors=errors, archive_missing=safe_to_archive)
 
 
-__all__ = ["PublishReport", "publish_notes", "publish_vault", "scan"]
+__all__ = ["PublishReport", "collect", "parse_files", "publish_notes", "publish_vault", "scan"]

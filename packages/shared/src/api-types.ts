@@ -4536,6 +4536,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/vault/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** انتشار یادداشت‌های Vault */
+        post: operations["publish_api_v1_vault_publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ventures": {
         parameters: {
             query?: never;
@@ -12463,6 +12480,58 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /**
+         * VaultNoteIn
+         * @description یک فایل، خام. تحلیل و اعتبارسنجی سمت سرور است، نه از دستِ ابزار.
+         */
+        VaultNoteIn: {
+            /** Path */
+            path: string;
+            /** Raw */
+            raw: string;
+        };
+        /** VaultPublishIn */
+        VaultPublishIn: {
+            /**
+             * Apply
+             * @default false
+             */
+            apply: boolean;
+            /** Client Errors */
+            client_errors?: {
+                [key: string]: string;
+            };
+            /**
+             * Complete
+             * @default false
+             */
+            complete: boolean;
+            /** Notes */
+            notes: components["schemas"]["VaultNoteIn"][];
+        };
+        /** VaultPublishOut */
+        VaultPublishOut: {
+            /** Applied */
+            applied: boolean;
+            /** Archived */
+            archived: string[];
+            /** Created */
+            created: string[];
+            /** Errors */
+            errors: {
+                [key: string]: string;
+            };
+            /** Ok */
+            ok: boolean;
+            /** Unchanged */
+            unchanged: string[];
+            /** Updated */
+            updated: string[];
+            /** Warnings */
+            warnings: {
+                [key: string]: string[];
+            };
         };
         /** VentureDetailOut */
         VentureDetailOut: {
@@ -25293,6 +25362,57 @@ export interface operations {
             };
             /** @description Not Found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_api_v1_vault_publish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VaultPublishIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VaultPublishOut"];
+                };
+            };
+            /** @description توکن نامعتبر */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description دامنه یا مجوز کافی نیست */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

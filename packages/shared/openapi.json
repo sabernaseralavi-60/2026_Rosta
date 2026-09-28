@@ -21568,6 +21568,133 @@
         "title": "ValidationError",
         "type": "object"
       },
+      "VaultNoteIn": {
+        "description": "یک فایل، خام. تحلیل و اعتبارسنجی سمت سرور است، نه از دستِ ابزار.",
+        "properties": {
+          "path": {
+            "maxLength": 300,
+            "minLength": 1,
+            "pattern": "^12_Content/[^\\\\\\x00]+\\.md$",
+            "title": "Path",
+            "type": "string"
+          },
+          "raw": {
+            "maxLength": 300000,
+            "title": "Raw",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "raw"
+        ],
+        "title": "VaultNoteIn",
+        "type": "object"
+      },
+      "VaultPublishIn": {
+        "properties": {
+          "apply": {
+            "default": false,
+            "title": "Apply",
+            "type": "boolean"
+          },
+          "client_errors": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "maxProperties": 500,
+            "title": "Client Errors",
+            "type": "object"
+          },
+          "complete": {
+            "default": false,
+            "title": "Complete",
+            "type": "boolean"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/VaultNoteIn"
+            },
+            "maxItems": 500,
+            "title": "Notes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "notes"
+        ],
+        "title": "VaultPublishIn",
+        "type": "object"
+      },
+      "VaultPublishOut": {
+        "properties": {
+          "applied": {
+            "title": "Applied",
+            "type": "boolean"
+          },
+          "archived": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Archived",
+            "type": "array"
+          },
+          "created": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Created",
+            "type": "array"
+          },
+          "errors": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "object"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "unchanged": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unchanged",
+            "type": "array"
+          },
+          "updated": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Updated",
+            "type": "array"
+          },
+          "warnings": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Warnings",
+            "type": "object"
+          }
+        },
+        "required": [
+          "applied",
+          "created",
+          "updated",
+          "unchanged",
+          "archived",
+          "errors",
+          "warnings",
+          "ok"
+        ],
+        "title": "VaultPublishOut",
+        "type": "object"
+      },
       "VentureDetailOut": {
         "properties": {
           "can_manage": {
@@ -42196,6 +42323,72 @@
         "summary": "جستجوی هم‌تیمی",
         "tags": [
           "teams"
+        ]
+      }
+    },
+    "/api/v1/vault/publish": {
+      "post": {
+        "operationId": "publish_api_v1_vault_publish_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VaultPublishIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VaultPublishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "توکن نامعتبر"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "دامنه یا مجوز کافی نیست"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "انتشار یادداشت‌های Vault",
+        "tags": [
+          "vault"
         ]
       }
     },
