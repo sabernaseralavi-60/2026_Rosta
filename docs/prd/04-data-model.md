@@ -1870,6 +1870,43 @@ ALTER TABLE venture_metrics ADD CONSTRAINT venture_metrics_owner
 
 ---
 
+## ۴.۱۱.۱ موتور محتوا، کد شخصی و درخواست‌های ورودی (ADR-0030، مهاجرت ۰۰۲۳ و ۰۰۲۴)
+
+```sql
+ALTER TABLE users ADD COLUMN person_code TEXT NOT NULL UNIQUE   -- P-00128؛ دائمی، با تغییر نقش عوض نمی‌شود
+  DEFAULT next_person_code();                                    -- دنبالهٔ person_code_seq؛ بعد از P-99999 بریده نمی‌شود
+
+CREATE TABLE content_items (            -- نمایهٔ یادداشت‌های 12_Content در Vault مالک
+  id UUID PRIMARY KEY DEFAULT uuidv7(),
+  slug TEXT NOT NULL UNIQUE,
+  kind TEXT NOT NULL,                   -- ARTICLE|BOOK_SUMMARY|PAPER_SUMMARY|EXAMPLE|CASE_STUDY|DATASET_NOTE
+  title_fa TEXT NOT NULL, summary TEXT NOT NULL, body_md TEXT NOT NULL,
+  cover TEXT,                           -- کلید عکس سایت یا نشانی https
+  access TEXT NOT NULL,                 -- PUBLIC|REGISTERED|STUDENT|MEMBER|PREMIUM
+  topics TEXT[] NOT NULL, skills TEXT[] NOT NULL, course_slug TEXT,
+  status TEXT NOT NULL,                 -- DRAFT|PUBLISHED|ARCHIVED (فایل ناپدیدشده آرشیو می‌شود)
+  published_at TIMESTAMPTZ, reading_minutes INT NOT NULL,
+  source_path TEXT UNIQUE, content_sha256 TEXT,   -- کلید و اثر انگشت همگام‌سازی
+  created_at TIMESTAMPTZ NOT NULL, updated_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE TABLE intake_requests (          -- «مسئله / نیاز» و «همکاری» از بازدیدکنندهٔ بی‌حساب
+  id UUID PRIMARY KEY DEFAULT uuidv7(),
+  kind TEXT NOT NULL,                   -- INTAKE|COLLABORATION
+  tracking_code TEXT NOT NULL UNIQUE,   -- Q-1001 | C-1002 (intake_code_seq)
+  status TEXT NOT NULL DEFAULT 'NEW',   -- NEW|IN_REVIEW|ACCEPTED|DECLINED|ARCHIVED
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,   -- فقط با موبایل/ایمیل تأییدشده
+  contact_name TEXT NOT NULL, contact_mobile TEXT, contact_email CITEXT, organization TEXT,
+  need_type TEXT, services TEXT[] NOT NULL, summary TEXT NOT NULL, payload JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL, updated_at TIMESTAMPTZ NOT NULL,
+  CHECK (contact_mobile IS NOT NULL OR contact_email IS NOT NULL)
+);
+```
+
+نوع اعلان تازهٔ `OWNER_BROADCAST` (گروه `SYSTEM`، بدون پیامک) الگوی `IN_APP` و `EMAIL` دارد.
+
+---
+
 ## ۴.۱۲ خط‌مشی نگهداری داده
 
 | داده | مدت نگهداری |
