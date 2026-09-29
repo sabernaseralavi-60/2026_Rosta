@@ -11,6 +11,10 @@ import { MathBlock, MathInline } from './math';
  * کد، پررنگ، پیوند). این مبدل همان را می‌فهمد، سمت سرور و در زمان ساخت اجرا
  * می‌شود و هیچ JS به مرورگر نمی‌فرستد. HTML خام را نمی‌پذیرد: خروجی فقط
  * عنصر React است، پس `dangerouslySetInnerHTML` لازم نیست.
+ *
+ * یک استثنا: بندی که فقط از یک یا چند `![توضیح](نشانی)` پشت‌سرهم ساخته شده
+ * باشد، به‌جای پاراگراف، ردیف گالری تصویر می‌شود (برای جلد کتاب‌ها و مشابه
+ * آن). نشانی بیرونی است، مثل `cover` — با `<img>` ساده، نه بهینه‌ساز Next.
  */
 
 export type LinkResolver = (href: string) => string | null;
@@ -83,15 +87,36 @@ interface ListItem {
   children: ListItem[];
 }
 
+interface GalleryItem {
+  alt: string;
+  src: string;
+}
+
 type Block =
   | { kind: 'heading'; level: 1 | 2 | 3; text: string }
   | { kind: 'paragraph'; text: string }
+  | { kind: 'gallery'; items: GalleryItem[] }
   | { kind: 'list'; ordered: boolean; items: ListItem[] }
   | { kind: 'quote'; text: string }
   | { kind: 'code'; text: string }
   | { kind: 'math'; text: string }
   | { kind: 'table'; header: string[]; rows: string[][] }
   | { kind: 'rule' };
+
+// بندی که فقط از تصویر(ها) ساخته شده: `![توضیح](نشانی)` یک یا چند بار، با
+// فاصله یا خط تازه میانشان — نه متن دیگری کنارشان. توضیح می‌تواند فاصله
+// داشته باشد؛ نشانی نه.
+const IMAGE_TOKEN = /!\[([^\]]*)\]\(([^)\s]+)\)/g;
+
+function parseGallery(text: string): GalleryItem[] | null {
+  const items: GalleryItem[] = [];
+  const stripped = text.replace(IMAGE_TOKEN, (_whole, alt: string, src: string) => {
+    items.push({ alt, src });
+    return '';
+  });
+  if (items.length === 0 || stripped.trim() !== '') return null;
+  return items;
+}
 
 const LIST_ITEM = /^(\s*)(?:[-*]|\d+\.)\s+(.*)$/;
 
@@ -227,7 +252,9 @@ export function parse(markdown: string): Block[] {
       body.push((lines[i] ?? '').trim());
       i += 1;
     }
-    blocks.push({ kind: 'paragraph', text: body.join(' ') });
+    const text = body.join(' ');
+    const gallery = parseGallery(text);
+    blocks.push(gallery ? { kind: 'gallery', items: gallery } : { kind: 'paragraph', text });
   }
 
   return blocks;
@@ -278,6 +305,21 @@ export function render(markdown: string, resolve: LinkResolver): ReactNode[] {
           <p key={key} className="leading-[2]">
             {inline(block.text, resolve, key)}
           </p>
+        );
+      case 'gallery':
+        return (
+          <div key={key} className="my-1 flex flex-wrap gap-3">
+            {block.items.map((item, index) => (
+              // eslint-disable-next-line @next/next/no-img-element -- نشانی بیرونی، خارج از بهینه‌ساز (مثل CoverImage)
+              <img
+                key={`${key}-${index}`}
+                src={item.src}
+                alt={item.alt}
+                loading="lazy"
+                className="h-44 w-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-sunken)] object-contain shadow-[var(--shadow-sm)] transition-transform duration-[var(--dur-normal)] hover:-translate-y-1 hover:shadow-[var(--shadow-lg)]"
+              />
+            ))}
+          </div>
         );
       case 'list':
         return renderList(block.items, block.ordered, resolve, key);
