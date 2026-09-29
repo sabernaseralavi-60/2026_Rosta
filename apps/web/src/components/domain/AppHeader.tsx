@@ -64,6 +64,7 @@ export function AppHeader() {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [guest, setGuest] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const session = readSession();
@@ -79,6 +80,11 @@ export function AppHeader() {
     setDisplayName(session.user.display_name ?? session.user.username);
     setRoles(session.user.roles ?? []);
   }, [router, pathname]);
+
+  // مسیر عوض شود، منوی موبایل بسته بماند — وگرنه پشت صفحهٔ تازه می‌ماند.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   async function handleLogout() {
     const session = readSession();
@@ -97,6 +103,11 @@ export function AppHeader() {
     clearSession();
     router.replace('/login');
   }
+
+  const extraLinks = [
+    canSeeTeach(roles) && { href: '/teach', label: 'تدریس', accent: true },
+    canSeeAdmin(roles) && { href: adminHome(roles), label: 'مدیریت', accent: true },
+  ].filter((link): link is { href: string; label: string; accent: boolean } => Boolean(link));
 
   return (
     <>
@@ -122,24 +133,16 @@ export function AppHeader() {
                   {item.label}
                 </Link>
               ))}
-              {canSeeTeach(roles) && (
+              {extraLinks.map((item) => (
                 <Link
-                  href="/teach"
-                  aria-current={pathname.startsWith('/teach') ? 'page' : undefined}
+                  key={item.href}
+                  href={item.href}
+                  aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
                   className="whitespace-nowrap text-[13.5px] font-medium text-[var(--fg-accent)] hover:underline"
                 >
-                  تدریس
+                  {item.label}
                 </Link>
-              )}
-              {canSeeAdmin(roles) && (
-                <Link
-                  href={adminHome(roles)}
-                  aria-current={pathname.startsWith('/admin') ? 'page' : undefined}
-                  className="whitespace-nowrap text-[13.5px] font-medium text-[var(--fg-accent)] hover:underline"
-                >
-                  مدیریت
-                </Link>
-              )}
+              ))}
             </nav>
           </div>
 
@@ -165,8 +168,39 @@ export function AppHeader() {
                 </Button>
               </>
             )}
+            <button
+              type="button"
+              aria-expanded={menuOpen}
+              aria-controls="app-menu"
+              aria-label={menuOpen ? 'بستن منو' : 'باز کردن منو'}
+              onClick={() => setMenuOpen((value) => !value)}
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] xl:hidden"
+            >
+              <span aria-hidden="true">{menuOpen ? '✕' : '☰'}</span>
+            </button>
           </div>
         </div>
+        {menuOpen && (
+          <nav
+            id="app-menu"
+            aria-label="منوی ناوبری"
+            className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] xl:hidden"
+          >
+            <ul className="page flex flex-col py-2">
+              {[...NAV, ...extraLinks].map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
+                    className="flex h-12 items-center text-[15px] font-medium text-[var(--fg-primary)] aria-[current=page]:font-semibold aria-[current=page]:text-[var(--fg-brand)]"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </header>
     </>
   );

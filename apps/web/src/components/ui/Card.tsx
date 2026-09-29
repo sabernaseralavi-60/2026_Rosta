@@ -30,7 +30,10 @@ export function Card({ variant = 'flat', className, children, ...props }: CardPr
   return (
     <div
       className={cn(
-        'rounded-[var(--radius-lg)] bg-[var(--bg-surface)]',
+        // `relative`: لنگر موقعیت‌دهی برای پوشش «کل کارت کلیک‌پذیر» (ProjectCard) —
+        // بدون آن، `after:absolute after:inset-0` به‌جای خود کارت کل صفحه را
+        // می‌گیرد و کلیک روی هر چیز دیگری (مثلاً دکمهٔ منو در هدر) را می‌رباید.
+        'relative rounded-[var(--radius-lg)] bg-[var(--bg-surface)]',
         // §10.4 — فاصلهٔ درون کارت ۲۰px
         'p-5',
         VARIANTS[variant],
