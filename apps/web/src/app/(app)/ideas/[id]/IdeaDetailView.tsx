@@ -123,7 +123,7 @@ export function IdeaDetailView({ id }: { id: string }) {
           </div>
           <h1>{idea.title}</h1>
           <p className="text-[13px] text-[var(--fg-tertiary)]">
-            {idea.author?.name ?? (idea.is_anonymous ? 'ناشناس' : 'کاربر سیلپ')} ·{' '}
+            {idea.author?.name ?? (idea.is_anonymous ? 'ناشناس' : 'کاربر رُستا')} ·{' '}
             {formatDateLong(idea.created_at)}
             {idea.is_mine && idea.is_anonymous && ' · ناشناس برای دیگران'}
           </p>
@@ -340,7 +340,7 @@ function CommentItem({
     <div className="flex flex-col gap-1.5">
       <p className="text-[12.5px] text-[var(--fg-tertiary)]">
         <span className="font-medium text-[var(--fg-secondary)]">
-          {comment.author?.name ?? comment.author?.username ?? 'کاربر سیلپ'}
+          {comment.author?.name ?? comment.author?.username ?? 'کاربر رُستا'}
         </span>{' '}
         · {formatRelative(comment.created_at)}
       </p>

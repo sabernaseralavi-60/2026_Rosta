@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { CommandPaletteTrigger } from '@/components/domain/CommandPaletteTrigger';
 import { ImpersonationBanner } from '@/components/domain/ImpersonationBanner';
+import { Logo } from '@/components/domain/Logo';
 import { NotificationBell } from '@/components/domain/NotificationBell';
 import { PointsBadge } from '@/components/domain/PointsBadge';
 import { Button } from '@/components/ui/Button';
@@ -115,11 +116,8 @@ export function AppHeader() {
       <header className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div className="page flex h-16 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-4">
-            <Link
-              href={guest ? '/' : '/dashboard'}
-              className="text-[17px] font-bold text-[var(--fg-brand)]"
-            >
-              سیلپ
+            <Link href={guest ? '/' : '/dashboard'} className="text-[17px] font-bold">
+              <Logo />
             </Link>
             {!guest && <CommandPaletteTrigger />}
             <nav aria-label="ناوبری اصلی" className="hidden items-center gap-3 xl:flex">

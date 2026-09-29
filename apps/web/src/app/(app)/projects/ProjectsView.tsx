@@ -92,7 +92,7 @@ export function ProjectsView() {
       <PageBanner
         photo="solve"
         title="پروژه‌ها"
-        description="واحد ارزش در سیلپ، پروژه است — نه درس."
+        description="واحد ارزش در رُستا، پروژه است — نه درس."
       />
 
       {recommended === null ? (

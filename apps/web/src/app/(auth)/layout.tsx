@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { Logo } from '@/components/domain/Logo';
+
 /**
  * پوستهٔ ناحیهٔ ورود — §3.3.
  *
@@ -10,7 +12,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-[var(--bg-canvas)]">
       <header className="px-4 py-6 md:px-8">
-        <span className="text-[17px] font-bold text-[var(--fg-brand)]">سیلپ</span>
+        <Logo className="text-[17px] font-bold" />
       </header>
 
       {/* عرض را خود صفحه تعیین می‌کند: فرم ورود باریک است ولی صفحهٔ

@@ -18,14 +18,14 @@ export const metadata: Metadata = {
   title: {
     default: 'سامانهٔ نوآوری و یادگیری صابر',
     // §10.8 — عنوان صفحه در هر مسیر منحصربه‌فرد و توصیفی است.
-    template: '%s — سیلپ',
+    template: '%s — رُستا',
   },
   description: 'اکوسیستمی که دانشجو را از مصرف‌کنندهٔ دانش به تولیدکنندهٔ ارزش تبدیل می‌کند.',
-  applicationName: 'SILP',
+  applicationName: 'Rosta',
   robots: { index: true, follow: true },
   // ADR-0029 — مانیفست از `app/manifest.ts` خودکار پیوند می‌شود.
   icons: { icon: '/icons/icon-192.png', apple: '/icons/apple-touch-icon.png' },
-  appleWebApp: { capable: true, title: 'سیلپ', statusBarStyle: 'default' },
+  appleWebApp: { capable: true, title: 'رُستا', statusBarStyle: 'default' },
 };
 
 export const viewport: Viewport = {

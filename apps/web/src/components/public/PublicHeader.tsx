@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { Logo } from '@/components/domain/Logo';
 import { readSession } from '@/lib/auth/session';
 
 /**
@@ -32,14 +33,8 @@ export function PublicHeader() {
     <header className="bg-[var(--bg-surface)]/85 sticky top-0 z-40 border-b border-[var(--border-subtle)] backdrop-blur-md">
       <div className="page flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 text-[18px] font-bold">
-            <span
-              aria-hidden="true"
-              className="flex size-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--brand-600)] text-[15px] text-[var(--fg-on-brand)]"
-            >
-              س
-            </span>
-            <span className="text-[var(--fg-brand)]">سیلپ</span>
+          <Link href="/" className="text-[18px] font-bold">
+            <Logo />
           </Link>
           <nav aria-label="ناوبری عمومی" className="hidden items-center gap-1 lg:flex">
             {NAV.map((item) => (

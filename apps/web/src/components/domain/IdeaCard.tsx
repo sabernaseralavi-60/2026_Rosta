@@ -56,7 +56,7 @@ export function IdeaCard({
         </Link>
         <p className="text-[14px] leading-[1.9] text-[var(--fg-secondary)]">{idea.excerpt}</p>
         <p className="text-[12.5px] text-[var(--fg-tertiary)]">
-          {idea.author?.name ?? (idea.is_anonymous ? 'ناشناس' : 'کاربر سیلپ')} ·{' '}
+          {idea.author?.name ?? (idea.is_anonymous ? 'ناشناس' : 'کاربر رُستا')} ·{' '}
           {formatRelative(idea.created_at)} · {toPersianDigits(idea.comment_count)} نظر
         </p>
       </div>

@@ -32,7 +32,7 @@ export async function generateMetadata({
   if (!profile) return { title: 'نیمرخ پیدا نشد', robots: { index: false } };
   return {
     title: profile.name,
-    description: `نیمرخ عمومی ${profile.name} در سیلپ — پروژه‌ها، گواهی‌ها و مهارت‌ها.`,
+    description: `نیمرخ عمومی ${profile.name} در رُستا — پروژه‌ها، گواهی‌ها و مهارت‌ها.`,
   };
 }
 

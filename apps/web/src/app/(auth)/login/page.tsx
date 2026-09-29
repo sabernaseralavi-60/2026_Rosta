@@ -19,7 +19,7 @@ export default function LoginPage() {
   return (
     <section className="flex w-full max-w-[26rem] flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h1>ورود به سیلپ</h1>
+        <h1>ورود به رُستا</h1>
         <p className="text-[15px] text-[var(--fg-secondary)]">
           شمارهٔ موبایلت را وارد کن. یک کد شش‌رقمی برایت می‌فرستیم.
         </p>

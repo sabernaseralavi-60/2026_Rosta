@@ -6,7 +6,7 @@ import { render } from '@/lib/markdown/render';
 
 export const metadata: Metadata = {
   title: 'راهنما',
-  description: 'راهنمای فارسی سیلپ برای دانشجو، استاد، مدیر و کاربر عمومی.',
+  description: 'راهنمای فارسی رُستا برای دانشجو، استاد، مدیر و کاربر عمومی.',
 };
 
 // از docs/user در زمان ساخت؛ در اجرا به فایل دست نمی‌زند (M7-19).

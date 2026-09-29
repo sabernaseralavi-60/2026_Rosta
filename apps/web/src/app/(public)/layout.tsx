@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { Logo } from '@/components/domain/Logo';
 import { PublicHeader } from '@/components/public/PublicHeader';
 
 /**
@@ -17,7 +18,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <footer className="mt-8 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div className="page grid gap-8 py-10 text-[14px] md:grid-cols-[1.4fr_1fr_1fr]">
           <div className="flex flex-col gap-2">
-            <span className="text-[18px] font-bold text-[var(--fg-brand)]">سیلپ</span>
+            <Logo className="text-[18px] font-bold" />
             <p className="max-w-[44ch] leading-[1.9] text-[var(--fg-secondary)]">
               آموزش، پژوهش، همکاری و توسعهٔ راه‌حل‌های واقعی؛ از ایده تا اجرا.
             </p>

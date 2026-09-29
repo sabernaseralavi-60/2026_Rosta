@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
     name: 'سامانهٔ نوآوری و یادگیری صابر',
-    short_name: 'سیلپ',
+    short_name: 'رُستا',
     description: 'یادگیری، پژوهش، کارآفرینی و حل مسئلهٔ واقعی — یک‌جا.',
     lang: 'fa',
     dir: 'rtl',

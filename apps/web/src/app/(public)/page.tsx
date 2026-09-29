@@ -22,7 +22,7 @@ import { statTiles } from '@/lib/public/home';
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: { absolute: 'سیلپ — یاد بگیر، مهارت بساز، یا مسئله‌ات را به ما بسپار' },
+  title: { absolute: 'رُستا — یاد بگیر، مهارت بساز، یا مسئله‌ات را به ما بسپار' },
   description:
     'آموزش، پژوهش، همکاری و توسعهٔ راه‌حل‌های واقعی؛ از ایده تا اجرا. مطالب تخصصی حمل‌ونقل، عمران و داده، مسیر پژوهش تا مقالهٔ Q1 و پروژه‌های واقعی.',
 };

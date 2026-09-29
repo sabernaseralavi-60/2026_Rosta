@@ -1199,7 +1199,7 @@ async def on_impersonation_started(
     await NotificationService(session).notify(
         "ACCOUNT_VIEWED_BY_SUPPORT",
         [event.target_id],
-        {"agent": f"پشتیبانی سیلپ ({agent})"},
+        {"agent": f"پشتیبانی رُستا ({agent})"},
     )
 
 
