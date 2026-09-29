@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { PageBanner } from '@/components/domain/PageBanner';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -51,17 +52,16 @@ export function CoursesView() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-[26px] font-bold text-[var(--fg-primary)]">دروس من</h1>
-          <p className="text-[14px] text-[var(--fg-secondary)]">
-            درس‌هایی که در آن‌ها ثبت‌نام کرده‌اید. محتوای هر درس برای دانشجویانش رایگان است.
-          </p>
-        </div>
-        <Button variant="secondary" asChild>
-          <Link href="/library">کتابخانهٔ دروس</Link>
-        </Button>
-      </header>
+      <PageBanner
+        photo="learn"
+        title="دروس من"
+        description="درس‌هایی که در آن‌ها ثبت‌نام کرده‌اید. محتوای هر درس برای دانشجویانش رایگان است."
+        actions={
+          <Button variant="secondary" asChild>
+            <Link href="/library">کتابخانهٔ دروس</Link>
+          </Button>
+        }
+      />
 
       {error && (
         <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">

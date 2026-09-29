@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { PageBanner } from '@/components/domain/PageBanner';
 import { ProjectCard } from '@/components/domain/ProjectCard';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -88,12 +89,11 @@ export function ProjectsView() {
 
   return (
     <div className="flex flex-col gap-10">
-      <header className="flex flex-col gap-1">
-        <h1>پروژه‌ها</h1>
-        <p className="text-[15px] text-[var(--fg-secondary)]">
-          واحد ارزش در سیلپ، پروژه است — نه درس.
-        </p>
-      </header>
+      <PageBanner
+        photo="solve"
+        title="پروژه‌ها"
+        description="واحد ارزش در سیلپ، پروژه است — نه درس."
+      />
 
       {recommended === null ? (
         // هم‌قد بخش واقعی (عنوان + سه کارت) تا بانک پروژه با آمدن پیشنهادها

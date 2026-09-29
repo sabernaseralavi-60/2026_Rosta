@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { PageBanner } from '@/components/domain/PageBanner';
 import { Badge, type BadgeTone } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -49,29 +50,28 @@ export function ResearchView() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1>مسیر پژوهش</h1>
-          <p className="text-[15px] text-[var(--fg-secondary)]">
-            از مرور ادبیات تا مقالهٔ Q1 — هر سطح با تأیید منتور باز می‌شود.
-          </p>
-        </div>
-        <nav aria-label="بخش‌های پژوهش" className="flex flex-wrap gap-2">
-          <Button asChild variant="secondary" size="sm">
-            <Link href="/research/topics">بانک موضوع</Link>
-          </Button>
-          {accessToken && (
+      <PageBanner
+        photo="research"
+        title="مسیر پژوهش"
+        description="از مرور ادبیات تا مقالهٔ Q1 — هر سطح با تأیید منتور باز می‌شود."
+        actions={
+          <nav aria-label="بخش‌های پژوهش" className="flex flex-wrap gap-2">
             <Button asChild variant="secondary" size="sm">
-              <Link href="/research/outputs">مقاله‌های من</Link>
+              <Link href="/research/topics">بانک موضوع</Link>
             </Button>
-          )}
-          {track?.can_review && (
-            <Button asChild size="sm">
-              <Link href="/research/review">صف بررسی</Link>
-            </Button>
-          )}
-        </nav>
-      </header>
+            {accessToken && (
+              <Button asChild variant="secondary" size="sm">
+                <Link href="/research/outputs">مقاله‌های من</Link>
+              </Button>
+            )}
+            {track?.can_review && (
+              <Button asChild size="sm">
+                <Link href="/research/review">صف بررسی</Link>
+              </Button>
+            )}
+          </nav>
+        }
+      />
 
       {error && (
         <p role="alert" className="text-[13.5px] text-[var(--fg-danger)]">
