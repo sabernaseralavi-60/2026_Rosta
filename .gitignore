@@ -56,3 +56,9 @@ infra/monitoring/secrets/
 students/
 *.xlsx
 *.xls
+
+# Vault شخصی مالک: روی رایانهٔ خودش می‌ماند، نه در Git/GitHub (ADR-0030)
+Vault/
+
+# کتاب‌های مرجع (PDF کپی‌رایت‌دار): فقط منبع نوشتن پست، نه محتوای مخزن
+Books/
