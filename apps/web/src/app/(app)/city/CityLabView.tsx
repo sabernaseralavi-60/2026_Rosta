@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { PageBanner } from '@/components/domain/PageBanner';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardDescription, CardTitle } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -48,15 +49,11 @@ export function CityLabView() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex flex-col gap-2">
-        <h1>آزمایشگاه شهر هوشمند</h1>
-        <p className="max-w-[70ch] text-[15px] leading-[1.95] text-[var(--fg-secondary)]">
-          تولید خدمات هوشمند ترافیکی برای شهرداری‌ها، در هشت مرحلهٔ ثابت. هر مرحله تحویل‌دادنی،
-          چک‌لیست کیفیت و مسئول دارد و فقط پس از تأیید مرحلهٔ قبل باز می‌شود. کل مسیر{' '}
-          {toPersianDigits(workflow.total_days / 7)} هفته و {toPersianDigits(workflow.total_points)}{' '}
-          امتیاز است؛ کامل کردنش نشان «شهرساز» دارد.
-        </p>
-      </header>
+      <PageBanner
+        photo="research"
+        title="آزمایشگاه شهر هوشمند"
+        description={`تولید خدمات هوشمند ترافیکی برای شهرداری‌ها، در هشت مرحلهٔ ثابت. هر مرحله تحویل‌دادنی، چک‌لیست کیفیت و مسئول دارد و فقط پس از تأیید مرحلهٔ قبل باز می‌شود. کل مسیر ${toPersianDigits(workflow.total_days / 7)} هفته و ${toPersianDigits(workflow.total_points)} امتیاز است؛ کامل کردنش نشان «شهرساز» دارد.`}
+      />
 
       <section aria-labelledby="stages-title" className="flex flex-col gap-3">
         <h2 id="stages-title" className="text-[18px] font-semibold">

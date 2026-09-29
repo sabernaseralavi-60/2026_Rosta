@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { PageBanner } from '@/components/domain/PageBanner';
 import { StageTrack } from '@/components/domain/StageTrack';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -90,17 +91,16 @@ export function VenturesView() {
 
   return (
     <div className="flex flex-col gap-10">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1>کسب‌وکارها</h1>
-          <p className="text-[15px] text-[var(--fg-secondary)]">
-            از ایده تا رشد، قدم‌به‌قدم — هر گام با معیاری روشن.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/ventures/new">ثبت کسب‌وکار</Link>
-        </Button>
-      </header>
+      <PageBanner
+        photo="agri"
+        title="کسب‌وکارها"
+        description="از ایده تا رشد، قدم‌به‌قدم — هر گام با معیاری روشن."
+        actions={
+          <Button asChild>
+            <Link href="/ventures/new">ثبت کسب‌وکار</Link>
+          </Button>
+        }
+      />
 
       {mine && mine.length > 0 && (
         <section className="flex flex-col gap-4">

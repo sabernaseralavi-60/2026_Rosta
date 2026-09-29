@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { PageBanner } from '@/components/domain/PageBanner';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -68,18 +69,16 @@ export function LibraryView() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-[26px] font-bold text-[var(--fg-primary)]">کتابخانهٔ دروس</h1>
-          <p className="max-w-[60ch] text-[14px] leading-7 text-[var(--fg-secondary)]">
-            محتوای هر درس برای دانشجویان همان درس رایگان است. برای بقیه، با اشتراک ماهانه در دسترس
-            است.
-          </p>
-        </div>
-        <Button variant="secondary" asChild>
-          <Link href="/pricing">طرح‌های اشتراک</Link>
-        </Button>
-      </header>
+      <PageBanner
+        photo="learn"
+        title="کتابخانهٔ دروس"
+        description="محتوای هر درس برای دانشجویان همان درس رایگان است. برای بقیه، با اشتراک ماهانه در دسترس است."
+        actions={
+          <Button variant="secondary" asChild>
+            <Link href="/pricing">طرح‌های اشتراک</Link>
+          </Button>
+        }
+      />
 
       <div className="flex flex-wrap items-end gap-3">
         <Input

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { IdeaCard } from '@/components/domain/IdeaCard';
+import { PageBanner } from '@/components/domain/PageBanner';
 import { Button } from '@/components/ui/Button';
 import { ChipGroup, type ChipOption } from '@/components/ui/ChipGroup';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -107,17 +108,16 @@ export function IdeasView({
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1>بانک ایده</h1>
-          <p className="text-[15px] text-[var(--fg-secondary)]">
-            ایده‌ات را بنویس، رأی جمع کن؛ ایدهٔ خوب به پروژه یا کسب‌وکار تبدیل می‌شود.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/ideas/new">ثبت ایده</Link>
-        </Button>
-      </header>
+      <PageBanner
+        photo="collab"
+        title="بانک ایده"
+        description="ایده‌ات را بنویس، رأی جمع کن؛ ایدهٔ خوب به پروژه یا کسب‌وکار تبدیل می‌شود."
+        actions={
+          <Button asChild>
+            <Link href="/ideas/new">ثبت ایده</Link>
+          </Button>
+        }
+      />
 
       <div className="flex flex-col gap-3">
         <Input
