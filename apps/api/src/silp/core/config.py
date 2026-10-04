@@ -183,6 +183,28 @@ class Settings(BaseSettings):
         return str(self.database_url).replace("postgresql+asyncpg://", "postgresql://")
 
     # ── اعتبارسنجی ─────────────────────────────────────────────────────
+    @field_validator("dev_fixed_otp", mode="before")
+    @classmethod
+    def _otp_off_switch(cls, v: object) -> object:
+        """میزبان‌های ابری مقدار خالی را نمی‌پذیرند؛ ``off`` یعنی خاموش."""
+        if isinstance(v, str) and v.strip().lower() in ("", "off", "none", "false"):
+            return None
+        return v
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def _normalize_provider_url(cls, v: object) -> object:
+        """آدرس استاندارد ارائه‌دهندهٔ ابری (Neon/Vercel) را به قالب asyncpg برمی‌گرداند:
+        ``postgresql://…?sslmode=require&channel_binding=require`` ⇒
+        ``postgresql+asyncpg://…?ssl=require``."""
+        if not isinstance(v, str) or not v.startswith(("postgresql://", "postgres://")):
+            return v
+        base, _, query = v.partition("?")
+        base = "postgresql+asyncpg://" + base.split("://", 1)[1]
+        params = [p for p in query.split("&") if p and p.split("=")[0] != "channel_binding"]
+        params = ["ssl=" + p.split("=", 1)[1] if p.startswith("sslmode=") else p for p in params]
+        return base + ("?" + "&".join(params) if params else "")
+
     @field_validator("database_url")
     @classmethod
     def _require_asyncpg(cls, v: PostgresDsn) -> PostgresDsn:

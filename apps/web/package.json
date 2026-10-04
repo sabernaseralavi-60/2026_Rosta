@@ -23,7 +23,7 @@
     "@radix-ui/react-toast": "^1.2.2",
     "clsx": "^2.1.1",
     "katex": "^0.18.9",
-    "next": "15.1.8",
+    "next": "15.1.12",
     "next-intl": "^3.25.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
