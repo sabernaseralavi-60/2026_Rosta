@@ -16,11 +16,11 @@ import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'سامانهٔ نوآوری و یادگیری صابر',
+    default: 'رُستا — یاد بگیر و رشد کن',
     // §10.8 — عنوان صفحه در هر مسیر منحصربه‌فرد و توصیفی است.
     template: '%s — رُستا',
   },
-  description: 'اکوسیستمی که دانشجو را از مصرف‌کنندهٔ دانش به تولیدکنندهٔ ارزش تبدیل می‌کند.',
+  description: 'مطالب آموزشی، آزمون، پروژه و پژوهش؛ جایی برای یادگیری و رشد گام‌به‌گام.',
   applicationName: 'Rosta',
   robots: { index: true, follow: true },
   // ADR-0029 — مانیفست از `app/manifest.ts` خودکار پیوند می‌شود.

@@ -9,16 +9,13 @@ import { readSession } from '@/lib/auth/session';
 /**
  * هدر ناحیهٔ عمومی — §10.10.
  *
- * ناوبری عمومی فقط پنج مورد دارد؛ «همکاری با ما» دکمهٔ کوچک کنار «ورود» است تا
- * صفحهٔ اول شلوغ نشود (فایل مشخصات فاز ۰، بند ۲). کاربر واردشده به‌جای «ورود»
+ * ناوبری عمومی فقط سه مورد آموزشی دارد؛ مسیر درخواست و همکاری در پایین صفحه است. کاربر واردشده به‌جای «ورود»
  * «داشبورد» می‌بیند؛ نشست در `sessionStorage` است، پس این بخش کلاینتی است.
  */
 const NAV = [
   { href: '/content', label: 'مطالب' },
   { href: '/research', label: 'پژوهش' },
   { href: '/projects', label: 'پروژه‌ها' },
-  { href: '/city', label: 'شهر هوشمند' },
-  { href: '/intake', label: 'طرح مسئله / نیاز' },
 ] as const;
 
 export function PublicHeader() {
@@ -50,12 +47,6 @@ export function PublicHeader() {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/collaborate"
-            className="hidden rounded-[var(--radius-md)] px-3 py-2 text-[14px] font-medium text-[var(--fg-brand)] hover:bg-[var(--brand-50)] sm:inline-flex"
-          >
-            🤝 همکاری با ما
-          </Link>
-          <Link
             href={signedIn ? '/dashboard' : '/login'}
             className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[var(--brand-600)] px-4 text-[14px] font-semibold text-[var(--fg-on-brand)] hover:bg-[var(--brand-700)]"
           >
@@ -80,7 +71,7 @@ export function PublicHeader() {
           className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] lg:hidden"
         >
           <ul className="page flex flex-col py-2">
-            {[...NAV, { href: '/collaborate', label: '🤝 همکاری با ما' } as const].map((item) => (
+            {NAV.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

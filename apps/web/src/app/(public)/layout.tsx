@@ -20,7 +20,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
           <div className="flex flex-col gap-2">
             <Logo className="text-[18px] font-bold" />
             <p className="max-w-[44ch] leading-[1.9] text-[var(--fg-secondary)]">
-              آموزش، پژوهش، همکاری و توسعهٔ راه‌حل‌های واقعی؛ از ایده تا اجرا.
+              یاد بگیر و رشد کن.
             </p>
           </div>
           <nav aria-label="مسیرها" className="flex flex-col gap-2">
@@ -29,13 +29,13 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
               href="/content"
               className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
             >
-              یادگیری و مطالب
+              مطالب
             </Link>
             <Link
               href="/intake"
               className="text-[var(--fg-secondary)] hover:text-[var(--fg-brand)]"
             >
-              طرح مسئله / نیاز
+              ثبت درخواست
             </Link>
             <Link
               href="/collaborate"

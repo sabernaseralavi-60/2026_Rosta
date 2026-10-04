@@ -18,7 +18,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: 'مطالب',
   description:
-    'مقاله‌های آموزشی، خلاصهٔ کتاب و مقاله، مثال‌های حل‌شده و مطالعهٔ موردی در حمل‌ونقل، عمران و تحلیل داده.',
+    'مقاله‌های آموزشی، خلاصهٔ کتاب و مقاله، مثال‌های حل‌شده و مطالعهٔ موردی.',
 };
 
 type Search = { kind?: string; topic?: string; q?: string; page?: string };
