@@ -446,6 +446,8 @@ _KINDS: tuple[Kind, ...] = (
         ("code", "status", "note"),
     ),
     Kind("INTAKE_MESSAGE", "SYSTEM", "NORMAL", "پیام دربارهٔ درخواست شما", ("code", "note")),
+    # ── گفت‌وگوی استاد–دانشجو — ADR-0036 ─────────────────────────────
+    Kind("MESSAGE_RECEIVED", "COURSE", "NORMAL", "پیام تازه", ("sender", "course", "preview")),
 )
 
 KINDS: dict[str, Kind] = {kind.code: kind for kind in _KINDS}

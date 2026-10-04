@@ -59,6 +59,7 @@ const TABS: { path: string; label: string; needs?: keyof OfferingPermissions }[]
   { path: '/grades', label: 'دفتر نمره', needs: 'manage' },
   { path: '/quizzes', label: 'آزمون‌ها' },
   { path: '/announcements', label: 'اعلان‌ها' },
+  { path: '/messages', label: 'پیام‌ها' },
   { path: '/settings', label: 'تنظیمات', needs: 'manage' },
 ];
 

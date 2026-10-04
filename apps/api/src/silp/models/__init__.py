@@ -88,6 +88,7 @@ from silp.models.research import (
     ResearchTopic,
     ResearchTrack,
 )
+from silp.models.conversation import Conversation, ConversationMember, Message
 from silp.models.roster import RosterClaim, RosterEntry
 from silp.models.taxonomy import Asset, Interest, Skill, University
 from silp.models.venture import Venture, VentureMetric, VentureStageChange

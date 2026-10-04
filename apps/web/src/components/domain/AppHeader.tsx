@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { CommandPaletteTrigger } from '@/components/domain/CommandPaletteTrigger';
 import { ImpersonationBanner } from '@/components/domain/ImpersonationBanner';
 import { Logo } from '@/components/domain/Logo';
+import { MessagesLink } from '@/components/domain/MessagesLink';
 import { NotificationBell } from '@/components/domain/NotificationBell';
 import { PointsBadge } from '@/components/domain/PointsBadge';
 import { Button } from '@/components/ui/Button';
@@ -161,6 +162,7 @@ export function AppHeader() {
             ) : (
               <>
                 <PointsBadge />
+                <MessagesLink />
                 <NotificationBell />
                 {displayName && (
                   <Link
