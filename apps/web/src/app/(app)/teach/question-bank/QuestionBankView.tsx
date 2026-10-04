@@ -22,6 +22,7 @@ import {
   type TeachOffering,
   updateBankItem,
 } from '@/lib/api/teach';
+import { type Competency, fetchCompetencies } from '@/lib/api/learning';
 import { useSession } from '@/lib/auth/use-session';
 import { toPersianDigits } from '@/lib/format/digits';
 
@@ -41,6 +42,15 @@ export function QuestionBankView() {
   const [difficulty, setDifficulty] = useState('');
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [competencies, setCompetencies] = useState<Competency[]>([]);
+
+  const concepts = useMemo(
+    () =>
+      competencies.flatMap((comp) =>
+        comp.concepts.map((c): [string, string] => [c.id, `${comp.title_fa} › ${c.title_fa}`]),
+      ),
+    [competencies],
+  );
 
   const courses = useMemo(() => {
     const seen = new Map<string, string>();
@@ -66,6 +76,12 @@ export function QuestionBankView() {
   useEffect(load, [load]);
   useEffect(() => {
     if (!accessToken) return;
+    fetchCompetencies(accessToken)
+      .then(setCompetencies)
+      .catch(() => setCompetencies([]));
+  }, [accessToken]);
+  useEffect(() => {
+    if (!accessToken) return;
     fetchTeachOfferings(accessToken)
       .then(setOfferings)
       .catch(() => setOfferings([]));
@@ -88,6 +104,7 @@ export function QuestionBankView() {
         <NewBankItem
           token={accessToken}
           courses={courses}
+          concepts={concepts}
           onCancel={() => setAdding(false)}
           onAdded={() => {
             setAdding(false);
@@ -158,6 +175,7 @@ export function QuestionBankView() {
                 <BankItemRow
                   item={item}
                   courses={courses}
+                  concepts={concepts}
                   token={accessToken ?? ''}
                   onChanged={load}
                 />
@@ -173,17 +191,20 @@ export function QuestionBankView() {
 function NewBankItem({
   token,
   courses,
+  concepts,
   onCancel,
   onAdded,
 }: {
   token: string;
   courses: [string, string][];
+  concepts: [string, string][];
   onCancel: () => void;
   onAdded: () => void;
 }) {
   const [courseId, setCourseId] = useState(courses[0]?.[0] ?? '');
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('3');
+  const [conceptId, setConceptId] = useState('');
 
   return (
     <Card className="flex flex-col gap-4">
@@ -224,6 +245,20 @@ function NewBankItem({
           </select>
         </Field>
       </div>
+      <Field label="مفهوم (برای چالش روزانه و نقشهٔ مهارت)">
+        <select
+          className={SELECT_CLASS}
+          value={conceptId}
+          onChange={(e) => setConceptId(e.target.value)}
+        >
+          <option value="">بدون مفهوم</option>
+          {concepts.map(([id, title]) => (
+            <option key={id} value={id}>
+              {title}
+            </option>
+          ))}
+        </select>
+      </Field>
       <QuestionEditor
         withPoints={false}
         submitLabel="افزودن به بانک"
@@ -238,6 +273,7 @@ function NewBankItem({
               course_id: courseId || null,
               category: category.trim() || null,
               difficulty: Number(difficulty),
+              concept_id: conceptId || null,
             },
             token,
           );
@@ -251,11 +287,13 @@ function NewBankItem({
 function BankItemRow({
   item,
   courses,
+  concepts,
   token,
   onChanged,
 }: {
   item: BankItem;
   courses: [string, string][];
+  concepts: [string, string][];
   token: string;
   onChanged: () => void;
 }) {
@@ -263,6 +301,7 @@ function BankItemRow({
   const [courseId, setCourseId] = useState(item.course_id ?? '');
   const [category, setCategory] = useState(item.category ?? '');
   const [difficulty, setDifficulty] = useState(String(item.difficulty ?? 3));
+  const [conceptId, setConceptId] = useState(item.concept_id ?? '');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState<'delete' | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -305,6 +344,20 @@ function BankItemRow({
             </select>
           </Field>
         </div>
+        <Field label="مفهوم (برای چالش روزانه و نقشهٔ مهارت)">
+          <select
+            className={SELECT_CLASS}
+            value={conceptId}
+            onChange={(e) => setConceptId(e.target.value)}
+          >
+            <option value="">بدون مفهوم</option>
+            {concepts.map(([id, title]) => (
+              <option key={id} value={id}>
+                {title}
+              </option>
+            ))}
+          </select>
+        </Field>
         <QuestionEditor
           question={{
             id: item.id,
@@ -332,6 +385,7 @@ function BankItemRow({
                 course_id: courseId || null,
                 category: category.trim() || null,
                 difficulty: Number(difficulty),
+                concept_id: conceptId || null,
               },
               token,
             );
@@ -352,6 +406,11 @@ function BankItemRow({
       <span className="flex flex-wrap items-center gap-2 text-[13px]">
         <Badge tone="brand">{item.kind_fa}</Badge>
         {item.category && <Badge tone="neutral">{item.category}</Badge>}
+        {item.concept_id && (
+          <Badge tone="success">
+            {concepts.find(([id]) => id === item.concept_id)?.[1] ?? 'دارای مفهوم'}
+          </Badge>
+        )}
         {item.difficulty && (
           <span className="text-[var(--fg-secondary)]">
             دشواری {toPersianDigits(item.difficulty)} از ۵

@@ -107,7 +107,7 @@ export function AppHeader() {
   }
 
   const extraLinks = [
-    { href: '/', label: 'صفحهٔ اصلی سایت', accent: false },
+    { href: '/', label: 'صفحهٔ اصلی', accent: false },
     canSeeTeach(roles) && { href: '/teach', label: 'تدریس', accent: true },
     canSeeAdmin(roles) && { href: adminHome(roles), label: 'مدیریت', accent: true },
   ].filter((link): link is { href: string; label: string; accent: boolean } => Boolean(link));

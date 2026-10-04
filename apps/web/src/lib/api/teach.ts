@@ -622,6 +622,7 @@ export interface BankItem {
   course_id: string | null;
   category: string | null;
   difficulty: number | null;
+  concept_id: string | null;
   usage_count: number;
 }
 
@@ -647,6 +648,7 @@ export type BankItemInput = Omit<QuestionInput, 'points'> & {
   course_id?: string | null;
   category?: string | null;
   difficulty?: number | null;
+  concept_id?: string | null;
 };
 
 export function addBankItem(body: BankItemInput, token: string) {

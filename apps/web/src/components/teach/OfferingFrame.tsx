@@ -57,6 +57,7 @@ const TABS: { path: string; label: string; needs?: keyof OfferingPermissions }[]
   { path: '/students', label: 'دانشجویان' },
   { path: '/attendance', label: 'حضور و غیاب', needs: 'record_attendance' },
   { path: '/grades', label: 'دفتر نمره', needs: 'manage' },
+  { path: '/lessons', label: 'درس‌نامه و چالش' },
   { path: '/quizzes', label: 'آزمون‌ها' },
   { path: '/announcements', label: 'اعلان‌ها' },
   { path: '/messages', label: 'پیام‌ها' },

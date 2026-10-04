@@ -346,6 +346,7 @@ async def add_bank_item(
         course_id=body.course_id,
         category=body.category,
         difficulty=body.difficulty,
+        concept_id=body.concept_id,
     )
     return _bank_out(item)
 
@@ -372,6 +373,7 @@ async def update_bank_item(
         course_id=body.course_id,
         category=body.category,
         difficulty=body.difficulty,
+        concept_id=body.concept_id,
     )
     return _bank_out(item)
 
@@ -809,6 +811,9 @@ def _draft(body: QuizIn) -> QuizDraft:
         shuffle_options=body.shuffle_options,
         result_visibility=body.result_visibility,
         show_correct_answers=body.show_correct_answers,
+        kind=body.kind,
+        lesson_id=body.lesson_id,
+        draw_count=body.draw_count,
     )
 
 
@@ -849,6 +854,9 @@ def _quiz_out(
         total_points=quiz.total_points,
         results_published_at=quiz.results_published_at,
         attempt_count=attempts,
+        kind=quiz.kind,
+        lesson_id=quiz.lesson_id,
+        draw_count=quiz.draw_count,
         questions=[_question_out(q) for q in (questions or [])],
     )
 
@@ -878,6 +886,7 @@ def _bank_out(item: object) -> BankItemOut:
         course_id=item.course_id,  # type: ignore[attr-defined]
         category=item.category,  # type: ignore[attr-defined]
         difficulty=item.difficulty,  # type: ignore[attr-defined]
+        concept_id=item.concept_id,  # type: ignore[attr-defined]
         usage_count=item.usage_count,  # type: ignore[attr-defined]
     )
 

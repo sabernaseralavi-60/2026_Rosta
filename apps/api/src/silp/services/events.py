@@ -45,6 +45,7 @@ LISTENER_MODULES: tuple[str, ...] = (
     "silp.services.point_listeners",
     "silp.services.certificate_listeners",
     "silp.services.notification_listeners",
+    "silp.services.learning_listeners",
 )
 
 #: خطای شنونده بالا بیاید؟ فقط در تست روشن می‌شود.

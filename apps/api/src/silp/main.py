@@ -35,14 +35,15 @@ from silp.routers.v1 import (
     ideas,
     inbox,
     intake,
+    learning,
     me,
+    messaging,
     notifications,
     projects,
     public,
     qa,
     quizzes,
     research,
-    messaging,
     roster,
     search,
     subscriptions,
@@ -182,6 +183,7 @@ def _register_routers(app: FastAPI) -> None:
     v1.include_router(intake.router)
     v1.include_router(roster.router)
     v1.include_router(messaging.router)
+    v1.include_router(learning.router)
     v1.include_router(inbox.admin_router)
     v1.include_router(inbox.me_router)
     v1.include_router(inbox.public_router)

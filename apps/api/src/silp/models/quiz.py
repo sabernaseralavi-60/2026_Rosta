@@ -132,6 +132,13 @@ class Quiz(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     created_by: Mapped[uuid.UUID | None] = mapped_column(
         PGUUID(as_uuid=True), ForeignKey("users.id")
     )
+    #: ADR-0036 — `CHECKPOINT` = چالش روزانه (بی‌نمرهٔ رسمی، فقط امتیاز و شایستگی).
+    kind: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'QUIZ'"))
+    lesson_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("lessons.id", ondelete="SET NULL")
+    )
+    #: اگر مقدار داشته باشد هر تلاش این‌قدر سؤال از استخر می‌گیرد.
+    draw_count: Mapped[int | None] = mapped_column(Integer)
 
     questions: Mapped[list[QuizQuestion]] = relationship(
         back_populates="quiz",
@@ -150,6 +157,11 @@ class Quiz(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
             _in_list("result_visibility", RESULT_VISIBILITIES), name="result_visibility_valid"
         ),
         CheckConstraint(_in_list("status", QUIZ_STATUSES), name="status_valid"),
+        CheckConstraint("kind IN ('EXAM', 'QUIZ', 'CHECKPOINT')", name="kind_valid"),
+        CheckConstraint(
+            "draw_count IS NULL OR draw_count BETWEEN 1 AND 100", name="draw_count_range"
+        ),
+        Index("idx_quizzes_lesson", "lesson_id", postgresql_where=text("lesson_id IS NOT NULL")),
         Index("idx_quizzes_offering", "offering_id", "status"),
         Index("idx_quizzes_week", "week_id", postgresql_where=text("week_id IS NOT NULL")),
         Index(
@@ -194,6 +206,9 @@ class QuestionBankItem(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Bas
     )
     explanation: Mapped[str | None] = mapped_column(Text)
     usage_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    concept_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("concepts.id", ondelete="SET NULL")
+    )
 
     __table_args__ = (
         CheckConstraint(_in_list("kind", QUESTION_KINDS), name="kind_valid"),
@@ -237,6 +252,10 @@ class QuizQuestion(UUIDPrimaryKeyMixin, Base):
     explanation: Mapped[str | None] = mapped_column(Text)
     points: Mapped[Decimal] = mapped_column(Numeric(5, 2), nullable=False, server_default=text("1"))
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    #: کپی منجمد هنگام کپی از بانک (ADR-0007)؛ ویرایش بعدیِ نقشه تاریخچه را عوض نمی‌کند.
+    concept_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("concepts.id", ondelete="SET NULL")
+    )
 
     quiz: Mapped[Quiz] = relationship(back_populates="questions")
 
@@ -245,6 +264,11 @@ class QuizQuestion(UUIDPrimaryKeyMixin, Base):
         CheckConstraint("points > 0", name="points_positive"),
         CheckConstraint("jsonb_typeof(payload) = 'object'", name="payload_is_object"),
         Index("idx_quiz_questions_quiz", "quiz_id", "sort_order"),
+        Index(
+            "idx_quiz_questions_concept",
+            "concept_id",
+            postgresql_where=text("concept_id IS NOT NULL"),
+        ),
     )
 
 

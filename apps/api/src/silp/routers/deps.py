@@ -45,6 +45,8 @@ from silp.services.enrollment_service import EnrollmentService
 from silp.services.entitlement_service import EntitlementService
 from silp.services.file_service import FileService
 from silp.services.grading_service import GradingService
+from silp.services.learning_service import LearningService
+from silp.services.messaging_service import MessagingService
 from silp.services.otp_service import OTPService
 from silp.services.peer_evaluation_service import PeerEvaluationService
 from silp.services.profile_service import ProfileService
@@ -52,7 +54,6 @@ from silp.services.progress_service import ProgressService
 from silp.services.project_service import ProjectService
 from silp.services.quiz_service import QuizService
 from silp.services.reflection_service import ReflectionService
-from silp.services.messaging_service import MessagingService
 from silp.services.roster_service import RosterService
 from silp.services.subscription_service import SubscriptionService
 from silp.services.teaching_service import TeachingService
@@ -153,6 +154,10 @@ def get_roster_service(session: SessionDep, settings: SettingsDep) -> RosterServ
     return RosterService(session, settings)
 
 
+def get_learning_service(session: SessionDep) -> LearningService:
+    return LearningService(session)
+
+
 def get_messaging_service(session: SessionDep) -> MessagingService:
     return MessagingService(session)
 
@@ -210,6 +215,7 @@ CourseServiceDep = Annotated[CourseService, Depends(get_course_service)]
 EnrollmentServiceDep = Annotated[EnrollmentService, Depends(get_enrollment_service)]
 RosterServiceDep = Annotated[RosterService, Depends(get_roster_service)]
 MessagingServiceDep = Annotated[MessagingService, Depends(get_messaging_service)]
+LearningServiceDep = Annotated[LearningService, Depends(get_learning_service)]
 EntitlementServiceDep = Annotated[EntitlementService, Depends(get_entitlement_service)]
 ProgressServiceDep = Annotated[ProgressService, Depends(get_progress_service)]
 TeachingServiceDep = Annotated[TeachingService, Depends(get_teaching_service)]
@@ -506,6 +512,7 @@ __all__ = [
     "OptionalUserDep",
     "PeerEvaluationServiceDep",
     "ProfileServiceDep",
+    "LearningServiceDep",
     "ProgressServiceDep",
     "ProjectServiceDep",
     "ReflectionServiceDep",

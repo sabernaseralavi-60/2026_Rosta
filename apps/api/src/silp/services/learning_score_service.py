@@ -128,6 +128,7 @@ class LearningScoreService:
                     Quiz.offering_id == offering_id,
                     Quiz.status.in_(("PUBLISHED", "CLOSED")),
                     Quiz.deleted_at.is_(None),
+                    Quiz.kind != "CHECKPOINT",
                     Quiz.total_points > 0,
                 )
             )

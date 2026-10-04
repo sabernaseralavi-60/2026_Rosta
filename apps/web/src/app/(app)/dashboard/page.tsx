@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { TodaySection } from '@/components/learning/TodaySection';
+
 import { DashboardView } from './DashboardView';
 import { MyWork } from './MyWork';
 import { OnboardingNotice } from './OnboardingNotice';
@@ -22,11 +24,10 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-1">
         <h1>داشبورد</h1>
-        <p className="text-[15px] text-[var(--fg-secondary)]">
-          اینجا مسیر رشدت را دنبال می‌کنی.
-        </p>
+        <p className="text-[15px] text-[var(--fg-secondary)]">اینجا مسیر رشدت را دنبال می‌کنی.</p>
       </div>
 
+      <TodaySection />
       <DashboardView />
       <MyWork />
       <OnboardingNotice />

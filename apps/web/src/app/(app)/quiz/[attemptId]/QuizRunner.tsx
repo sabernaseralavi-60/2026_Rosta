@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { ExamWatermark } from '@/components/domain/ExamWatermark';
 import { QuestionField } from '@/components/domain/QuestionField';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -78,7 +79,7 @@ const SYNC_TONE: Record<SyncState, 'success' | 'neutral' | 'warning'> = {
 
 export function QuizRunner({ attemptId }: { attemptId: string }) {
   const router = useRouter();
-  const { accessToken, loading: sessionLoading } = useSession();
+  const { session, accessToken, loading: sessionLoading } = useSession();
 
   const [attempt, setAttempt] = useState<AttemptView | null>(null);
   const [answers, setAnswers] = useState<Record<string, AnswerResponse | null>>({});
@@ -348,8 +349,31 @@ export function QuizRunner({ attemptId }: { attemptId: string }) {
   const level = levelFor(seconds);
   const readOnly = attempt.status !== 'IN_PROGRESS' || seconds <= 0;
 
+  // ADR-0036 §۴ — «حالت آزمون»: در طول تلاش کپی و انتخاب متن سؤال بسته است و واترمارک
+  // نام دانشجو را نشان می‌دهد. جعبهٔ نوشتن (پاسخ تشریحی) آزاد می‌ماند. بعد از ارسال،
+  // صفحهٔ نتیجه («حالت مرور») همه‌چیز را قابل کپی می‌گذارد.
+  const lock = attempt.status === 'IN_PROGRESS' && !readOnly;
+  const blockCopy = (event: React.ClipboardEvent<HTMLDivElement>) => {
+    if (!lock) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('textarea, input')) return;
+    event.preventDefault();
+  };
+  const watermarkLabel = session?.user.display_name ?? session?.user.username ?? 'دانشجو';
+
   return (
-    <div className="space-y-4">
+    <div
+      className={cn('space-y-4', lock && '[&_*:not(textarea):not(input)]:select-none')}
+      onCopy={blockCopy}
+      onCut={blockCopy}
+      onContextMenu={(event) => {
+        if (lock && !(event.target as HTMLElement).closest('textarea, input')) {
+          event.preventDefault();
+        }
+      }}
+      data-exam-lock={lock ? 'on' : 'off'}
+    >
+      {lock && <ExamWatermark label={watermarkLabel} />}
       {/* ── سربرگ: زمان‌سنج و نشانگر همگام‌سازی ── */}
       <Card className="flex flex-wrap items-center justify-between gap-3 p-4">
         <div>

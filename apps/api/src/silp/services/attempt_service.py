@@ -50,6 +50,7 @@ from silp.core.exceptions import (
     ValidationFailed,
 )
 from silp.core.logging import get_logger
+from silp.domain.learning import draw_questions
 from silp.domain.quiz import (
     AUTO_GRADED_KINDS,
     CHOICE_KINDS,
@@ -175,13 +176,17 @@ class AttemptService:
             case QuizAvailability.AVAILABLE:
                 pass
 
-        question_ids = list(
-            await self.session.scalars(
-                select(QuizQuestion.id)
-                .where(QuizQuestion.quiz_id == quiz_id)
-                .order_by(QuizQuestion.sort_order, QuizQuestion.id)
-            )
-        )
+        pool = [
+            (row[0], row[1])
+            for row in (
+                await self.session.execute(
+                    select(QuizQuestion.id, QuizQuestion.concept_id)
+                    .where(QuizQuestion.quiz_id == quiz_id)
+                    .order_by(QuizQuestion.sort_order, QuizQuestion.id)
+                )
+            ).all()
+        ]
+        question_ids = [qid for qid, _ in pool]
         if not question_ids:
             raise NotFound("این آزمون هنوز سؤالی ندارد.")
 
@@ -196,6 +201,11 @@ class AttemptService:
             expires_at=expires_at,
         )
         # ترتیب پس از درج تولید می‌شود چون دانه‌اش شناسهٔ همان تلاش است.
+        # ADR-0036 — با `draw_count` هر تلاش n سؤال از استخر می‌گیرد، برابر میان مفاهیم؛
+        # دانه شناسهٔ تلاش است، پس مجموعهٔ هر دانشجو متفاوت و با رفرش ثابت می‌ماند.
+        if quiz.draw_count is not None and quiz.draw_count < len(pool):
+            drawn = set(draw_questions(pool, quiz.draw_count, seed=attempt.id))
+            question_ids = [qid for qid in question_ids if qid in drawn]
         attempt.question_order = question_order(
             question_ids, attempt_id=attempt.id, shuffle=quiz.shuffle_questions
         )

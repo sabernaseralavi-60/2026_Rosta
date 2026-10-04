@@ -40,6 +40,7 @@ from silp.core.exceptions import (
 from silp.core.logging import get_logger
 from silp.domain.quiz import InvalidQuestionPayload, validate_payload
 from silp.models.education import CourseOffering, CourseWeek
+from silp.models.learning import Concept, Lesson
 from silp.models.quiz import (
     MAX_ATTEMPTS,
     MAX_DURATION_MIN,
@@ -58,6 +59,11 @@ MAX_QUESTIONS_PER_QUIZ = 200
 MAX_BANK_PICK = 100
 
 
+QUIZ_KINDS = ("EXAM", "QUIZ", "CHECKPOINT")
+CHECKPOINT_MAX_MINUTES = 30
+CHECKPOINT_MAX_QUESTIONS = 30
+
+
 @dataclass(frozen=True, slots=True)
 class QuizDraft:
     title_fa: str
@@ -72,6 +78,9 @@ class QuizDraft:
     shuffle_options: bool = True
     result_visibility: str = "AFTER_CLOSE"
     show_correct_answers: bool = True
+    kind: str = "QUIZ"
+    lesson_id: uuid.UUID | None = None
+    draw_count: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -132,6 +141,7 @@ class QuizService:
         _validate_draft(draft)
         if draft.week_id is not None:
             await self._require_week_of(draft.week_id, offering_id)
+        await self._require_lesson_of(draft.lesson_id, offering_id)
 
         quiz = Quiz(
             offering_id=offering_id,
@@ -147,6 +157,9 @@ class QuizService:
             shuffle_options=draft.shuffle_options,
             result_visibility=draft.result_visibility,
             show_correct_answers=draft.show_correct_answers,
+            kind=draft.kind,
+            lesson_id=draft.lesson_id,
+            draw_count=draft.draw_count,
             status="DRAFT",
             created_by=created_by,
         )
@@ -161,6 +174,7 @@ class QuizService:
         _validate_draft(draft)
         if draft.week_id is not None:
             await self._require_week_of(draft.week_id, offering_id)
+        await self._require_lesson_of(draft.lesson_id, offering_id)
 
         # مدت آزمون پس از شروع اولین تلاش عوض نمی‌شود: `expires_at` هر
         # تلاش در لحظهٔ شروع قفل شده (§7.3 قاعدهٔ ۱)، پس تغییر مدت فقط
@@ -181,6 +195,11 @@ class QuizService:
         quiz.shuffle_options = draft.shuffle_options
         quiz.result_visibility = draft.result_visibility
         quiz.show_correct_answers = draft.show_correct_answers
+        quiz.lesson_id = draft.lesson_id
+        if draft.draw_count != quiz.draw_count:
+            if await self._has_attempts(quiz_id):
+                raise QuizHasAttempts("اندازهٔ استخر آزمونی که تلاش ثبت‌شده دارد قابل تغییر نیست.")
+            quiz.draw_count = draft.draw_count
 
         await self.session.commit()
         await self.session.refresh(quiz)
@@ -198,6 +217,8 @@ class QuizService:
         )
         if not count:
             raise QuizHasNoQuestions()
+        if quiz.draw_count is not None:
+            await self._require_valid_pool(quiz, count)
 
         quiz.status = "PUBLISHED"
         await events.publish(self.session, events.QuizPublished(quiz_id=quiz.id))
@@ -315,8 +336,11 @@ class QuizService:
         course_id: uuid.UUID | None = None,
         category: str | None = None,
         difficulty: int | None = None,
+        concept_id: uuid.UUID | None = None,
     ) -> QuestionBankItem:
         _validate_question(draft)
+        if concept_id is not None and await self.session.get(Concept, concept_id) is None:
+            raise NotFound("مفهوم پیدا نشد.")
         if difficulty is not None and not 1 <= difficulty <= 5:
             raise ValidationFailed("سطح دشواری باید بین ۱ تا ۵ باشد.")
 
@@ -329,6 +353,7 @@ class QuizService:
             body=draft.body.strip(),
             payload=draft.payload,
             explanation=draft.explanation,
+            concept_id=concept_id,
         )
         self.session.add(item)
         await self.session.commit()
@@ -344,6 +369,7 @@ class QuizService:
         course_id: uuid.UUID | None = None,
         category: str | None = None,
         difficulty: int | None = None,
+        concept_id: uuid.UUID | None = None,
     ) -> QuestionBankItem:
         """جایگزینی کامل سؤال بانک — ADR-0021.
 
@@ -357,6 +383,9 @@ class QuizService:
         item.course_id = course_id
         item.category = category.strip() if category else None
         item.difficulty = difficulty
+        if concept_id is not None and await self.session.get(Concept, concept_id) is None:
+            raise NotFound("مفهوم پیدا نشد.")
+        item.concept_id = concept_id
         item.kind = draft.kind
         item.body = draft.body.strip()
         item.payload = draft.payload
@@ -450,6 +479,7 @@ class QuizService:
                 explanation=item.explanation,
                 points=points,
                 sort_order=start + index,
+                concept_id=item.concept_id,
             )
             self.session.add(question)
             created.append(question)
@@ -500,6 +530,107 @@ class QuizService:
         return await self.copy_from_bank(
             quiz_id=quiz_id, offering_id=offering_id, bank_ids=chosen, points=points
         )
+
+    # ── چالش روزانه — ADR-0036 ─────────────────────────────────────────
+    async def create_checkpoint(
+        self,
+        *,
+        offering_id: uuid.UUID,
+        created_by: uuid.UUID,
+        title_fa: str,
+        lesson_id: uuid.UUID | None,
+        concept_ids: list[uuid.UUID],
+        draw_count: int,
+        opens_at: datetime,
+        closes_at: datetime,
+        duration_min: int,
+        publish: bool,
+    ) -> Quiz:
+        """چالش روزانه: استخر از بانک (مفاهیم انتخابی)، هر تلاش `draw_count` سؤال.
+
+        سؤال‌های استخر **کپی** می‌شوند (نمرهٔ یکسان ۱)؛ ویرایش بعدی بانک چالشِ برگزارشده را
+        عوض نمی‌کند. دانشجو آزمونی بی‌نمرهٔ رسمی می‌بیند که فقط XP و شایستگی می‌سازد.
+        """
+        if not concept_ids:
+            raise ValidationFailed("دست‌کم یک مفهوم برای چالش لازم است.")
+        if not 1 <= duration_min <= CHECKPOINT_MAX_MINUTES:
+            raise ValidationFailed(f"مدت چالش باید بین ۱ تا {CHECKPOINT_MAX_MINUTES} دقیقه باشد.")
+        if not 1 <= draw_count <= CHECKPOINT_MAX_QUESTIONS:
+            raise ValidationFailed(
+                f"تعداد سؤال هر تلاش باید بین ۱ تا {CHECKPOINT_MAX_QUESTIONS} باشد."
+            )
+        pool = list(
+            await self.session.scalars(
+                select(QuestionBankItem.id)
+                .where(
+                    QuestionBankItem.concept_id.in_(concept_ids),
+                    QuestionBankItem.deleted_at.is_(None),
+                )
+                .order_by(QuestionBankItem.id)
+                .limit(MAX_QUESTIONS_PER_QUIZ)
+            )
+        )
+        if len(pool) < draw_count:
+            raise Conflict(
+                f"بانک برای این مفاهیم فقط {len(pool)} سؤال دارد؛ {draw_count} سؤال خواسته شد.",
+                code="POOL_TOO_SMALL",
+            )
+        quiz = await self.create(
+            offering_id=offering_id,
+            created_by=created_by,
+            draft=QuizDraft(
+                title_fa=title_fa,
+                duration_min=duration_min,
+                opens_at=opens_at,
+                closes_at=closes_at,
+                max_attempts=1,
+                passing_score=None,
+                result_visibility="AFTER_CLOSE",
+                show_correct_answers=True,
+                kind="CHECKPOINT",
+                lesson_id=lesson_id,
+                draw_count=draw_count,
+            ),
+        )
+        await self.copy_from_bank(
+            quiz_id=quiz.id, offering_id=offering_id, bank_ids=pool, points=Decimal(1)
+        )
+        if publish:
+            return await self.publish(quiz_id=quiz.id, offering_id=offering_id)
+        await self.session.refresh(quiz)
+        return quiz
+
+    async def _require_lesson_of(self, lesson_id: uuid.UUID | None, offering_id: uuid.UUID) -> None:
+        if lesson_id is None:
+            return
+        found = await self.session.scalar(
+            select(Lesson.id).where(Lesson.id == lesson_id, Lesson.offering_id == offering_id)
+        )
+        if found is None:
+            raise NotFound("درس‌نامهٔ خواسته‌شده در این ارائه نیست.")
+
+    async def _require_valid_pool(self, quiz: Quiz, count: int) -> None:
+        """استخر: همهٔ سؤال‌ها نمرهٔ یکسان، و دست‌کم `draw_count` سؤال.
+
+        وگرنه جمع نمرهٔ یک تلاش به سؤال‌هایی که قرعه می‌خورند بستگی می‌داشت و درصد دانشجویان
+        قابل‌مقایسه نبود (`quizzes.total_points` برای استخر `draw_count × نمرهٔ هر سؤال` است).
+        """
+        assert quiz.draw_count is not None
+        if count < quiz.draw_count:
+            raise Conflict(
+                f"استخر {count} سؤال دارد ولی هر تلاش {quiz.draw_count} سؤال می‌گیرد.",
+                code="POOL_TOO_SMALL",
+            )
+        distinct = await self.session.scalar(
+            select(func.count(func.distinct(QuizQuestion.points))).where(
+                QuizQuestion.quiz_id == quiz.id
+            )
+        )
+        if (distinct or 0) > 1:
+            raise Conflict(
+                "در آزمونِ دارای استخر، همهٔ سؤال‌ها باید نمرهٔ یکسان داشته باشند.",
+                code="POOL_POINTS_MIXED",
+            )
 
     # ── کمکی ───────────────────────────────────────────────────────────
     def _build_question(
@@ -564,6 +695,10 @@ def _validate_draft(draft: QuizDraft) -> None:
         raise ValidationFailed("نحوهٔ نمایش نتیجه معتبر نیست.")
     if draft.passing_score is not None and draft.passing_score < 0:
         raise ValidationFailed("نمرهٔ قبولی نمی‌تواند منفی باشد.")
+    if draft.kind not in QUIZ_KINDS:
+        raise ValidationFailed("نوع آزمون معتبر نیست.")
+    if draft.draw_count is not None and not 1 <= draft.draw_count <= 100:
+        raise ValidationFailed("اندازهٔ قرعه از استخر باید بین ۱ تا ۱۰۰ باشد.")
 
 
 def _validate_question(draft: QuestionDraft) -> None:

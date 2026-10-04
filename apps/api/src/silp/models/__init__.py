@@ -89,6 +89,16 @@ from silp.models.research import (
     ResearchTrack,
 )
 from silp.models.conversation import Conversation, ConversationMember, Message
+from silp.models.learning import (
+    CheckpointResult,
+    Competency,
+    CompetencyMastery,
+    Concept,
+    Lesson,
+    Module,
+    Streak,
+    Topic,
+)
 from silp.models.roster import RosterClaim, RosterEntry
 from silp.models.taxonomy import Asset, Interest, Skill, University
 from silp.models.venture import Venture, VentureMetric, VentureStageChange

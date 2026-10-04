@@ -348,7 +348,8 @@ async def on_quiz_graded(session: AsyncSession, event: events.QuizGraded) -> Non
     if attempt is None:
         return
     quiz = await session.get(Quiz, attempt.quiz_id)
-    if quiz is None:
+    if quiz is None or quiz.kind == "CHECKPOINT":
+        # چالش روزانه نمرهٔ رسمی نیست؛ امتیازش از `learning_listeners` می‌آید (ADR-0036).
         return
     await LearningPoints(session).reconcile_quiz(student_id=attempt.student_id, quiz=quiz)
 
@@ -358,7 +359,7 @@ async def on_quiz_results_published(
     session: AsyncSession, event: events.QuizResultsPublished
 ) -> None:
     quiz = await session.get(Quiz, event.quiz_id)
-    if quiz is None:
+    if quiz is None or quiz.kind == "CHECKPOINT":
         return
     learning = LearningPoints(session)
     students = await session.scalars(

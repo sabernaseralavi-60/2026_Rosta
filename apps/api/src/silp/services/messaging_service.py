@@ -166,7 +166,9 @@ class MessagingService:
         await self._offering(offering_id)
         if not await self.is_staff(actor, offering_id):
             raise PermissionDenied()
-        return await self._channel(offering_id, actor.id)
+        conv = await self._channel(offering_id, actor.id)
+        await self.session.commit()
+        return conv
 
     async def _add_member(self, conv_id: uuid.UUID, user_id: uuid.UUID, role: str) -> None:
         await self.session.execute(
@@ -206,6 +208,7 @@ class MessagingService:
         assert conv is not None
         await self._add_member(conv.id, student_id, "STUDENT")
         await self._add_member(conv.id, actor.id, "STAFF")
+        await self.session.commit()
         return conv
 
     # ── دسترسی به یک گفت‌وگو ───────────────────────────────────────────
@@ -251,6 +254,7 @@ class MessagingService:
                 raise Conflict("پیام مرجع در این گفت‌وگو نیست.", code="REPLY_INVALID")
         message = await self._post(conv, actor.id, role, text, reply_to_id)
         await self._notify(conv, actor.id, text)
+        await self.session.commit()
         return message
 
     async def _post(
@@ -328,6 +332,7 @@ class MessagingService:
             conv = await self._channel(offering_id, actor.id)
             await self._post(conv, actor.id, "STAFF", text, None)
             await self._notify(conv, actor.id, text)
+            await self.session.commit()
             count = await self.session.scalar(
                 select(func.count())
                 .select_from(Enrollment)
@@ -351,6 +356,7 @@ class MessagingService:
             await self._post(conv, actor.id, "STAFF", text, None)
             await self._notify(conv, actor.id, text)
             sent += 1
+        await self.session.commit()
         return SendResult(sent=sent, skipped_no_account=skipped)
 
     async def _unclaimed(self, offering_id: uuid.UUID) -> int:
@@ -409,6 +415,7 @@ class MessagingService:
             )
             .values(last_read_at=datetime.now(UTC))
         )
+        await self.session.commit()
 
     async def delete_message(self, actor: CurrentUser, message_id: uuid.UUID) -> None:
         """حذف نرم؛ فقط فرستنده یا کادر."""
@@ -419,6 +426,7 @@ class MessagingService:
         if message.sender_id != actor.id and role != "STAFF":
             raise PermissionDenied()
         message.deleted_at = datetime.now(UTC)
+        await self.session.commit()
 
     async def inbox(self, actor: CurrentUser) -> list[ConversationSummary]:
         """گفت‌وگوهای کاربر: مستقیم‌های خودش + کانال درس‌هایی که در آن‌هاست."""

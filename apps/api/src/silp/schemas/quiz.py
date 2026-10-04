@@ -240,6 +240,9 @@ class QuizIn(BaseModel):
     shuffle_options: bool = True
     result_visibility: ResultVisibility = "AFTER_CLOSE"
     show_correct_answers: bool = True
+    kind: Literal["EXAM", "QUIZ", "CHECKPOINT"] = "QUIZ"
+    lesson_id: uuid.UUID | None = None
+    draw_count: Annotated[int | None, Field(ge=1, le=100)] = None
 
 
 class QuestionIn(BaseModel):
@@ -290,6 +293,9 @@ class QuizDetailOut(BaseModel):
     total_points: Decimal
     results_published_at: datetime | None = None
     attempt_count: int = 0
+    kind: Literal["EXAM", "QUIZ", "CHECKPOINT"] = "QUIZ"
+    lesson_id: uuid.UUID | None = None
+    draw_count: int | None = None
     questions: list[QuestionOut] = Field(default_factory=list)
 
 
@@ -305,6 +311,7 @@ class BankItemIn(BaseModel):
     course_id: uuid.UUID | None = None
     category: Annotated[str | None, Field(max_length=MAX_TITLE)] = None
     difficulty: Annotated[int | None, Field(ge=1, le=5)] = None
+    concept_id: uuid.UUID | None = None
 
 
 class BankItemOut(BaseModel):
@@ -320,6 +327,7 @@ class BankItemOut(BaseModel):
     course_id: uuid.UUID | None = None
     category: str | None = None
     difficulty: int | None = None
+    concept_id: uuid.UUID | None = None
     usage_count: int
 
 
