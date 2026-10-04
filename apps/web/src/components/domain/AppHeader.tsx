@@ -106,6 +106,7 @@ export function AppHeader() {
   }
 
   const extraLinks = [
+    { href: '/', label: 'صفحهٔ اصلی سایت', accent: false },
     canSeeTeach(roles) && { href: '/teach', label: 'تدریس', accent: true },
     canSeeAdmin(roles) && { href: adminHome(roles), label: 'مدیریت', accent: true },
   ].filter((link): link is { href: string; label: string; accent: boolean } => Boolean(link));
@@ -125,7 +126,11 @@ export function AppHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
+                  aria-current={
+                    (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href))
+                      ? 'page'
+                      : undefined
+                  }
                   className="whitespace-nowrap text-[13.5px] text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)] aria-[current=page]:font-semibold aria-[current=page]:text-[var(--fg-brand)]"
                 >
                   {item.label}
@@ -135,7 +140,11 @@ export function AppHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
+                  aria-current={
+                    (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href))
+                      ? 'page'
+                      : undefined
+                  }
                   className="whitespace-nowrap text-[13.5px] font-medium text-[var(--fg-accent)] hover:underline"
                 >
                   {item.label}
@@ -189,7 +198,11 @@ export function AppHeader() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
+                    aria-current={
+                      (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href))
+                        ? 'page'
+                        : undefined
+                    }
                     className="flex h-12 items-center text-[15px] font-medium text-[var(--fg-primary)] aria-[current=page]:font-semibold aria-[current=page]:text-[var(--fg-brand)]"
                   >
                     {item.label}

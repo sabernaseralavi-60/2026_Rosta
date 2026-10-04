@@ -104,14 +104,12 @@ function PasswordLogin() {
   return (
     <form onSubmit={submit} noValidate className="flex flex-col gap-5">
       <Input
-        label="شمارهٔ موبایل"
+        label="موبایل یا نام کاربری"
         name="mobile"
-        type="tel"
-        inputMode="tel"
         autoComplete="username"
         autoFocus
         forceLtr
-        maxLength={16}
+        maxLength={64}
         value={mobile}
         onChange={(event) => setMobile(event.target.value)}
         placeholder="09121234567"

@@ -118,6 +118,13 @@ class AuthService:
             )
 
         user = await self._find_by_identifier(normalized) if normalized else None
+        if user is None and not normalized and self.settings.is_development:
+            # فقط توسعه: ورود مالک با نام کاربری (مثلاً حساب آزمون `saber`).
+            user = await self.session.scalar(
+                select(User).where(
+                    User.username == identifier.strip().lower(), User.deleted_at.is_(None)
+                )
+            )
         password_hash = user.password_hash if user else None
 
         if not verify_password(password, password_hash) or user is None:
